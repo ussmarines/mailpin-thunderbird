@@ -1,0 +1,37 @@
+name: Rapport de bug
+description: Signaler un comportement reproductible
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Version de l’extension
+    validations:
+      required: true
+  - type: input
+    id: thunderbird
+    attributes:
+      label: Thunderbird et système
+    validations:
+      required: true
+  - type: dropdown
+    id: account
+    attributes:
+      label: Type de compte
+      options: [IMAP, POP, Gmail, Exchange, Local, Autre]
+  - type: textarea
+    id: steps
+    attributes:
+      label: Étapes de reproduction
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: Résultat observé et attendu
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Journaux expurgés
+      description: Ne joindre aucun message, adresse privée, profil ou secret.

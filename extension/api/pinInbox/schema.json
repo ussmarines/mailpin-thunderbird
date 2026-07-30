@@ -1,0 +1,503 @@
+[
+  {
+    "namespace": "pinInbox",
+    "description": "Panneau local avancé de messages épinglés, stockage structuré, rappels, règles et agenda.",
+    "functions": [
+      {
+        "name": "setup",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "tabId",
+            "type": "integer"
+          }
+        ]
+      },
+      {
+        "name": "toggleSelected",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "tabId",
+            "type": "integer"
+          },
+          {
+            "name": "forceState",
+            "type": "boolean",
+            "optional": true
+          }
+        ]
+      },
+      {
+        "name": "toggleConversationSelected",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "tabId",
+            "type": "integer"
+          },
+          {
+            "name": "forceState",
+            "type": "boolean",
+            "optional": true
+          }
+        ]
+      },
+      {
+        "name": "toggleDisplayed",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "tabId",
+            "type": "integer"
+          },
+          {
+            "name": "forceState",
+            "type": "boolean",
+            "optional": true
+          }
+        ]
+      },
+      {
+        "name": "getSelectionState",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "tabId",
+            "type": "integer"
+          }
+        ]
+      },
+      {
+        "name": "performSelected",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "tabId",
+            "type": "integer"
+          },
+          {
+            "name": "action",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "name": "getConfiguration",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "setConfiguration",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "configuration",
+            "type": "object"
+          }
+        ]
+      },
+      {
+        "name": "exportConfiguration",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "importConfiguration",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "configuration",
+            "type": "object"
+          }
+        ]
+      },
+      {
+        "name": "resetConfiguration",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "cleanupBroken",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "rescanPinned",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "undoLast",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "repairReferences",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "resetInterface",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "importNativeStars",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "clearStars",
+            "type": "boolean",
+            "optional": true
+          }
+        ]
+      },
+      {
+        "name": "getDiagnosticReport",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "getDashboardData",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "options",
+            "type": "object",
+            "optional": true
+          }
+        ]
+      },
+      {
+        "name": "openReference",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "stableKey",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "name": "performReferenceAction",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "stableKeys",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "action",
+            "type": "string"
+          },
+          {
+            "name": "options",
+            "type": "object",
+            "optional": true
+          }
+        ]
+      },
+      {
+        "name": "getCalendars",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "createCalendarItem",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "stableKey",
+            "type": "string"
+          },
+          {
+            "name": "itemType",
+            "type": "string",
+            "optional": true
+          },
+          {
+            "name": "calendarId",
+            "type": "string",
+            "optional": true
+          }
+        ]
+      },
+      {
+        "name": "createCaseCalendarItem",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "caseId",
+            "type": "string"
+          },
+          {
+            "name": "itemType",
+            "type": "string",
+            "optional": true
+          },
+          {
+            "name": "calendarId",
+            "type": "string",
+            "optional": true
+          }
+        ]
+      },
+      {
+        "name": "snoozeReminder",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "stableKey",
+            "type": "string"
+          },
+          {
+            "name": "durationMs",
+            "type": "number"
+          }
+        ]
+      },
+      {
+        "name": "runCompatibilityCheck",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "getPerformanceReport",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "checkStorageIntegrity",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "runBackup",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "reason",
+            "type": "string",
+            "optional": true
+          }
+        ]
+      },
+      {
+        "name": "getBackupStatus",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "chooseBackupDirectory",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "simulateRules",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "options",
+            "type": "object",
+            "optional": true
+          }
+        ]
+      },
+      {
+        "name": "clearRuleLog",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "getCases",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "getTemplates",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "getHistory",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "options",
+            "type": "object",
+            "optional": true
+          }
+        ]
+      },
+      {
+        "name": "setWorkflowStatus",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "stableKeys",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "type": "string"
+          },
+          {
+            "name": "options",
+            "type": "object",
+            "optional": true
+          }
+        ]
+      },
+      {
+        "name": "createCase",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "details",
+            "type": "object"
+          }
+        ]
+      },
+      {
+        "name": "updateCase",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "caseId",
+            "type": "string"
+          },
+          {
+            "name": "details",
+            "type": "object"
+          }
+        ]
+      },
+      {
+        "name": "deleteCase",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "caseId",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "name": "createTemplate",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "details",
+            "type": "object"
+          }
+        ]
+      },
+      {
+        "name": "updateTemplate",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "templateId",
+            "type": "string"
+          },
+          {
+            "name": "details",
+            "type": "object"
+          }
+        ]
+      },
+      {
+        "name": "deleteTemplate",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "templateId",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "name": "applyTemplate",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "stableKeys",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "templateId",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "name": "syncCalendarLinks",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      }
+    ],
+    "events": [
+      {
+        "name": "onDashboardRequested",
+        "type": "function",
+        "description": "Émis lorsque l’interface privilégiée demande l’ouverture du tableau de bord.",
+        "parameters": []
+      }
+    ]
+  }
+]

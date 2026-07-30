@@ -1,0 +1,68 @@
+{
+  "extensionName": {
+    "message": "Épingles Outlook pour Thunderbird"
+  },
+  "extensionShortName": {
+    "message": "Épingles"
+  },
+  "extensionDescription": {
+    "message": "Panneau complet avec épingles indépendantes, suivi des réponses, affaires, Kanban, rappels, règles, Agenda, historique et sauvegardes locales."
+  },
+  "messageDisplayActionTitle": {
+    "message": "Épingler ou désépingler ce message"
+  },
+  "dashboardActionTitle": {
+    "message": "Tableau de bord des Épingles Outlook"
+  },
+  "commandWait": {
+    "message": "Placer les épingles sélectionnées en attente"
+  },
+  "commandPlan": {
+    "message": "Planifier les épingles sélectionnées"
+  },
+  "commandActivate": {
+    "message": "Remettre les épingles sélectionnées à traiter"
+  },
+  "optionsTitle": {
+    "message": "Paramètres des Épingles Outlook"
+  },
+  "dashboardTitle": {
+    "message": "Tableau de bord — Épingles Outlook"
+  },
+  "commandToggle": {
+    "message": "Épingler ou désépingler les messages sélectionnés"
+  },
+  "commandConversation": {
+    "message": "Épingler ou désépingler la conversation sélectionnée"
+  },
+  "commandComplete": {
+    "message": "Marquer les épingles sélectionnées comme terminées"
+  },
+  "commandDashboard": {
+    "message": "Ouvrir le tableau de bord des épingles"
+  },
+  "menuToggle": {
+    "message": "Épingler ou désépingler la sélection"
+  },
+  "menuPin": {
+    "message": "Épingler la sélection"
+  },
+  "menuUnpin": {
+    "message": "Désépingler la sélection"
+  },
+  "menuConversation": {
+    "message": "Épingler ou désépingler la conversation"
+  },
+  "menuDisplayed": {
+    "message": "Épingler ou désépingler ce message"
+  },
+  "menuDashboard": {
+    "message": "Tableau de bord des Épingles Outlook"
+  },
+  "menuUndo": {
+    "message": "Annuler la dernière action des Épingles Outlook"
+  },
+  "menuOptions": {
+    "message": "Paramètres des Épingles Outlook"
+  }
+}

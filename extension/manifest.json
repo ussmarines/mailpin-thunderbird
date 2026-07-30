@@ -1,0 +1,93 @@
+{
+  "manifest_version": 3,
+  "name": "__MSG_extensionName__",
+  "short_name": "__MSG_extensionShortName__",
+  "description": "__MSG_extensionDescription__",
+  "version": "3.1.0",
+  "author": "ussmarines",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "pin-mails@MailPerch.local",
+      "strict_min_version": "128.0",
+      "strict_max_version": "153.*"
+    }
+  },
+  "permissions": [
+    "menus"
+  ],
+  "background": {
+    "type": "module",
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "commands": {
+    "toggle-pin-selected": {
+      "suggested_key": {
+        "default": "Alt+P"
+      },
+      "description": "__MSG_commandToggle__"
+    },
+    "toggle-conversation-selected": {
+      "description": "__MSG_commandConversation__"
+    },
+    "complete-selected-pin": {
+      "description": "__MSG_commandComplete__"
+    },
+    "open-pin-dashboard": {
+      "description": "__MSG_commandDashboard__"
+    },
+    "wait-selected-pin": {
+      "description": "__MSG_commandWait__"
+    },
+    "plan-selected-pin": {
+      "description": "__MSG_commandPlan__"
+    },
+    "activate-selected-pin": {
+      "description": "__MSG_commandActivate__"
+    }
+  },
+  "message_display_action": {
+    "default_title": "__MSG_messageDisplayActionTitle__",
+    "default_icon": {
+      "16": "icons/pin-regular.svg",
+      "32": "icons/pin-regular.svg"
+    }
+  },
+  "action": {
+    "default_title": "__MSG_dashboardActionTitle__",
+    "default_icon": {
+      "16": "icons/pin.svg",
+      "32": "icons/pin.svg"
+    }
+  },
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": true
+  },
+  "icons": {
+    "16": "icons/pin.svg",
+    "32": "icons/pin.svg",
+    "64": "icons/pin.svg"
+  },
+  "experiment_apis": {
+    "pinInbox": {
+      "schema": "api/pinInbox/schema.json",
+      "parent": {
+        "scopes": [
+          "addon_parent"
+        ],
+        "paths": [
+          [
+            "pinInbox"
+          ]
+        ],
+        "script": "api/pinInbox/implementation.js"
+      }
+    }
+  },
+  "default_locale": "fr",
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'"
+  }
+}

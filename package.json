@@ -1,0 +1,17 @@
+{
+  "name": "thunderbird-outlook-pins",
+  "version": "3.1.0",
+  "private": true,
+  "description": "Build and test commands for the Thunderbird mail pinning extension.",
+  "scripts": {
+    "check": "python3 scripts/check_repo.py && python3 scripts/scan_secrets.py",
+    "test": "python3 tests/static_checks.py && python3 tests/test_folder_counter_guard.py && python3 tests/test_ui_regressions.py && python3 tests/test_build_reproducible.py && node tests/model_tests.mjs && python3 tests/sqlite_model_tests.py",
+    "build": "python3 scripts/build.py --source",
+    "ci": "npm run check && npm test && npm run build"
+  },
+  "engines": {
+    "node": ">=20",
+    "npm": ">=10",
+    "python": ">=3.11"
+  }
+}

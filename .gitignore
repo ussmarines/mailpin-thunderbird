@@ -1,0 +1,29 @@
+# Build outputs
+dist/*
+!dist/.gitkeep
+*.xpi
+*.zip
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+
+# Local profiles and secrets
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+thunderbird-profile/
+profiles/
+
+# Tool caches
+node_modules/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

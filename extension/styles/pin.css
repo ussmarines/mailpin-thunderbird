@@ -1,0 +1,946 @@
+/* Épingles Outlook pour Thunderbird 3.1.0 */
+
+:root {
+  --pin-mails-accent: light-dark(#0f6cbd, #62b0e8);
+  --pin-mails-accent-hover: light-dark(#115ea3, #82c8f2);
+  --pin-mails-muted-icon: light-dark(#5b6570, #bcc5ce);
+  --pin-mails-hover-icon: light-dark(#0f6cbd, #7dc9ff);
+  --pin-mails-hover-bg: light-dark(#dceeff, color-mix(in srgb, #62b0e8 24%, transparent));
+  --pin-mails-panel-bg: var(--layout-background-0);
+  --pin-mails-header-bg: var(--layout-background-1);
+  --pin-mails-border: var(--sidebar-border);
+  --pin-mails-card-bg: var(--layout-background-0);
+  --pin-mails-card-hover: var(--layout-background-2);
+  --pin-mails-soft: light-dark(#e8f2fb, color-mix(in srgb, #0f6cbd 22%, transparent));
+  --pin-mails-max-height: 360px;
+  --pin-mails-card-gap: 4px;
+  --pin-mails-card-padding: 7px 9px 7px 12px;
+  --pin-mails-card-min-height: 52px;
+}
+
+:root[pin-mails-density="compact"] {
+  --pin-mails-card-gap: 2px;
+  --pin-mails-card-padding: 5px 8px 5px 11px;
+  --pin-mails-card-min-height: 42px;
+}
+
+:root[pin-mails-density="comfortable"] {
+  --pin-mails-card-gap: 6px;
+  --pin-mails-card-padding: 10px 11px 10px 14px;
+  --pin-mails-card-min-height: 62px;
+}
+
+/* Le filtre étoilé devient un interrupteur du panneau, sans filtrage.
+ * L'icône est un masque CSS : Thunderbird ne peut donc plus imposer le noir
+ * contenu dans un SVG utilisé comme image d'arrière-plan. */
+#pin-mails-panel {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  min-block-size: 0;
+  max-block-size: min(55vh, var(--pin-mails-max-height));
+  background: var(--pin-mails-panel-bg);
+  border-block-end: 1px solid var(--pin-mails-border);
+}
+
+#pin-mails-panel[hidden] { display: none !important; }
+
+.pin-mails-panel-header {
+  flex: 0 0 auto;
+  min-block-size: 38px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 7px;
+  background: var(--pin-mails-header-bg);
+  border-block-end: 1px solid var(--pin-mails-border);
+}
+
+.pin-mails-collapse-button,
+.pin-mails-header-action {
+  flex: 0 0 auto;
+  inline-size: 30px;
+  block-size: 30px;
+  min-inline-size: 30px;
+  min-block-size: 30px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.pin-mails-collapse-button:hover,
+.pin-mails-collapse-button:focus-visible,
+.pin-mails-header-action:hover,
+.pin-mails-header-action:focus-visible {
+  background: var(--pin-mails-card-hover);
+}
+
+.pin-mails-chevron {
+  display: block;
+  inline-size: 9px;
+  block-size: 9px;
+  margin: auto;
+  border-inline-end: 2px solid currentColor;
+  border-block-end: 2px solid currentColor;
+  transform: rotate(45deg) translate(-1px, -1px);
+  transition: transform 120ms ease;
+}
+
+#pin-mails-panel[data-collapsed] .pin-mails-chevron {
+  transform: rotate(-45deg) translate(1px, -1px);
+}
+
+.pin-mails-header-icon {
+  flex: 0 0 auto;
+  inline-size: 22px;
+  block-size: 22px;
+  background-color: var(--pin-mails-accent);
+  -webkit-mask: url("../icons/pin-filled.svg") center / 22px 22px no-repeat;
+  mask: url("../icons/pin-filled.svg") center / 22px 22px no-repeat;
+  filter: drop-shadow(0 0 1px color-mix(in srgb, var(--pin-mails-accent) 60%, transparent));
+}
+
+.pin-mails-title-wrap {
+  min-inline-size: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-inline-end: auto;
+}
+
+.pin-mails-title { font-weight: 700; }
+
+.pin-mails-count,
+.pin-mails-group-count {
+  min-inline-size: 21px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--pin-mails-accent) 18%, transparent);
+  color: var(--pin-mails-accent);
+  font-size: 0.82rem;
+  text-align: center;
+}
+
+.pin-mails-header-select {
+  min-block-size: 28px;
+  max-inline-size: 145px;
+  padding: 2px 24px 2px 7px;
+  border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+  border-radius: 5px;
+  background: var(--layout-background-0);
+  color: inherit;
+  font: inherit;
+  font-size: 0.9rem;
+}
+
+.pin-mails-panel-list {
+  min-block-size: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 4px;
+  scrollbar-gutter: stable;
+}
+
+#pin-mails-panel[data-collapsed] .pin-mails-panel-list { display: none; }
+
+.pin-mails-empty {
+  padding: 11px 12px;
+  color: var(--layout-color-2);
+  font-style: italic;
+}
+
+.pin-mails-account-group {
+  margin-block-end: 5px;
+  border: 1px solid color-mix(in srgb, var(--pin-account-color, var(--pin-mails-accent)) 32%, var(--pin-mails-border));
+  border-radius: 7px;
+  overflow: clip;
+}
+
+.pin-mails-account-header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-block-size: 28px;
+  padding: 4px 8px;
+  background: color-mix(in srgb, var(--pin-account-color, var(--pin-mails-accent)) 10%, var(--pin-mails-header-bg));
+  border-block-end: 1px solid color-mix(in srgb, var(--pin-account-color, var(--pin-mails-accent)) 26%, var(--pin-mails-border));
+  font-size: 0.9rem;
+  font-weight: 650;
+}
+
+.pin-mails-account-dot {
+  inline-size: 9px;
+  block-size: 9px;
+  border-radius: 50%;
+  background: var(--pin-account-color, var(--pin-mails-accent));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--pin-account-color, var(--pin-mails-accent)) 18%, transparent);
+}
+
+.pin-mails-group-count {
+  margin-inline-start: auto;
+  color: var(--pin-account-color, var(--pin-mails-accent));
+  background: color-mix(in srgb, var(--pin-account-color, var(--pin-mails-accent)) 15%, transparent);
+}
+
+.pin-mails-card {
+  --pin-account-color: var(--pin-mails-accent);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pin-mails-card-gap);
+  min-block-size: var(--pin-mails-card-min-height);
+  margin: 2px;
+  padding: var(--pin-mails-card-padding);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: var(--pin-mails-card-bg);
+  cursor: default;
+  outline: none;
+}
+
+.pin-mails-card::before {
+  content: "";
+  position: absolute;
+  inset-block: 5px;
+  inset-inline-start: 3px;
+  inline-size: 3px;
+  border-radius: 4px;
+  background: var(--pin-account-color);
+}
+
+.pin-mails-card:hover { background: var(--pin-mails-card-hover); }
+.pin-mails-card:focus-visible,
+.pin-mails-card[data-selected] {
+  border-color: var(--pin-account-color);
+  background: color-mix(in srgb, var(--pin-account-color) 13%, var(--pin-mails-card-bg));
+}
+
+.pin-mails-card[data-broken] {
+  opacity: 0.72;
+  border-style: dashed;
+}
+
+.pin-mails-card[data-dragging] { opacity: 0.48; }
+.pin-mails-card[data-drop-before] { box-shadow: 0 -3px 0 var(--pin-account-color); }
+.pin-mails-card[data-drop-after] { box-shadow: 0 3px 0 var(--pin-account-color); }
+
+:root[pin-mails-animate="true"] .pin-mails-card {
+  transition: background-color 120ms ease, border-color 120ms ease, transform 120ms ease;
+}
+
+.pin-mails-card[data-just-pinned] { animation: pin-mails-pop 220ms ease-out; }
+@keyframes pin-mails-pop {
+  0% { transform: translateY(-3px); opacity: 0.55; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+.pin-mails-card-top,
+.pin-mails-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-inline-size: 0;
+}
+
+.pin-mails-author,
+.pin-mails-subject,
+.pin-mails-preview,
+.pin-mails-folder {
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pin-mails-author { flex: 1 1 auto; font-weight: 600; }
+.pin-mails-subject { color: var(--layout-color-1); }
+.pin-mails-preview { color: var(--layout-color-2); font-size: 0.9rem; }
+.pin-mails-date { flex: 0 0 auto; color: var(--layout-color-2); font-size: 0.88rem; white-space: nowrap; }
+.pin-mails-folder { color: var(--layout-color-2); font-size: 0.84rem; }
+
+.pin-mails-card[data-unread] .pin-mails-author,
+.pin-mails-card[data-unread] .pin-mails-subject { font-weight: 750; }
+
+.pin-mails-unread-dot {
+  inline-size: 8px;
+  block-size: 8px;
+  border-radius: 50%;
+  background: light-dark(#107c10, #6ccb78);
+}
+
+.pin-mails-card-pin {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  inline-size: 32px;
+  block-size: 32px;
+  min-inline-size: 32px;
+  min-block-size: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--pin-account-color) 13%, transparent);
+  color: light-dark(
+    color-mix(in srgb, var(--pin-account-color) 84%, black),
+    color-mix(in srgb, var(--pin-account-color) 62%, white)
+  );
+  cursor: pointer;
+  transition: color 120ms ease, background-color 120ms ease, transform 120ms ease;
+}
+
+.pin-mails-card-pin::before {
+  content: "";
+  inline-size: 23px;
+  block-size: 23px;
+  background-color: currentColor;
+  -webkit-mask: url("../icons/pin-filled.svg") center / 23px 23px no-repeat;
+  mask: url("../icons/pin-filled.svg") center / 23px 23px no-repeat;
+  filter: drop-shadow(0 0 1px color-mix(in srgb, currentColor 70%, transparent));
+}
+
+.pin-mails-card-pin:hover,
+.pin-mails-card-pin:focus-visible {
+  color: light-dark(
+    color-mix(in srgb, var(--pin-account-color) 92%, black),
+    color-mix(in srgb, var(--pin-account-color) 45%, white)
+  );
+  background-color: color-mix(in srgb, var(--pin-account-color) 25%, transparent);
+  transform: scale(1.06);
+}
+
+.pin-mails-meta-icon {
+  flex: 0 0 auto;
+  min-inline-size: 16px;
+  color: var(--layout-color-2);
+  font-size: 0.84rem;
+  text-align: center;
+}
+
+.pin-mails-priority { color: light-dark(#b42318, #ff8178); font-weight: 800; }
+
+.pin-mails-tags {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-inline-size: 0;
+  overflow: hidden;
+}
+
+.pin-mails-tag {
+  max-inline-size: 110px;
+  padding: 1px 6px;
+  border: 1px solid color-mix(in srgb, var(--tag-color, currentColor) 65%, transparent);
+  border-radius: 999px;
+  color: var(--tag-color, currentColor);
+  font-size: 0.78rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#pin-mails-all-header {
+  flex: 0 0 auto;
+  min-block-size: 31px;
+  display: flex;
+  align-items: center;
+  padding: 5px 11px;
+  background: var(--pin-mails-header-bg);
+  border-block-end: 1px solid var(--pin-mails-border);
+  color: var(--layout-color-1);
+  font-weight: 650;
+}
+
+#pin-mails-all-header[hidden] { display: none !important; }
+
+/* Épingles de la liste complète.
+ * Les images natives sont rendues transparentes, puis remplacées par des
+ * masques CSS colorables. Cette méthode fonctionne de manière fiable dans les
+ * vues tableau et cartes, y compris avec les thèmes sombres. */
+:root[pin-mails-inbox][pin-mails-native-star] #flaggedColButton,
+:root[pin-mails-inbox][pin-mails-native-star] .tree-view-row-flag > .tree-button-flag,
+:root[pin-mails-inbox][pin-mails-native-star] .card-layout .pin-mails-row-button {
+  position: relative !important;
+  display: grid !important;
+  place-items: center !important;
+  background-image: none !important;
+}
+
+:root[pin-mails-inbox][pin-mails-native-star] #flaggedColButton img,
+:root[pin-mails-inbox][pin-mails-native-star] .tree-view-row-flag img {
+  opacity: 0 !important;
+  inline-size: 22px !important;
+  block-size: 22px !important;
+}
+
+:root[pin-mails-inbox][pin-mails-native-star] #flaggedColButton::before,
+:root[pin-mails-inbox][pin-mails-native-star] .tree-view-row-flag > .tree-button-flag::before,
+:root[pin-mails-inbox][pin-mails-native-star] .card-layout .pin-mails-row-button::before {
+  content: "";
+  inline-size: 22px;
+  block-size: 22px;
+  background-color: var(--pin-mails-muted-icon);
+  -webkit-mask: url("../icons/pin-regular.svg") center / 22px 22px no-repeat;
+  mask: url("../icons/pin-regular.svg") center / 22px 22px no-repeat;
+  opacity: 0.22;
+  transition: opacity 120ms ease, background-color 120ms ease,
+    filter 120ms ease, transform 120ms ease;
+  pointer-events: none;
+}
+
+:root[pin-mails-inbox][pin-mails-native-star] #flaggedColButton::before {
+  opacity: 0.78;
+}
+
+:root[pin-mails-inbox][pin-mails-native-star] tr:hover .tree-view-row-flag > .tree-button-flag::before,
+:root[pin-mails-inbox][pin-mails-native-star] .tree-view-row-flag > .tree-button-flag:focus-visible::before,
+:root[pin-mails-inbox] .card-layout:hover .pin-mails-row-button::before,
+:root[pin-mails-inbox][pin-mails-native-star] .card-layout .pin-mails-row-button:focus-visible::before {
+  background-color: var(--pin-mails-hover-icon);
+  opacity: 1;
+  filter: drop-shadow(0 0 2px color-mix(in srgb, var(--pin-mails-hover-icon) 70%, transparent));
+  transform: scale(1.12);
+}
+
+:root[pin-mails-inbox][pin-mails-native-star] tr[data-properties~="flagged"] .tree-view-row-flag > .tree-button-flag::before,
+:root[pin-mails-inbox] .card-layout[data-properties~="flagged"] .pin-mails-row-button::before {
+  background-color: light-dark(
+    color-mix(in srgb, var(--pin-row-account-color, var(--pin-mails-accent)) 84%, black),
+    color-mix(in srgb, var(--pin-row-account-color, var(--pin-mails-accent)) 58%, white)
+  );
+  -webkit-mask-image: url("../icons/pin-filled.svg");
+  mask-image: url("../icons/pin-filled.svg");
+  opacity: 1;
+  filter: drop-shadow(
+    0 0 2px
+    color-mix(in srgb, var(--pin-row-account-color, var(--pin-mails-accent)) 72%, transparent)
+  );
+  transform: scale(1.08);
+}
+
+:root[pin-mails-inbox][pin-mails-native-star] .tree-view-row-flag > .tree-button-flag,
+:root[pin-mails-inbox][pin-mails-native-star] .card-layout .pin-mails-row-button {
+  inline-size: 32px !important;
+  block-size: 32px !important;
+  min-inline-size: 32px !important;
+  min-block-size: 32px !important;
+  padding: 0 !important;
+  border-radius: 7px !important;
+  transition: background-color 120ms ease, box-shadow 120ms ease !important;
+}
+
+:root[pin-mails-inbox][pin-mails-native-star] .card-layout .pin-mails-row-button {
+  flex: 0 0 auto !important;
+  margin-inline-start: 2px !important;
+  opacity: 1 !important;
+}
+
+:root[pin-mails-inbox][pin-mails-native-star] tr:hover .tree-view-row-flag > .tree-button-flag,
+:root[pin-mails-inbox][pin-mails-native-star] .tree-view-row-flag > .tree-button-flag:focus-visible,
+:root[pin-mails-inbox] .card-layout:hover .pin-mails-row-button,
+:root[pin-mails-inbox][pin-mails-native-star] .card-layout .pin-mails-row-button:focus-visible {
+  background-color: var(--pin-mails-hover-bg) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--pin-mails-hover-icon) 32%, transparent);
+}
+
+/* Survol direct de la punaise : état plus marqué que le simple survol de la ligne. */
+:root[pin-mails-inbox][pin-mails-native-star] .tree-view-row-flag > .tree-button-flag:hover,
+:root[pin-mails-inbox][pin-mails-native-star] .card-layout .pin-mails-row-button:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--pin-mails-hover-icon) 30%,
+    transparent
+  ) !important;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--pin-mails-hover-icon) 62%, transparent),
+    0 0 0 2px color-mix(in srgb, var(--pin-mails-hover-icon) 14%, transparent) !important;
+  cursor: pointer !important;
+}
+
+:root[pin-mails-inbox][pin-mails-native-star] .tree-view-row-flag > .tree-button-flag:hover::before,
+:root[pin-mails-inbox][pin-mails-native-star] .card-layout .pin-mails-row-button:hover::before {
+  background-color: var(--pin-mails-hover-icon);
+  opacity: 1;
+  filter: drop-shadow(
+    0 0 4px color-mix(in srgb, var(--pin-mails-hover-icon) 78%, transparent)
+  );
+  transform: scale(1.23);
+}
+
+:root[pin-mails-inbox][pin-mails-native-star] tr[data-properties~="flagged"] .tree-view-row-flag > .tree-button-flag,
+:root[pin-mails-inbox] .card-layout[data-properties~="flagged"] .pin-mails-row-button {
+  background-color: color-mix(
+    in srgb,
+    var(--pin-row-account-color, var(--pin-mails-accent)) 22%,
+    transparent
+  ) !important;
+  box-shadow: inset 0 0 0 1px color-mix(
+    in srgb,
+    var(--pin-row-account-color, var(--pin-mails-accent)) 46%,
+    transparent
+  );
+}
+
+:root[pin-mails-inbox][pin-mails-native-star] tr[data-properties~="flagged"]:hover .tree-view-row-flag > .tree-button-flag,
+:root[pin-mails-inbox] .card-layout[data-properties~="flagged"] .pin-mails-row-button:focus-visible {
+  background-color: color-mix(
+    in srgb,
+    var(--pin-row-account-color, var(--pin-mails-accent)) 31%,
+    transparent
+  ) !important;
+}
+
+:root[pin-mails-inbox][pin-mails-native-star] tr[data-properties~="flagged"] .tree-view-row-flag > .tree-button-flag:hover,
+:root[pin-mails-inbox] .card-layout[data-properties~="flagged"] .pin-mails-row-button:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--pin-row-account-color, var(--pin-mails-accent)) 40%,
+    transparent
+  ) !important;
+  box-shadow:
+    inset 0 0 0 1px color-mix(
+      in srgb,
+      var(--pin-row-account-color, var(--pin-mails-accent)) 72%,
+      transparent
+    ),
+    0 0 0 2px color-mix(
+      in srgb,
+      var(--pin-row-account-color, var(--pin-mails-accent)) 16%,
+      transparent
+    ) !important;
+}
+
+:root[pin-mails-inbox][pin-mails-native-star] tr[data-properties~="flagged"] .tree-view-row-flag > .tree-button-flag:hover::before,
+:root[pin-mails-inbox] .card-layout[data-properties~="flagged"] .pin-mails-row-button:hover::before {
+  background-color: light-dark(
+    color-mix(in srgb, var(--pin-row-account-color, var(--pin-mails-accent)) 92%, black),
+    color-mix(in srgb, var(--pin-row-account-color, var(--pin-mails-accent)) 38%, white)
+  );
+  filter: drop-shadow(
+    0 0 4px
+    color-mix(in srgb, var(--pin-row-account-color, var(--pin-mails-accent)) 84%, transparent)
+  );
+  transform: scale(1.2);
+}
+
+@container threadPane (max-width: 600px) {
+  .pin-mails-header-select { max-inline-size: 105px; }
+  .pin-mails-header-select[data-secondary] { display: none; }
+}
+
+
+/* Bouton de panneau distinct du filtre étoilé natif. */
+#pin-mails-qfb-toggle {
+  position: relative;
+  background-image: none !important;
+}
+#pin-mails-qfb-toggle::before {
+  content: "";
+  inline-size: 20px;
+  block-size: 20px;
+  flex: 0 0 auto;
+  background-color: var(--pin-mails-muted-icon);
+  -webkit-mask: url("../icons/pin-regular.svg") center / 20px 20px no-repeat;
+  mask: url("../icons/pin-regular.svg") center / 20px 20px no-repeat;
+  opacity: .8;
+}
+#pin-mails-qfb-toggle:hover::before,
+#pin-mails-qfb-toggle:focus-visible::before {
+  background-color: var(--pin-mails-hover-icon);
+  opacity: 1;
+}
+#pin-mails-qfb-toggle[aria-pressed="true"] {
+  color: var(--pin-mails-accent);
+  background-color: color-mix(in srgb, var(--pin-mails-accent) 16%, transparent) !important;
+}
+#pin-mails-qfb-toggle[aria-pressed="true"]::before {
+  background-color: var(--pin-mails-accent);
+  -webkit-mask-image: url("../icons/pin-filled.svg");
+  mask-image: url("../icons/pin-filled.svg");
+  opacity: 1;
+}
+
+/* Épingle indépendante des étoiles Thunderbird. */
+.pin-mails-independent-button {
+  position: relative !important;
+  display: grid !important;
+  place-items: center !important;
+  inline-size: 32px !important;
+  block-size: 32px !important;
+  min-inline-size: 32px !important;
+  min-block-size: 32px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 7px !important;
+  background: transparent !important;
+  cursor: pointer !important;
+  opacity: .34;
+  transition: background-color 120ms ease, box-shadow 120ms ease, opacity 120ms ease, transform 120ms ease !important;
+}
+.pin-mails-independent-button::before {
+  content: "";
+  inline-size: 22px;
+  block-size: 22px;
+  background-color: var(--pin-mails-muted-icon);
+  -webkit-mask: url("../icons/pin-regular.svg") center / 22px 22px no-repeat;
+  mask: url("../icons/pin-regular.svg") center / 22px 22px no-repeat;
+  transition: background-color 120ms ease, filter 120ms ease, transform 120ms ease;
+}
+tr:hover .pin-mails-independent-button,
+.pin-mails-independent-button:focus-visible {
+  opacity: 1;
+  background: var(--pin-mails-hover-bg) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--pin-mails-hover-icon) 32%, transparent);
+}
+.pin-mails-independent-button:hover {
+  opacity: 1;
+  background: color-mix(in srgb, var(--pin-mails-hover-icon) 30%, transparent) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--pin-mails-hover-icon) 62%, transparent), 0 0 0 2px color-mix(in srgb, var(--pin-mails-hover-icon) 14%, transparent) !important;
+}
+.pin-mails-independent-button:hover::before,
+.pin-mails-independent-button:focus-visible::before {
+  background-color: var(--pin-mails-hover-icon);
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--pin-mails-hover-icon) 78%, transparent));
+  transform: scale(1.22);
+}
+tr[data-pin-mails-pinned] .pin-mails-independent-button {
+  opacity: 1;
+  background: color-mix(in srgb, var(--pin-row-account-color, var(--pin-mails-accent)) 22%, transparent) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--pin-row-account-color, var(--pin-mails-accent)) 46%, transparent);
+}
+tr[data-pin-mails-pinned] .pin-mails-independent-button::before {
+  background-color: light-dark(
+    color-mix(in srgb, var(--pin-row-account-color, var(--pin-mails-accent)) 84%, black),
+    color-mix(in srgb, var(--pin-row-account-color, var(--pin-mails-accent)) 58%, white)
+  );
+  -webkit-mask-image: url("../icons/pin-filled.svg");
+  mask-image: url("../icons/pin-filled.svg");
+  filter: drop-shadow(0 0 2px color-mix(in srgb, var(--pin-row-account-color, var(--pin-mails-accent)) 72%, transparent));
+}
+tr[data-pin-mails-pinned] .pin-mails-independent-button:hover {
+  background: color-mix(in srgb, var(--pin-row-account-color, var(--pin-mails-accent)) 40%, transparent) !important;
+}
+.pin-mails-table-host { position: relative; padding-inline-end: 38px !important; }
+.pin-mails-table-host > .pin-mails-independent-button { position: absolute !important; inset-inline-end: 2px; inset-block-start: 50%; transform: translateY(-50%); }
+
+.pin-mails-panel-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 7px;
+  border-block-end: 1px solid var(--pin-mails-border);
+  background: color-mix(in srgb, var(--pin-mails-panel-bg) 94%, currentColor 6%);
+}
+.pin-mails-search-wrap { flex: 1 1 220px; min-inline-size: 120px; }
+.pin-mails-search {
+  inline-size: 100%;
+  min-block-size: 30px;
+  padding: 4px 9px;
+  border: 1px solid var(--pin-mails-border);
+  border-radius: 6px;
+  background: var(--layout-background-0);
+  color: inherit;
+  font: inherit;
+}
+.pin-mails-bulk-actions { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.pin-mails-bulk-actions[hidden] { display: none !important; }
+.pin-mails-bulk-count { font-weight: 650; color: var(--layout-color-2); }
+.pin-mails-quick-button {
+  min-inline-size: 27px;
+  min-block-size: 27px;
+  padding: 3px 7px;
+  border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+}
+.pin-mails-quick-button:hover,
+.pin-mails-quick-button:focus-visible { background: var(--pin-mails-card-hover); border-color: var(--pin-mails-accent); }
+.pin-mails-summary { color: var(--layout-color-2); font-size: .78rem; white-space: nowrap; }
+
+.pin-mails-note {
+  padding: 5px 7px;
+  border-inline-start: 3px solid var(--pin-account-color);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--pin-account-color) 8%, transparent);
+  color: var(--layout-color-1);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.pin-mails-status-line { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.pin-mails-due,
+.pin-mails-group-chip,
+.pin-mails-priority-chip {
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: .78rem;
+  border: 1px solid color-mix(in srgb, currentColor 28%, transparent);
+}
+.pin-mails-card[data-overdue] .pin-mails-due { color: light-dark(#a4262c, #ff9ca2); background: light-dark(#fde7e9, #4a1b1e); }
+.pin-mails-group-chip { color: var(--pin-group-color); border-color: color-mix(in srgb, var(--pin-group-color) 60%, transparent); }
+.pin-mails-priority-chip.high { color: light-dark(#8a4b00, #ffc46b); }
+.pin-mails-priority-chip.urgent { color: light-dark(#a4262c, #ff9ca2); font-weight: 750; }
+.pin-mails-card-actions { display: flex; justify-content: flex-end; gap: 4px; opacity: 0; transition: opacity 100ms ease; }
+.pin-mails-card:hover .pin-mails-card-actions,
+.pin-mails-card:focus-within .pin-mails-card-actions,
+.pin-mails-card[data-selected] .pin-mails-card-actions { opacity: 1; }
+.pin-mails-custom-group {
+  margin-block-end: 6px;
+  border: 1px solid color-mix(in srgb, var(--pin-account-color) 35%, var(--pin-mails-border));
+  border-radius: 8px;
+  overflow: clip;
+}
+.pin-mails-custom-group-header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-block-size: 30px;
+  padding: 5px 8px;
+  background: color-mix(in srgb, var(--pin-account-color) 12%, var(--pin-mails-header-bg));
+  border-block-end: 1px solid color-mix(in srgb, var(--pin-account-color) 28%, var(--pin-mails-border));
+  font-weight: 700;
+}
+
+.pin-mails-load-more { inline-size: calc(100% - 8px); margin: 5px 4px; min-block-size: 32px; border: 1px solid var(--pin-mails-border); border-radius: 6px; background: transparent; color: inherit; cursor: pointer; }
+.pin-mails-load-more:hover { background: var(--pin-mails-card-hover); }
+.pin-mails-live { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); }
+
+.pin-mails-toast {
+  position: absolute;
+  z-index: 20;
+  inset-inline-end: 12px;
+  inset-block-end: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-inline-size: 420px;
+  padding: 9px 12px;
+  border: 1px solid var(--pin-mails-border);
+  border-radius: 8px;
+  background: var(--layout-background-0);
+  color: inherit;
+  box-shadow: 0 5px 18px rgb(0 0 0 / .28);
+}
+.pin-mails-toast[hidden] { display: none !important; }
+.pin-mails-toast-undo { border: 0; background: transparent; color: var(--pin-mails-accent); font-weight: 750; cursor: pointer; }
+
+.pin-mails-editor {
+  inline-size: min(620px, calc(100vw - 32px));
+  padding: 0;
+  border: 1px solid var(--pin-mails-border);
+  border-radius: 10px;
+  background: var(--layout-background-0);
+  color: inherit;
+  box-shadow: 0 12px 42px rgb(0 0 0 / .4);
+}
+.pin-mails-editor::backdrop { background: rgb(0 0 0 / .45); }
+.pin-mails-editor-form { display: grid; gap: 12px; padding: 18px; }
+.pin-mails-editor-title { margin: 0; }
+.pin-mails-editor-subject { margin: 0; color: var(--layout-color-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pin-mails-editor-form label { display: grid; gap: 5px; font-weight: 650; }
+.pin-mails-editor-form textarea,
+.pin-mails-editor-form select,
+.pin-mails-editor-form input {
+  inline-size: 100%;
+  min-block-size: 32px;
+  padding: 6px 8px;
+  border: 1px solid var(--pin-mails-border);
+  border-radius: 6px;
+  background: var(--layout-background-1);
+  color: inherit;
+  font: inherit;
+}
+.pin-mails-editor-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.pin-mails-editor-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.pin-mails-editor-actions button { min-block-size: 34px; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
+.pin-mails-editor-actions .primary { background: var(--pin-mails-accent); color: white; border: 1px solid var(--pin-mails-accent); }
+.pin-mails-editor-actions .secondary { background: transparent; color: inherit; border: 1px solid var(--pin-mails-border); }
+
+@media (prefers-reduced-motion: reduce) {
+  #pin-mails-panel *, .pin-mails-independent-button, .pin-mails-card-actions { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}
+@media (forced-colors: active) {
+  .pin-mails-card, .pin-mails-account-group, .pin-mails-custom-group, .pin-mails-editor { border: 1px solid CanvasText; }
+  .pin-mails-independent-button:focus-visible, .pin-mails-card:focus-visible, .pin-mails-quick-button:focus-visible { outline: 2px solid Highlight !important; }
+  .pin-mails-note, .pin-mails-due, .pin-mails-group-chip { forced-color-adjust: none; }
+}
+@container threadPane (max-width: 700px) {
+  .pin-mails-panel-tools { flex-direction: column; align-items: stretch; }
+  .pin-mails-card-actions { opacity: 1; }
+  .pin-mails-summary { display: none; }
+}
+/* 2.0 — sections intelligentes, conversations, état terminé et agenda. */
+.pin-mails-smart-group {
+  margin-block: 6px;
+  border: 1px solid color-mix(in srgb, var(--pin-account-color) 45%, transparent);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.pin-mails-smart-group-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  background: color-mix(in srgb, var(--pin-account-color) 15%, transparent);
+  font-weight: 600;
+}
+
+.pin-mails-conversation-chip,
+.pin-mails-completed-chip,
+.pin-mails-calendar-chip {
+  display: inline-flex;
+  padding: 1px 7px;
+  border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+  border-radius: 999px;
+  font-size: .78em;
+}
+
+.pin-mails-completed-chip { color: #57d163; }
+.pin-mails-calendar-chip { color: #69b7ff; }
+.pin-mails-card[data-completed] { opacity: .68; }
+.pin-mails-card[data-completed] .pin-mails-subject { text-decoration: line-through; }
+.pin-mails-editor-calendar-row { display: flex; gap: 6px; flex-wrap: wrap; margin-block: 10px; }
+.pin-mails-editor-completed-label { display: flex !important; align-items: center; gap: 6px; }
+.pin-mails-panel-header .pin-mails-header-action { min-width: 28px; }
+.pin-mails-folder-badge { display: none !important; }
+
+@media (forced-colors: active) {
+  .pin-mails-smart-group,
+  .pin-mails-smart-group-header,
+  .pin-mails-conversation-chip,
+  .pin-mails-completed-chip,
+  .pin-mails-calendar-chip { border: 1px solid CanvasText; }
+}
+/* 3.0 — workflows, affaires, modèles et suivis récurrents. */
+.pin-mails-workflow-chip,
+.pin-mails-follow-up-chip,
+.pin-mails-recurrence-chip,
+.pin-mails-case-chip {
+  display: inline-flex;
+  align-items: center;
+  max-inline-size: 100%;
+  padding: 2px 7px;
+  border: 1px solid color-mix(in srgb, currentColor 28%, transparent);
+  border-radius: 999px;
+  font-size: .78rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pin-mails-workflow-chip.waiting { color: light-dark(#8a4b00, #ffc46b); background: light-dark(#fff4ce, #3d2b0e); }
+.pin-mails-workflow-chip.planned { color: light-dark(#004578, #86d0ff); background: light-dark(#deecf9, #102c3d); }
+.pin-mails-follow-up-chip { color: light-dark(#5c2e91, #d7b6ff); }
+.pin-mails-follow-up-chip.overdue { color: light-dark(#a4262c, #ff9ca2); font-weight: 750; }
+.pin-mails-recurrence-chip { color: light-dark(#107c10, #77df78); }
+.pin-mails-case-chip { color: var(--pin-case-color); border-color: color-mix(in srgb, var(--pin-case-color) 60%, transparent); }
+.pin-mails-editor-calendar-row .secondary { min-block-size: 32px; padding: 5px 9px; border: 1px solid var(--pin-mails-border); border-radius: 6px; background: transparent; color: inherit; cursor: pointer; }
+.pin-mails-editor-calendar-row .secondary:hover,
+.pin-mails-editor-calendar-row .secondary:focus-visible { background: var(--pin-mails-card-hover); border-color: var(--pin-mails-accent); }
+@media (forced-colors: active) {
+  .pin-mails-workflow-chip,.pin-mails-follow-up-chip,.pin-mails-recurrence-chip,.pin-mails-case-chip { border: 1px solid CanvasText; forced-color-adjust: none; }
+}
+
+/* 3.1 — retours du test visuel, menu contextuel et contrôles explicites. */
+#pin-mails-panel {
+  position: relative;
+}
+
+.pin-mails-header-action-icon {
+  display: block;
+  inline-size: 17px;
+  block-size: 17px;
+  margin: auto;
+  background-color: currentColor;
+  opacity: .9;
+}
+
+.pin-mails-action-conversation .pin-mails-header-action-icon {
+  -webkit-mask: url("../icons/conversation.svg") center / contain no-repeat;
+  mask: url("../icons/conversation.svg") center / contain no-repeat;
+}
+
+.pin-mails-action-dashboard .pin-mails-header-action-icon {
+  -webkit-mask: url("../icons/dashboard.svg") center / contain no-repeat;
+  mask: url("../icons/dashboard.svg") center / contain no-repeat;
+}
+
+.pin-mails-action-add-group .pin-mails-header-action-icon {
+  -webkit-mask: url("../icons/add.svg") center / contain no-repeat;
+  mask: url("../icons/add.svg") center / contain no-repeat;
+}
+
+.pin-mails-header-action:hover .pin-mails-header-action-icon,
+.pin-mails-header-action:focus-visible .pin-mails-header-action-icon {
+  background-color: var(--pin-mails-accent);
+  opacity: 1;
+}
+
+.pin-mails-card[data-selected] {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--pin-account-color);
+}
+
+#pin-mails-panel [data-drop-target] {
+  outline: 2px dashed var(--pin-mails-accent);
+  outline-offset: -3px;
+}
+
+.pin-mails-context-menu {
+  position: fixed;
+  z-index: 2147483647;
+  inline-size: min(290px, calc(100vw - 12px));
+  max-block-size: min(480px, calc(100vh - 12px));
+  overflow: auto;
+  padding: 5px;
+  border: 1px solid var(--pin-mails-border);
+  border-radius: 8px;
+  background: var(--layout-background-0);
+  color: inherit;
+  box-shadow: 0 8px 28px rgb(0 0 0 / .38);
+}
+
+.pin-mails-context-menu[hidden] {
+  display: none !important;
+}
+
+.pin-mails-context-item {
+  display: flex;
+  align-items: center;
+  inline-size: 100%;
+  min-block-size: 31px;
+  padding: 5px 9px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.pin-mails-context-item:hover,
+.pin-mails-context-item:focus-visible {
+  outline: none;
+  background: var(--pin-mails-card-hover);
+  color: var(--pin-mails-accent-hover);
+}
+
+.pin-mails-context-separator {
+  block-size: 1px;
+  margin: 4px 6px;
+  background: var(--pin-mails-border);
+}
+
+.pin-mails-card-actions .pin-mails-quick-button:last-child {
+  font-size: 1.2em;
+  line-height: 1;
+}
+
+@media (forced-colors: active) {
+  .pin-mails-context-menu { border-color: CanvasText; }
+  .pin-mails-card[data-selected] { box-shadow: inset 0 0 0 2px Highlight; }
+}

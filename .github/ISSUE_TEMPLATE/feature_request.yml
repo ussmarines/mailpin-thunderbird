@@ -1,0 +1,19 @@
+name: Proposition de fonction
+description: Décrire un besoin utilisateur, pas seulement une solution
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: Problème à résoudre
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Comportement souhaité
+    validations:
+      required: true
+  - type: textarea
+    id: risks
+    attributes:
+      label: Cas limites ou risques identifiés

@@ -1,0 +1,68 @@
+{
+  "extensionName": {
+    "message": "Outlook Pins for Thunderbird"
+  },
+  "extensionShortName": {
+    "message": "Pins"
+  },
+  "extensionDescription": {
+    "message": "Complete local pin panel with independent pins, reply tracking, cases, Kanban, reminders, rules, Calendar, history and backups."
+  },
+  "messageDisplayActionTitle": {
+    "message": "Pin or unpin this message"
+  },
+  "dashboardActionTitle": {
+    "message": "Open the Outlook Pins dashboard"
+  },
+  "commandWait": {
+    "message": "Move selected pins to Waiting"
+  },
+  "commandPlan": {
+    "message": "Move selected pins to Planned"
+  },
+  "commandActivate": {
+    "message": "Move selected pins back to Active"
+  },
+  "optionsTitle": {
+    "message": "Outlook Pins Settings"
+  },
+  "dashboardTitle": {
+    "message": "Outlook Pins Dashboard"
+  },
+  "commandToggle": {
+    "message": "Pin or unpin selected messages"
+  },
+  "commandConversation": {
+    "message": "Pin or unpin the selected conversation"
+  },
+  "commandComplete": {
+    "message": "Mark selected pins as completed"
+  },
+  "commandDashboard": {
+    "message": "Open the pins dashboard"
+  },
+  "menuToggle": {
+    "message": "Pin or unpin selection"
+  },
+  "menuPin": {
+    "message": "Pin selection"
+  },
+  "menuUnpin": {
+    "message": "Unpin selection"
+  },
+  "menuConversation": {
+    "message": "Pin or unpin conversation"
+  },
+  "menuDisplayed": {
+    "message": "Pin or unpin this message"
+  },
+  "menuDashboard": {
+    "message": "Outlook Pins dashboard"
+  },
+  "menuUndo": {
+    "message": "Undo the last Outlook Pins action"
+  },
+  "menuOptions": {
+    "message": "Outlook Pins settings"
+  }
+}

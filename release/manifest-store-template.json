@@ -1,0 +1,12 @@
+{
+  "note": "REMPLACER les valeurs entre chevrons, puis copier les champs ci-dessous dans manifest.json uniquement pour la première publication publique. Ne pas installer ce fichier tel quel.",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "<ATN_USER>.message-pins@addons.thunderbird.net",
+      "strict_min_version": "128.0",
+      "strict_max_version": "153.*"
+    }
+  },
+  "homepage_url": "A_COMPLETER_AVEC_LE_DEPOT_PUBLIC",
+  "support_url": "A_COMPLETER_AVEC_LA_PAGE_DE_SUPPORT"
+}

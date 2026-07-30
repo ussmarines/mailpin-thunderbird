@@ -1,0 +1,45 @@
+name: Extension checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Python review helpers
+        run: python -m pip install --disable-pip-version-check beautifulsoup4 tinycss2
+      - name: Repository checks
+        run: npm run check
+      - name: Model tests
+        run: npm test
+      - name: Reproducible build
+        run: npm run build
+      - name: Verify XPI layout
+        run: |
+          python - <<'PY'
+          import json, pathlib, zipfile
+          xpi = next(pathlib.Path('dist').glob('*.xpi'))
+          with zipfile.ZipFile(xpi) as z:
+              assert 'manifest.json' in z.namelist()
+              json.loads(z.read('manifest.json'))
+              assert all(not name.startswith('extension/') for name in z.namelist())
+          print('XPI layout: OK')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: development-build
+          path: |
+            dist/*.xpi
+            dist/SHA256SUMS.txt
