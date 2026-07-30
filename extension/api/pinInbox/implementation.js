@@ -3530,7 +3530,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
 
   _performMessageAction(action, headers, about3Pane) {
     const usable = headers.filter(Boolean);
-    if (!usable.length) return;
+    if (!usable.length) return {count: 0};
     if (action === "read" || action === "unread" || action === "toggleRead") {
       this._pushUndo("Modification de l’état lu", this._captureFlags(usable, false));
       const targetRead = action === "read" ? true : action === "unread" ? false : !usable.every(hdr => hdr.flags & Ci.nsMsgMessageFlags.Read);
@@ -3543,7 +3543,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       for (const [folder, list] of byFolder) folder.markMessagesRead(list, targetRead);
       this._showToastAll(targetRead ? "Message(s) marqué(s) comme lu(s)." : "Message(s) marqué(s) comme non lu(s).", false);
       this._refreshAllStates(true);
-      return;
+      return {count: usable.length, read: targetRead};
     }
     if (action === "reply" && usable.length === 1) {
       const hdr = usable[0];
@@ -3555,7 +3555,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         about3Pane?.msgWindow || null, null, false
       );
       this._recordActivity("reply-compose", messageStableKey(hdr), formatSubject(hdr));
-      return;
+      return {count: 1, opened: true};
     }
     if (action === "archive") {
       const archiver = new MessageArchiver();
@@ -3563,14 +3563,14 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       archiver.oncomplete = () => this._refreshAllStates(true);
       archiver.archiveMessages(usable);
       this._showToastAll(`${usable.length} message(s) archivé(s).`, false);
-      return;
+      return {count: usable.length, requested: true};
     }
     if (action === "delete") {
       if (this._settings.confirmDelete) {
         const accepted = about3Pane?.confirm
           ? about3Pane.confirm(`Supprimer ${usable.length} message(s) ?`)
           : Services.prompt.confirm(null, "MailPerch", `Supprimer ${usable.length} message(s) ?`);
-        if (!accepted) return;
+        if (!accepted) return {count: 0, cancelled: true};
       }
       const byFolder = new Map();
       const pendingKeys=[];
@@ -3592,7 +3592,9 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         folder.deleteMessages(list, about3Pane?.msgWindow || null, false, false, null, true);
       }
       this._showToastAll(`${usable.length} suppression(s) demandée(s).`, false);
+      return {count: usable.length, requested: true};
     }
+    return {count: 0};
   }
 
   _setupAbout3Pane(about3Pane) {
@@ -3630,6 +3632,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     let groupDialog = null;
     let groupAssignmentDialog = null;
     let onPanelContextMenu = null;
+    let onPanelRightPointerDown = null;
 
     const clearDropVisuals = () => {
       if (!panel) return;
@@ -3672,14 +3675,22 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       return node;
     };
 
+    const elementFromEvent = event => {
+      const path = typeof event.composedPath === "function" ? event.composedPath() : [];
+      for (const candidate of path) {
+        if (candidate?.nodeType === 1) return candidate;
+      }
+      return event.target?.nodeType === 1 ? event.target : null;
+    };
+
     const cardFromEvent = event => {
       const path = typeof event.composedPath === "function" ? event.composedPath() : [];
-      for (const node of path) {
-        if (node instanceof about3Pane.Element && node.classList?.contains("pin-mails-card")) return node;
+      for (const candidate of path) {
+        if (candidate?.nodeType === 1 && candidate.classList?.contains("pin-mails-card")) {
+          return candidate;
+        }
       }
-      return event.target instanceof about3Pane.Element
-        ? event.target.closest(".pin-mails-card")
-        : null;
+      return elementFromEvent(event)?.closest?.(".pin-mails-card") || null;
     };
 
     const headerForRow = row => {
@@ -3797,12 +3808,13 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       panelToggle.setAttribute("aria-pressed", String(visible));
     };
 
-    const showToast = (message, allowUndo = true) => {
+    const showToast = (message, allowUndo = true, kind = "info") => {
       createPanel();
       const toast = panel.querySelector(`#${TOAST_ID}`);
       if (!toast) return;
       if (toastTimer) about3Pane.clearTimeout(toastTimer);
       toast.replaceChildren();
+      toast.dataset.kind = ["success", "error", "busy"].includes(kind) ? kind : "info";
       const text = createNode("span", "pin-mails-toast-text", message);
       toast.appendChild(text);
       if (allowUndo && this._settings.enableUndo && this._undoStack?.length) {
@@ -3814,7 +3826,8 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       toast.hidden = false;
       toastTimer = about3Pane.setTimeout(() => {
         toast.hidden = true;
-      }, this._settings.undoTimeoutMs);
+        delete toast.dataset.kind;
+      }, kind === "error" ? Math.max(this._settings.undoTimeoutMs, 9000) : this._settings.undoTimeoutMs);
     };
 
     const createEditor = () => {
@@ -4090,11 +4103,20 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       contextMenu.setAttribute("aria-label", "Actions du message épinglé");
       contextMenu.tabIndex = -1;
       const menuItems = [
-        ["open", "Ouvrir le message"], ["reply", "Répondre"], ["toggleRead", "Marquer lu / non lu"],
-        ["waiting", "Mettre en attente / à traiter"], ["planned", "Planifier / à traiter"],
-        ["complete", "Terminer / rouvrir"], ["snooze", "Reporter le rappel d’une heure"],
-        ["calendar", "Ajouter ou synchroniser dans l’agenda"], ["edit", "Modifier le suivi"],
-        ["archive", "Archiver"], ["delete", "Supprimer"], ["unpin", "Désépingler"]
+        ["open", "Ouvrir le message"],
+        ["reply", "Répondre"],
+        ["toggleRead", "Marquer lu / non lu"],
+        ["waiting", "Mettre en attente"],
+        ["planned", "Planifier"],
+        ["complete", "Marquer comme terminé"],
+        ["group", "Classer dans un groupe"],
+        ["snooze", "Reporter le rappel d’une heure"],
+        ["calendar-task", "Créer ou synchroniser une tâche"],
+        ["calendar-event", "Créer ou synchroniser un événement"],
+        ["edit", "Modifier le suivi"],
+        ["archive", "Archiver"],
+        ["delete", "Supprimer"],
+        ["unpin", "Désépingler"]
       ];
       for (const [action, label] of menuItems) {
         if (action === "archive" || action === "unpin") contextMenu.appendChild(createNode("div", "pin-mails-context-separator"));
@@ -4105,7 +4127,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         contextMenu.appendChild(item);
       }
       panel.append(header, tools, list, live, toast);
-      document.body.appendChild(contextMenu);
+      document.documentElement.appendChild(contextMenu);
       allHeader = document.getElementById(ALL_HEADER_ID) || createNode("div", "", "Tous les messages");
       allHeader.id = ALL_HEADER_ID;
       threadTree.before(panel, allHeader);
@@ -4175,8 +4197,45 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         contextMenu.hidden = true;
         contextMenuKey = "";
       };
+
+      const setActionBusy = (button, busy) => {
+        if (!button) return;
+        button.disabled = Boolean(busy);
+        button.toggleAttribute("data-busy", Boolean(busy));
+        button.setAttribute("aria-busy", String(Boolean(busy)));
+      };
+
+      const prepareContextMenu = key => {
+        const ref = this._data.refs[key];
+        const card = list.querySelector(`.pin-mails-card[data-stable-key="${CSS.escape(key)}"]`);
+        const hdr = card?._pinMessageHeader || (ref ? this._resolveReference(ref, false) : null);
+        const item = action => contextMenu.querySelector(`[data-context-action="${action}"]`);
+        const setLabel = (action, label) => {
+          const button = item(action);
+          if (button) button.textContent = label;
+        };
+        const disable = (action, disabled) => {
+          const button = item(action);
+          if (button) button.disabled = Boolean(disabled);
+        };
+
+        setLabel("toggleRead", hdr && hdr.flags & Ci.nsMsgMessageFlags.Read ? "Marquer comme non lu" : "Marquer comme lu");
+        setLabel("waiting", ref?.workflowStatus === "waiting" ? "Repasser à traiter" : "Mettre en attente");
+        setLabel("planned", ref?.workflowStatus === "planned" ? "Repasser à traiter" : "Planifier");
+        setLabel("complete", ref?.completedAt ? "Rouvrir" : "Marquer comme terminé");
+        setLabel("unpin", hdr ? "Désépingler" : "Retirer la référence introuvable");
+
+        for (const action of ["open", "reply", "toggleRead", "archive", "delete"]) {
+          disable(action, !hdr);
+        }
+        disable("group", !this._data.groups.length);
+        disable("calendar-task", !this._settings.enableCalendarIntegration);
+        disable("calendar-event", !this._settings.enableCalendarIntegration);
+      };
+
       const positionContextMenu = (clientX, clientY) => {
-        if (!contextMenu) return;
+        if (!contextMenu || !contextMenuKey) return;
+        prepareContextMenu(contextMenuKey);
         contextMenu.hidden = false;
         contextMenu.style.left = "0px";
         contextMenu.style.top = "0px";
@@ -4189,28 +4248,104 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         contextMenu.style.top = `${y}px`;
         contextMenu.querySelector(".pin-mails-context-item:not([disabled])")?.focus();
       };
-      const runCardAction = (key, action) => {
+
+      const openContextMenuForCard = (card, clientX, clientY) => {
+        if (!card || !panel?.contains(card)) return false;
+        selectedPanelKey = card.dataset.stableKey;
+        selectionAnchorKey = card.dataset.stableKey;
+        updatePanelSelection();
+        contextMenuKey = card.dataset.stableKey;
+        positionContextMenu(clientX, clientY);
+        return true;
+      };
+
+      const runCardAction = async (key, action, sourceButton = null) => {
         const ref = this._data.refs[key];
         const card = list.querySelector(`.pin-mails-card[data-stable-key="${CSS.escape(key)}"]`);
         const hdr = card?._pinMessageHeader || (ref ? this._resolveReference(ref, false) : null);
-        if (!ref) return;
-        if (action === "open") selectPanelMessage(ref, hdr, card);
-        else if (action === "unpin") { if (selectedPanelKey === key) selectedPanelKey = null; selectedPanelKeys.delete(key); this._performReferenceAction([key], "unpin"); showToast(hdr ? "Message désépinglé." : "Référence introuvable retirée.", true); }
-        else if (action === "edit") openEditor(key);
-        else if (action === "waiting") this._setWorkflowStatus([key], ref.workflowStatus === "waiting" ? "active" : "waiting");
-        else if (action === "planned") this._setWorkflowStatus([key], ref.workflowStatus === "planned" ? "active" : "planned");
-        else if (action === "complete") this._performReferenceAction([key], ref.completedAt ? "uncomplete" : "complete");
-        else if (action === "snooze") this._snoozeReminder(key, 60 * 60_000);
-        else if (action === "calendar") this._createCalendarItem(key, this._settings.calendarItemType, this._settings.preferredCalendarId).then(() => showToast("Ajouté à l’agenda.", false)).catch(error => showToast(String(error), false));
-        else this._performMessageAction(action, hdr ? [hdr] : [], about3Pane);
+        if (!ref) {
+          showToast("Cette épingle n’existe plus.", false, "error");
+          return;
+        }
+
+        setActionBusy(sourceButton, true);
+        try {
+          if (action === "open") {
+            if (!selectPanelMessage(ref, hdr, card)) {
+              showToast("Le message est introuvable.", false, "error");
+            }
+            return;
+          }
+          if (action === "unpin") {
+            if (selectedPanelKey === key) selectedPanelKey = null;
+            selectedPanelKeys.delete(key);
+            this._performReferenceAction([key], "unpin");
+            showToast(hdr ? "Message désépinglé." : "Référence introuvable retirée.", true, "success");
+            return;
+          }
+          if (action === "edit") {
+            openEditor(key);
+            return;
+          }
+          if (action === "group") {
+            openGroupAssignmentDialog([key]);
+            return;
+          }
+          if (action === "waiting") {
+            const waiting = ref.workflowStatus !== "waiting";
+            this._setWorkflowStatus([key], waiting ? "waiting" : "active");
+            showToast(waiting ? "Message placé en attente." : "Message replacé à traiter.", true, "success");
+            return;
+          }
+          if (action === "planned") {
+            const planned = ref.workflowStatus !== "planned";
+            this._setWorkflowStatus([key], planned ? "planned" : "active");
+            showToast(planned ? "Message planifié." : "Message replacé à traiter.", true, "success");
+            return;
+          }
+          if (action === "complete") {
+            const completed = !ref.completedAt;
+            this._performReferenceAction([key], completed ? "complete" : "uncomplete");
+            showToast(completed ? "Message marqué comme terminé." : "Message rouvert.", true, "success");
+            return;
+          }
+          if (action === "snooze") {
+            this._snoozeReminder(key, 60 * 60_000);
+            showToast("Rappel reporté d’une heure.", true, "success");
+            return;
+          }
+          if (action === "calendar-task" || action === "calendar-event") {
+            const type = action === "calendar-event" ? "event" : "task";
+            await this._createCalendarItem(key, type, this._settings.preferredCalendarId);
+            showToast(type === "event" ? "Événement synchronisé dans l’Agenda." : "Tâche synchronisée dans l’Agenda.", false, "success");
+            return;
+          }
+
+          const result = this._performMessageAction(action, hdr ? [hdr] : [], about3Pane);
+          if (!result?.count) {
+            if (!result?.cancelled) showToast("Cette action ne peut pas être exécutée sur ce message.", false, "error");
+            return;
+          }
+          if (action === "reply") {
+            showToast("Fenêtre de réponse ouverte.", false, "success");
+          }
+        } catch (error) {
+          this._recordDiagnostic("error", `Action de carte impossible : ${action}`, error);
+          showToast(`Action impossible : ${error?.message || error}`, false, "error");
+        } finally {
+          setActionBusy(sourceButton, false);
+        }
       };
+
       contextMenu.addEventListener("click", event => {
-        const item = event.target.closest("[data-context-action]");
+        const target = elementFromEvent(event);
+        const item = target?.closest?.("[data-context-action]");
         if (!item || !contextMenuKey) return;
         const key = contextMenuKey;
         closeContextMenu();
-        runCardAction(key, item.dataset.contextAction);
+        void runCardAction(key, item.dataset.contextAction, item);
       });
+
       contextMenu.addEventListener("keydown", event => {
         const items = [...contextMenu.querySelectorAll(".pin-mails-context-item:not([disabled])")];
         const index = items.indexOf(document.activeElement);
@@ -4219,14 +4354,19 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
           const key = contextMenuKey;
           closeContextMenu();
           if (key) list.querySelector(`[data-stable-key="${CSS.escape(key)}"]`)?.focus();
-        }
-        else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+        } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
           event.preventDefault();
           const delta = event.key === "ArrowDown" ? 1 : -1;
           items[(index + delta + items.length) % items.length]?.focus();
-        } else if (event.key === "Home") { event.preventDefault(); items[0]?.focus(); }
-        else if (event.key === "End") { event.preventDefault(); items.at(-1)?.focus(); }
+        } else if (event.key === "Home") {
+          event.preventDefault();
+          items[0]?.focus();
+        } else if (event.key === "End") {
+          event.preventDefault();
+          items.at(-1)?.focus();
+        }
       });
+
       if (!onPanelContextMenu) {
         onPanelContextMenu = event => {
           const card = cardFromEvent(event);
@@ -4234,25 +4374,36 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
           event.preventDefault();
           event.stopPropagation();
           event.stopImmediatePropagation();
-          selectedPanelKey = card.dataset.stableKey;
-          selectionAnchorKey = card.dataset.stableKey;
-          updatePanelSelection();
-          contextMenuKey = card.dataset.stableKey;
-          positionContextMenu(event.clientX, event.clientY);
+          openContextMenuForCard(card, event.clientX, event.clientY);
         };
-        document.addEventListener("contextmenu", onPanelContextMenu, true);
+        about3Pane.addEventListener("contextmenu", onPanelContextMenu, true);
+      }
+
+      if (!onPanelRightPointerDown) {
+        onPanelRightPointerDown = event => {
+          if (event.button !== 2) return;
+          const card = cardFromEvent(event);
+          if (!card || !panel?.contains(card)) return;
+          event.preventDefault();
+          event.stopPropagation();
+          event.stopImmediatePropagation();
+          openContextMenuForCard(card, event.clientX, event.clientY);
+        };
+        about3Pane.addEventListener("pointerdown", onPanelRightPointerDown, true);
       }
 
       list.addEventListener("click", event => {
         closeContextMenu();
-        const actionButton = event.target.closest("[data-card-action]");
-        const card = event.target.closest(".pin-mails-card");
+        const target = elementFromEvent(event);
+        const actionButton = target?.closest?.("[data-card-action]");
+        const card = cardFromEvent(event);
         if (!card) return;
         const key = card.dataset.stableKey;
         const ref = this._data.refs[key];
         const hdr = card._pinMessageHeader;
         if (actionButton) {
-          event.preventDefault(); event.stopPropagation();
+          event.preventDefault();
+          event.stopPropagation();
           const action = actionButton.dataset.cardAction;
           if (action === "more") {
             selectedPanelKey = key;
@@ -4262,7 +4413,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
             const rect = actionButton.getBoundingClientRect();
             positionContextMenu(rect.right, rect.bottom);
           } else {
-            runCardAction(key, action);
+            void runCardAction(key, action, actionButton);
           }
           return;
         }
@@ -4379,14 +4530,16 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     };
 
     const selectPanelMessage = (ref, hdr, card) => {
-      if (!ref) return;
+      if (!ref) return false;
       selectedPanelKey = ref.stableKey;
       updatePanelSelection();
-      if (!hdr) return;
+      if (!hdr) return false;
       try {
         about3Pane.messagePane.displayMessage(hdr.folder.getUriForMsg(hdr));
+        return true;
       } catch (error) {
         this._recordDiagnostic("error", "Affichage du message impossible", error);
+        return false;
       }
     };
 
@@ -4416,8 +4569,12 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       if (hdr && !(hdr.flags & Ci.nsMsgMessageFlags.Read)) { const dot = createNode("span", "pin-mails-unread-dot"); dot.title = "Non lu"; top.appendChild(dot); }
       const author = createNode("span", "pin-mails-author", hdr ? formatAuthor(hdr) : ref.author || "Message introuvable"); author.title = author.textContent;
       const date = createNode("time", "pin-mails-date", this._formatDate(about3Pane, hdr, ref));
-      const pin = createQuickButton("unpin", "Désépingler", ""); pin.classList.add("pin-mails-card-pin");
-      top.append(author, date, pin);
+      const more = createQuickButton("more", "Plus d’actions", "⋯");
+      more.classList.add("pin-mails-card-more");
+      more.setAttribute("aria-haspopup", "menu");
+      const pin = createQuickButton("unpin", "Désépingler", "");
+      pin.classList.add("pin-mails-card-pin");
+      top.append(author, date, more, pin);
       const subject = createNode("div", "pin-mails-subject", hdr ? formatSubject(hdr) : ref.subject || "Message déplacé ou supprimé"); subject.title = subject.textContent;
       card.append(top, subject);
 
@@ -4457,8 +4614,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
           createQuickButton("reply", "Répondre", "↩"),
           createQuickButton("waiting", ref.workflowStatus === "waiting" ? "Repasser à traiter" : "Mettre en attente d’une réponse", ref.workflowStatus === "waiting" ? "▶" : "⌛"),
           createQuickButton("complete", ref.completedAt ? "Rouvrir" : "Marquer terminé", ref.completedAt ? "↺" : "✓"),
-          createQuickButton("edit", "Note, affaire, modèle et échéance", "✎"),
-          (() => { const more = createQuickButton("more", "Plus d’actions", "⋯"); more.setAttribute("aria-haspopup", "menu"); return more; })()
+          createQuickButton("edit", "Note, affaire, modèle et échéance", "✎")
         );
         card.appendChild(actions);
       } else if (!this._settings.safeMode && (this._settings.showNotes || this._settings.showDeadlines || this._settings.showGroups)) {
@@ -4593,7 +4749,9 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     const onRowCountChange = () => scheduleRefresh();
     const onSelectionChange = () => this._updateMainMenuWindow(about3Pane.top);
     const onDocumentPointerDown = event => {
-      if (contextMenu?.hidden || event.target?.closest?.(".pin-mails-context-menu")) return;
+      const target = elementFromEvent(event);
+      if (event.button === 2 && cardFromEvent(event)) return;
+      if (contextMenu?.hidden || target?.closest?.(".pin-mails-context-menu")) return;
       contextMenu.hidden = true;
       contextMenuKey = "";
     };
@@ -4632,7 +4790,8 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       document.removeEventListener("click", onDocumentClick, true);
       document.removeEventListener("pointerdown", onDocumentPointerDown, true);
       document.removeEventListener("keydown", onDocumentKeyDown, true);
-      if (onPanelContextMenu) document.removeEventListener("contextmenu", onPanelContextMenu, true);
+      if (onPanelContextMenu) about3Pane.removeEventListener("contextmenu", onPanelContextMenu, true);
+      if (onPanelRightPointerDown) about3Pane.removeEventListener("pointerdown", onPanelRightPointerDown, true);
       document.removeEventListener("select", onSelectionChange, true);
       about3Pane.removeEventListener("blur", onWindowBlur, true);
       about3Pane.removeEventListener("resize", onViewportChange);

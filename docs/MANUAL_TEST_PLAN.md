@@ -5,7 +5,7 @@ Consigner version Thunderbird, OS, thème, vue, type de compte et résultat.
 ## Installation et migration
 
 - installation propre ;
-- mise à niveau 3.1.0 → 3.1.1 ;
+- mise à niveau 3.1.1 → 3.1.2 ;
 - redémarrage normal et redémarrage forcé ;
 - sauvegarde puis restauration.
 
@@ -66,3 +66,15 @@ Consigner version Thunderbird, OS, thème, vue, type de compte et résultat.
 - punaise centrée dans son bouton en vue Cartes et Tableau ;
 - création et affectation d’un groupe sans dialogue natif du navigateur ;
 - ouverture du dashboard juste après le démarrage de Thunderbird, sans faux message d’indisponibilité.
+
+## Régressions de la seconde vidéo du 30 juillet 2026
+
+- faire défiler les paramètres jusqu’en bas, lancer chaque action et vérifier le toast dans le viewport ;
+- modifier une option puis lancer Vérifier SQLite : la modification non enregistrée doit rester présente ;
+- vérifier le bandeau fixe Enregistrer/Annuler après toute saisie ;
+- cliquer sur auteur, objet, espace vide, bouton Plus et punaise : aucune zone morte ;
+- clic droit sur chaque zone de la carte : menu MailPerch visible, jamais le menu natif seul ;
+- quitter la carte : les actions rapides invisibles ne doivent plus capter les clics ;
+- vérifier les couleurs de compte et le centrage des punaises dans les deux thèmes ;
+- exécuter chaque action du dashboard : état occupé puis succès ou erreur visible ;
+- déplacer une carte Kanban et vérifier le feedback et l’absence de contour résiduel.

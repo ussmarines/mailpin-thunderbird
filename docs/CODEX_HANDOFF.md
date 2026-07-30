@@ -2,9 +2,21 @@
 
 ## État exact
 
-Produit : **MailPerch — Email Pins & Follow-up**. Build : **3.1.1**, ID de développement `pin-mails@MailPerch.local`.
+Produit : **MailPerch — Email Pins & Follow-up**. Build : **3.1.2**, ID de développement `pin-mails@MailPerch.local`.
 
 Corrections implémentées à partir des captures :
+
+Corrections dérivées de la seconde vidéo du 30 juillet 2026 :
+
+- feedback des paramètres fixé au bas de la fenêtre avec états succès/erreur/chargement ;
+- barre persistante pour les modifications non enregistrées ;
+- actions de maintenance sans écrasement des champs en cours de saisie ;
+- menu contextuel renforcé au niveau de `about:3pane` et par `pointerdown` droit ;
+- actions invisibles neutralisées avec `pointer-events: none` ;
+- menu « Plus » toujours visible et gestionnaire d’actions unifié ;
+- couleurs, centrage et survol des punaises restaurés ;
+- feedback des actions du dashboard et du Kanban ;
+- documentation détaillée dans `docs/VIDEO_REVIEW_2026-07-30_2.md`.
 
 Corrections supplémentaires dérivées de la vidéo du 30 juillet 2026 :
 

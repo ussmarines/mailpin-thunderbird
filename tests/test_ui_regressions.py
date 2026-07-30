@@ -10,6 +10,9 @@ background = (EXT / "background.js").read_text(encoding="utf-8")
 dashboard_html = (EXT / "dashboard/dashboard.html").read_text(encoding="utf-8")
 dashboard_css = (EXT / "dashboard/dashboard.css").read_text(encoding="utf-8")
 dashboard_js = (EXT / "dashboard/dashboard.js").read_text(encoding="utf-8")
+options_html = (EXT / "options/options.html").read_text(encoding="utf-8")
+options_css = (EXT / "options/options.css").read_text(encoding="utf-8")
+options_js = (EXT / "options/options.js").read_text(encoding="utf-8")
 
 # Dashboard must be opened from the WebExtension background, not from chrome UI.
 assert "onDashboardRequested" in impl
@@ -21,17 +24,37 @@ assert 'href="./dashboard.css"' in dashboard_html
 assert 'src="./dashboard.js"' in dashboard_html
 assert "fatal-error" in dashboard_html and "data-loading" in dashboard_css
 assert "getDashboardData" in dashboard_js
+assert 'id="status"' in dashboard_html and "aria-atomic=\"true\"" in dashboard_html
+assert "position: fixed" in dashboard_css and ".status.success" in dashboard_css
+assert "setButtonBusy" in dashboard_js and "ACTION_MESSAGES" in dashboard_js
+assert "event.composedPath" in dashboard_js
+
+# Settings feedback must remain visible at the user's current scroll position.
+assert 'id="save-dock"' in options_html
+assert 'id="save-all-floating"' in options_html
+assert 'class="status-toast"' in options_html
+assert 'id="status-close"' in options_html
+assert ".status-toast" in options_css and "position: fixed" in options_css
+assert ".save-dock" in options_css and "position: fixed" in options_css
+assert "function setDirty" in options_js
+assert "function withBusy" in options_js
+assert "preserveEdits" in options_js
+assert "beforeunload" in options_js
+assert 'setStatus("Paramètres enregistrés."' in options_js
 
 # Pinned cards have a context menu captured before Thunderbird's native menu.
-assert 'document.addEventListener("contextmenu", onPanelContextMenu, true)' in impl
+assert 'about3Pane.addEventListener("contextmenu", onPanelContextMenu, true)' in impl
+assert 'about3Pane.addEventListener("pointerdown", onPanelRightPointerDown, true)' in impl
 assert 'list.addEventListener("contextmenu"' not in impl
 assert "event.composedPath()" in impl
 assert "event.stopImmediatePropagation()" in impl
 assert 'event.key === "ContextMenu"' in impl
 assert 'event.shiftKey && event.key === "F10"' in impl
-assert "document.body.appendChild(contextMenu)" in impl
+assert "document.documentElement.appendChild(contextMenu)" in impl
 assert "contextMenu?.remove()" in impl
 assert ".pin-mails-context-menu" in css and "position: fixed" in css
+assert "openContextMenuForCard" in impl
+assert "runCardAction" in impl
 
 # Reading a card is an active state, not a persistent bulk selection.
 click_start = impl.index('list.addEventListener("click"')
@@ -41,9 +64,19 @@ assert "selectedPanelKeys.clear();" in click_handler
 assert "selectPanelMessage(ref, hdr, card);" in click_handler
 assert "selectedPanelKeys.add(key);\n        selectionAnchorKey = key;\n        selectPanelMessage" not in click_handler
 assert 'card.toggleAttribute("data-active", active)' in impl
-assert '.pin-mails-card[data-active]' in css
-assert '.pin-mails-card[data-selected]' in css
-assert '.pin-mails-card[data-selected] .pin-mails-card-actions' not in css
+assert ".pin-mails-card[data-active]" in css
+assert ".pin-mails-card[data-selected]" in css
+assert ".pin-mails-card[data-selected] .pin-mails-card-actions" not in css
+
+# Hidden quick actions must never intercept card clicks.
+assert ".pin-mails-card-actions" in css
+assert "visibility: hidden" in css
+assert "pointer-events: none" in css
+assert ".pin-mails-card:hover .pin-mails-card-actions" in css
+assert ".pin-mails-card[data-active] .pin-mails-card-actions" in css
+assert "pointer-events: auto" in css
+assert 'createQuickButton("more", "Plus d’actions"' in impl
+assert ".pin-mails-card-more" in css
 
 # Pin colours and hover states must be driven by account variables, not white.
 assert "color: var(--pin-account-color);" in css
@@ -51,6 +84,8 @@ assert "background-color: var(--pin-row-account-color, var(--pin-mails-accent));
 assert "tr[data-pin-mails-pinned] .pin-mails-independent-button::before" in css
 assert "#threadTree tr:is(:hover, :focus-within) .pin-mails-independent-button" in css
 assert ".pin-mails-card-pin:hover::before" in css
+assert ".pin-mails-quick-button.pin-mails-card-pin" in css
+assert "place-items: center" in css
 assert 'light-dark(color-mix(in srgb, var(--pin-account-color)' not in css
 
 # Group creation uses an extension-owned accessible dialog, never native prompt().

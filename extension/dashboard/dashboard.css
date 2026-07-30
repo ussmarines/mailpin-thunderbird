@@ -107,8 +107,25 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 }
 .search-control { flex: 1 1 260px; }
 .search-control input { width: 100%; }
-.status { min-height: 1.7em; padding: 2px 0 8px; color: var(--accent); }
-.status.error { color: var(--danger); }
+.status {
+  position: fixed;
+  inset-inline-end: 18px;
+  inset-block-end: 18px;
+  z-index: 1000;
+  max-inline-size: min(520px, calc(100vw - 24px));
+  padding: 11px 14px;
+  border: 1px solid var(--border);
+  border-inline-start: 4px solid var(--accent);
+  border-radius: 9px;
+  background: var(--surface-raised);
+  color: CanvasText;
+  box-shadow: 0 8px 28px rgb(0 0 0 / .28);
+}
+.status[hidden] { display: none !important; }
+.status.success { border-inline-start-color: var(--success); }
+.status.error { border-inline-start-color: var(--danger); }
+.status.busy { border-inline-start-color: var(--accent); }
+
 
 .items { display: grid; gap: 9px; }
 .item {
@@ -228,4 +245,23 @@ body[data-loading] #kanban,
 body[data-loading] #cases,
 body[data-loading] #history {
   opacity: .65;
+}
+
+.button[data-busy] { position: relative; cursor: progress; opacity: .78; }
+.button[data-busy]::after {
+  content: "";
+  inline-size: 11px;
+  block-size: 11px;
+  margin-inline-start: 7px;
+  border: 2px solid currentColor;
+  border-inline-end-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  vertical-align: -1px;
+  animation: mailperch-dashboard-spin 700ms linear infinite;
+}
+@keyframes mailperch-dashboard-spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 720px) {
+  .status { inset-inline: 12px; inset-block-end: 12px; max-inline-size: none; }
 }

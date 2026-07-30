@@ -6,8 +6,20 @@
   <link rel="stylesheet" href="options.css"><script src="options.js" defer></script>
 </head>
 <body><main>
-<header class="page-header"><div class="title-row"><img src="../icons/pin.svg" alt="" width="38" height="38"><div class="brand-copy"><h1><span data-i18n="optionsHeading">MailPerch</span> <span id="app-version" class="app-version"></span></h1><p data-i18n="brandSubtitle">Épinglez, organisez et suivez vos e-mails dans Thunderbird.</p><p class="brand-slogan" data-i18n="brandSlogan">Gardez vos messages importants à portée de main.</p></div></div><div id="status" role="status" aria-live="polite"></div></header>
+<header class="page-header"><div class="title-row"><img src="../icons/pin.svg" alt="" width="38" height="38"><div class="brand-copy"><h1><span data-i18n="optionsHeading">MailPerch</span> <span id="app-version" class="app-version"></span></h1><p data-i18n="brandSubtitle">Épinglez, organisez et suivez vos e-mails dans Thunderbird.</p><p class="brand-slogan" data-i18n="brandSlogan">Gardez vos messages importants à portée de main.</p></div></div></header>
 <form id="settings-form">
+<section class="feature-access-guide" aria-labelledby="feature-access-title">
+  <div>
+    <h2 id="feature-access-title">Où retrouver les fonctions</h2>
+    <p class="hint">Les réglages activent les fonctions, puis elles se pilotent depuis le panneau MailPerch.</p>
+  </div>
+  <ul>
+    <li><strong>Actions d’un message :</strong> bouton <span aria-hidden="true">⋯</span> ou clic droit sur toute la carte.</li>
+    <li><strong>Note, échéance, rappel et affaire :</strong> commande « Modifier le suivi » dans le menu de la carte.</li>
+    <li><strong>Kanban, historique et actions groupées :</strong> bouton « Tableau de bord ».</li>
+    <li><strong>Paramètres modifiés :</strong> le bandeau fixe « Enregistrer » reste visible en bas de la fenêtre.</li>
+  </ul>
+</section>
 <section><h2>Épinglage et compatibilité</h2><div class="grid two-columns">
 <label>Stockage des épingles<select id="pinMode"><option value="independent">Indépendant des étoiles — recommandé</option><option value="nativeStar">Étoiles natives Thunderbird</option></select></label>
 <label>Cible par défaut<select id="defaultPinTarget"><option value="message">Message précis</option><option value="conversation">Conversation complète</option></select></label>
@@ -47,5 +59,20 @@
 <div class="button-row"><button id="integrity-check" type="button" class="secondary">Vérifier SQLite</button><button id="compat-check" type="button" class="secondary">Vérifier la compatibilité</button><button id="dashboard" type="button" class="secondary">Tableau de bord</button><button id="undo" type="button" class="secondary">Annuler</button><button id="repair" type="button" class="secondary">Réparer</button><button id="rescan" type="button" class="secondary">Rescanner</button><button id="cleanup" type="button" class="secondary">Nettoyer</button><button id="reset-interface" type="button" class="secondary">Réinitialiser l’interface</button><button id="diagnostic" type="button" class="secondary">Exporter le diagnostic</button><button id="export" type="button" class="secondary">Exporter</button><label class="file-button secondary">Importer<input id="import-file" type="file" accept="application/json,.json"></label></div></section>
 
 <section><h2>Raccourci</h2><div class="shortcut-row"><input id="shortcut" type="text"><button id="save-shortcut" type="button" class="secondary">Enregistrer</button></div></section>
-<footer><button type="submit" class="primary">Enregistrer tous les paramètres</button><button id="reset" type="button" class="danger">Réinitialiser les réglages</button><span id="stats"></span></footer>
-</form></main></body></html>
+<footer class="form-footer">
+  <button id="save-all" type="submit" class="primary">Enregistrer tous les paramètres</button>
+  <button id="reset" type="button" class="danger">Réinitialiser les réglages</button>
+  <span id="stats"></span>
+</footer>
+<div id="save-dock" class="save-dock" hidden role="region" aria-label="Modifications non enregistrées">
+  <span id="save-dock-message">Modifications non enregistrées</span>
+  <button id="save-all-floating" type="submit" class="primary">Enregistrer</button>
+  <button id="discard-changes" type="button" class="secondary">Annuler les modifications</button>
+</div>
+</form></main>
+<aside id="status" class="status-toast" role="status" aria-live="polite" aria-atomic="true" hidden>
+  <span id="status-icon" class="status-icon" aria-hidden="true"></span>
+  <span id="status-message"></span>
+  <button id="status-close" type="button" class="status-close" aria-label="Fermer la notification">×</button>
+</aside>
+</body></html>

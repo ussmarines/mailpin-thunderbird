@@ -1,28 +1,28 @@
 # Journal des modifications
 
-## 3.1.1 — corrections issues de la vidéo d’utilisation
+## 3.1.2 — interactions et retours d’action
 
 ### Corrigé
 
-- contrat de l’API Experiment complété pour accepter les propriétés réellement envoyées par les paramètres et le tableau de bord ;
-- enregistrement des paramètres, import de configuration, simulation des règles et chargement du dashboard débloqués ;
-- ouverture du tableau de bord rendue tolérante au démarrage différé du background ;
-- clic droit capturé au niveau du document avant le menu natif de Thunderbird ;
-- support conservé pour `Shift+F10` et la touche Menu ;
-- état actif d’un message séparé de la sélection multiple persistante ;
-- actions rapides de nouveau limitées au survol et au focus de la carte ;
-- couleurs des épingles restaurées à partir de la couleur de compte, dans le panneau comme dans la liste native ;
-- zones de survol et retours visuels des punaises renforcés ;
-- centrage optique des SVG de punaise corrigé ;
-- création et affectation de groupes déplacées vers des dialogues intégrés, sans `prompt()` natif ;
-- libellés de secours MailPerch corrigés dans les menus ;
-- nettoyage de la demande différée du dashboard lors de l’arrêt de l’extension.
+- notification des paramètres déplacée dans un toast fixe visible quelle que soit la position de défilement ;
+- bandeau fixe pour enregistrer ou annuler les modifications non sauvegardées ;
+- opérations de maintenance protégées contre l’écrasement silencieux des modifications en cours ;
+- états occupé, succès et erreur ajoutés aux boutons des paramètres et du dashboard ;
+- aide intégrée indiquant où retrouver les fonctions activées ;
+- clic droit capturé au niveau de la fenêtre `about:3pane`, avec solution de secours sur le bouton droit ;
+- menu complet accessible par clic droit, bouton « Plus », `Shift+F10` et touche Menu ;
+- boutons invisibles empêchés d’intercepter les clics sur les cartes ;
+- actions rapides et actions du menu reliées à un gestionnaire unique avec retours visibles ;
+- couleurs par compte restaurées sur les punaises du panneau ;
+- centrage et zone cliquable des punaises stabilisés ;
+- survol des cartes, punaises et boutons rendu cohérent ;
+- actions unitaires, groupées et Kanban du dashboard dotées d’un résultat visible ;
+- gardes de régression étendues aux interactions et au feedback des paramètres.
 
-### Tests
+### Validation
 
-- ajout d’un test du contrat des objets traversant l’API Experiment ;
-- gardes de régression sur le clic droit, les états actif/sélection, les couleurs, le survol et les dialogues de groupes ;
-- plan de test manuel enrichi à partir de la vidéo du 30 juillet 2026.
+- nouvelle passe vidéo du 30 juillet 2026 documentée dans `docs/VIDEO_REVIEW_2026-07-30_2.md` ;
+- build et tests portés en version 3.1.2.
 
 ## 3.1.0 — passe de débogage, dashboard et dépôt
 

@@ -1,8 +1,27 @@
-# Message Pins for Thunderbird
+# MailPerch
 
-A development Thunderbird MailExtension that adds a separate pinned-message panel above the native message list, plus local workflows, reminders, groups, cases, Kanban, rules and Calendar integration.
+**MailPerch — Email Pins & Follow-up**
 
-> **Status: development build 3.1.1.** This build addresses the regressions recorded in the July 30, 2026 usage video, including API contracts, context menus, pin colours, hover feedback and icon alignment. A complete real-Thunderbird GUI validation is still required before release.
+> **Pin, organize and follow up on your emails in Thunderbird.**
+> *Keep important mail within reach.*
+
+MailPerch is a Thunderbird extension that adds a separate pinned-message panel above the native message list, plus local workflows, reminders, groups, cases, Kanban, rules and Calendar integration.
+
+> **Status: development build 3.1.2.** Static checks, model tests and regression guards run automatically. A complete real-Thunderbird GUI validation is still required before release.
+
+## Main features
+
+- pins independent from Thunderbird stars;
+- a separate panel that does not hide the native message list;
+- account colours, groups, notes, priorities and deadlines;
+- active, waiting, planned and completed workflows;
+- conversations, reminders and recurring follow-ups;
+- cases, Kanban and bulk actions;
+- local rules with simulation and loop protection;
+- Thunderbird Calendar tasks and events;
+- local SQLite storage, backups, repair and diagnostics;
+- a context menu on the whole pinned card;
+- visible success, busy and error feedback in settings and dashboard.
 
 ## Development
 

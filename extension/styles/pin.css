@@ -1,4 +1,4 @@
-/* MailPerch — Email Pins & Follow-up 3.1.1 */
+/* MailPerch — Email Pins & Follow-up 3.1.2 */
 
 :root {
   --pin-mails-accent: light-dark(#0f6cbd, #62b0e8);
@@ -211,7 +211,9 @@
 }
 
 .pin-mails-card:hover {
-  background: color-mix(in srgb, var(--pin-account-color) 8%, var(--pin-mails-card-hover));
+  border-color: color-mix(in srgb, var(--pin-account-color) 40%, transparent);
+  background: color-mix(in srgb, var(--pin-account-color) 12%, var(--pin-mails-card-hover));
+  box-shadow: inset 3px 0 0 var(--pin-account-color);
 }
 .pin-mails-card[data-active] {
   background: color-mix(in srgb, var(--pin-account-color) 8%, var(--pin-mails-card-bg));
@@ -702,9 +704,22 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
 .pin-mails-group-chip { color: var(--pin-group-color); border-color: color-mix(in srgb, var(--pin-group-color) 60%, transparent); }
 .pin-mails-priority-chip.high { color: light-dark(#8a4b00, #ffc46b); }
 .pin-mails-priority-chip.urgent { color: light-dark(#a4262c, #ff9ca2); font-weight: 750; }
-.pin-mails-card-actions { display: flex; justify-content: flex-end; gap: 4px; opacity: 0; transition: opacity 100ms ease; }
+.pin-mails-card-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 100ms ease, visibility 100ms ease;
+}
 .pin-mails-card:hover .pin-mails-card-actions,
-.pin-mails-card:focus-within .pin-mails-card-actions { opacity: 1; }
+.pin-mails-card:focus-within .pin-mails-card-actions,
+.pin-mails-card[data-active] .pin-mails-card-actions {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
 .pin-mails-custom-group {
   margin-block-end: 6px;
   border: 1px solid color-mix(in srgb, var(--pin-account-color) 35%, var(--pin-mails-border));
@@ -991,4 +1006,109 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
 @media (forced-colors: active) {
   .pin-mails-context-menu { border-color: CanvasText; }
   .pin-mails-card[data-selected] { box-shadow: inset 0 0 0 2px Highlight; }
+}
+
+
+/* 3.1.2 — interactions fiables des cartes et punaises. */
+.pin-mails-quick-button.pin-mails-card-pin {
+  display: grid;
+  place-items: center;
+  inline-size: 32px;
+  block-size: 32px;
+  min-inline-size: 32px;
+  min-block-size: 32px;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--pin-account-color) 45%, transparent);
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--pin-account-color) 17%, transparent);
+  color: var(--pin-account-color);
+  line-height: 0;
+}
+.pin-mails-quick-button.pin-mails-card-pin::before {
+  inset: 0;
+  inline-size: 21px;
+  block-size: 21px;
+  margin: auto;
+  -webkit-mask-size: 21px 21px;
+  mask-size: 21px 21px;
+  transform: none;
+}
+.pin-mails-quick-button.pin-mails-card-pin:hover,
+.pin-mails-quick-button.pin-mails-card-pin:focus-visible {
+  color: var(--pin-account-color);
+  border-color: var(--pin-account-color);
+  background: color-mix(in srgb, var(--pin-account-color) 30%, transparent);
+}
+.pin-mails-quick-button.pin-mails-card-pin:hover::before,
+.pin-mails-quick-button.pin-mails-card-pin:focus-visible::before {
+  transform: scale(1.1);
+}
+
+.pin-mails-card-more {
+  flex: 0 0 auto;
+  inline-size: 30px;
+  block-size: 30px;
+  min-inline-size: 30px;
+  min-block-size: 30px;
+  padding: 0;
+  border-color: transparent;
+  border-radius: 7px;
+  font-size: 1.22rem;
+  line-height: 1;
+  opacity: .72;
+}
+.pin-mails-card-more:hover,
+.pin-mails-card-more:focus-visible,
+.pin-mails-card[data-active] .pin-mails-card-more {
+  opacity: 1;
+  border-color: color-mix(in srgb, var(--pin-account-color) 50%, transparent);
+  background: color-mix(in srgb, var(--pin-account-color) 16%, transparent);
+}
+
+.pin-mails-quick-button:active {
+  transform: translateY(1px);
+}
+.pin-mails-quick-button[data-busy] {
+  cursor: progress;
+  opacity: .65;
+}
+.pin-mails-quick-button[data-busy]::after {
+  content: "";
+  inline-size: 11px;
+  block-size: 11px;
+  border: 2px solid currentColor;
+  border-inline-end-color: transparent;
+  border-radius: 50%;
+  animation: pin-mails-button-spin 700ms linear infinite;
+}
+@keyframes pin-mails-button-spin { to { transform: rotate(360deg); } }
+
+.pin-mails-context-menu {
+  isolation: isolate;
+  pointer-events: auto;
+}
+.pin-mails-context-item:disabled {
+  cursor: not-allowed;
+  opacity: .48;
+}
+.pin-mails-context-item:active {
+  transform: translateY(1px);
+}
+
+.pin-mails-toast[data-kind="success"] {
+  border-inline-start: 4px solid light-dark(#107c10, #70d48f);
+}
+.pin-mails-toast[data-kind="error"] {
+  border-inline-start: 4px solid light-dark(#d13438, #ff9ca2);
+}
+.pin-mails-toast[data-kind="busy"] {
+  border-inline-start: 4px solid var(--pin-mails-accent);
+}
+
+@media (hover: none) {
+  .pin-mails-card-actions {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
 }

@@ -1,29 +1,36 @@
-# Épingles de messages pour Thunderbird
+# MailPerch
 
-Extension Thunderbird expérimentale qui ajoute un panneau d’épingles au-dessus de la liste des messages, avec suivi local, rappels, groupes, affaires, Kanban, règles et intégration Agenda.
+**MailPerch — Email Pins & Follow-up**
 
-> **État : build de développement 3.1.1.** Cette version corrige les régressions observées dans la vidéo d’utilisation du 30 juillet 2026, notamment le contrat API, le clic droit, les couleurs, le survol et le centrage des punaises. Une nouvelle validation graphique complète dans Thunderbird reste obligatoire avant publication. Voir [docs/VIDEO_REVIEW_2026-07-30.md](docs/VIDEO_REVIEW_2026-07-30.md).
+> **Épinglez, organisez et suivez vos e-mails dans Thunderbird.**
+> *Gardez vos messages importants à portée de main.*
+
+MailPerch est une extension Thunderbird qui ajoute un panneau d’épingles au-dessus de la liste native des messages, avec suivi local, rappels, groupes, affaires, Kanban, règles et intégration Agenda.
+
+> **État : build de développement 3.1.2.** Les contrôles statiques, les tests de modèle et les gardes de régression sont exécutés automatiquement. Une validation graphique complète dans Thunderbird reste obligatoire avant publication.
 
 ## Fonctions principales
 
 - épingles indépendantes des étoiles Thunderbird ;
 - panneau distinct sans masquer la liste native ;
-- couleurs par compte, groupes, notes et priorités ;
+- couleurs personnalisables par compte, groupes, notes et priorités ;
 - suivi « À traiter / En attente / Planifié / Terminé » ;
 - conversations, échéances, rappels et récurrences ;
 - affaires et tableau Kanban ;
 - règles locales avec simulation et protections anti-boucle ;
-- tâches/événements Agenda ;
+- tâches et événements Agenda ;
 - sauvegardes, réparation, diagnostic et stockage SQLite local ;
-- menu contextuel accessible sur les cartes épinglées ;
-- tableau de bord global adapté aux thèmes clair et sombre.
+- menu contextuel sur toute la surface des cartes épinglées ;
+- tableau de bord global adapté aux thèmes clair et sombre ;
+- retours d’action visibles dans les paramètres et le dashboard.
 
 ## Installation de test
 
 1. Construire avec `npm run build`, ou utiliser le XPI fourni séparément.
 2. Dans Thunderbird : **Extensions et thèmes → roue dentée → Installer un module depuis un fichier**.
-3. Redémarrer Thunderbird.
-4. Utiliser un profil de test et des messages sans importance pour les opérations de suppression, archivage et règles.
+3. Sélectionner `dist/MailPerch_v3.1.2.xpi`.
+4. Redémarrer complètement Thunderbird.
+5. Utiliser un profil de test et des messages sans importance pour les opérations de suppression, archivage et règles.
 
 ## Développement
 
@@ -61,7 +68,3 @@ L’extension utilise une API Experiment pour accéder à des éléments interne
 ## Licence
 
 Ce dépôt n’est pas open source. Le code est fourni sous une licence source-disponible restrictive, non commerciale et sans droit de redistribution publique. Voir [LICENSE](LICENSE). Une validation juridique professionnelle est recommandée avant publication publique.
-
-## Nom du projet
-
-« Outlook » est une marque de Microsoft. Le nom actuel est un nom de développement descriptif. Un examen du nom et des marques est requis avant la publication sur Add-ons for Thunderbird.

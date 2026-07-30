@@ -10,7 +10,7 @@ manifest = json.loads((EXT / "manifest.json").read_text(encoding="utf-8"))
 version = manifest["version"]
 
 assert manifest["manifest_version"] == 3
-assert version == "3.1.1"
+assert version == "3.1.2"
 assert manifest["permissions"] == ["menus"]
 assert manifest["browser_specific_settings"]["gecko"]["id"] == "pin-mails@MailPerch.local"
 assert manifest["browser_specific_settings"]["gecko"]["strict_min_version"] == "128.0"
@@ -102,7 +102,7 @@ assert "contentTab" not in impl
 assert "settings.showFolderBadge = false" in impl
 assert 'this._extensionVersion = String(context.extension.manifest?.version || "0.0.0")' in impl
 assert 'extension: {version: this._extensionVersion || "0.0.0"' in impl
-assert 'document.body.appendChild(contextMenu)' in impl
+assert 'document.documentElement.appendChild(contextMenu)' in impl
 assert 'contextMenu?.remove()' in impl
 
 css = (EXT / "styles/pin.css").read_text(encoding="utf-8")

@@ -1,21 +1,34 @@
 "use strict";
 
-function localize(){document.documentElement.lang=(messenger.i18n.getUILanguage?.()||"fr").split("-")[0];for(const element of document.querySelectorAll("[data-i18n]")){const value=messenger.i18n.getMessage(element.dataset.i18n);if(value)element.textContent=value;}}
+function localize() {
+  document.documentElement.lang = (messenger.i18n.getUILanguage?.() || "fr").split("-")[0];
+  for (const element of document.querySelectorAll("[data-i18n]")) {
+    const value = messenger.i18n.getMessage(element.dataset.i18n);
+    if (value) element.textContent = value;
+  }
+}
 
 const api = globalThis.messenger || globalThis.browser;
 const selected = new Set();
 let current = null;
 let searchTimer = null;
+let statusTimer = null;
 let loadGeneration = 0;
 let loading = false;
 
 const $ = id => document.getElementById(id);
 
+function eventElement(event) {
+  const path = typeof event.composedPath === "function" ? event.composedPath() : [];
+  return path.find(candidate => candidate?.nodeType === Node.ELEMENT_NODE) ||
+    (event.target?.nodeType === Node.ELEMENT_NODE ? event.target : null);
+}
+
 function normalizeTimestamp(value) {
   const number = Number(value) || 0;
   if (!number) return 0;
-  if (number > 10_000_000_000_000) return Math.trunc(number / 1000); // PRTime microseconds.
-  if (number < 10_000_000_000) return number * 1000; // Unix seconds.
+  if (number > 10_000_000_000_000) return Math.trunc(number / 1000);
+  if (number < 10_000_000_000) return number * 1000;
   return number;
 }
 
@@ -23,12 +36,14 @@ function formatDate(value) {
   const timestamp = normalizeTimestamp(value);
   if (!timestamp) return "";
   try {
-    return new Intl.DateTimeFormat(undefined, {dateStyle: "short", timeStyle: "short"}).format(new Date(timestamp));
+    return new Intl.DateTimeFormat(undefined, {
+      dateStyle: "short",
+      timeStyle: "short"
+    }).format(new Date(timestamp));
   } catch {
     return new Date(timestamp).toLocaleString();
   }
 }
-
 
 function clearKanbanDropState() {
   for (const list of document.querySelectorAll(".kanban-list[data-drop-active]")) {
@@ -40,14 +55,55 @@ function setLoading(value) {
   loading = Boolean(value);
   document.body.toggleAttribute("data-loading", loading);
   for (const control of document.querySelectorAll("button, select, input")) {
-    if (control.id !== "retry") control.disabled = loading;
+    if (control.id === "retry") continue;
+    if (loading) {
+      control.dataset.mailperchLoadingWasDisabled = String(control.disabled);
+      control.disabled = true;
+    } else {
+      control.disabled = control.dataset.mailperchLoadingWasDisabled === "true";
+      delete control.dataset.mailperchLoadingWasDisabled;
+    }
   }
 }
 
-function setStatus(message, isError = false) {
+function clearStatus() {
+  if (statusTimer) {
+    clearTimeout(statusTimer);
+    statusTimer = null;
+  }
   const status = $("status");
-  status.textContent = message || "";
-  status.classList.toggle("error", isError);
+  status.textContent = "";
+  status.className = "status";
+  status.hidden = true;
+}
+
+function setStatus(message, type = "", {persistent = false} = {}) {
+  if (statusTimer) {
+    clearTimeout(statusTimer);
+    statusTimer = null;
+  }
+  const status = $("status");
+  status.textContent = String(message || "");
+  status.className = `status ${type}`.trim();
+  status.hidden = !message;
+  if (message && !persistent && type !== "busy") {
+    statusTimer = setTimeout(clearStatus, type === "error" ? 12000 : 6500);
+  }
+}
+
+function setButtonBusy(control, busy) {
+  if (!(control instanceof HTMLButtonElement)) return;
+  if (busy) {
+    control.dataset.mailperchBusyWasDisabled = String(control.disabled);
+    control.disabled = true;
+    control.dataset.busy = "true";
+    control.setAttribute("aria-busy", "true");
+  } else {
+    control.disabled = control.dataset.mailperchBusyWasDisabled === "true";
+    delete control.dataset.mailperchBusyWasDisabled;
+    delete control.dataset.busy;
+    control.removeAttribute("aria-busy");
+  }
 }
 
 function button(action, label) {
@@ -56,6 +112,8 @@ function button(action, label) {
   element.className = "button secondary";
   element.dataset.action = action;
   element.textContent = label;
+  element.title = label;
+  element.setAttribute("aria-label", label);
   return element;
 }
 
@@ -89,7 +147,11 @@ function badgesFor(item) {
     [item.unread, "Non lu", ""],
     [item.workflowStatus === "waiting", "En attente", "waiting"],
     [item.workflowStatus === "planned", "Planifié", "planned"],
-    [item.dueAt || item.followUpAt, `${item.smartSection === "overdue" ? "En retard" : "Échéance"} ${formatDate(item.followUpAt || item.dueAt)}`, item.smartSection === "overdue" ? "overdue" : ""],
+    [
+      item.dueAt || item.followUpAt,
+      `${item.smartSection === "overdue" ? "En retard" : "Échéance"} ${formatDate(item.followUpAt || item.dueAt)}`,
+      item.smartSection === "overdue" ? "overdue" : ""
+    ],
     [item.completedAt, "Terminé", ""],
     [item.trackingMode === "conversation", `${item.conversationCount || 1} messages`, ""],
     [item.caseName, `Affaire : ${item.caseName}`, ""],
@@ -131,7 +193,9 @@ function createCard(item, {checkbox = true, compact = false} = {}) {
   title.textContent = item.subject || "(sans objet)";
   const meta = document.createElement("div");
   meta.className = "meta";
-  meta.textContent = [item.author, item.accountName, item.folderName, formatDate(item.date)].filter(Boolean).join(" · ");
+  meta.textContent = [item.author, item.accountName, item.folderName, formatDate(item.date)]
+    .filter(Boolean)
+    .join(" · ");
   body.append(title, meta);
   if (item.note) {
     const note = document.createElement("div");
@@ -145,10 +209,13 @@ function createCard(item, {checkbox = true, compact = false} = {}) {
   actions.className = "actions";
   actions.append(
     button("open", "Ouvrir"),
-    button(item.workflowStatus === "completed" ? "active" : "complete", item.workflowStatus === "completed" ? "Rouvrir" : "Terminer"),
+    button(
+      item.workflowStatus === "completed" ? "active" : "complete",
+      item.workflowStatus === "completed" ? "Rouvrir" : "Terminer"
+    ),
     button("waiting", "Attente"),
     button("planned", "Planifier"),
-    button("snooze", "+1 h"),
+    button("snooze", "Reporter 1 h"),
     button("calendar", "Agenda"),
     button("unpin", "Désépingler")
   );
@@ -169,7 +236,12 @@ function renderList() {
 function renderKanban() {
   const host = $("kanban");
   host.replaceChildren();
-  const columns = [["active", "À traiter"], ["waiting", "En attente"], ["planned", "Planifié"], ["completed", "Terminé"]];
+  const columns = [
+    ["active", "À traiter"],
+    ["waiting", "En attente"],
+    ["planned", "Planifié"],
+    ["completed", "Terminé"]
+  ];
   for (const [status, label] of columns) {
     const column = document.createElement("section");
     column.className = "kanban-column";
@@ -180,21 +252,39 @@ function renderKanban() {
     const list = document.createElement("div");
     list.className = "kanban-list";
     list.dataset.status = status;
-    list.addEventListener("dragenter", event => { event.preventDefault(); clearKanbanDropState(); list.dataset.dropActive = "true"; });
-    list.addEventListener("dragover", event => { event.preventDefault(); event.dataTransfer.dropEffect = "move"; });
-    list.addEventListener("dragleave", event => { if (!list.contains(event.relatedTarget)) delete list.dataset.dropActive; });
+    list.addEventListener("dragenter", event => {
+      event.preventDefault();
+      clearKanbanDropState();
+      list.dataset.dropActive = "true";
+    });
+    list.addEventListener("dragover", event => {
+      event.preventDefault();
+      event.dataTransfer.dropEffect = "move";
+    });
+    list.addEventListener("dragleave", event => {
+      if (!list.contains(event.relatedTarget)) delete list.dataset.dropActive;
+    });
     list.addEventListener("drop", async event => {
       event.preventDefault();
       clearKanbanDropState();
       const key = event.dataTransfer.getData("text/x-pin-mails-key");
       if (!key) return;
-      await api.pinInbox.setWorkflowStatus([key], status, {});
-      await load();
+      setStatus("Déplacement de la carte…", "busy", {persistent: true});
+      try {
+        await api.pinInbox.setWorkflowStatus([key], status, {});
+        await load({announce: false});
+        setStatus("Carte déplacée.", "success");
+      } catch (error) {
+        setStatus(`Déplacement impossible : ${error?.message || error}`, "error");
+      }
     });
     for (const item of items) {
       const card = createCard(item, {checkbox: false, compact: true});
       card.draggable = true;
-      card.addEventListener("dragstart", event => event.dataTransfer.setData("text/x-pin-mails-key", item.stableKey));
+      card.addEventListener("dragstart", event => {
+        event.dataTransfer.setData("text/x-pin-mails-key", item.stableKey);
+        event.dataTransfer.effectAllowed = "move";
+      });
       card.addEventListener("dragend", clearKanbanDropState);
       list.append(card);
     }
@@ -228,7 +318,10 @@ function renderCases() {
     heading.textContent = `${caseItem.name} · ${entries.length}`;
     header.append(heading);
     if (caseItem.id !== "__none") {
-      const agenda = button("case-calendar", caseItem.calendarItemId ? "Synchroniser Agenda" : "Créer une tâche Agenda");
+      const agenda = button(
+        "case-calendar",
+        caseItem.calendarItemId ? "Synchroniser Agenda" : "Créer une tâche Agenda"
+      );
       agenda.dataset.caseId = caseItem.id;
       header.append(agenda);
     }
@@ -289,16 +382,25 @@ function renderTechnical() {
 
 function setView() {
   const view = $("view").value;
-  const visibleId = {list: "items", kanban: "kanban", cases: "cases", history: "history"}[view] || "items";
-  for (const id of ["items", "kanban", "cases", "history"]) $(id).hidden = id !== visibleId;
+  const visibleId = {
+    list: "items",
+    kanban: "kanban",
+    cases: "cases",
+    history: "history"
+  }[view] || "items";
+  for (const id of ["items", "kanban", "cases", "history"]) {
+    $(id).hidden = id !== visibleId;
+  }
 }
 
-async function load() {
+async function load({announce = true} = {}) {
   const generation = ++loadGeneration;
   setLoading(true);
-  setStatus("Chargement…");
+  if (announce) setStatus("Chargement…", "busy", {persistent: true});
   try {
-    if (!api?.pinInbox?.getDashboardData) throw new Error("L’API interne des épingles n’est pas disponible.");
+    if (!api?.pinInbox?.getDashboardData) {
+      throw new Error("L’API interne des épingles n’est pas disponible.");
+    }
     const result = await api.pinInbox.getDashboardData({
       filter: $("filter").value,
       search: $("search").value,
@@ -307,27 +409,39 @@ async function load() {
     if (generation !== loadGeneration) return;
     current = result;
     const visibleKeys = new Set(current.items.map(item => item.stableKey));
-    for (const key of [...selected]) if (!visibleKeys.has(key)) selected.delete(key);
+    for (const key of [...selected]) {
+      if (!visibleKeys.has(key)) selected.delete(key);
+    }
     $("fatal-error").hidden = true;
     $("stats").replaceChildren(
-      stat("Total", current.stats.total), stat("À traiter", current.stats.active),
-      stat("En attente", current.stats.waiting), stat("Planifiés", current.stats.planned),
-      stat("En retard", current.stats.overdue), stat("Terminés", current.stats.completed)
+      stat("Total", current.stats.total),
+      stat("À traiter", current.stats.active),
+      stat("En attente", current.stats.waiting),
+      stat("Planifiés", current.stats.planned),
+      stat("En retard", current.stats.overdue),
+      stat("Terminés", current.stats.completed)
     );
-    $("bulk-case").replaceChildren(option("", "Aucune affaire"), ...current.cases.map(item => option(item.id, item.name)));
-    $("bulk-template").replaceChildren(option("", "Appliquer un modèle…"), ...current.templates.map(item => option(item.id, item.name)));
+    $("bulk-case").replaceChildren(
+      option("", "Aucune affaire"),
+      ...current.cases.map(item => option(item.id, item.name))
+    );
+    $("bulk-template").replaceChildren(
+      option("", "Appliquer un modèle…"),
+      ...current.templates.map(item => option(item.id, item.name))
+    );
     renderList();
     renderKanban();
     renderCases();
     renderHistory();
     renderTechnical();
     setView();
-    setStatus(`${current.items.length} élément(s) affiché(s).`);
+    if (announce) setStatus(`${current.items.length} élément(s) affiché(s).`, "success");
   } catch (error) {
     console.error("MailPerch : chargement du tableau de bord impossible", error);
     $("fatal-error-message").textContent = String(error?.message || error);
     $("fatal-error").hidden = false;
-    setStatus("Chargement impossible.", true);
+    setStatus("Chargement impossible.", "error");
+    throw error;
   } finally {
     if (generation === loadGeneration) setLoading(false);
   }
@@ -336,69 +450,117 @@ async function load() {
 async function actionFor(key, action) {
   if (action === "snooze") return api.pinInbox.snoozeReminder(key, 3_600_000);
   if (action === "calendar") return api.pinInbox.createCalendarItem(key, "task", "");
-  if (["active", "waiting", "planned"].includes(action)) return api.pinInbox.setWorkflowStatus([key], action, {});
-  if (action === "complete") return api.pinInbox.setWorkflowStatus([key], "completed", {});
+  if (["active", "waiting", "planned"].includes(action)) {
+    return api.pinInbox.setWorkflowStatus([key], action, {});
+  }
+  if (action === "complete") {
+    return api.pinInbox.setWorkflowStatus([key], "completed", {});
+  }
   return api.pinInbox.performReferenceAction([key], action, {});
 }
 
+const ACTION_MESSAGES = {
+  open: "Message ouvert.",
+  active: "Message replacé à traiter.",
+  complete: "Message marqué comme terminé.",
+  waiting: "Message placé en attente.",
+  planned: "Message planifié.",
+  snooze: "Rappel reporté d’une heure.",
+  calendar: "Élément Agenda créé ou synchronisé.",
+  unpin: "Message désépinglé.",
+  "case-calendar": "Affaire synchronisée avec l’Agenda."
+};
+
 for (const hostId of ["items", "kanban", "cases"]) {
   $(hostId).addEventListener("click", async event => {
-    const actionButton = event.target.closest("[data-action]");
+    const target = eventElement(event);
+    const actionButton = target?.closest?.("[data-action]");
     if (!actionButton) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const action = actionButton.dataset.action;
+    setButtonBusy(actionButton, true);
+    setStatus("Application de l’action…", "busy", {persistent: true});
     try {
-      actionButton.disabled = true;
-      if (actionButton.dataset.action === "case-calendar" && actionButton.dataset.caseId) {
+      if (action === "case-calendar" && actionButton.dataset.caseId) {
         await api.pinInbox.createCaseCalendarItem(actionButton.dataset.caseId, "task", "");
       } else {
-        const card = event.target.closest(".item");
-        if (!card) return;
-        await actionFor(card.dataset.key, actionButton.dataset.action);
+        const card = target.closest(".item");
+        if (!card) throw new Error("La carte ciblée est introuvable.");
+        await actionFor(card.dataset.key, action);
       }
-      await load();
+      await load({announce: false});
+      setStatus(ACTION_MESSAGES[action] || "Action appliquée.", "success");
     } catch (error) {
-      setStatus(String(error?.message || error), true);
+      setStatus(`Action impossible : ${error?.message || error}`, "error");
     } finally {
-      actionButton.disabled = false;
+      setButtonBusy(actionButton, false);
     }
   });
 }
 
-$("refresh").addEventListener("click", load);
-$("retry").addEventListener("click", load);
-$("filter").addEventListener("change", load);
-$("view").addEventListener("change", () => { setView(); load(); });
+$("refresh").addEventListener("click", async event => {
+  setButtonBusy(event.currentTarget, true);
+  try {
+    await load();
+  } catch {
+    // load() already provides a visible error.
+  } finally {
+    setButtonBusy(event.currentTarget, false);
+  }
+});
+$("retry").addEventListener("click", () => load().catch(() => {}));
+$("filter").addEventListener("change", () => load().catch(() => {}));
+$("view").addEventListener("change", () => {
+  setView();
+  load().catch(() => {});
+});
 $("search").addEventListener("input", () => {
   clearTimeout(searchTimer);
-  searchTimer = setTimeout(load, 220);
+  searchTimer = setTimeout(() => load().catch(() => {}), 220);
 });
 
-$("apply").addEventListener("click", async () => {
+$("apply").addEventListener("click", async event => {
   if (!selected.size) {
-    setStatus("Sélectionnez au moins un élément.", true);
+    setStatus("Sélectionnez au moins un élément.", "error");
     return;
   }
   const action = $("bulk").value;
   const caseId = $("bulk-case").value;
   const templateId = $("bulk-template").value;
+  setButtonBusy(event.currentTarget, true);
+  setStatus("Application de l’action groupée…", "busy", {persistent: true});
   try {
     if (templateId) await api.pinInbox.applyTemplate([...selected], templateId);
     else if (caseId) await api.pinInbox.performReferenceAction([...selected], "case", {caseId});
-    else if (["active", "waiting", "planned"].includes(action)) await api.pinInbox.setWorkflowStatus([...selected], action, {});
-    else if (action === "complete") await api.pinInbox.setWorkflowStatus([...selected], "completed", {});
-    else if (action) await api.pinInbox.performReferenceAction([...selected], action, {});
-    else {
-      setStatus("Choisissez une action, une affaire ou un modèle.", true);
+    else if (["active", "waiting", "planned"].includes(action)) {
+      await api.pinInbox.setWorkflowStatus([...selected], action, {});
+    } else if (action === "complete") {
+      await api.pinInbox.setWorkflowStatus([...selected], "completed", {});
+    } else if (action) {
+      await api.pinInbox.performReferenceAction([...selected], action, {});
+    } else {
+      setStatus("Choisissez une action, une affaire ou un modèle.", "error");
       return;
     }
     $("bulk").value = "";
+    $("bulk-case").value = "";
     $("bulk-template").value = "";
     selected.clear();
-    await load();
+    await load({announce: false});
+    setStatus("Action groupée appliquée.", "success");
   } catch (error) {
-    setStatus(String(error?.message || error), true);
+    setStatus(`Action groupée impossible : ${error?.message || error}`, "error");
+  } finally {
+    setButtonBusy(event.currentTarget, false);
   }
 });
 
-document.addEventListener("visibilitychange", () => { if (!document.hidden && !loading) load(); });
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden && !loading) load({announce: false}).catch(() => {});
+});
 window.addEventListener("blur", clearKanbanDropState);
-window.addEventListener("DOMContentLoaded", () => { localize(); load(); }, {once: true});
+window.addEventListener("DOMContentLoaded", () => {
+  localize();
+  load().catch(() => {});
+}, {once: true});

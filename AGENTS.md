@@ -4,7 +4,7 @@ Ce dépôt contient une MailExtension Thunderbird Manifest V3 avec une API Exper
 
 ## But du produit
 
-MailPerch affiche des messages épinglés dans un panneau distinct au-dessus de la liste native, sans filtrer ni déplacer la liste « Tous les messages ». Les épingles, notes, workflows, rappels et données Agenda restent locales.
+Afficher des messages épinglés dans un panneau distinct au-dessus de la liste native, sans filtrer ni déplacer la liste « Tous les messages ». Les épingles, notes, workflows, rappels et données Agenda restent locales.
 
 ## Invariants non négociables
 
@@ -18,7 +18,6 @@ MailPerch affiche des messages épinglés dans un panneau distinct au-dessus de 
 8. Le tableau de bord doit être ouvert par le background via `tabs.create`; l’Experiment émet `onDashboardRequested`.
 9. Les écritures SQLite doivent rester incrémentales, transactionnelles et sérialisées.
 10. Toute écoute, minuterie, feuille de style, menu et nœud injecté doit être nettoyé dans `onShutdown`/`cleanup`.
-11. Respecter `BRANDING.md` : MailPerch est le nom public canonique et « Outlook » ne doit pas réapparaître dans les surfaces publiques.
 
 ## Carte rapide
 
