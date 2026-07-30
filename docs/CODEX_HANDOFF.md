@@ -2,9 +2,20 @@
 
 ## État exact
 
-Produit : **MailPerch — Email Pins & Follow-up**. Build : **3.1.0**, ID de développement `pin-mails@MailPerch.local`.
+Produit : **MailPerch — Email Pins & Follow-up**. Build : **3.1.1**, ID de développement `pin-mails@MailPerch.local`.
 
 Corrections implémentées à partir des captures :
+
+Corrections supplémentaires dérivées de la vidéo du 30 juillet 2026 :
+
+- schémas explicites pour tous les objets transmis à l’API Experiment ;
+- chargement du dashboard et sauvegarde des paramètres débloqués ;
+- clic droit capturé avant le menu natif de Thunderbird ;
+- état actif séparé de la sélection multiple ;
+- couleurs de compte rétablies pour toutes les punaises ;
+- retours de survol restaurés et hitboxes stabilisées ;
+- centrage optique des SVG corrigé ;
+- dialogues internes pour la création et l’affectation de groupes.
 
 - dashboard ouvert par le background afin que CSS/JS soient chargés comme ressources d’extension ;
 - dashboard entièrement stylé avec états d’erreur et de chargement ;

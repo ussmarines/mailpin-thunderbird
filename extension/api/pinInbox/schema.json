@@ -101,7 +101,7 @@
         "parameters": [
           {
             "name": "configuration",
-            "type": "object"
+            "$ref": "ConfigurationInput"
           }
         ]
       },
@@ -118,7 +118,7 @@
         "parameters": [
           {
             "name": "configuration",
-            "type": "object"
+            "$ref": "ConfigurationInput"
           }
         ]
       },
@@ -183,7 +183,7 @@
         "parameters": [
           {
             "name": "options",
-            "type": "object",
+            "$ref": "DashboardOptions",
             "optional": true
           }
         ]
@@ -217,7 +217,7 @@
           },
           {
             "name": "options",
-            "type": "object",
+            "$ref": "ReferenceActionOptions",
             "optional": true
           }
         ]
@@ -334,7 +334,7 @@
         "parameters": [
           {
             "name": "options",
-            "type": "object",
+            "$ref": "RuleSimulationOptions",
             "optional": true
           }
         ]
@@ -364,7 +364,7 @@
         "parameters": [
           {
             "name": "options",
-            "type": "object",
+            "$ref": "HistoryOptions",
             "optional": true
           }
         ]
@@ -387,7 +387,7 @@
           },
           {
             "name": "options",
-            "type": "object",
+            "$ref": "WorkflowOptions",
             "optional": true
           }
         ]
@@ -399,7 +399,7 @@
         "parameters": [
           {
             "name": "details",
-            "type": "object"
+            "$ref": "CaseDetails"
           }
         ]
       },
@@ -414,7 +414,7 @@
           },
           {
             "name": "details",
-            "type": "object"
+            "$ref": "CaseDetails"
           }
         ]
       },
@@ -436,7 +436,7 @@
         "parameters": [
           {
             "name": "details",
-            "type": "object"
+            "$ref": "TemplateDetails"
           }
         ]
       },
@@ -451,7 +451,7 @@
           },
           {
             "name": "details",
-            "type": "object"
+            "$ref": "TemplateDetails"
           }
         ]
       },
@@ -497,6 +497,339 @@
         "type": "function",
         "description": "Émis lorsque l’interface privilégiée demande l’ouverture du tableau de bord.",
         "parameters": []
+      }
+    ],
+    "types": [
+      {
+        "id": "ConfigurationInput",
+        "type": "object",
+        "properties": {
+          "format": {
+            "type": "string",
+            "optional": true
+          },
+          "version": {
+            "type": "integer",
+            "optional": true
+          },
+          "exportedAt": {
+            "type": "string",
+            "optional": true
+          },
+          "shortcut": {
+            "type": "string",
+            "optional": true
+          },
+          "settings": {
+            "type": "any",
+            "optional": true
+          },
+          "groups": {
+            "type": "array",
+            "items": {
+              "type": "any"
+            },
+            "optional": true
+          },
+          "rules": {
+            "type": "array",
+            "items": {
+              "type": "any"
+            },
+            "optional": true
+          },
+          "cases": {
+            "type": "array",
+            "items": {
+              "type": "any"
+            },
+            "optional": true
+          },
+          "templates": {
+            "type": "array",
+            "items": {
+              "type": "any"
+            },
+            "optional": true
+          },
+          "data": {
+            "type": "any",
+            "optional": true
+          }
+        },
+        "additionalProperties": {
+          "type": "any"
+        }
+      },
+      {
+        "id": "DashboardOptions",
+        "type": "object",
+        "properties": {
+          "filter": {
+            "type": "string",
+            "optional": true
+          },
+          "search": {
+            "type": "string",
+            "optional": true
+          },
+          "view": {
+            "type": "string",
+            "optional": true
+          },
+          "historySearch": {
+            "type": "string",
+            "optional": true
+          }
+        }
+      },
+      {
+        "id": "ReferenceActionOptions",
+        "type": "object",
+        "properties": {
+          "durationMs": {
+            "type": "number",
+            "optional": true
+          },
+          "itemType": {
+            "type": "string",
+            "optional": true
+          },
+          "calendarId": {
+            "type": "string",
+            "optional": true
+          },
+          "groupId": {
+            "type": "string",
+            "optional": true
+          },
+          "caseId": {
+            "type": "string",
+            "optional": true
+          },
+          "templateId": {
+            "type": "string",
+            "optional": true
+          },
+          "note": {
+            "type": "string",
+            "optional": true
+          },
+          "dueAt": {
+            "type": "number",
+            "optional": true
+          },
+          "reminderAt": {
+            "type": "number",
+            "optional": true
+          },
+          "priorityLevel": {
+            "type": "string",
+            "optional": true
+          },
+          "workflowStatus": {
+            "type": "string",
+            "optional": true
+          },
+          "completed": {
+            "type": "boolean",
+            "optional": true
+          },
+          "repeatRule": {
+            "type": "string",
+            "optional": true
+          },
+          "recurrenceRule": {
+            "type": "string",
+            "optional": true
+          },
+          "recurrenceInterval": {
+            "type": "number",
+            "optional": true
+          },
+          "followUpAt": {
+            "type": "number",
+            "optional": true
+          },
+          "reminderLeadMinutes": {
+            "type": "number",
+            "optional": true
+          },
+          "snoozeUntil": {
+            "type": "number",
+            "optional": true
+          },
+          "clearFollowUp": {
+            "type": "boolean",
+            "optional": true
+          },
+          "action": {
+            "type": "string",
+            "optional": true
+          }
+        }
+      },
+      {
+        "id": "RuleSimulationOptions",
+        "type": "object",
+        "properties": {
+          "trigger": {
+            "type": "string",
+            "optional": true
+          },
+          "limit": {
+            "type": "integer",
+            "optional": true
+          },
+          "accountKey": {
+            "type": "string",
+            "optional": true
+          },
+          "folderURI": {
+            "type": "string",
+            "optional": true
+          }
+        }
+      },
+      {
+        "id": "HistoryOptions",
+        "type": "object",
+        "properties": {
+          "search": {
+            "type": "string",
+            "optional": true
+          },
+          "caseId": {
+            "type": "string",
+            "optional": true
+          },
+          "limit": {
+            "type": "integer",
+            "optional": true
+          }
+        }
+      },
+      {
+        "id": "WorkflowOptions",
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "optional": true
+          },
+          "followUpAt": {
+            "type": "number",
+            "optional": true
+          },
+          "clearFollowUp": {
+            "type": "boolean",
+            "optional": true
+          }
+        }
+      },
+      {
+        "id": "CaseDetails",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "optional": true
+          },
+          "name": {
+            "type": "string",
+            "optional": true
+          },
+          "color": {
+            "type": "string",
+            "optional": true
+          },
+          "note": {
+            "type": "string",
+            "optional": true
+          },
+          "dueAt": {
+            "type": "number",
+            "optional": true
+          },
+          "status": {
+            "type": "string",
+            "optional": true
+          },
+          "createdAt": {
+            "type": "number",
+            "optional": true
+          },
+          "updatedAt": {
+            "type": "number",
+            "optional": true
+          },
+          "calendarId": {
+            "type": "string",
+            "optional": true
+          },
+          "calendarItemId": {
+            "type": "string",
+            "optional": true
+          }
+        }
+      },
+      {
+        "id": "TemplateDetails",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "optional": true
+          },
+          "name": {
+            "type": "string",
+            "optional": true
+          },
+          "groupId": {
+            "type": "string",
+            "optional": true
+          },
+          "caseId": {
+            "type": "string",
+            "optional": true
+          },
+          "priorityLevel": {
+            "type": "string",
+            "optional": true
+          },
+          "workflowStatus": {
+            "type": "string",
+            "optional": true
+          },
+          "dueOffsetDays": {
+            "type": "number",
+            "optional": true
+          },
+          "reminderLeadMinutes": {
+            "type": "number",
+            "optional": true
+          },
+          "followUpDelayDays": {
+            "type": "number",
+            "optional": true
+          },
+          "recurrenceRule": {
+            "type": "string",
+            "optional": true
+          },
+          "recurrenceInterval": {
+            "type": "number",
+            "optional": true
+          },
+          "notePrefix": {
+            "type": "string",
+            "optional": true
+          },
+          "updatedAt": {
+            "type": "number",
+            "optional": true
+          }
+        }
       }
     ]
   }

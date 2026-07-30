@@ -1,13 +1,28 @@
 # Journal des modifications
 
-## Non publié — identité MailPerch
+## 3.1.1 — corrections issues de la vidéo d’utilisation
 
-- adoption du nom public **MailPerch** ;
-- nom complet : **MailPerch — Email Pins & Follow-up** ;
-- ajout des sous-titres français et anglais et du slogan canonique ;
-- renommage des paquets de build en `MailPerch_v<VERSION>.xpi` et `MailPerch_GitHub_Repository_v<VERSION>.zip` ;
-- ajout de `BRANDING.md` et de contrôles empêchant une régression du nom ;
-- conservation volontaire des identifiants techniques historiques pour assurer les migrations.
+### Corrigé
+
+- contrat de l’API Experiment complété pour accepter les propriétés réellement envoyées par les paramètres et le tableau de bord ;
+- enregistrement des paramètres, import de configuration, simulation des règles et chargement du dashboard débloqués ;
+- ouverture du tableau de bord rendue tolérante au démarrage différé du background ;
+- clic droit capturé au niveau du document avant le menu natif de Thunderbird ;
+- support conservé pour `Shift+F10` et la touche Menu ;
+- état actif d’un message séparé de la sélection multiple persistante ;
+- actions rapides de nouveau limitées au survol et au focus de la carte ;
+- couleurs des épingles restaurées à partir de la couleur de compte, dans le panneau comme dans la liste native ;
+- zones de survol et retours visuels des punaises renforcés ;
+- centrage optique des SVG de punaise corrigé ;
+- création et affectation de groupes déplacées vers des dialogues intégrés, sans `prompt()` natif ;
+- libellés de secours MailPerch corrigés dans les menus ;
+- nettoyage de la demande différée du dashboard lors de l’arrêt de l’extension.
+
+### Tests
+
+- ajout d’un test du contrat des objets traversant l’API Experiment ;
+- gardes de régression sur le clic droit, les états actif/sélection, les couleurs, le survol et les dialogues de groupes ;
+- plan de test manuel enrichi à partir de la vidéo du 30 juillet 2026.
 
 ## 3.1.0 — passe de débogage, dashboard et dépôt
 
@@ -47,4 +62,4 @@
 
 ## 1.x
 
-- panneau d’épingles, couleurs par compte, tri, épingles indépendantes et premières fonctions avancées.
+- panneau Outlook, couleurs par compte, tri, épingles indépendantes et premières fonctions avancées.

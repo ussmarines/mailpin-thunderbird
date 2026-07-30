@@ -5,7 +5,7 @@ Consigner version Thunderbird, OS, thème, vue, type de compte et résultat.
 ## Installation et migration
 
 - installation propre ;
-- mise à niveau 3.0.0 → 3.1.0 ;
+- mise à niveau 3.1.0 → 3.1.1 ;
 - redémarrage normal et redémarrage forcé ;
 - sauvegarde puis restauration.
 
@@ -52,3 +52,17 @@ Consigner version Thunderbird, OS, thème, vue, type de compte et résultat.
 - règle simulée puis appliquée ;
 - limite et anti-boucle ;
 - veille, réveil et rappel manqué.
+
+## Régressions vidéo du 30 juillet 2026
+
+- le dashboard charge sans erreur `Unexpected properties` ;
+- enregistrer les paramètres ne produit aucune erreur de schéma ;
+- clic droit sur chaque zone d’une carte : auteur, objet, espace vide et punaise ;
+- clic simple : le message s’affiche sans conserver la bordure de sélection multiple ;
+- les actions rapides disparaissent quand la souris quitte la carte ;
+- `Ctrl`/`Cmd` et `Maj` conservent leur sélection multiple distincte ;
+- couleur de compte visible sur les punaises du panneau et de la liste native ;
+- punaise inactive visible au survol de ligne, puis retour renforcé au survol direct ;
+- punaise centrée dans son bouton en vue Cartes et Tableau ;
+- création et affectation d’un groupe sans dialogue natif du navigateur ;
+- ouverture du dashboard juste après le démarrage de Thunderbird, sans faux message d’indisponibilité.

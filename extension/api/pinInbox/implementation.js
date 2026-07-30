@@ -1369,6 +1369,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     this._pendingDeleteTimers = new Set();
     this._lastCalendarSyncAt = 0;
     this._counterRegressionEvents = [];
+    this._dashboardRequestPending = false;
     this._storage = new PinStructuredStore(this);
     this._readyPromise = this._storage.initialize(this._data, this._undoStack).then(result => {
       this._data = normalizeData(result.data);
@@ -1418,6 +1419,12 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
             const listener = () => fire.async();
             this._dashboardRequestListeners ??= new Set();
             this._dashboardRequestListeners.add(listener);
+            if (this._dashboardRequestPending) {
+              this._dashboardRequestPending = false;
+              Services.tm.dispatchToMainThread(() => {
+                if (this._dashboardRequestListeners?.has(listener)) listener();
+              });
+            }
             return () => this._dashboardRequestListeners?.delete(listener);
           }
         }).api(),
@@ -3620,6 +3627,9 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     let inboxDragHeaders = [];
     let contextMenuKey = "";
     let contextMenu = null;
+    let groupDialog = null;
+    let groupAssignmentDialog = null;
+    let onPanelContextMenu = null;
 
     const clearDropVisuals = () => {
       if (!panel) return;
@@ -3660,6 +3670,16 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       if (className) node.className = className;
       if (text !== undefined) node.textContent = text;
       return node;
+    };
+
+    const cardFromEvent = event => {
+      const path = typeof event.composedPath === "function" ? event.composedPath() : [];
+      for (const node of path) {
+        if (node instanceof about3Pane.Element && node.classList?.contains("pin-mails-card")) return node;
+      }
+      return event.target instanceof about3Pane.Element
+        ? event.target.closest(".pin-mails-card")
+        : null;
     };
 
     const headerForRow = row => {
@@ -3904,24 +3924,116 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       dialog.showModal(); dialog.querySelector(".pin-mails-editor-note").focus();
     };
 
+    const createGroupDialog = () => {
+      if (groupDialog?.isConnected) return groupDialog;
+      groupDialog = createNode("dialog", "pin-mails-group-dialog");
+      const form = createNode("form", "pin-mails-group-dialog-form");
+      form.method = "dialog";
+      const title = createNode("h2", "pin-mails-group-dialog-title", "Créer un groupe");
+      title.id = "pin-mails-group-dialog-create-title";
+      groupDialog.setAttribute("aria-labelledby", title.id);
+      const nameLabel = createNode("label", "", "Nom du groupe");
+      const name = createNode("input", "pin-mails-group-dialog-name");
+      name.type = "text";
+      name.maxLength = 80;
+      name.required = true;
+      name.autocomplete = "off";
+      nameLabel.appendChild(name);
+      const colorLabel = createNode("label", "", "Couleur");
+      const color = createNode("input", "pin-mails-group-dialog-color");
+      color.type = "color";
+      colorLabel.appendChild(color);
+      const actions = createNode("div", "pin-mails-editor-actions");
+      const cancel = createNode("button", "secondary", "Annuler");
+      cancel.type = "button";
+      const save = createNode("button", "primary", "Créer");
+      save.type = "submit";
+      actions.append(cancel, save);
+      form.append(title, nameLabel, colorLabel, actions);
+      groupDialog.appendChild(form);
+      document.body.appendChild(groupDialog);
+      cancel.addEventListener("click", () => groupDialog.close());
+      form.addEventListener("submit", event => {
+        event.preventDefault();
+        const label = name.value.trim();
+        if (!label) { name.focus(); return; }
+        const base = sanitizeSearchText(label).replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "groupe";
+        let id = base.slice(0, 40);
+        let index = 2;
+        while (this._data.groups.some(group => group.id === id)) id = `${base.slice(0, 35)}-${index++}`;
+        this._pushUndo("Création du groupe");
+        this._data.groups.push({id, name: label.slice(0, 80), color: COLOR_RE.test(color.value) ? color.value : "#6264a7"});
+        this._data.groupOrder.push(id);
+        this._saveData("group-create");
+        this._refreshAllStates(true);
+        groupDialog.close();
+        showToast("Groupe créé.", true);
+      });
+      return groupDialog;
+    };
+
     const addGroup = () => {
       if (this._data.groups.length >= MAX_GROUPS) {
         showToast("Nombre maximal de groupes atteint.", false);
         return;
       }
-      const name = about3Pane.prompt("Nom du nouveau groupe :", "À traiter");
-      if (!name?.trim()) return;
-      const base = sanitizeSearchText(name).replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "groupe";
-      let id = base.slice(0, 40);
-      let index = 2;
-      while (this._data.groups.some(group => group.id === id)) id = `${base.slice(0, 35)}-${index++}`;
-      this._pushUndo("Création du groupe");
-      const color = DEFAULT_COLORS[this._data.groups.length % DEFAULT_COLORS.length];
-      this._data.groups.push({id, name: name.trim().slice(0, 80), color});
-      this._data.groupOrder.push(id);
-      this._saveData();
-      this._refreshAllStates(true);
-      showToast("Groupe créé.", true);
+      const dialog = createGroupDialog();
+      const name = dialog.querySelector(".pin-mails-group-dialog-name");
+      const color = dialog.querySelector(".pin-mails-group-dialog-color");
+      name.value = "À traiter";
+      color.value = DEFAULT_COLORS[this._data.groups.length % DEFAULT_COLORS.length];
+      dialog.showModal();
+      name.select();
+    };
+
+    const openGroupAssignmentDialog = keys => {
+      if (!groupAssignmentDialog?.isConnected) {
+        groupAssignmentDialog = createNode("dialog", "pin-mails-group-dialog");
+        const form = createNode("form", "pin-mails-group-dialog-form");
+        form.method = "dialog";
+        const title = createNode("h2", "pin-mails-group-dialog-title", "Classer les messages");
+        title.id = "pin-mails-group-dialog-assign-title";
+        groupAssignmentDialog.setAttribute("aria-labelledby", title.id);
+        form.appendChild(title);
+        const label = createNode("label", "", "Groupe");
+        const select = createNode("select", "pin-mails-group-assignment-select");
+        label.appendChild(select);
+        const actions = createNode("div", "pin-mails-editor-actions");
+        const cancel = createNode("button", "secondary", "Annuler"); cancel.type = "button";
+        const save = createNode("button", "primary", "Appliquer"); save.type = "submit";
+        actions.append(cancel, save);
+        form.append(label, actions);
+        groupAssignmentDialog.appendChild(form);
+        document.body.appendChild(groupAssignmentDialog);
+        cancel.addEventListener("click", () => groupAssignmentDialog.close());
+        form.addEventListener("submit", event => {
+          event.preventDefault();
+          const activeKeys = JSON.parse(groupAssignmentDialog.dataset.stableKeys || "[]");
+          const groupId = select.value;
+          this._pushUndo("Changement de groupe");
+          let count = 0;
+          for (const key of activeKeys) {
+            const ref = this._data.refs[key];
+            if (!ref) continue;
+            ref.groupId = groupId;
+            ref.updatedAt = Date.now();
+            count++;
+          }
+          if (count) {
+            this._saveData("group-assign");
+            this._refreshAllStates(true);
+          }
+          groupAssignmentDialog.close();
+          showToast(`${count} message(s) classé(s).`, true);
+        });
+      }
+      const select = groupAssignmentDialog.querySelector(".pin-mails-group-assignment-select");
+      select.replaceChildren();
+      const none = createNode("option", "", "Aucun groupe"); none.value = ""; select.appendChild(none);
+      for (const item of this._data.groups) { const option = createNode("option", "", item.name); option.value = item.id; select.appendChild(option); }
+      groupAssignmentDialog.dataset.stableKeys = JSON.stringify(keys);
+      groupAssignmentDialog.showModal();
+      select.focus();
     };
 
     const createPanel = () => {
@@ -4015,13 +4127,19 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       });
       dashboardButton.addEventListener("click", () => {
         const listeners = [...(this._dashboardRequestListeners || [])];
-        if (!listeners.length) {
-          showToast("Le tableau de bord n’est pas encore prêt. Réessayez dans un instant.", false);
+        if (listeners.length) {
+          for (const listener of listeners) {
+            try { listener(); } catch (error) { this._recordDiagnostic("warning", "Ouverture du tableau de bord impossible", error); }
+          }
           return;
         }
-        for (const listener of listeners) {
-          try { listener(); } catch (error) { this._recordDiagnostic("warning", "Ouverture du tableau de bord impossible", error); }
-        }
+        this._dashboardRequestPending = true;
+        showToast("Ouverture du tableau de bord…", false);
+        about3Pane.setTimeout(() => {
+          if (!this._dashboardRequestPending) return;
+          this._dashboardRequestPending = false;
+          showToast("Le tableau de bord n’a pas pu être ouvert. Redémarrez Thunderbird puis réessayez.", false);
+        }, 2500);
       });
       search.addEventListener("input", () => { searchText = search.value; renderLimit = this._settings.panelPageSize; renderPanel(); });
 
@@ -4046,11 +4164,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         } else if (action === "complete") {
           this._performReferenceAction(keys, "complete"); selectedPanelKeys.clear();
         } else if (action === "group") {
-          const name = about3Pane.prompt("Nom exact du groupe (vide pour aucun) :", "");
-          const group = this._data.groups.find(item => item.name.toLowerCase() === String(name || "").trim().toLowerCase());
-          this._pushUndo("Changement de groupe");
-          for (const key of keys) if (this._data.refs[key]) this._data.refs[key].groupId = group?.id || "";
-          this._saveData(); this._refreshAllStates(true); showToast("Groupe mis à jour.", true);
+          openGroupAssignmentDialog(keys);
         } else {
           this._performMessageAction(action, headers, about3Pane);
         }
@@ -4081,7 +4195,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         const hdr = card?._pinMessageHeader || (ref ? this._resolveReference(ref, false) : null);
         if (!ref) return;
         if (action === "open") selectPanelMessage(ref, hdr, card);
-        else if (action === "unpin") { this._performReferenceAction([key], "unpin"); showToast(hdr ? "Message désépinglé." : "Référence introuvable retirée.", true); }
+        else if (action === "unpin") { if (selectedPanelKey === key) selectedPanelKey = null; selectedPanelKeys.delete(key); this._performReferenceAction([key], "unpin"); showToast(hdr ? "Message désépinglé." : "Référence introuvable retirée.", true); }
         else if (action === "edit") openEditor(key);
         else if (action === "waiting") this._setWorkflowStatus([key], ref.workflowStatus === "waiting" ? "active" : "waiting");
         else if (action === "planned") this._setWorkflowStatus([key], ref.workflowStatus === "planned" ? "active" : "planned");
@@ -4113,19 +4227,21 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         } else if (event.key === "Home") { event.preventDefault(); items[0]?.focus(); }
         else if (event.key === "End") { event.preventDefault(); items.at(-1)?.focus(); }
       });
-      list.addEventListener("contextmenu", event => {
-        const card = event.target.closest(".pin-mails-card");
-        if (!card) return;
-        event.preventDefault();
-        event.stopPropagation();
-        event.stopImmediatePropagation();
-        selectedPanelKeys.clear();
-        selectedPanelKeys.add(card.dataset.stableKey);
-        selectionAnchorKey = card.dataset.stableKey;
-        updatePanelSelection();
-        contextMenuKey = card.dataset.stableKey;
-        positionContextMenu(event.clientX, event.clientY);
-      }, true);
+      if (!onPanelContextMenu) {
+        onPanelContextMenu = event => {
+          const card = cardFromEvent(event);
+          if (!card || !panel?.contains(card)) return;
+          event.preventDefault();
+          event.stopPropagation();
+          event.stopImmediatePropagation();
+          selectedPanelKey = card.dataset.stableKey;
+          selectionAnchorKey = card.dataset.stableKey;
+          updatePanelSelection();
+          contextMenuKey = card.dataset.stableKey;
+          positionContextMenu(event.clientX, event.clientY);
+        };
+        document.addEventListener("contextmenu", onPanelContextMenu, true);
+      }
 
       list.addEventListener("click", event => {
         closeContextMenu();
@@ -4139,8 +4255,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
           event.preventDefault(); event.stopPropagation();
           const action = actionButton.dataset.cardAction;
           if (action === "more") {
-            selectedPanelKeys.clear();
-            selectedPanelKeys.add(key);
+            selectedPanelKey = key;
             selectionAnchorKey = key;
             updatePanelSelection();
             contextMenuKey = key;
@@ -4165,8 +4280,8 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
           updatePanelSelection();
           return;
         }
-        selectedPanelKeys.clear(); selectedPanelKeys.add(key); selectionAnchorKey = key;
-        updatePanelSelection();
+        selectedPanelKeys.clear();
+        selectionAnchorKey = key;
         selectPanelMessage(ref, hdr, card);
       });
 
@@ -4183,8 +4298,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
           event.preventDefault(); selectPanelMessage(this._data.refs[card.dataset.stableKey], card._pinMessageHeader, card);
         } else if (event.key === "ContextMenu" || (event.shiftKey && event.key === "F10")) {
           event.preventDefault();
-          selectedPanelKeys.clear();
-          selectedPanelKeys.add(card.dataset.stableKey);
+          selectedPanelKey = card.dataset.stableKey;
           selectionAnchorKey = card.dataset.stableKey;
           updatePanelSelection();
           contextMenuKey = card.dataset.stableKey;
@@ -4248,9 +4362,14 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     const updatePanelSelection = () => {
       if (!panel) return;
       for (const card of panel.querySelectorAll(".pin-mails-card")) {
-        const selected = selectedPanelKeys.has(card.dataset.stableKey);
+        const key = card.dataset.stableKey;
+        const selected = selectedPanelKeys.has(key);
+        const active = selectedPanelKey === key;
         card.toggleAttribute("data-selected", selected);
+        card.toggleAttribute("data-active", active);
         card.setAttribute("aria-selected", String(selected));
+        if (active) card.setAttribute("aria-current", "true");
+        else card.removeAttribute("aria-current");
       }
       const bulk = panel.querySelector(".pin-mails-bulk-actions");
       if (bulk) {
@@ -4262,6 +4381,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     const selectPanelMessage = (ref, hdr, card) => {
       if (!ref) return;
       selectedPanelKey = ref.stableKey;
+      updatePanelSelection();
       if (!hdr) return;
       try {
         about3Pane.messagePane.displayMessage(hdr.folder.getUriForMsg(hdr));
@@ -4461,7 +4581,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     };
 
     const applySettings = () => { renderLimit = this._settings.panelPageSize; updatePanelToggle(); scheduleRefresh(true); };
-    const updateFolderMode = () => { selectedPanelKeys.clear(); selectionAnchorKey = null; searchText = ""; renderLimit = this._settings.panelPageSize; patchAllRows(); renderPanel(); this._updateMainMenuWindow(about3Pane.top); };
+    const updateFolderMode = () => { selectedPanelKeys.clear(); selectedPanelKey = null; selectionAnchorKey = null; searchText = ""; renderLimit = this._settings.panelPageSize; patchAllRows(); renderPanel(); this._updateMainMenuWindow(about3Pane.top); };
 
     const observer = new about3Pane.MutationObserver(() => scheduleRefresh());
     observer.observe(threadTree, {subtree: true, childList: true, attributes: true, attributeFilter: ["data-properties"]});
@@ -4512,6 +4632,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       document.removeEventListener("click", onDocumentClick, true);
       document.removeEventListener("pointerdown", onDocumentPointerDown, true);
       document.removeEventListener("keydown", onDocumentKeyDown, true);
+      if (onPanelContextMenu) document.removeEventListener("contextmenu", onPanelContextMenu, true);
       document.removeEventListener("select", onSelectionChange, true);
       about3Pane.removeEventListener("blur", onWindowBlur, true);
       about3Pane.removeEventListener("resize", onViewportChange);
@@ -4525,7 +4646,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       document.documentElement.removeAttribute("pin-mails-density");
       document.documentElement.removeAttribute("pin-mails-animate");
       document.documentElement.style.removeProperty("--pin-mails-max-height");
-      panel?.remove(); allHeader?.remove(); panelToggle?.remove(); editor?.remove(); contextMenu?.remove(); for (const badge of document.querySelectorAll(".pin-mails-folder-badge")) badge.remove();
+      panel?.remove(); allHeader?.remove(); panelToggle?.remove(); editor?.remove(); contextMenu?.remove(); groupDialog?.remove(); groupAssignmentDialog?.remove(); for (const badge of document.querySelectorAll(".pin-mails-folder-badge")) badge.remove();
       for (const button of document.querySelectorAll(`.${INDEPENDENT_BUTTON_CLASS}`)) button.remove();
       for (const button of document.querySelectorAll(`.${BUTTON_CLASS}`)) restoreNativeButton(button);
       this._states.delete(state);
@@ -4647,6 +4768,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       }
     }
     this._cleanupMainMenus();
+    this._dashboardRequestPending = false;
     this._dashboardRequestListeners?.clear();
     // Start an atomic emergency-file write before the asynchronous SQLite
     // close. The next startup compares it with the last committed revision and

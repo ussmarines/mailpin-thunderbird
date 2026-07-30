@@ -1,5 +1,5 @@
 # Third-party notices
 
-La build 3.1.0 n’embarque aucune bibliothèque JavaScript, police, service distant ou ressource CDN tierce.
+La build 3.1.1 n’embarque aucune bibliothèque JavaScript, police, service distant ou ressource CDN tierce.
 
-Les icônes SVG présentes dans `extension/icons/` sont des actifs simples créés pour MailPerch. Le nom Thunderbird reste soumis aux droits de son propriétaire ; voir `NOTICE.md`.
+Les icônes SVG présentes dans `extension/icons/` sont des actifs simples créés pour ce projet. Les noms Thunderbird, Microsoft et Outlook restent soumis aux droits de leurs propriétaires respectifs ; voir `NOTICE.md`.

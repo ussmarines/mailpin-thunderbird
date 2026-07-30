@@ -98,17 +98,17 @@ function createMenus() {
   });
   messenger.menus.create({
     id: MENU_IDS.dashboard,
-    title: translate("menuDashboard", "Tableau de bord des MailPerch"),
+    title: translate("menuDashboard", "Tableau de bord MailPerch"),
     contexts: ["tools_menu"]
   });
   messenger.menus.create({
     id: MENU_IDS.undo,
-    title: translate("menuUndo", "Annuler la dernière action des MailPerch"),
+    title: translate("menuUndo", "Annuler la dernière action MailPerch"),
     contexts: ["tools_menu"]
   });
   messenger.menus.create({
     id: MENU_IDS.options,
-    title: translate("menuOptions", "Paramètres des MailPerch"),
+    title: translate("menuOptions", "Paramètres de MailPerch"),
     contexts: ["tools_menu"]
   });
 }

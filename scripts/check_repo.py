@@ -44,6 +44,7 @@ package = load_json(ROOT / "package.json")
 fr_locale = load_json(EXT / "_locales/fr/messages.json")
 en_locale = load_json(EXT / "_locales/en/messages.json")
 check(package.get("name") == "mailperch-thunderbird", "nom package MailPerch inattendu")
+check(str(package.get("version", "")) == version, "versions package/manifest incohérentes")
 check(fr_locale.get("extensionName", {}).get("message") == "MailPerch — Email Pins & Follow-up", "nom FR MailPerch incohérent")
 check(en_locale.get("extensionName", {}).get("message") == "MailPerch — Email Pins & Follow-up", "nom EN MailPerch incohérent")
 check(fr_locale.get("brandSubtitle", {}).get("message") == "Épinglez, organisez et suivez vos e-mails dans Thunderbird.", "sous-titre FR MailPerch incohérent")
@@ -58,9 +59,9 @@ required_root = [
     "docs/ARCHITECTURE.md", "docs/CODEX_HANDOFF.md", "docs/DATA_MODEL.md", "docs/DEBUGGING.md",
     "docs/UI_SPEC.md", "docs/THREAT_MODEL.md", "docs/ATN_RELEASE_CHECKLIST.md",
     "docs/MANUAL_TEST_PLAN.md", "docs/SCREENSHOT_FINDINGS.md", "docs/DECISIONS.md",
-    "docs/KNOWN_LIMITATIONS.md", "scripts/build.py", "scripts/check_repo.py", "scripts/scan_secrets.py",
+    "docs/KNOWN_LIMITATIONS.md", "docs/VIDEO_REVIEW_2026-07-30.md", "scripts/build.py", "scripts/check_repo.py", "scripts/scan_secrets.py",
     "release/BUILD_INSTRUCTIONS.md", "release/ATN_REVIEW_NOTES_TEMPLATE.md", "release/manifest-store-template.json",
-    "tests/test_build_reproducible.py", "tests/test_ui_regressions.py"
+    "tests/test_build_reproducible.py", "tests/test_ui_regressions.py", "tests/test_api_schema_contract.py"
 ]
 for relative in required_root:
     check((ROOT / relative).is_file(), f"fichier dépôt manquant: {relative}")

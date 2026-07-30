@@ -1,24 +1,19 @@
-# MailPerch
+# Épingles de messages pour Thunderbird
 
-**MailPerch — Email Pins & Follow-up**
+Extension Thunderbird expérimentale qui ajoute un panneau d’épingles au-dessus de la liste des messages, avec suivi local, rappels, groupes, affaires, Kanban, règles et intégration Agenda.
 
-> **Épinglez, organisez et suivez vos e-mails dans Thunderbird.**
-> *Gardez vos messages importants à portée de main.*
-
-MailPerch est une extension Thunderbird qui ajoute un panneau d’épingles au-dessus de la liste native des messages, avec suivi local, rappels, groupes, affaires, Kanban, règles et intégration Agenda.
-
-> **État : build de développement 3.1.0.** Le code a fait l’objet de contrôles statiques, de tests de modèles et d’une passe de correction issue de captures Thunderbird. Une validation graphique complète dans Thunderbird reste obligatoire avant publication. Voir [AUDIT_REPORT_3.1.0.md](AUDIT_REPORT_3.1.0.md).
+> **État : build de développement 3.1.1.** Cette version corrige les régressions observées dans la vidéo d’utilisation du 30 juillet 2026, notamment le contrat API, le clic droit, les couleurs, le survol et le centrage des punaises. Une nouvelle validation graphique complète dans Thunderbird reste obligatoire avant publication. Voir [docs/VIDEO_REVIEW_2026-07-30.md](docs/VIDEO_REVIEW_2026-07-30.md).
 
 ## Fonctions principales
 
 - épingles indépendantes des étoiles Thunderbird ;
 - panneau distinct sans masquer la liste native ;
-- couleurs personnalisables par compte, groupes, notes et priorités ;
+- couleurs par compte, groupes, notes et priorités ;
 - suivi « À traiter / En attente / Planifié / Terminé » ;
 - conversations, échéances, rappels et récurrences ;
 - affaires et tableau Kanban ;
 - règles locales avec simulation et protections anti-boucle ;
-- tâches et événements Agenda ;
+- tâches/événements Agenda ;
 - sauvegardes, réparation, diagnostic et stockage SQLite local ;
 - menu contextuel accessible sur les cartes épinglées ;
 - tableau de bord global adapté aux thèmes clair et sombre.
@@ -41,13 +36,6 @@ npm run build   # XPI reproductible + archive source
 npm run ci      # ensemble des contrôles
 ```
 
-Les builds sont créés sous les noms :
-
-```text
-MailPerch_v<VERSION>.xpi
-MailPerch_GitHub_Repository_v<VERSION>.zip
-```
-
 Le contenu de `extension/` est placé à la racine du XPI. Le dossier `dist/` n’est pas versionné.
 
 ## Structure
@@ -60,7 +48,6 @@ tests/           tests statiques et modèles
 release/         modèle de manifeste pour la future publication
 .github/         CI et modèles de contribution
 AGENTS.md        consignes compactes pour Codex et les contributeurs
-BRANDING.md      identité canonique et règles de nommage
 ```
 
 ## Confidentialité
@@ -69,14 +56,12 @@ Aucun appel réseau n’est présent. Les métadonnées nécessaires aux épingl
 
 ## Sécurité
 
-MailPerch utilise une API Experiment pour accéder à des éléments internes de Thunderbird. Cela implique un avertissement d’accès complet à l’installation et une dépendance aux versions internes de Thunderbird. Voir [SECURITY.md](SECURITY.md), [docs/THREAT_MODEL.md](docs/THREAT_MODEL.md) et [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md).
+L’extension utilise une API Experiment pour accéder à des éléments internes de Thunderbird. Cela implique un avertissement d’accès complet à l’installation et une dépendance aux versions internes de Thunderbird. Voir [SECURITY.md](SECURITY.md), [docs/THREAT_MODEL.md](docs/THREAT_MODEL.md) et [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md).
 
 ## Licence
 
 Ce dépôt n’est pas open source. Le code est fourni sous une licence source-disponible restrictive, non commerciale et sans droit de redistribution publique. Voir [LICENSE](LICENSE). Une validation juridique professionnelle est recommandée avant publication publique.
 
-## Marque et identifiants techniques
+## Nom du projet
 
-Le nom public est **MailPerch**. Les anciens identifiants techniques `pin-mails-*` et l’ID de développement `pin-mails@MailPerch.local` sont conservés pour assurer les migrations et la continuité des données. Voir [BRANDING.md](BRANDING.md).
-
-Thunderbird est une marque de MZLA Technologies Corporation. MailPerch est un projet indépendant, sans affiliation ni approbation de MZLA ou du projet Thunderbird.
+« Outlook » est une marque de Microsoft. Le nom actuel est un nom de développement descriptif. Un examen du nom et des marques est requis avant la publication sur Add-ons for Thunderbird.

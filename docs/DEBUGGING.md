@@ -26,7 +26,7 @@ Vérifier :
 - inspecter `.pin-mails-context-menu` dans le document `about:3pane` ;
 - vérifier `hidden`, `left`, `top` et `z-index` ;
 - essayer `Shift+F10` sur une carte focalisée ;
-- confirmer que l’événement `contextmenu` est capturé par `.pin-mails-panel-list`.
+- confirmer que l’événement `contextmenu` est capturé en phase capture sur le document `about:3pane`, puis limité aux cartes du panneau.
 
 ## Drag-and-drop
 
@@ -40,3 +40,14 @@ Après chaque drag, aucun élément ne doit conserver :
 ## Base
 
 Le bouton d’intégrité des paramètres exécute les contrôles SQLite. Avant toute manipulation manuelle, fermer Thunderbird et copier le profil de test.
+
+## Erreur « Unexpected properties »
+
+Thunderbird valide les objets transmis à une API Experiment à partir de `schema.json`. Un paramètre déclaré comme simple `type: object` sans propriétés n’accepte aucune clé applicative.
+
+Vérifier :
+
+1. que chaque paramètre objet utilise un `$ref` déclaré dans `types` ;
+2. que toutes les clés envoyées par `options.js` et `dashboard.js` sont listées ;
+3. que `python3 tests/test_api_schema_contract.py` réussit ;
+4. qu’aucun nouveau paramètre objet nu n’est ajouté.
