@@ -1,18 +1,33 @@
 {
   "extensionName": {
-    "message": "Épingles Outlook pour Thunderbird"
+    "message": "MailPerch — Email Pins & Follow-up"
   },
   "extensionShortName": {
-    "message": "Épingles"
+    "message": "MailPerch"
   },
   "extensionDescription": {
-    "message": "Panneau complet avec épingles indépendantes, suivi des réponses, affaires, Kanban, rappels, règles, Agenda, historique et sauvegardes locales."
+    "message": "Épinglez, organisez et suivez vos e-mails dans Thunderbird. Suivi local, rappels, Kanban, règles et Agenda inclus."
+  },
+  "brandSubtitle": {
+    "message": "Épinglez, organisez et suivez vos e-mails dans Thunderbird."
+  },
+  "brandSlogan": {
+    "message": "Gardez vos messages importants à portée de main."
+  },
+  "dashboardHeading": {
+    "message": "Tableau de bord MailPerch"
+  },
+  "dashboardSubtitle": {
+    "message": "Liste, Kanban, affaires, historique et activité — données locales."
+  },
+  "optionsHeading": {
+    "message": "MailPerch"
   },
   "messageDisplayActionTitle": {
     "message": "Épingler ou désépingler ce message"
   },
   "dashboardActionTitle": {
-    "message": "Tableau de bord des Épingles Outlook"
+    "message": "Ouvrir le tableau de bord MailPerch"
   },
   "commandWait": {
     "message": "Placer les épingles sélectionnées en attente"
@@ -24,10 +39,10 @@
     "message": "Remettre les épingles sélectionnées à traiter"
   },
   "optionsTitle": {
-    "message": "Paramètres des Épingles Outlook"
+    "message": "Paramètres de MailPerch"
   },
   "dashboardTitle": {
-    "message": "Tableau de bord — Épingles Outlook"
+    "message": "Tableau de bord — MailPerch"
   },
   "commandToggle": {
     "message": "Épingler ou désépingler les messages sélectionnés"
@@ -39,7 +54,7 @@
     "message": "Marquer les épingles sélectionnées comme terminées"
   },
   "commandDashboard": {
-    "message": "Ouvrir le tableau de bord des épingles"
+    "message": "Ouvrir le tableau de bord MailPerch"
   },
   "menuToggle": {
     "message": "Épingler ou désépingler la sélection"
@@ -57,12 +72,12 @@
     "message": "Épingler ou désépingler ce message"
   },
   "menuDashboard": {
-    "message": "Tableau de bord des Épingles Outlook"
+    "message": "Tableau de bord MailPerch"
   },
   "menuUndo": {
-    "message": "Annuler la dernière action des Épingles Outlook"
+    "message": "Annuler la dernière action MailPerch"
   },
   "menuOptions": {
-    "message": "Paramètres des Épingles Outlook"
+    "message": "Paramètres de MailPerch"
   }
 }

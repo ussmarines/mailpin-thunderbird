@@ -15,6 +15,9 @@ main { max-width: 1120px; margin: 0 auto; padding: 28px 24px 48px; }
 .title-row { display: flex; align-items: center; gap: 12px; }
 h1,h2,p { margin-top: 0; } h1 { margin-bottom: 3px; font-size: 1.65rem; } h2 { margin-bottom: 14px; font-size: 1.14rem; }
 .page-header p { margin-bottom: 0; color: var(--muted); }
+.brand-copy p + p { margin-top: 4px; }
+.brand-slogan { font-style: italic; }
+.app-version { color: var(--muted); font-size: .72em; font-weight: 600; }
 #status { min-height: 24px; padding: 5px 9px; border-radius: 6px; color: var(--muted); }
 #status.success { color: light-dark(#0e6b2f,#70d48f); background: light-dark(#e5f5ea,#143b21); }
 #status.error { color: light-dark(#a4262c,#ff9ca2); background: light-dark(#fde7e9,#4a1b1e); }

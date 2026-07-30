@@ -1,11 +1,24 @@
-# Préparation de publication
+# Préparation de publication de MailPerch
+
+## Identité retenue
+
+- **Nom :** MailPerch
+- **Nom complet :** MailPerch — Email Pins & Follow-up
+- **Sous-titre FR :** Épinglez, organisez et suivez vos e-mails dans Thunderbird.
+- **Subtitle EN:** Pin, organize and follow up on your emails in Thunderbird.
+- **Slogan :** Keep important mail within reach.
+
+Voir `BRANDING.md` pour les règles de nommage et les identifiants techniques conservés.
+
+## État
 
 La build actuelle n’est pas déclarée prête pour Add-ons for Thunderbird.
 
 Avant publication :
 
-- choisir le nom sans risque de marque ;
+- effectuer une recherche finale de disponibilité juridique de la marque MailPerch ;
 - remplacer l’ID de développement par un ID définitif et durable ;
+- rendre accessibles publiquement la page d’accueil, le support et la politique de confidentialité ;
 - exécuter la matrice `docs/MANUAL_TEST_PLAN.md` ;
 - compléter la localisation de toutes les interfaces ;
 - fournir aux reviewers le code source lisible et `python3 scripts/build.py --source` ;

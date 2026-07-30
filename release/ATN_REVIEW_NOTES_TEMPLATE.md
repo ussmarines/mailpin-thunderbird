@@ -1,8 +1,16 @@
-# Notes pour les reviewers ATN — modèle
+# Notes pour les reviewers ATN — MailPerch
+
+## Identité du module
+
+- **Nom :** MailPerch — Email Pins & Follow-up
+- **Nom court :** MailPerch
+- **Sous-titre FR :** Épinglez, organisez et suivez vos e-mails dans Thunderbird.
+- **Subtitle EN:** Pin, organize and follow up on your emails in Thunderbird.
+- **Slogan :** Keep important mail within reach.
 
 ## Fonction principale
 
-Ajouter un panneau local de messages épinglés au-dessus de la liste native, avec workflows, rappels et outils facultatifs.
+MailPerch ajoute un panneau local de messages épinglés au-dessus de la liste native, avec workflows, rappels et outils facultatifs.
 
 ## Permission privilégiée
 
@@ -30,8 +38,8 @@ Voir `release/BUILD_INSTRUCTIONS.md`. Aucune dépendance de build ou d’exécut
 2. épingler un message depuis la liste ;
 3. vérifier qu’il apparaît dans le panneau et reste dans la liste ;
 4. cliquer la carte : le message s’affiche sans défilement ;
-5. utiliser clic droit sur la carte ;
-6. ouvrir le dashboard ;
+5. utiliser le clic droit sur la carte ;
+6. ouvrir le tableau de bord MailPerch ;
 7. désépingler et confirmer que le compteur non lu n’a pas changé.
 
 ## Versions testées

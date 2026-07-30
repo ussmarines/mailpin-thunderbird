@@ -2,7 +2,7 @@
 
 ## État exact
 
-Build : **3.1.0**, ID de développement `pin-mails@MailPerch.local`.
+Produit : **MailPerch — Email Pins & Follow-up**. Build : **3.1.0**, ID de développement `pin-mails@MailPerch.local`.
 
 Corrections implémentées à partir des captures :
 
@@ -45,6 +45,10 @@ Pour le test graphique, suivre `docs/MANUAL_TEST_PLAN.md` et consigner : version
 4. erreur ou fuite d’écouteur ;
 5. menu/dashboard/drag ;
 6. cosmétique.
+
+## Identité de marque
+
+Lire `BRANDING.md`. MailPerch est le nom public canonique. Les identifiants internes `pin-mails-*` sont historiques et restent conservés jusqu’à une migration explicitement testée.
 
 ## Interdictions
 

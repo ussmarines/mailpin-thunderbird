@@ -2150,7 +2150,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   async _chooseBackupDirectory() {
     const win=Services.wm.getMostRecentWindow("mail:3pane");
     const picker=Cc["@mozilla.org/filepicker;1"].createInstance(Ci.nsIFilePicker);
-    picker.init(win, "Choisir le dossier des sauvegardes Épingles Outlook", Ci.nsIFilePicker.modeGetFolder);
+    picker.init(win, "Choisir le dossier des sauvegardes MailPerch", Ci.nsIFilePicker.modeGetFolder);
     const result=await new Promise(resolve=>picker.open(resolve));
     if(result===Ci.nsIFilePicker.returnCancel||!picker.file)return {selected:false};
     this._settings.backupDirectory=picker.file.path;this._saveSettings();
@@ -3562,7 +3562,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       if (this._settings.confirmDelete) {
         const accepted = about3Pane?.confirm
           ? about3Pane.confirm(`Supprimer ${usable.length} message(s) ?`)
-          : Services.prompt.confirm(null, "Épingles Outlook", `Supprimer ${usable.length} message(s) ?`);
+          : Services.prompt.confirm(null, "MailPerch", `Supprimer ${usable.length} message(s) ?`);
         if (!accepted) return;
       }
       const byFolder = new Map();

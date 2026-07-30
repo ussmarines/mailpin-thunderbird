@@ -14,7 +14,7 @@ const MENU_IDS = Object.freeze({
 const translate = (key, fallback) => messenger.i18n.getMessage(key) || fallback;
 
 function logError(context, error) {
-  console.error(`Épingles Outlook : ${context}`, error);
+  console.error(`MailPerch : ${context}`, error);
 }
 
 async function setupTab(tabId) {
@@ -22,7 +22,7 @@ async function setupTab(tabId) {
   try {
     await messenger.pinInbox.setup(tabId);
   } catch (error) {
-    console.debug("Épingles Outlook : onglet non initialisé", error);
+    console.debug("MailPerch : onglet non initialisé", error);
   }
 }
 
@@ -98,17 +98,17 @@ function createMenus() {
   });
   messenger.menus.create({
     id: MENU_IDS.dashboard,
-    title: translate("menuDashboard", "Tableau de bord des Épingles Outlook"),
+    title: translate("menuDashboard", "Tableau de bord des MailPerch"),
     contexts: ["tools_menu"]
   });
   messenger.menus.create({
     id: MENU_IDS.undo,
-    title: translate("menuUndo", "Annuler la dernière action des Épingles Outlook"),
+    title: translate("menuUndo", "Annuler la dernière action des MailPerch"),
     contexts: ["tools_menu"]
   });
   messenger.menus.create({
     id: MENU_IDS.options,
-    title: translate("menuOptions", "Paramètres des Épingles Outlook"),
+    title: translate("menuOptions", "Paramètres des MailPerch"),
     contexts: ["tools_menu"]
   });
 }
@@ -131,7 +131,7 @@ messenger.menus.onShown.addListener(async (_info, tab) => {
     ]);
     await messenger.menus.refresh();
   } catch (error) {
-    console.debug("Épingles Outlook : menu contextuel non actualisé", error);
+    console.debug("MailPerch : menu contextuel non actualisé", error);
   }
 });
 

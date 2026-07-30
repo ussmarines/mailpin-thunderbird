@@ -1,5 +1,7 @@
 "use strict";
 
+function localize(){document.documentElement.lang=(messenger.i18n.getUILanguage?.()||"fr").split("-")[0];for(const element of document.querySelectorAll("[data-i18n]")){const value=messenger.i18n.getMessage(element.dataset.i18n);if(value)element.textContent=value;}}
+
 const api = globalThis.messenger || globalThis.browser;
 const selected = new Set();
 let current = null;
@@ -322,7 +324,7 @@ async function load() {
     setView();
     setStatus(`${current.items.length} élément(s) affiché(s).`);
   } catch (error) {
-    console.error("Épingles : chargement du tableau de bord impossible", error);
+    console.error("MailPerch : chargement du tableau de bord impossible", error);
     $("fatal-error-message").textContent = String(error?.message || error);
     $("fatal-error").hidden = false;
     setStatus("Chargement impossible.", true);
@@ -399,4 +401,4 @@ $("apply").addEventListener("click", async () => {
 
 document.addEventListener("visibilitychange", () => { if (!document.hidden && !loading) load(); });
 window.addEventListener("blur", clearKanbanDropState);
-window.addEventListener("DOMContentLoaded", load, {once: true});
+window.addEventListener("DOMContentLoaded", () => { localize(); load(); }, {once: true});

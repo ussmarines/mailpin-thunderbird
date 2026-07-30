@@ -1,33 +1,48 @@
 {
   "extensionName": {
-    "message": "Outlook Pins for Thunderbird"
+    "message": "MailPerch — Email Pins & Follow-up"
   },
   "extensionShortName": {
-    "message": "Pins"
+    "message": "MailPerch"
   },
   "extensionDescription": {
-    "message": "Complete local pin panel with independent pins, reply tracking, cases, Kanban, reminders, rules, Calendar, history and backups."
+    "message": "Pin, organize and follow up on your emails in Thunderbird. Includes local tracking, reminders, Kanban, rules, and Calendar integration."
+  },
+  "brandSubtitle": {
+    "message": "Pin, organize and follow up on your emails in Thunderbird."
+  },
+  "brandSlogan": {
+    "message": "Keep important mail within reach."
+  },
+  "dashboardHeading": {
+    "message": "MailPerch Dashboard"
+  },
+  "dashboardSubtitle": {
+    "message": "List, Kanban, cases, history, and activity — stored locally."
+  },
+  "optionsHeading": {
+    "message": "MailPerch"
   },
   "messageDisplayActionTitle": {
     "message": "Pin or unpin this message"
   },
   "dashboardActionTitle": {
-    "message": "Open the Outlook Pins dashboard"
+    "message": "Open the MailPerch dashboard"
   },
   "commandWait": {
     "message": "Move selected pins to Waiting"
   },
   "commandPlan": {
-    "message": "Move selected pins to Planned"
+    "message": "Plan selected pins"
   },
   "commandActivate": {
-    "message": "Move selected pins back to Active"
+    "message": "Move selected pins back to To do"
   },
   "optionsTitle": {
-    "message": "Outlook Pins Settings"
+    "message": "MailPerch Settings"
   },
   "dashboardTitle": {
-    "message": "Outlook Pins Dashboard"
+    "message": "MailPerch Dashboard"
   },
   "commandToggle": {
     "message": "Pin or unpin selected messages"
@@ -39,30 +54,30 @@
     "message": "Mark selected pins as completed"
   },
   "commandDashboard": {
-    "message": "Open the pins dashboard"
+    "message": "Open the MailPerch dashboard"
   },
   "menuToggle": {
-    "message": "Pin or unpin selection"
+    "message": "Pin or unpin the selection"
   },
   "menuPin": {
-    "message": "Pin selection"
+    "message": "Pin the selection"
   },
   "menuUnpin": {
-    "message": "Unpin selection"
+    "message": "Unpin the selection"
   },
   "menuConversation": {
-    "message": "Pin or unpin conversation"
+    "message": "Pin or unpin the conversation"
   },
   "menuDisplayed": {
     "message": "Pin or unpin this message"
   },
   "menuDashboard": {
-    "message": "Outlook Pins dashboard"
+    "message": "MailPerch Dashboard"
   },
   "menuUndo": {
-    "message": "Undo the last Outlook Pins action"
+    "message": "Undo the last MailPerch action"
   },
   "menuOptions": {
-    "message": "Outlook Pins settings"
+    "message": "MailPerch Settings"
   }
 }

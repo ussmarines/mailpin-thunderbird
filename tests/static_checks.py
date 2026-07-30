@@ -16,6 +16,15 @@ assert manifest["browser_specific_settings"]["gecko"]["id"] == "pin-mails@MailPe
 assert manifest["browser_specific_settings"]["gecko"]["strict_min_version"] == "128.0"
 assert manifest["browser_specific_settings"]["gecko"]["strict_max_version"] == "153.*"
 assert manifest["default_locale"] == "fr"
+package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
+fr_locale = json.loads((EXT / "_locales/fr/messages.json").read_text(encoding="utf-8"))
+en_locale = json.loads((EXT / "_locales/en/messages.json").read_text(encoding="utf-8"))
+assert package["name"] == "mailperch-thunderbird"
+assert fr_locale["extensionName"]["message"] == "MailPerch — Email Pins & Follow-up"
+assert en_locale["extensionName"]["message"] == "MailPerch — Email Pins & Follow-up"
+assert fr_locale["brandSubtitle"]["message"] == "Épinglez, organisez et suivez vos e-mails dans Thunderbird."
+assert en_locale["brandSubtitle"]["message"] == "Pin, organize and follow up on your emails in Thunderbird."
+assert en_locale["brandSlogan"]["message"] == "Keep important mail within reach."
 assert manifest["options_ui"]["page"] == "options/options.html"
 assert manifest["content_security_policy"]["extension_pages"] == "script-src 'self'; object-src 'none'"
 

@@ -23,3 +23,7 @@ Le build repose uniquement sur Python et Node pour faciliter la revue, réduire 
 ## D006 — Licence source-disponible restrictive
 
 Le propriétaire ne souhaite ni vente ni redistribution publique du code. Le projet n’est donc pas présenté comme open source. Une revue juridique est requise avant publication publique.
+
+## D007 — MailPerch comme identité publique
+
+Le nom public canonique est **MailPerch** et le nom complet du store est **MailPerch — Email Pins & Follow-up**. Les anciens noms faisant référence à Outlook sont retirés des surfaces publiques. Les identifiants techniques `pin-mails-*` restent conservés jusqu’à une migration dédiée afin de préserver les données et les mises à niveau.

@@ -40,8 +40,18 @@ check(manifest.get("content_security_policy", {}).get("extension_pages") == "scr
 version = str(manifest.get("version", ""))
 check(bool(re.fullmatch(r"\d+\.\d+\.\d+", version)), "version SemVer invalide")
 
+package = load_json(ROOT / "package.json")
+fr_locale = load_json(EXT / "_locales/fr/messages.json")
+en_locale = load_json(EXT / "_locales/en/messages.json")
+check(package.get("name") == "mailperch-thunderbird", "nom package MailPerch inattendu")
+check(fr_locale.get("extensionName", {}).get("message") == "MailPerch — Email Pins & Follow-up", "nom FR MailPerch incohérent")
+check(en_locale.get("extensionName", {}).get("message") == "MailPerch — Email Pins & Follow-up", "nom EN MailPerch incohérent")
+check(fr_locale.get("brandSubtitle", {}).get("message") == "Épinglez, organisez et suivez vos e-mails dans Thunderbird.", "sous-titre FR MailPerch incohérent")
+check(en_locale.get("brandSubtitle", {}).get("message") == "Pin, organize and follow up on your emails in Thunderbird.", "sous-titre EN MailPerch incohérent")
+check(en_locale.get("brandSlogan", {}).get("message") == "Keep important mail within reach.", "slogan MailPerch incohérent")
+
 required_root = [
-    "AGENTS.md", "README.md", "README.en.md", "LICENSE", "NOTICE.md", "CHANGELOG.md", "AUDIT_REPORT_3.1.0.md",
+    "AGENTS.md", "BRANDING.md", "README.md", "README.en.md", "LICENSE", "NOTICE.md", "CHANGELOG.md", "AUDIT_REPORT_3.1.0.md",
     "CONTRIBUTING.md", "CODE_OF_CONDUCT.md", "SECURITY.md", "PRIVACY.md", "ROADMAP.md", "SUPPORT.md",
     "package.json", ".editorconfig", ".gitattributes", ".gitignore", "extension/AGENTS.md",
     "extension/api/pinInbox/AGENTS.md", "tests/AGENTS.md",

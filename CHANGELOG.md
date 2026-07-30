@@ -1,5 +1,14 @@
 # Journal des modifications
 
+## Non publié — identité MailPerch
+
+- adoption du nom public **MailPerch** ;
+- nom complet : **MailPerch — Email Pins & Follow-up** ;
+- ajout des sous-titres français et anglais et du slogan canonique ;
+- renommage des paquets de build en `MailPerch_v<VERSION>.xpi` et `MailPerch_GitHub_Repository_v<VERSION>.zip` ;
+- ajout de `BRANDING.md` et de contrôles empêchant une régression du nom ;
+- conservation volontaire des identifiants techniques historiques pour assurer les migrations.
+
 ## 3.1.0 — passe de débogage, dashboard et dépôt
 
 ### Corrigé
@@ -38,4 +47,4 @@
 
 ## 1.x
 
-- panneau Outlook, couleurs par compte, tri, épingles indépendantes et premières fonctions avancées.
+- panneau d’épingles, couleurs par compte, tri, épingles indépendantes et premières fonctions avancées.

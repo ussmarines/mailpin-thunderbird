@@ -131,7 +131,7 @@ Les points suivants ne sont **pas déclarés validés** tant qu’ils ne sont pa
 
 ## Limites et décisions avant publication
 
-- Le nom de développement contient « Outlook », marque de Microsoft : choisir un nom public après vérification des marques.
+- Le nom public retenu est **MailPerch**. Une vérification juridique finale de disponibilité de la marque reste recommandée avant publication.
 - L’identifiant de développement `pin-mails@MailPerch.local` doit rester inchangé pendant les tests afin de préserver les migrations. Choisir l’identifiant public une seule fois avant la première publication.
 - La licence fournie est restrictive et non open source. Elle correspond à la demande fonctionnelle, mais n’est pas un avis juridique ; une revue par un professionnel est recommandée.
 - L’API Experiment donne un accès privilégié et dépend des interfaces internes de Thunderbird. La plage de compatibilité doit être validée réellement avant publication.

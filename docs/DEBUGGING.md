@@ -8,7 +8,7 @@ Utiliser un profil dédié. Ne pas tester les suppressions et règles avec une b
 
 Activer **Outils de développement → Boîte à outils du navigateur**. Rechercher les préfixes :
 
-- `Épingles Outlook` ;
+- `MailPerch` ;
 - `pinInbox` ;
 - erreurs `about:3pane`, `Sqlite` ou `calendar`.
 

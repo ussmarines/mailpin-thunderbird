@@ -57,11 +57,11 @@ def main() -> None:
     manifest = json.loads((EXTENSION / "manifest.json").read_text(encoding="utf-8"))
     version = manifest["version"]
     DIST.mkdir(exist_ok=True)
-    xpi = DIST / f"Thunderbird_Pin_Mails_v{version}.xpi"
+    xpi = DIST / f"MailPerch_v{version}.xpi"
     create_xpi(xpi)
     outputs = [xpi]
     if args.source:
-        source_zip = DIST / f"Thunderbird_Pin_Mails_GitHub_Repository_v{version}.zip"
+        source_zip = DIST / f"MailPerch_GitHub_Repository_v{version}.zip"
         create_source_zip(source_zip)
         outputs.append(source_zip)
 
