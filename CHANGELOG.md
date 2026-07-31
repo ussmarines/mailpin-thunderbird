@@ -1,5 +1,21 @@
 # Journal des modifications
 
+## 3.2.0 — workflows intelligents, fiabilité et refonte UX
+
+- refonte guidée et aérée des paramètres avec navigation groupée, recherche, section active, aides contextuelles et retours non invasifs ;
+- tableau de bord enrichi avec vues intelligentes, sélection multiple, actions groupées et centre de santé ;
+- suivi automatique local des conversations sans réponse, avec annulation lors d’une réponse entrante ;
+- diagnostic expurgé exportable, journal borné et indicateur de santé discret dans le panneau ;
+- matrice locale de compatibilité pour comptes IMAP, POP, Gmail, Microsoft, dossiers locaux et calendriers ;
+- restauration prévisualisée, fusion contrôlée, protection contre les clés dangereuses et sauvegarde obligatoire avant migration/restauration ;
+- rendu différentiel des cartes, cache par signature et chargement progressif au-delà du seuil configuré ;
+- logique stable séparée dans les modules `bulk`, `diagnostics`, `health`, `localization`, `migrations`, `performance`, `providers` et `smart` ;
+- navigation clavier étendue, focus restauré après les menus natifs, liens d’évitement, contraste élevé et réduction des animations ;
+- couverture FR/EN de toutes les chaînes déclaratives des paramètres et du dashboard, plus localisation du panneau injecté principal ;
+- zone d’épinglage de la liste générale agrandie et recentrée pour éloigner la punaise du bord supérieur ;
+- CI renforcée sur Linux et Windows, contrôle centralisé des versions et workflow manuel de release candidate ;
+- nouvelles gardes de régression et nouveaux tests de modèle pour les fonctions 3.2.0.
+
 ## 3.1.5 — menu d’actions natif des messages épinglés
 
 - remplacement du menu HTML positionné manuellement par un `menupopup` natif Thunderbird ;

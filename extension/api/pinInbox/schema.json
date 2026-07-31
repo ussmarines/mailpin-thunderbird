@@ -177,6 +177,88 @@
         "parameters": []
       },
       {
+        "name": "exportDiagnosticBundle",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "clearDiagnostics",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "getHealthReport",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "repairHealthIssues",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "options",
+            "$ref": "HealthRepairOptions",
+            "optional": true
+          }
+        ]
+      },
+      {
+        "name": "runProviderCompatibilityCheck",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "previewImport",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "configuration",
+            "$ref": "ConfigurationInput"
+          }
+        ]
+      },
+      {
+        "name": "restoreConfiguration",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "configuration",
+            "$ref": "ConfigurationInput"
+          },
+          {
+            "name": "strategy",
+            "type": "string",
+            "optional": true
+          }
+        ]
+      },
+      {
+        "name": "setNoReplyTracking",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "stableKeys",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "options",
+            "$ref": "NoReplyOptions",
+            "optional": true
+          }
+        ]
+      },
+      {
         "name": "getDashboardData",
         "type": "function",
         "async": true,
@@ -580,6 +662,14 @@
           "historySearch": {
             "type": "string",
             "optional": true
+          },
+          "smartView": {
+            "type": "string",
+            "optional": true
+          },
+          "useSmartView": {
+            "type": "boolean",
+            "optional": true
           }
         }
       },
@@ -665,6 +755,22 @@
           },
           "action": {
             "type": "string",
+            "optional": true
+          },
+          "days": {
+            "type": "number",
+            "optional": true
+          },
+          "enabled": {
+            "type": "boolean",
+            "optional": true
+          },
+          "at": {
+            "type": "number",
+            "optional": true
+          },
+          "keepWaiting": {
+            "type": "boolean",
             "optional": true
           }
         }
@@ -827,6 +933,41 @@
           },
           "updatedAt": {
             "type": "number",
+            "optional": true
+          }
+        }
+      },
+      {
+        "id": "HealthRepairOptions",
+        "type": "object",
+        "properties": {
+          "actions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "optional": true
+          }
+        }
+      },
+      {
+        "id": "NoReplyOptions",
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "optional": true
+          },
+          "days": {
+            "type": "number",
+            "optional": true
+          },
+          "at": {
+            "type": "number",
+            "optional": true
+          },
+          "keepWaiting": {
+            "type": "boolean",
             "optional": true
           }
         }

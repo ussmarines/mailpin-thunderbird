@@ -19,7 +19,11 @@ ChromeUtils.defineESModuleGetters(lazy, {
 });
 
 const PIN_MODULES = {};
-const MODULE_PATHS = ["identity.js", "storage.js", "workflow.js", "rules.js", "calendar.js"];
+const MODULE_PATHS = [
+  "identity.js", "storage.js", "workflow.js", "rules.js", "calendar.js",
+  "smart.js", "bulk.js", "diagnostics.js", "providers.js", "health.js",
+  "migrations.js", "performance.js", "localization.js"
+];
 
 const STYLE_SHEET_SERVICE = "@mozilla.org/content/style-sheet-service;1";
 const PREF_SETTINGS = "extensions.pinMails.settings";
@@ -40,6 +44,7 @@ const MAX_CASES = 200;
 const MAX_TEMPLATES = 100;
 const MAX_HISTORY = 5000;
 const MAX_RULE_LOG = 2000;
+const MAX_DIAGNOSTIC_EVENTS = 500;
 const DATA_CHANGED_TOPIC = "pin-mails-data-changed";
 const DEFAULT_BACKUP_FOLDER = "pin-mails-backups";
 const RECOVERY_FILENAME = "pin-mails-recovery.json";
@@ -83,7 +88,7 @@ const DEFAULT_COLORS = [
 ];
 
 const DEFAULT_SETTINGS = Object.freeze({
-  schemaVersion: 5,
+  schemaVersion: 6,
   pinMode: "independent",
   panelScope: "currentInbox",
   sortMode: "manual",
@@ -91,6 +96,10 @@ const DEFAULT_SETTINGS = Object.freeze({
   cardLines: 3,
   panelMaxHeight: 420,
   panelPageSize: 100,
+  panelVirtualizationThreshold: 180,
+  uiPreset: "balanced",
+  settingsExperience: "guided",
+  reduceMotion: "auto",
   groupByAccount: true,
   groupByCustomGroup: false,
   showAccountColor: true,
@@ -132,12 +141,24 @@ const DEFAULT_SETTINGS = Object.freeze({
   preferredCalendarId: "",
   calendarItemType: "task",
   enableGlobalDashboard: true,
+  enableSmartViews: true,
+  defaultSmartView: "today",
+  enableBulkActions: true,
+  confirmBulkDestructiveActions: true,
+  enableHealthCenter: true,
+  enableHealthNotifications: true,
+  enableDiagnostics: true,
+  diagnosticLevel: "warning",
+  diagnosticMaxEntries: 500,
   compatibilityMode: "auto",
   enablePerformanceMetrics: true,
   enableBidirectionalCalendarSync: true,
   calendarDeleteOnUnpin: false,
   calendarCompleteOnPinComplete: true,
   enableWaitingWorkflow: true,
+  enableAutomaticNoReplyTracking: true,
+  noReplyDefaultDays: 5,
+  noReplyCancelOnIncomingReply: true,
   defaultFollowUpDays: 3,
   reopenOnConversationReply: true,
   enableCases: true,
@@ -171,7 +192,7 @@ const DEFAULT_SETTINGS = Object.freeze({
 });
 
 const DEFAULT_DATA = Object.freeze({
-  schemaVersion: 5,
+  schemaVersion: 6,
   refs: {},
   manualOrder: [],
   groups: [],
@@ -185,8 +206,9 @@ const DEFAULT_DATA = Object.freeze({
   history: [],
   ruleLog: [],
   activity: [],
-  dashboard: {filter: "active", search: "", view: "list"},
-  migration: {from: 0, to: 5, completedAt: 0},
+  dashboard: {filter: "active", smartView: "today", search: "", view: "list"},
+  providerMatrix: {checkedAt: 0, accounts: [], providers: [], calendars: []},
+  migration: {from: 0, to: 6, completedAt: 0},
   revision: 0
 });
 
@@ -288,18 +310,31 @@ function normalizeSettings(value) {
   const missedPolicies = new Set(["notify", "nextStart", "ignore"]);
   const calendarTypes = new Set(["task", "event"]);
   const compatibilityModes = new Set(["auto", "full", "reduced"]);
+  const uiPresets = new Set(["compact", "balanced", "comfortable"]);
+  const settingsExperiences = new Set(["guided", "advanced"]);
+  const reduceMotionModes = new Set(["auto", "always", "never"]);
+  const diagnosticLevels = new Set(["debug", "info", "warning", "error"]);
+  const smartViews = new Set(["all", "today", "overdue", "week", "waiting", "noReply", "noDue", "unread", "missing", "calendarError", "recentCompleted"]);
 
   settings.pinMode = pinModes.has(source.pinMode) ? source.pinMode : settings.pinMode;
   settings.defaultPinTarget = pinTargets.has(source.defaultPinTarget) ? source.defaultPinTarget : settings.defaultPinTarget;
   settings.missedReminderPolicy = missedPolicies.has(source.missedReminderPolicy) ? source.missedReminderPolicy : settings.missedReminderPolicy;
   settings.calendarItemType = calendarTypes.has(source.calendarItemType) ? source.calendarItemType : settings.calendarItemType;
   settings.compatibilityMode = compatibilityModes.has(source.compatibilityMode) ? source.compatibilityMode : settings.compatibilityMode;
+  settings.uiPreset = uiPresets.has(source.uiPreset) ? source.uiPreset : settings.uiPreset;
+  settings.settingsExperience = settingsExperiences.has(source.settingsExperience) ? source.settingsExperience : settings.settingsExperience;
+  settings.reduceMotion = reduceMotionModes.has(source.reduceMotion) ? source.reduceMotion : settings.reduceMotion;
+  settings.diagnosticLevel = diagnosticLevels.has(source.diagnosticLevel) ? source.diagnosticLevel : settings.diagnosticLevel;
+  settings.defaultSmartView = smartViews.has(source.defaultSmartView) ? source.defaultSmartView : settings.defaultSmartView;
   settings.panelScope = scopes.has(source.panelScope) ? source.panelScope : settings.panelScope;
   settings.sortMode = sorts.has(source.sortMode) ? source.sortMode : settings.sortMode;
   settings.density = densities.has(source.density) ? source.density : settings.density;
   settings.cardLines = [2, 3].includes(Number(source.cardLines)) ? Number(source.cardLines) : settings.cardLines;
   settings.panelMaxHeight = clampNumber(source.panelMaxHeight, 160, 900, settings.panelMaxHeight);
   settings.panelPageSize = clampNumber(source.panelPageSize, 20, 500, settings.panelPageSize);
+  settings.panelVirtualizationThreshold = clampNumber(source.panelVirtualizationThreshold, 40, 2000, settings.panelVirtualizationThreshold);
+  settings.diagnosticMaxEntries = clampNumber(source.diagnosticMaxEntries, 50, MAX_DIAGNOSTIC_EVENTS, settings.diagnosticMaxEntries);
+  settings.noReplyDefaultDays = clampNumber(source.noReplyDefaultDays, 1, 365, settings.noReplyDefaultDays);
   settings.cleanupGraceDays = clampNumber(source.cleanupGraceDays, 0, 90, settings.cleanupGraceDays);
   settings.undoTimeoutMs = clampNumber(source.undoTimeoutMs, 3000, 20000, settings.undoTimeoutMs);
   settings.completedRetentionDays = clampNumber(source.completedRetentionDays, 0, 3650, settings.completedRetentionDays);
@@ -328,7 +363,10 @@ function normalizeSettings(value) {
     "enableRecurringFollowUps", "enableTemplates", "enableHistory",
     "enableAutomaticBackups", "backupBeforeMigration", "backupIncludeHistory",
     "enableRuleSimulation", "enableConcurrentWriteProtection",
-    "enableCounterRegressionGuard"
+    "enableCounterRegressionGuard", "enableAutomaticNoReplyTracking",
+    "noReplyCancelOnIncomingReply", "enableSmartViews", "enableBulkActions",
+    "confirmBulkDestructiveActions", "enableHealthCenter", "enableHealthNotifications",
+    "enableDiagnostics"
   ]) {
     settings[key] = normalizeBoolean(source[key], settings[key]);
   }
@@ -432,6 +470,11 @@ function normalizeHistory(value) {
     completedAt: Math.max(0, Number(value.completedAt) || Date.now()),
     durationMs: Math.max(0, Number(value.durationMs) || 0),
     followUpCount: Math.max(0, Number(value.followUpCount) || 0),
+    noReplyTracking: Boolean(value.noReplyTracking),
+    noReplyAt: Math.max(0, Number(value.noReplyAt) || 0),
+    noReplyStartedAt: Math.max(0, Number(value.noReplyStartedAt) || 0),
+    noReplyBaselineMessageId: boundedText(value.noReplyBaselineMessageId, 2048),
+    calendarSyncError: boundedText(value.calendarSyncError, 500),
     action: String(value.action || "completed").slice(0, 80)
   };
 }
@@ -502,6 +545,11 @@ function normalizeReference(key, value) {
     lastReplyAt: Math.max(0, Number(value.lastReplyAt) || 0),
     lastOutgoingAt: Math.max(0, Number(value.lastOutgoingAt) || 0),
     followUpCount: Math.max(0, Number(value.followUpCount) || 0),
+    noReplyTracking: Boolean(value.noReplyTracking),
+    noReplyAt: Math.max(0, Number(value.noReplyAt) || 0),
+    noReplyStartedAt: Math.max(0, Number(value.noReplyStartedAt) || 0),
+    noReplyBaselineMessageId: boundedText(value.noReplyBaselineMessageId, 2048),
+    calendarSyncError: boundedText(value.calendarSyncError, 500),
     caseId: String(value.caseId || "").slice(0, 64),
     templateId: String(value.templateId || "").slice(0, 64),
     recurrenceRule: ["", "daily", "weekdays", "weekly", "monthly", "quarterly", "yearly"].includes(value.recurrenceRule) ? value.recurrenceRule : "",
@@ -571,18 +619,21 @@ function normalizeData(value) {
   data.activity = (Array.isArray(source.activity) ? source.activity : [])
     .map(normalizeActivity).filter(Boolean).slice(-MAX_ACTIVITY);
   data.dashboard = {
-    filter: ["active", "all", "overdue", "today", "week", "completed", "unread", "waiting", "planned"].includes(source.dashboard?.filter)
+    filter: ["active", "all", "overdue", "today", "week", "completed", "unread", "waiting", "planned", "noReply", "noDue", "missing", "calendarError", "recentCompleted"].includes(source.dashboard?.filter)
       ? source.dashboard.filter : "active",
+    smartView: ["all", "today", "overdue", "week", "waiting", "noReply", "noDue", "unread", "missing", "calendarError", "recentCompleted"].includes(source.dashboard?.smartView)
+      ? source.dashboard.smartView : "today",
     search: boundedText(source.dashboard?.search, 500),
-    view: ["list", "kanban", "cases", "history"].includes(source.dashboard?.view) ? source.dashboard.view : "list"
+    view: ["list", "kanban", "cases", "history", "health"].includes(source.dashboard?.view) ? source.dashboard.view : "list"
   };
+  data.providerMatrix = source.providerMatrix && typeof source.providerMatrix === "object" ? clone(source.providerMatrix) : clone(DEFAULT_DATA.providerMatrix);
   data.migration = {
     from: Number(source.migration?.from) || Number(source.schemaVersion) || 1,
-    to: 5,
+    to: 6,
     completedAt: Number(source.migration?.completedAt) || 0
   };
   data.revision = Math.max(0, Number(source.revision) || 0);
-  data.schemaVersion = 5;
+  data.schemaVersion = 6;
   return data;
 }
 
@@ -878,8 +929,14 @@ const SMART_SECTION_LABELS = Object.freeze({
   overdue: "En retard",
   today: "Aujourd’hui",
   week: "Cette semaine",
+  waiting: "En attente",
+  noReply: "Sans réponse",
   later: "Plus tard",
   noDue: "Sans échéance",
+  unread: "Non lus",
+  missing: "Messages introuvables",
+  calendarError: "Agenda à vérifier",
+  recentCompleted: "Récemment terminés",
   completed: "Terminés"
 });
 
@@ -1069,6 +1126,7 @@ class PinStructuredStore {
         else if (key === "panelVisibleByInbox") data.panelVisibleByInbox = normalizeRecord(value);
         else if (key === "migration") data.migration = value;
         else if (key === "dashboard") data.dashboard = value;
+        else if (key === "providerMatrix") data.providerMatrix = value;
         else if (key === "caseOrder") data.caseOrder = Array.isArray(value) ? value.map(String) : [];
       }
       for (const row of await this.connection.execute("SELECT payload FROM rules ORDER BY sort_order")) {
@@ -1237,7 +1295,7 @@ class PinStructuredStore {
               if(current&&this._json(current)!==this._json(base)){
                 data.refs[key]=current;
                 if(!data.manualOrder.includes(key))data.manualOrder.push(key);
-                this.owner._recordDiagnostic?.("warning",`Suppression concurrente évitée : ${current.subject||key}`);
+                this.owner._recordDiagnostic?.("warning",`Suppression concurrente évitée : ${hashString(String(key)).toString(16)}`);
                 continue;
               }
             }catch{}
@@ -1257,7 +1315,7 @@ class PinStructuredStore {
               if(externallyChanged&&Number(current.updatedAt||0)>Number(ref.updatedAt||0)){
                 data.refs[key]=current;
                 ref=current;
-                this.owner._recordDiagnostic?.("warning",`Modification concurrente conservée : ${current.subject||key}`);
+                this.owner._recordDiagnostic?.("warning",`Modification concurrente conservée : ${hashString(String(key)).toString(16)}`);
               }
             }catch{}
           }
@@ -1279,8 +1337,8 @@ class PinStructuredStore {
       data.caseOrder = (data.caseOrder || []).filter(id => data.cases.some(item => item.id === id));
       for (const item of data.cases) if (!data.caseOrder.includes(item.id)) data.caseOrder.push(item.id);
 
-      const states = {manualOrder:data.manualOrder||[],collapsedByInbox:data.collapsedByInbox||{},panelVisibleByInbox:data.panelVisibleByInbox||{},migration:data.migration||{},dashboard:data.dashboard||{},caseOrder:data.caseOrder||[]};
-      const oldStates = {manualOrder:previous.manualOrder||[],collapsedByInbox:previous.collapsedByInbox||{},panelVisibleByInbox:previous.panelVisibleByInbox||{},migration:previous.migration||{},dashboard:previous.dashboard||{},caseOrder:previous.caseOrder||[]};
+      const states = {manualOrder:data.manualOrder||[],collapsedByInbox:data.collapsedByInbox||{},panelVisibleByInbox:data.panelVisibleByInbox||{},migration:data.migration||{},dashboard:data.dashboard||{},providerMatrix:data.providerMatrix||{},caseOrder:data.caseOrder||[]};
+      const oldStates = {manualOrder:previous.manualOrder||[],collapsedByInbox:previous.collapsedByInbox||{},panelVisibleByInbox:previous.panelVisibleByInbox||{},migration:previous.migration||{},dashboard:previous.dashboard||{},providerMatrix:previous.providerMatrix||{},caseOrder:previous.caseOrder||[]};
       for (const [key, value] of Object.entries(states)) if (this._json(value) !== this._json(oldStates[key])) await c.execute("INSERT INTO state_data(key,payload) VALUES(:key,:payload) ON CONFLICT(key) DO UPDATE SET payload=excluded.payload", {key,payload:JSON.stringify(value)});
 
       const oldHistory = Object.fromEntries((previous.history||[]).map(item=>[item.id,item]));
@@ -1418,6 +1476,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     this._context = context;
     this._rootURI = context.extension.rootURI;
     this._extensionVersion = String(context.extension.manifest?.version || "0.0.0");
+    this._locale = String(context.extension.localeData?.selectedLocale || Services.locale?.appLocaleAsBCP47 || "fr");
     if (!this._modulesLoaded) {
       for (const name of MODULE_PATHS) {
         Services.scriptloader.loadSubScript(context.extension.rootURI.resolve(`api/pinInbox/modules/${name}`), PIN_MODULES, "UTF-8");
@@ -1433,7 +1492,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     this._resolveCache = new Map();
     this._conversationCache = new Map();
     this._diagnosticEvents = [];
-    this._performance = {renders: 0, totalRenderMs: 0, maxRenderMs: 0, resolves: 0, cacheHits: 0, ruleRuns: 0, lastRenderMs: 0};
+    this._performance = {renders: 0, skippedRenders: 0, createdCards: 0, reusedCards: 0, totalRenderMs: 0, maxRenderMs: 0, resolves: 0, cacheHits: 0, ruleRuns: 0, lastRenderMs: 0};
     this._compatibility = {mode: "checking", missing: [], checkedAt: 0, reduced: false};
     this._instanceId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
     this._ruleGuard = new Map();
@@ -1520,6 +1579,14 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         resetInterface: ready(() => this._resetInterface()),
         importNativeStars: ready(clearStars => this._importNativeStars(Boolean(clearStars))),
         getDiagnosticReport: ready(() => this._getDiagnosticReport()),
+        exportDiagnosticBundle: ready(() => this._exportDiagnosticBundle()),
+        clearDiagnostics: ready(() => this._clearDiagnostics()),
+        getHealthReport: ready(() => this._getHealthReport()),
+        repairHealthIssues: ready(options => this._repairHealthIssues(options || {})),
+        runProviderCompatibilityCheck: ready(() => this._runProviderCompatibilityCheck()),
+        previewImport: ready(configuration => this._previewImport(configuration)),
+        restoreConfiguration: ready((configuration, strategy) => this._restoreConfiguration(configuration, strategy || "replace")),
+        setNoReplyTracking: ready((stableKeys, options) => this._setNoReplyTracking(stableKeys, options || {})),
         getDashboardData: ready(options => this._getDashboardData(options || {})),
         openReference: ready(stableKey => this._openReference(stableKey)),
         performReferenceAction: ready((stableKeys, action, options) => this._performReferenceAction(stableKeys, action, options || {})),
@@ -1555,6 +1622,13 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     if (this._readyPromise) await this._readyPromise;
   }
 
+  _t(key, fallback = "", variables = {}) {
+    try {
+      const localized = this._context?.extension?.localeData?.localizeMessage?.(key);
+      if (localized) return PIN_MODULES.PinLocalization?.interpolate(localized, variables) || localized;
+    } catch {}
+    return PIN_MODULES.PinLocalization?.t(this._locale, key, fallback, variables) || fallback || key;
+  }
 
   _saveSettings() {
     Services.prefs.setStringPref(PREF_SETTINGS, JSON.stringify(this._settings));
@@ -1645,12 +1719,14 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     const oldSettingsVersion = Number(rawSettings?.schemaVersion) || 1;
     const oldDataVersion = Number(rawData?.schemaVersion) || Number(this._data.schemaVersion) || 1;
     const oldVersion = Math.min(oldSettingsVersion, oldDataVersion);
-    if (oldVersion < 5 || Number(this._data.migration?.to) < 5) {
-      if (this._settings.backupBeforeMigration && this._storage?.available) {
+    if (oldVersion < 6 || Number(this._data.migration?.to) < 6) {
+      const hasUserData = Object.keys(this._data.refs || {}).length || (this._data.groups || []).length || (this._data.rules || []).length || (this._data.cases || []).length;
+      if (hasUserData && this._storage?.available) {
         try {
-          await this._storage.createFileBackup(clone(this._data), clone(this._undoStack), `before-migration-${oldVersion}-to-5`);
+          await this._storage.createFileBackup(clone(this._data), clone(this._undoStack), `before-migration-${oldVersion}-to-6`);
         } catch (error) {
-          this._recordDiagnostic("warning", "Sauvegarde pré-migration impossible", error);
+          this._recordDiagnostic("error", "Sauvegarde pré-migration impossible", error, {component: "migration", action: `v${oldVersion}-to-v6`});
+          throw new ExtensionError(`Migration annulée : la sauvegarde de sécurité n’a pas pu être créée (${error?.message || error}).`);
         }
       }
       this._settings.pinMode ||= "independent";
@@ -1666,19 +1742,36 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         }
       }
       this._data.cases ||= []; this._data.caseOrder ||= []; this._data.templates ||= []; this._data.history ||= []; this._data.ruleLog ||= [];
-      this._data.dashboard = {...(this._data.dashboard || {}), view: this._data.dashboard?.view || "list"};
-      this._data.migration = {from: oldVersion, to: 5, completedAt: Date.now()};
-      this._settings.schemaVersion = 5; this._data.schemaVersion = 5;
-      this._saveSettings(); this._saveData("migration-v3");
+      this._data.dashboard = {...(this._data.dashboard || {}), smartView: this._data.dashboard?.smartView || this._settings.defaultSmartView || "today", view: this._data.dashboard?.view || "list"};
+      this._data.providerMatrix ||= {checkedAt:0,accounts:[],providers:[],calendars:[]};
+      for (const ref of Object.values(this._data.refs || {})) {
+        ref.noReplyTracking = Boolean(ref.noReplyTracking);
+        ref.noReplyAt = Math.max(0, Number(ref.noReplyAt || 0));
+        ref.noReplyStartedAt = Math.max(0, Number(ref.noReplyStartedAt || 0));
+        ref.calendarSyncError ||= "";
+      }
+      this._data.migration = {from: oldVersion, to: 6, completedAt: Date.now()};
+      this._settings.schemaVersion = 6; this._data.schemaVersion = 6;
+      this._saveSettings(); this._saveData("migration-v6");
     }
   }
 
-  _recordDiagnostic(type, message, details = "") {
+  _recordDiagnostic(type, message, details = "", context = {}) {
     this._diagnosticEvents ??= [];
-    this._diagnosticEvents.push({time: Date.now(), type, message: String(message), details: String(details || "").slice(0, 500)});
-    if (this._diagnosticEvents.length > 100) {
-      this._diagnosticEvents.splice(0, this._diagnosticEvents.length - 100);
-    }
+    const levels = {debug:0,info:1,warning:2,error:3};
+    const threshold = levels[this._settings?.diagnosticLevel || "warning"] ?? 2;
+    const event = PIN_MODULES.PinDiagnostics?.event(type, message, details, context) || {time:Date.now(),type,message:String(message),details:String(details||"").slice(0,900)};
+    const eventLevel = levels[event.type] ?? 1;
+    const keep = (this._settings?.enableDiagnostics && eventLevel >= threshold) || eventLevel >= levels.error;
+    if (keep) this._diagnosticEvents.push(event);
+    const limit = clampNumber(this._settings?.diagnosticMaxEntries, 50, MAX_DIAGNOSTIC_EVENTS, 500);
+    if (this._diagnosticEvents.length > limit) this._diagnosticEvents.splice(0, this._diagnosticEvents.length - limit);
+  }
+
+  _clearDiagnostics() {
+    const cleared = this._diagnosticEvents?.length || 0;
+    this._diagnosticEvents = [];
+    return {cleared};
   }
 
   _recordActivity(type, stableKey = "", label = "") {
@@ -1837,12 +1930,15 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
             name: folder.prettyName || folder.name || "Courrier entrant",
             enabled: this._settings.inboxEnabled[folder.URI] !== false
           }));
+        const provider = PIN_MODULES.PinProviders?.providerFor(server) || String(server.type || "unknown");
         accounts.push({
           key: account.key,
           name: server.prettyName || account.key,
           email: account.defaultIdentity?.email || "",
           color: this._getAccountColor(account.key),
           defaultColor: getDefaultColor(account.key),
+          protocol: String(server.type || "unknown"),
+          provider,
           inboxes
         });
       }
@@ -1878,6 +1974,8 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       ruleLog: clone((this._data.ruleLog || []).slice(-100)),
       storage: {backend: this._storageBackend || "unknown", database: DB_FILENAME, schemaVersion: DB_SCHEMA_VERSION},
       compatibility: clone(this._compatibility || {}),
+      providerMatrix: clone(this._data.providerMatrix || DEFAULT_DATA.providerMatrix),
+      diagnostics: PIN_MODULES.PinDiagnostics?.summary(this._diagnosticEvents || []) || {total:(this._diagnosticEvents||[]).length},
       performance: this._getPerformanceReport()
     };
   }
@@ -1949,7 +2047,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   _exportConfiguration() {
     return {
       format: "thunderbird-pin-mails",
-      version: 5,
+      version: 6,
       exportedAt: new Date().toISOString(),
       settings: clone(this._settings),
       data: clone(this._data)
@@ -1964,7 +2062,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     if (configuration?.format === "pin-mails-backup" && configuration.data) {
       configuration = {
         format: "thunderbird-pin-mails",
-        version: Number(configuration.metadata?.schemaVersion || configuration.data?.schemaVersion || 5),
+        version: Number(configuration.metadata?.schemaVersion || configuration.data?.schemaVersion || 6),
         exportedAt: new Date(configuration.createdAt || Date.now()).toISOString(),
         settings: configuration.metadata?.settings || clone(this._settings),
         data: configuration.data,
@@ -1974,7 +2072,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     if (
       !configuration ||
       configuration.format !== "thunderbird-pin-mails" ||
-      ![1, 2, 3, 4, 5].includes(Number(configuration.version))
+      ![1, 2, 3, 4, 5, 6].includes(Number(configuration.version))
     ) {
       throw new ExtensionError("Ce fichier n’est pas une sauvegarde compatible.");
     }
@@ -1990,7 +2088,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     }
     this._data.migration = {
       from: Number(configuration.version) || 1,
-      to: 5,
+      to: 6,
       completedAt: Date.now()
     };
     this._saveSettings();
@@ -2964,6 +3062,134 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
 
+  _exportDiagnosticBundle() {
+    return {
+      ...this._getDiagnosticReport(),
+      format: "mailperch-diagnostic-bundle",
+      version: 4,
+      healthSnapshot: PIN_MODULES.PinHealth?.build({
+        data: this._data, settings: this._settings, compatibility: this._compatibility,
+        performance: this._getPerformanceReport(),
+        diagnostics: PIN_MODULES.PinDiagnostics?.summary(this._diagnosticEvents || [])
+      }) || null,
+      providerMatrix: clone(this._data.providerMatrix || DEFAULT_DATA.providerMatrix)
+    };
+  }
+
+  _runProviderCompatibilityCheck() {
+    const accounts = this._getAccountsMetadata();
+    const calendars = this._settings.enableCalendarIntegration ? this._getCalendars() : [];
+    this._data.providerMatrix = PIN_MODULES.PinProviders?.matrix(accounts, calendars) || {checkedAt:Date.now(),accounts,providers:[],calendars};
+    this._saveData("provider-matrix");
+    this._recordDiagnostic("info", "Matrice de compatibilité actualisée", `${accounts.length} compte(s), ${calendars.length} calendrier(s)`, {component:"compatibility"});
+    return clone(this._data.providerMatrix);
+  }
+
+  async _getHealthReport() {
+    let integrity = {ok:false, unavailable:true};
+    let backup = {stale:true};
+    try { integrity = await this._storage.integrityCheck(); } catch (error) { this._recordDiagnostic("warning", "Contrôle de santé SQLite impossible", error, {component:"health"}); }
+    try { backup = await this._storage.getBackupStatus(); } catch (error) { this._recordDiagnostic("warning", "État des sauvegardes indisponible", error, {component:"health"}); }
+    const report = PIN_MODULES.PinHealth?.build({
+      data:this._data, settings:this._settings, compatibility:this._compatibility,
+      performance:this._getPerformanceReport(), integrity, backup,
+      diagnostics:PIN_MODULES.PinDiagnostics?.summary(this._diagnosticEvents || [])
+    }) || {score:0,status:"critical",issues:[],counts:{}};
+    return {...report, integrity, backup, providerMatrix:clone(this._data.providerMatrix || DEFAULT_DATA.providerMatrix)};
+  }
+
+  async _repairHealthIssues(options = {}) {
+    const actions = Array.isArray(options.actions) ? new Set(options.actions.map(String)) : new Set(["orphan-links", "repair-references"]);
+    if (this._settings.backupBeforeMigration && this._storage) {
+      await this._storage.createFileBackup(this._data, this._undoStack, "before-health-repair");
+    }
+    this._pushUndo("Réparation du centre de santé");
+    let changed = false;
+    let repaired = 0;
+    if (actions.has("orphan-links")) {
+      const groups = new Set((this._data.groups || []).map(item => item.id));
+      const cases = new Set((this._data.cases || []).map(item => item.id));
+      const templates = new Set((this._data.templates || []).map(item => item.id));
+      for (const ref of Object.values(this._data.refs || {})) {
+        if (ref.groupId && !groups.has(ref.groupId)) { ref.groupId = ""; repaired++; changed = true; }
+        if (ref.caseId && !cases.has(ref.caseId)) { ref.caseId = ""; repaired++; changed = true; }
+        if (ref.templateId && !templates.has(ref.templateId)) { ref.templateId = ""; repaired++; changed = true; }
+      }
+    }
+    if (actions.has("repair-references")) { const result = this._repairReferences(); repaired += result.repaired || 0; }
+    if (changed) { this._saveData("health-repair"); this._refreshAllStates(true); }
+    return {repaired, health:await this._getHealthReport()};
+  }
+
+  _previewImport(configuration) {
+    if (!configuration || typeof configuration !== "object") throw new ExtensionError("Configuration invalide.");
+    const preview = PIN_MODULES.PinMigrations?.analyze(configuration, this._data) || {valid: false, errors: ["analysis-unavailable"]};
+    if (!preview.valid) this._recordDiagnostic("warning", "Sauvegarde refusée lors de la prévisualisation", (preview.errors || []).join(", "), {component: "migration", action: "preview"});
+    return preview;
+  }
+
+  async _restoreConfiguration(configuration, strategy = "replace") {
+    const preview = this._previewImport(configuration);
+    const selectedStrategy = ["replace", "merge"].includes(strategy) ? strategy : "replace";
+    if (!preview.valid) throw new ExtensionError(`Cette sauvegarde ne peut pas être restaurée${preview.errors?.length ? ` : ${preview.errors.join(", ")}` : "."}`);
+    if (!this._storage) throw new ExtensionError("Le stockage local MailPerch n’est pas disponible pour sécuriser la restauration.");
+
+    let safetyBackup;
+    try {
+      safetyBackup = await this._storage.createFileBackup(this._data, this._undoStack, `before-restore-${selectedStrategy}`);
+    } catch (error) {
+      this._recordDiagnostic("error", "Sauvegarde de sécurité avant restauration impossible", error, {component: "migration", action: selectedStrategy});
+      throw new ExtensionError(`La restauration a été annulée car la sauvegarde de sécurité n’a pas pu être créée : ${error?.message || error}`);
+    }
+
+    try {
+      let result;
+      if (selectedStrategy === "merge") {
+        const incoming = PIN_MODULES.PinMigrations?.sourceFor(configuration) || {};
+        const merged = PIN_MODULES.PinMigrations?.merge(this._data, incoming) || incoming;
+        result = this._importConfiguration({
+          format: "thunderbird-pin-mails",
+          version: Number(configuration.version || configuration.metadata?.schemaVersion || incoming.schemaVersion || 6),
+          settings: {...this._settings, ...(configuration.settings || configuration.metadata?.settings || {})},
+          data: merged
+        });
+      } else {
+        result = this._importConfiguration(configuration);
+      }
+      this._recordDiagnostic("info", "Restauration MailPerch terminée", `${selectedStrategy} · ${preview.incoming?.refs || 0} référence(s)`, {component: "migration", action: selectedStrategy});
+      return {...result, strategy: selectedStrategy, safetyBackup: safetyBackup?.path || "", preview};
+    } catch (error) {
+      this._recordDiagnostic("error", "Restauration MailPerch interrompue", error, {component: "migration", action: selectedStrategy});
+      throw error;
+    }
+  }
+
+  _setNoReplyTracking(stableKeys, options = {}) {
+    const keys = Array.isArray(stableKeys) ? stableKeys.map(String) : [String(stableKeys || "")];
+    const refs = keys.map(key => this._data.refs[key]).filter(Boolean);
+    if (!refs.length) return {count:0};
+    const enabled = options.enabled !== false;
+    const days = clampNumber(options.days, 1, 365, this._settings.noReplyDefaultDays || 5);
+    const now = Date.now();
+    this._pushUndo(enabled ? "Suivi sans réponse" : "Arrêt du suivi sans réponse");
+    for (const ref of refs) {
+      ref.noReplyTracking = enabled;
+      ref.noReplyStartedAt = enabled ? now : 0;
+      ref.noReplyAt = enabled ? Number(options.at) || now + days * DAY_MS : 0;
+      ref.noReplyBaselineMessageId = enabled ? String(ref.headerMessageId || "") : "";
+      if (enabled) {
+        ref.workflowStatus = "waiting"; ref.waitingSince ||= now; ref.followUpAt = ref.noReplyAt; ref.completedAt = 0;
+      } else if (options.keepWaiting !== true) {
+        ref.workflowStatus = "active"; ref.waitingSince = 0; ref.followUpAt = 0;
+      }
+      ref.updatedAt = now;
+      this._recordActivity(enabled ? "no-reply-start" : "no-reply-cancel", ref.stableKey, ref.subject);
+    }
+    this._saveData(enabled ? "no-reply-start" : "no-reply-cancel");
+    this._refreshAllStates(true);
+    return {count:refs.length, enabled, dueAt:enabled ? refs[0].noReplyAt : 0};
+  }
+
   _resolveCapturedHeader(item) {
     if (!item) return null;
     try {
@@ -3014,6 +3240,10 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       resolves: p.resolves || 0,
       cacheHits: p.cacheHits || 0,
       ruleRuns: p.ruleRuns || 0,
+      skippedRenders: p.skippedRenders || 0,
+      createdCards: p.createdCards || 0,
+      reusedCards: p.reusedCards || 0,
+      reuseRate: (p.createdCards || p.reusedCards) ? Math.round((p.reusedCards || 0) / ((p.createdCards || 0) + (p.reusedCards || 0)) * 1000) / 10 : 0,
       storageBackend: this._storageBackend || "unknown",
       references: Object.keys(this._data?.refs || {}).length
     };
@@ -3191,10 +3421,18 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         if(this._settings.autoUnpinOnReply){
           for(const ref of refs){this._archiveReferenceHistory(ref,"reply-unpin");changed=this._removeReferenceByKey(ref.stableKey)||changed;}
         } else if(this._settings.enableWaitingWorkflow){
-          for(const ref of refs){ref.workflowStatus="waiting";ref.completedAt=0;ref.waitingSince=Date.now();ref.lastOutgoingAt=Date.now();ref.followUpAt=Date.now()+(this._settings.defaultFollowUpDays||3)*DAY_MS;if(this._settings.moveToWaitingOnReply&&this._groupForId(this._settings.waitingGroupId))ref.groupId=this._settings.waitingGroupId;changed=true;this._recordActivity("reply-sent",ref.stableKey,formatSubject(hdr));}
+          const now=Date.now();
+          for(const ref of refs){
+            ref.workflowStatus="waiting";ref.completedAt=0;ref.waitingSince=now;ref.lastOutgoingAt=now;
+            const trackingDays=this._settings.enableAutomaticNoReplyTracking?(this._settings.noReplyDefaultDays||5):(this._settings.defaultFollowUpDays||3);
+            ref.followUpAt=now+trackingDays*DAY_MS;
+            if(this._settings.enableAutomaticNoReplyTracking){ref.noReplyTracking=true;ref.noReplyStartedAt=now;ref.noReplyAt=ref.followUpAt;ref.noReplyBaselineMessageId=String(hdr.messageId||"");}
+            if(this._settings.moveToWaitingOnReply&&this._groupForId(this._settings.waitingGroupId))ref.groupId=this._settings.waitingGroupId;
+            changed=true;this._recordActivity("reply-sent",ref.stableKey,formatSubject(hdr));
+          }
         }
       } else if(this._settings.enableWaitingWorkflow){
-        for(const ref of refs){if(ref.workflowStatus==="waiting"&&this._settings.reopenOnConversationReply){ref.workflowStatus="active";ref.lastReplyAt=Date.now();ref.followUpAt=0;ref.followUpCount=(ref.followUpCount||0)+1;changed=true;this._recordActivity("reply-received",ref.stableKey,formatSubject(hdr));}}
+        for(const ref of refs){if(ref.workflowStatus==="waiting"&&this._settings.reopenOnConversationReply){ref.workflowStatus="active";ref.lastReplyAt=Date.now();ref.followUpAt=0;ref.followUpCount=(ref.followUpCount||0)+1;if(this._settings.noReplyCancelOnIncomingReply){ref.noReplyTracking=false;ref.noReplyAt=0;ref.noReplyStartedAt=0;ref.noReplyBaselineMessageId="";}changed=true;this._recordActivity("reply-received",ref.stableKey,formatSubject(hdr));}}
       }
     }
     if(trigger==="read"&&this._settings.autoUnpinOnRead)for(const key of keys)changed=this._removeReferenceByKey(key)||changed;
@@ -3204,7 +3442,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     }
     if(trigger==="reply"){
       if(this._settings.autoUnpinOnReply)for(const ref of refs){this._archiveReferenceHistory(ref,"reply-unpin");changed=this._removeReferenceByKey(ref.stableKey)||changed;}
-      else if(this._settings.enableWaitingWorkflow){for(const ref of refs){ref.workflowStatus="waiting";ref.waitingSince=Date.now();ref.lastOutgoingAt=Date.now();ref.followUpAt=Date.now()+(this._settings.defaultFollowUpDays||3)*DAY_MS;if(this._settings.moveToWaitingOnReply&&this._groupForId(this._settings.waitingGroupId))ref.groupId=this._settings.waitingGroupId;changed=true;}}
+      else if(this._settings.enableWaitingWorkflow){const now=Date.now();for(const ref of refs){ref.workflowStatus="waiting";ref.waitingSince=now;ref.lastOutgoingAt=now;const trackingDays=this._settings.enableAutomaticNoReplyTracking?(this._settings.noReplyDefaultDays||5):(this._settings.defaultFollowUpDays||3);ref.followUpAt=now+trackingDays*DAY_MS;if(this._settings.enableAutomaticNoReplyTracking){ref.noReplyTracking=true;ref.noReplyStartedAt=now;ref.noReplyAt=ref.followUpAt;ref.noReplyBaselineMessageId=String(hdr.messageId||"");}if(this._settings.moveToWaitingOnReply&&this._groupForId(this._settings.waitingGroupId))ref.groupId=this._settings.waitingGroupId;changed=true;}}
     }
     if(trigger==="delete"&&this._settings.autoUnpinOnDelete)for(const ref of refs){this._archiveReferenceHistory(ref,"delete");changed=this._removeReferenceByKey(ref.stableKey)||changed;}
     if(trigger==="move"&&!this._settings.keepPinOnMove)for(const ref of refs)changed=this._removeReferenceByKey(ref.stableKey)||changed;
@@ -3340,32 +3578,50 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       folderName:ref.folderName,date:ref.date,pinnedAt:ref.pinnedAt,note:ref.note,dueAt:ref.dueAt,reminderAt:ref.reminderAt,followUpAt:ref.followUpAt,
       priorityLevel:ref.priorityLevel,groupId:ref.groupId,groupName:group?.name||"",caseId:ref.caseId,caseName:caseItem?.name||"",templateId:ref.templateId,
       completedAt:ref.completedAt,workflowStatus:PIN_MODULES.PinWorkflow?.statusForReference(ref)||ref.workflowStatus||"active",waitingSince:ref.waitingSince,lastReplyAt:ref.lastReplyAt,lastOutgoingAt:ref.lastOutgoingAt,followUpCount:ref.followUpCount,
+      noReplyTracking:Boolean(ref.noReplyTracking),noReplyAt:ref.noReplyAt||0,noReplyStartedAt:ref.noReplyStartedAt||0,calendarSyncError:ref.calendarSyncError||"",
       recurrenceRule:ref.recurrenceRule,recurrenceInterval:ref.recurrenceInterval,trackingMode:ref.trackingMode,conversationCount:ref.conversationCount,conversationUnread:ref.conversationUnread,
-      unread:Boolean(hdr&&!(hdr.flags&Ci.nsMsgMessageFlags.Read)),missing:!hdr,smartSection:smartSectionForRef(ref),accountColor:this._getAccountColor(ref.accountKey),calendarItemId:ref.calendarItemId,calendarId:ref.calendarId,
+      unread:Boolean(hdr&&!(hdr.flags&Ci.nsMsgMessageFlags.Read)),missing:!hdr,smartSection:PIN_MODULES.PinSmartViews?.sectionFor(ref,{unread:Boolean(hdr&&!(hdr.flags&Ci.nsMsgMessageFlags.Read)),missing:!hdr,calendarError:Boolean(ref.calendarSyncError)})||smartSectionForRef(ref),accountColor:this._getAccountColor(ref.accountKey),calendarItemId:ref.calendarItemId,calendarId:ref.calendarId,
       activity:includeActivity?(this._data.activity||[]).filter(item=>item.stableKey===ref.stableKey).slice(-20):undefined
     };
   }
 
   _getDashboardData(options = {}) {
-    const filter=["active","all","overdue","today","week","completed","unread","waiting","planned"].includes(options.filter)?options.filter:(this._data.dashboard?.filter||"active");
-    const search=sanitizeSearchText(options.search??this._data.dashboard?.search??"");const view=["list","kanban","cases","history"].includes(options.view)?options.view:(this._data.dashboard?.view||"list");
-    const nextDashboard={filter,search:String(options.search??this._data.dashboard?.search??"").slice(0,500),view};
+    const validFilters = new Set(["active","all","overdue","today","week","completed","unread","waiting","planned","noReply","noDue","missing","calendarError","recentCompleted"]);
+    const validViews = new Set(["list","kanban","cases","history","health"]);
+    const filter = validFilters.has(options.filter) ? options.filter : (this._data.dashboard?.filter || "active");
+    const smartView = validFilters.has(options.smartView) ? options.smartView : (this._data.dashboard?.smartView || this._settings.defaultSmartView || "today");
+    const search = sanitizeSearchText(options.search ?? this._data.dashboard?.search ?? "");
+    const view = validViews.has(options.view) ? options.view : (this._data.dashboard?.view || "list");
+    const nextDashboard = {filter, smartView, search:String(options.search ?? this._data.dashboard?.search ?? "").slice(0,500), view};
     if ((PIN_MODULES.PinStorageHelpers?.stableStringify(this._data.dashboard)||JSON.stringify(this._data.dashboard)) !==
         (PIN_MODULES.PinStorageHelpers?.stableStringify(nextDashboard)||JSON.stringify(nextDashboard))) {
-      this._data.dashboard=nextDashboard;
+      this._data.dashboard = nextDashboard;
       this._saveData("dashboard-state");
     }
-    const items=[];
-    for(const ref of Object.values(this._data.refs)){
-      const item=this._serializeReference(ref);
-      if(filter==="active"&&item.workflowStatus!=="active")continue;if(filter==="completed"&&item.workflowStatus!=="completed")continue;if(filter==="waiting"&&item.workflowStatus!=="waiting")continue;if(filter==="planned"&&item.workflowStatus!=="planned")continue;
-      if(["overdue","today","week"].includes(filter)&&item.smartSection!==filter)continue;if(filter==="unread"&&!item.unread)continue;
-      if(search&&!sanitizeSearchText([item.subject,item.author,item.note,item.accountName,item.folderName,item.groupName,item.caseName,item.workflowStatus].join(" ")).includes(search))continue;items.push(item);
+    const allItems = [];
+    for (const ref of Object.values(this._data.refs)) {
+      const item = this._serializeReference(ref);
+      const context = {unread:item.unread, missing:item.missing, calendarError:Boolean(item.calendarSyncError)};
+      const activeFilter = options.useSmartView !== false && this._settings.enableSmartViews ? smartView : filter;
+      const matches = PIN_MODULES.PinSmartViews?.matches(activeFilter, ref, context) ?? (activeFilter === "all" || item.smartSection === activeFilter || item.workflowStatus === activeFilter);
+      if (!matches) continue;
+      if (search && !sanitizeSearchText([item.subject,item.author,item.note,item.accountName,item.folderName,item.groupName,item.caseName,item.workflowStatus].join(" ")).includes(search)) continue;
+      allItems.push(item);
     }
-    items.sort((a,b)=>(a.dueAt||a.followUpAt||Number.MAX_SAFE_INTEGER)-(b.dueAt||b.followUpAt||Number.MAX_SAFE_INTEGER)||b.date-a.date);const refs=Object.values(this._data.refs),now=Date.now();
-    return {items,filter,search:options.search||"",view,groups:clone(this._data.groups),cases:clone(this._data.cases||[]),templates:clone(this._data.templates||[]),history:this._getHistory({limit:200,search:options.historySearch||""}),ruleLog:clone((this._data.ruleLog||[]).slice(-200).reverse()),
-      stats:{total:refs.length,active:refs.filter(r=>(r.workflowStatus||"active")==="active"&&!r.completedAt).length,waiting:refs.filter(r=>r.workflowStatus==="waiting").length,planned:refs.filter(r=>r.workflowStatus==="planned").length,completed:refs.filter(r=>r.completedAt||r.workflowStatus==="completed").length,overdue:refs.filter(r=>!r.completedAt&&((r.dueAt&&r.dueAt<now)||(r.followUpAt&&r.followUpAt<now))).length},
-      activity:clone((this._data.activity||[]).slice(-100).reverse()),compatibility:clone(this._compatibility),performance:this._getPerformanceReport(),revision:this._data.revision||0,counterRegressionEvents:clone(this._counterRegressionEvents||[])};
+    allItems.sort((a,b)=>(a.dueAt||a.followUpAt||a.noReplyAt||Number.MAX_SAFE_INTEGER)-(b.dueAt||b.followUpAt||b.noReplyAt||Number.MAX_SAFE_INTEGER)||b.date-a.date);
+    const refs = Object.values(this._data.refs), now = Date.now();
+    const serializedAll = refs.map(ref => this._serializeReference(ref));
+    const smartCounts = PIN_MODULES.PinSmartViews?.counts(serializedAll.map(item => ({ref:item, unread:item.unread, missing:item.missing, calendarError:Boolean(item.calendarSyncError)})), now) || {};
+    const diagnosticSummary = PIN_MODULES.PinDiagnostics?.summary(this._diagnosticEvents || []) || {total:(this._diagnosticEvents||[]).length,counts:{}};
+    const health = PIN_MODULES.PinHealth?.build({data:this._data,settings:this._settings,compatibility:this._compatibility,performance:this._getPerformanceReport(),diagnostics:diagnosticSummary}) || null;
+    return {
+      items:allItems, filter, smartView, search:options.search||"", view, smartViews:clone(PIN_MODULES.PinSmartViews?.VIEWS || []), smartCounts,
+      groups:clone(this._data.groups), cases:clone(this._data.cases||[]), templates:clone(this._data.templates||[]),
+      history:this._getHistory({limit:200,search:options.historySearch||""}), ruleLog:clone((this._data.ruleLog||[]).slice(-200).reverse()),
+      stats:{total:refs.length,active:refs.filter(r=>(r.workflowStatus||"active")==="active"&&!r.completedAt).length,waiting:refs.filter(r=>r.workflowStatus==="waiting").length,planned:refs.filter(r=>r.workflowStatus==="planned").length,completed:refs.filter(r=>r.completedAt||r.workflowStatus==="completed").length,overdue:refs.filter(r=>!r.completedAt&&((r.dueAt&&r.dueAt<now)||(r.followUpAt&&r.followUpAt<now))).length,noReply:refs.filter(r=>r.noReplyTracking).length,missing:refs.filter(r=>r.missingSince).length},
+      activity:clone((this._data.activity||[]).slice(-100).reverse()), compatibility:clone(this._compatibility), providerMatrix:clone(this._data.providerMatrix||DEFAULT_DATA.providerMatrix),
+      performance:this._getPerformanceReport(), health, diagnostics:diagnosticSummary, revision:this._data.revision||0, counterRegressionEvents:clone(this._counterRegressionEvents||[])
+    };
   }
 
   _openReference(stableKey) {
@@ -3379,21 +3635,83 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
   _performReferenceAction(stableKeys, action, options = {}) {
-    const keys=Array.isArray(stableKeys)?stableKeys.map(String):[String(stableKeys||"")];const refs=keys.map(key=>this._data.refs[key]).filter(Boolean);if(!refs.length)return{count:0};
-    if(action==="open")return this._openReference(refs[0].stableKey);
-    if(["complete","uncomplete","active","waiting","planned"].includes(action))return this._setWorkflowStatus(keys,action==="uncomplete"?"active":action==="complete"?"completed":action,options);
-    if(action==="unpin"){
-      this._pushUndo("Désépinglage");for(const ref of refs)this._removeReferenceByKey(ref.stableKey,{archiveAction:"unpin"});this._saveData("unpin");this._refreshAllStates(true);return{count:refs.length};
+    const bulk = PIN_MODULES.PinBulk;
+    const normalizedAction = String(action || "");
+    const keys = bulk?.normalizeKeys(stableKeys) || [...new Set((Array.isArray(stableKeys) ? stableKeys : [stableKeys]).map(value => String(value || "")).filter(Boolean))];
+    if (!keys.length || (bulk && !bulk.supported(normalizedAction))) return {count: 0, unsupported: Boolean(normalizedAction)};
+    const actionKeys = bulk?.requiresSingle(normalizedAction) ? keys.slice(0, 1) : keys;
+    const refs = actionKeys.map(key => this._data.refs[key]).filter(Boolean);
+    if (!refs.length) return {count: 0};
+    const normalizedOptions = bulk?.normalizeOptions(normalizedAction, options, {defaultNoReplyDays: this._settings.noReplyDefaultDays}) || options || {};
+    this._recordDiagnostic("debug", "Action groupée demandée", `${normalizedAction} · ${refs.length} élément(s)`, {component: "bulk-actions", action: normalizedAction});
+
+    if (normalizedAction === "open") return this._openReference(refs[0].stableKey);
+    if (["complete", "uncomplete", "active", "waiting", "planned"].includes(normalizedAction)) {
+      return this._setWorkflowStatus(actionKeys, normalizedAction === "uncomplete" ? "active" : normalizedAction === "complete" ? "completed" : normalizedAction, normalizedOptions);
     }
-    if(action==="snooze")return this._snoozeReminder(refs[0].stableKey,Number(options.durationMs)||3600000);
-    if(action==="calendar")return this._createCalendarItem(refs[0].stableKey,options.itemType,options.calendarId);
-    if(action==="group"){this._pushUndo("Changement de groupe");const groupId=this._groupForId(String(options.groupId||""))?String(options.groupId):"";for(const ref of refs){ref.groupId=groupId;ref.updatedAt=Date.now();}this._saveData("group");this._refreshAllStates(true);return{count:refs.length};}
-    if(action==="case"){this._pushUndo("Changement d’affaire");const caseId=(this._data.cases||[]).some(item=>item.id===String(options.caseId||""))?String(options.caseId):"";for(const ref of refs){ref.caseId=caseId;ref.updatedAt=Date.now();}this._saveData("case-assign");this._refreshAllStates(true);return{count:refs.length};}
-    if(action==="template")return this._applyTemplate(keys,String(options.templateId||""));
-    if(action==="setMetadata"){let count=0;for(const ref of refs)if(this._setReferenceMetadata(ref.stableKey,options))count++;return{count};}
-    const headers=refs.map(ref=>this._resolveReference(ref,true)).filter(Boolean);
-    if(["read","unread","toggleRead","archive","delete","reply"].includes(action)){this._performMessageAction(action,headers,Services.wm.getMostRecentWindow("mail:3pane")?.document?.getElementById("tabmail")?.currentAbout3Pane||null);return{count:headers.length};}
-    return{count:0};
+    if (normalizedAction === "unpin") {
+      this._pushUndo("Désépinglage");
+      for (const ref of refs) this._removeReferenceByKey(ref.stableKey, {archiveAction: "unpin"});
+      this._saveData("unpin");
+      this._refreshAllStates(true);
+      return {count: refs.length};
+    }
+    if (normalizedAction === "snooze") return this._snoozeReminder(refs[0].stableKey, normalizedOptions.durationMs || 3_600_000);
+    if (normalizedAction === "trackNoReply") return this._setNoReplyTracking(actionKeys, {...normalizedOptions, enabled: true});
+    if (normalizedAction === "cancelNoReply") return this._setNoReplyTracking(actionKeys, {...normalizedOptions, enabled: false});
+    if (normalizedAction === "priority") {
+      this._pushUndo("Modification de priorité");
+      for (const ref of refs) { ref.priorityLevel = normalizedOptions.priorityLevel; ref.updatedAt = Date.now(); }
+      this._saveData("bulk-priority");
+      this._refreshAllStates(true);
+      return {count: refs.length, priorityLevel: normalizedOptions.priorityLevel};
+    }
+    if (normalizedAction === "deadline") {
+      this._pushUndo("Modification d’échéance");
+      for (const ref of refs) {
+        ref.dueAt = normalizedOptions.dueAt;
+        ref.updatedAt = Date.now();
+        if (ref.dueAt && this._settings.enableReminders) {
+          ref.reminderAt = Math.max(Date.now(), ref.dueAt - (ref.reminderLeadMinutes || this._settings.reminderLeadMinutes || 0) * 60_000);
+        } else if (!ref.dueAt) {
+          ref.reminderAt = 0;
+        }
+      }
+      this._saveData("bulk-deadline");
+      this._refreshAllStates(true);
+      return {count: refs.length, dueAt: normalizedOptions.dueAt};
+    }
+    if (normalizedAction === "calendar") return this._createCalendarItem(refs[0].stableKey, normalizedOptions.itemType, normalizedOptions.calendarId);
+    if (normalizedAction === "group") {
+      this._pushUndo("Changement de groupe");
+      const groupId = this._groupForId(normalizedOptions.groupId) ? normalizedOptions.groupId : "";
+      for (const ref of refs) { ref.groupId = groupId; ref.updatedAt = Date.now(); }
+      this._saveData("group");
+      this._refreshAllStates(true);
+      return {count: refs.length, groupId};
+    }
+    if (normalizedAction === "case") {
+      this._pushUndo("Changement d’affaire");
+      const caseId = (this._data.cases || []).some(item => item.id === normalizedOptions.caseId) ? normalizedOptions.caseId : "";
+      for (const ref of refs) { ref.caseId = caseId; ref.updatedAt = Date.now(); }
+      this._saveData("case-assign");
+      this._refreshAllStates(true);
+      return {count: refs.length, caseId};
+    }
+    if (normalizedAction === "template") return this._applyTemplate(actionKeys, normalizedOptions.templateId);
+    if (normalizedAction === "setMetadata") {
+      let count = 0;
+      for (const ref of refs) if (this._setReferenceMetadata(ref.stableKey, options)) count++;
+      return {count};
+    }
+
+    const headers = refs.map(ref => this._resolveReference(ref, true)).filter(Boolean);
+    if (["read", "unread", "toggleRead", "archive", "delete", "reply"].includes(normalizedAction)) {
+      const about3Pane = Services.wm.getMostRecentWindow("mail:3pane")?.document?.getElementById("tabmail")?.currentAbout3Pane || null;
+      const result = this._performMessageAction(normalizedAction, headers, about3Pane) || {count: 0};
+      return {...result, requested: refs.length, resolved: headers.length};
+    }
+    return {count: 0, unsupported: true};
   }
 
   _registerCalendarObservers() {
@@ -3490,7 +3808,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     const type = ref.calendarItemType === "event" ? "event" : "task";
     const descriptor = this._calendarDescriptor(calendar);
     const compatible = type === "event" ? descriptor.eventCompatible : descriptor.taskCompatible;
-    if (!compatible) throw this._calendarOperationError("Calendrier devenu incompatible", descriptor, type);
+    if (!compatible) { const error=this._calendarOperationError("Calendrier devenu incompatible", descriptor, type); ref.calendarSyncError=String(error.message||error).slice(0,500); throw error; }
     const cloneItem = item.clone();
     const due = ref.dueAt || ref.followUpAt || 0;
     if (due) {
@@ -3517,8 +3835,13 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     try {
       saved = await calendar.modifyItem(cloneItem, item);
     } catch (error) {
-      throw this._calendarOperationError(error, descriptor, type);
+      const wrapped=this._calendarOperationError(error, descriptor, type);
+      ref.calendarSyncError=String(wrapped.message||wrapped).slice(0,500);
+      ref.updatedAt=Date.now();
+      this._saveData("calendar-sync-error");
+      throw wrapped;
     }
+    ref.calendarSyncError = "";
     ref.calendarLastSyncedAt = Date.now();
     ref.calendarSyncHash = `${ref.dueAt}|${ref.completedAt}|${ref.subject}`;
     return {synced: true, itemId: saved?.id || item.id};
@@ -3530,9 +3853,11 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     this._lastCalendarSyncAt=Date.now();let synced=0,missing=0,casesSynced=0;
     for(const ref of Object.values(this._data.refs)){
       if(!ref.calendarItemId)continue;
-      const result=await this._syncReferenceToCalendar(ref);
-      if(result.synced)synced++;
-      if(result.missing){missing++;ref.calendarId="";ref.calendarItemId="";}
+      try {
+        const result=await this._syncReferenceToCalendar(ref);
+        if(result.synced)synced++;
+        if(result.missing){missing++;ref.calendarId="";ref.calendarItemId="";ref.calendarSyncError="Élément Agenda introuvable";}
+      } catch (error) { missing++; ref.calendarSyncError=String(error?.message||error).slice(0,500); this._recordDiagnostic("warning",`Synchronisation Agenda impossible : ${hashString(String(ref.stableKey)).toString(16)}`,error,{component:"calendar"}); }
     }
     for (const caseItem of this._data.cases || []) {
       if (!caseItem.calendarItemId || !caseItem.calendarId) continue;
@@ -3891,6 +4216,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     let editor = null;
     let toastTimer = null;
     let searchText = "";
+    let panelSmartView = "all";
     let renderLimit = this._settings.panelPageSize;
     let selectedPanelKey = null;
     const selectedPanelKeys = new Set();
@@ -3904,6 +4230,8 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     let groupDialog = null;
     let groupAssignmentDialog = null;
     let onPanelContextMenu = null;
+    const cardCache = new Map();
+    let lastRenderSignature = "";
 
     const clearDropVisuals = () => {
       if (!panel) return;
@@ -3976,7 +4304,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
 
     const setButtonLabel = (button, pinned) => {
       if (!button) return;
-      const label = pinned ? "Désépingler le message" : "Épingler le message";
+      const label = pinned ? this._t("unpinMessage", "Désépingler le message") : this._t("pinMessage", "Épingler le message");
       button.setAttribute("aria-label", label);
       button.setAttribute("title", label);
       button.setAttribute("aria-pressed", String(Boolean(pinned)));
@@ -4477,6 +4805,9 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       setLabel("waiting", ref?.workflowStatus === "waiting" ? "Repasser à traiter" : "Mettre en attente");
       setLabel("planned", ref?.workflowStatus === "planned" ? "Repasser à traiter" : "Planifier");
       setLabel("complete", ref?.completedAt ? "Rouvrir" : "Marquer comme terminé");
+      setLabel("track-no-reply", ref?.noReplyTracking ? "Modifier la relance sans réponse" : "Me relancer si aucune réponse");
+      setLabel("cancel-no-reply", "Arrêter le suivi sans réponse");
+      disable("cancel-no-reply", !ref?.noReplyTracking);
       setLabel("unpin", hdr ? "Désépingler" : "Retirer la référence introuvable");
 
       for (const action of ["open", "reply", "toggleRead", "archive", "delete"]) disable(action, !hdr);
@@ -4499,6 +4830,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         contextMenuTrigger = trigger;
         if (contextMenuTrigger) contextMenuTrigger.setAttribute("aria-expanded", "true");
         prepareContextMenu(stableKey);
+        this._recordDiagnostic("debug", "Ouverture du menu natif", trigger?.isConnected ? "button" : "contextmenu", {component:"pinned-panel",action:"open-menu",windowId:about3Pane.location?.href||"about:3pane"});
         try {
           if (trigger?.isConnected) {
             contextMenu.openPopup(trigger, "after_end", 0, 0, false, false, triggerEvent);
@@ -4530,6 +4862,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     };
 
     const runCardAction = async (key, action, sourceButton = null) => {
+      this._recordDiagnostic("debug", "Action de carte demandée", action, {component:"pinned-panel",action,windowId:about3Pane.location?.href||"about:3pane"});
       const ref = this._data.refs[key];
       const card = findCardByStableKey(key);
       const hdr = card?._pinMessageHeader || (ref ? this._resolveReference(ref, false) : null);
@@ -4569,6 +4902,16 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
           const completed = !ref.completedAt;
           this._performReferenceAction([key], completed ? "complete" : "uncomplete");
           showToast(completed ? "Message marqué comme terminé." : "Message rouvert.", true, "success");
+          return;
+        }
+        if (action === "track-no-reply") {
+          this._setNoReplyTracking([key], {enabled:true});
+          showToast(`Relance sans réponse prévue dans ${this._settings.noReplyDefaultDays || 5} jour(s).`, true, "success");
+          return;
+        }
+        if (action === "cancel-no-reply") {
+          this._setNoReplyTracking([key], {enabled:false});
+          showToast("Suivi sans réponse désactivé.", true, "success");
           return;
         }
         if (action === "snooze") {
@@ -4618,7 +4961,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       if (panel?.isConnected && allHeader?.isConnected) return;
       panel = document.getElementById(PANEL_ID) || createNode("section", "pin-mails-panel");
       panel.id = PANEL_ID;
-      panel.setAttribute("aria-label", "Messages épinglés");
+      panel.setAttribute("aria-label", this._t("pinnedMessages", "Messages épinglés"));
       panel.replaceChildren();
 
       const header = createNode("div", "pin-mails-panel-header");
@@ -4626,14 +4969,18 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       collapse.appendChild(createNode("span", "pin-mails-chevron"));
       const icon = createNode("span", "pin-mails-header-icon"); icon.setAttribute("aria-hidden", "true");
       const titleWrap = createNode("div", "pin-mails-title-wrap");
-      titleWrap.append(createNode("span", "pin-mails-title", "Épinglés"), createNode("span", "pin-mails-count", "0"));
+      titleWrap.append(createNode("span", "pin-mails-title", this._t("pinned", "Épinglés")), createNode("span", "pin-mails-count", "0"));
       const summary = createNode("span", "pin-mails-summary"); titleWrap.appendChild(summary);
-      const scope = createNode("select", "pin-mails-header-select"); scope.setAttribute("aria-label", "Portée du panneau");
-      for (const [value, label] of [["currentInbox", "Cette boîte"], ["currentAccount", "Ce compte"], ["global", "Tous les comptes"]]) {
+      const healthIndicator = createNode("button", "pin-mails-health-indicator");
+      healthIndicator.type = "button";
+      healthIndicator.hidden = true;
+      healthIndicator.setAttribute("aria-label", this._t("healthAttention", "Santé MailPerch à vérifier"));
+      const scope = createNode("select", "pin-mails-header-select"); scope.setAttribute("aria-label", this._t("panelScope", "Portée du panneau"));
+      for (const [value, label] of [["currentInbox", this._t("currentInbox", "Cette boîte")], ["currentAccount", this._t("currentAccount", "Ce compte")], ["global", this._t("allAccounts", "Tous les comptes")]]) {
         const option = createNode("option", "", label); option.value = value; scope.appendChild(option);
       }
-      const sort = createNode("select", "pin-mails-header-select"); sort.dataset.secondary = "true"; sort.setAttribute("aria-label", "Tri des épingles");
-      for (const [value, label] of [["manual", "Ordre manuel"], ["pinnedAt", "Épinglage"], ["messageDate", "Date"], ["deadline", "Échéance"], ["priority", "Priorité"], ["sender", "Expéditeur"], ["account", "Compte"]]) {
+      const sort = createNode("select", "pin-mails-header-select"); sort.dataset.secondary = "true"; sort.setAttribute("aria-label", this._t("sortPins", "Tri des épingles"));
+      for (const [value, label] of [["manual", this._t("manualOrder", "Ordre manuel")], ["pinnedAt", this._t("pinDate", "Épinglage")], ["messageDate", this._t("messageDate", "Date")], ["deadline", this._t("deadline", "Échéance")], ["priority", this._t("priority", "Priorité")], ["sender", this._t("sender", "Expéditeur")], ["account", this._t("account", "Compte")]]) {
         const option = createNode("option", "", label); option.value = value; sort.appendChild(option);
       }
       const headerAction = (className, label) => {
@@ -4644,43 +4991,50 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         button.appendChild(createNode("span", "pin-mails-header-action-icon"));
         return button;
       };
-      const conversationButton = headerAction("pin-mails-action-conversation", "Épingler la conversation sélectionnée");
-      const dashboardButton = headerAction("pin-mails-action-dashboard", "Ouvrir le tableau de bord global");
-      const addGroupButton = headerAction("pin-mails-action-add-group", "Créer un groupe");
-      header.append(collapse, icon, titleWrap, scope, sort, conversationButton, dashboardButton, addGroupButton);
+      const conversationButton = headerAction("pin-mails-action-conversation", this._t("pinConversation", "Épingler la conversation sélectionnée"));
+      const dashboardButton = headerAction("pin-mails-action-dashboard", this._t("openDashboard", "Ouvrir le tableau de bord global"));
+      const addGroupButton = headerAction("pin-mails-action-add-group", this._t("createGroup", "Créer un groupe"));
+      header.append(collapse, icon, titleWrap, healthIndicator, scope, sort, conversationButton, dashboardButton, addGroupButton);
 
       const tools = createNode("div", "pin-mails-panel-tools");
       const searchWrap = createNode("label", "pin-mails-search-wrap");
-      const search = createNode("input", "pin-mails-search"); search.type = "search"; search.placeholder = "Rechercher dans les épingles…"; search.setAttribute("aria-label", "Rechercher dans les messages épinglés");
+      const search = createNode("input", "pin-mails-search"); search.type = "search"; search.placeholder = this._t("searchPins", "Rechercher dans les épingles…"); search.setAttribute("aria-label", this._t("searchPinsLabel", "Rechercher dans les messages épinglés"));
       searchWrap.appendChild(search);
+      const smartView = createNode("select", "pin-mails-smart-view-select");
+      smartView.setAttribute("aria-label", this._t("smartView", "Vue intelligente"));
+      for (const view of PIN_MODULES.PinSmartViews?.VIEWS || []) { const option=createNode("option","",view.fallback);option.value=view.id;smartView.appendChild(option); }
+      smartView.value = panelSmartView;
+      smartView.addEventListener("change", () => { panelSmartView = smartView.value || "all"; lastRenderSignature = ""; renderLimit = this._settings.panelPageSize; renderPanel(); });
       const bulk = createNode("div", "pin-mails-bulk-actions"); bulk.hidden = true;
       const bulkCount = createNode("span", "pin-mails-bulk-count", "0 sélection");
       const bulkButton = (action, label) => { const b = createNode("button", "pin-mails-quick-button", label); b.type = "button"; b.dataset.bulkAction = action; b.setAttribute("aria-label", label); return b; };
-      bulk.append(bulkCount, bulkButton("toggleRead", "Lu/non lu"), bulkButton("complete", "Terminer"), bulkButton("archive", "Archiver"), bulkButton("group", "Grouper"), bulkButton("unpin", "Désépingler"), bulkButton("delete", "Supprimer"));
-      tools.append(searchWrap, bulk);
+      bulk.append(bulkCount, bulkButton("toggleRead", this._t("readUnread", "Lu/non lu")), bulkButton("complete", this._t("complete", "Terminer")), bulkButton("trackNoReply", this._t("noReply", "Relancer sans réponse")), bulkButton("archive", this._t("archive", "Archiver")), bulkButton("group", this._t("group", "Grouper")), bulkButton("unpin", this._t("unpin", "Désépingler")), bulkButton("delete", this._t("delete", "Supprimer")));
+      tools.append(searchWrap, smartView, bulk);
 
       const list = createNode("div", "pin-mails-panel-list"); list.setAttribute("role", "listbox"); list.setAttribute("aria-multiselectable", "true"); list.tabIndex = -1;
       const live = createNode("div", "pin-mails-live"); live.setAttribute("role", "status"); live.setAttribute("aria-live", "polite");
       const toast = createNode("div", "pin-mails-toast"); toast.id = TOAST_ID; toast.hidden = true; toast.setAttribute("role", "status"); toast.setAttribute("aria-live", "polite");
       contextMenu = document.createXULElement("menupopup");
       contextMenu.id = CONTEXT_MENU_ID;
-      contextMenu.setAttribute("aria-label", "Actions du message épinglé");
+      contextMenu.setAttribute("aria-label", this._t("cardActions", "Actions du message épinglé"));
       contextMenu.setAttribute("position", "after_end");
       const menuItems = [
-        ["open", "Ouvrir le message"],
-        ["reply", "Répondre"],
-        ["toggleRead", "Marquer lu / non lu"],
-        ["waiting", "Mettre en attente"],
-        ["planned", "Planifier"],
-        ["complete", "Marquer comme terminé"],
-        ["group", "Classer dans un groupe"],
-        ["snooze", "Reporter le rappel d’une heure"],
-        ["calendar-task", "Créer ou synchroniser une tâche"],
-        ["calendar-event", "Créer ou synchroniser un événement"],
-        ["edit", "Modifier le suivi"],
-        ["archive", "Archiver"],
-        ["delete", "Supprimer"],
-        ["unpin", "Désépingler"]
+        ["open", this._t("openMessage", "Ouvrir le message")],
+        ["reply", this._t("reply", "Répondre")],
+        ["toggleRead", this._t("markReadUnread", "Marquer lu / non lu")],
+        ["waiting", this._t("waiting", "Mettre en attente")],
+        ["planned", this._t("planned", "Planifier")],
+        ["complete", this._t("markComplete", "Marquer comme terminé")],
+        ["group", this._t("assignGroup", "Classer dans un groupe")],
+        ["track-no-reply", this._t("trackNoReply", "Me relancer si aucune réponse")],
+        ["cancel-no-reply", this._t("cancelNoReply", "Arrêter le suivi sans réponse")],
+        ["snooze", this._t("snoozeOneHour", "Reporter le rappel d’une heure")],
+        ["calendar-task", this._t("calendarTask", "Créer ou synchroniser une tâche")],
+        ["calendar-event", this._t("calendarEvent", "Créer ou synchroniser un événement")],
+        ["edit", this._t("editFollowUp", "Modifier le suivi")],
+        ["archive", this._t("archive", "Archiver")],
+        ["delete", this._t("delete", "Supprimer")],
+        ["unpin", this._t("unpin", "Désépingler")]
       ];
       for (const [action, label] of menuItems) {
         if (action === "archive" || action === "unpin") {
@@ -4700,7 +5054,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         ownedPopupSet = popupSet;
       }
       popupSet.appendChild(contextMenu);
-      allHeader = document.getElementById(ALL_HEADER_ID) || createNode("div", "", "Tous les messages");
+      allHeader = document.getElementById(ALL_HEADER_ID) || createNode("div", "", this._t("allMessages", "Tous les messages"));
       allHeader.id = ALL_HEADER_ID;
       threadTree.before(panel, allHeader);
 
@@ -4718,6 +5072,11 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         this._setHeadersPinned(unique, state, currentFolderURI(), state ? "Épinglage de conversation" : "Désépinglage de conversation", "conversation");
         for (const hdr of unique) { const ref = this._data.refs[conversationStableKey(hdr)]; if (ref) this._updateConversationReference(ref, hdr); }
         this._saveData("conversation");
+      });
+      healthIndicator.addEventListener("click", () => {
+        this._data.dashboard = {...(this._data.dashboard || {}), view: "health", smartView: "all"};
+        this._saveData("open-health-center");
+        dashboardButton.click();
       });
       dashboardButton.addEventListener("click", () => {
         const listeners = [...(this._dashboardRequestListeners || [])];
@@ -4757,6 +5116,9 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
           selectedPanelKeys.clear();
         } else if (action === "complete") {
           this._performReferenceAction(keys, "complete"); selectedPanelKeys.clear();
+        } else if (action === "trackNoReply") {
+          this._setNoReplyTracking(keys, {enabled:true}); selectedPanelKeys.clear();
+          showToast(`${keys.length} suivi(s) sans réponse activé(s).`, true, "success");
         } else if (action === "group") {
           openGroupAssignmentDialog(keys);
         } else {
@@ -4773,7 +5135,13 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         closeContextMenu();
         void runCardAction(key, action, item);
       });
-      contextMenu.addEventListener("popuphidden", resetContextMenuState);
+      contextMenu.addEventListener("popuphidden", () => {
+        const trigger = contextMenuTrigger;
+        resetContextMenuState();
+        if (trigger?.isConnected && !document.querySelector("dialog[open]")) {
+          about3Pane.setTimeout(() => { try { trigger.focus(); } catch {} }, 0);
+        }
+      });
 
       if (!onPanelContextMenu) {
         onPanelContextMenu = event => {
@@ -4830,13 +5198,36 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         selectPanelMessage(ref, hdr, card);
       });
 
+      list.addEventListener("focusin", event => {
+        const card = event.target.closest?.(".pin-mails-card");
+        if (!card) return;
+        for (const item of list.querySelectorAll(".pin-mails-card")) item.tabIndex = item === card ? 0 : -1;
+      });
+
       list.addEventListener("keydown", event => {
         const card = event.target.closest(".pin-mails-card");
         if (!card) return;
         const cards = [...list.querySelectorAll(".pin-mails-card")];
         const index = cards.indexOf(card);
-        if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-          event.preventDefault(); cards[Math.max(0, Math.min(cards.length - 1, index + (event.key === "ArrowDown" ? 1 : -1)))]?.focus();
+        if (["ArrowDown", "ArrowUp", "Home", "End", "PageDown", "PageUp"].includes(event.key)) {
+          event.preventDefault();
+          let nextIndex = index;
+          if (event.key === "ArrowDown") nextIndex++;
+          else if (event.key === "ArrowUp") nextIndex--;
+          else if (event.key === "Home") nextIndex = 0;
+          else if (event.key === "End") nextIndex = cards.length - 1;
+          else if (event.key === "PageDown") nextIndex += 5;
+          else if (event.key === "PageUp") nextIndex -= 5;
+          const nextCard = cards[Math.max(0, Math.min(cards.length - 1, nextIndex))];
+          if (nextCard) {
+            for (const item of cards) item.tabIndex = item === nextCard ? 0 : -1;
+            nextCard.focus();
+          }
+        } else if (event.key === "Escape") {
+          event.preventDefault();
+          closeContextMenu();
+          selectedPanelKeys.clear();
+          updatePanelSelection();
         } else if (event.key === " " && this._settings.enableMultiSelect) {
           event.preventDefault(); const key = card.dataset.stableKey; selectedPanelKeys.has(key) ? selectedPanelKeys.delete(key) : selectedPanelKeys.add(key); selectionAnchorKey = key; updatePanelSelection();
         } else if (event.key === "Enter") {
@@ -4902,19 +5293,26 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
 
     const updatePanelSelection = () => {
       if (!panel) return;
-      for (const card of panel.querySelectorAll(".pin-mails-card")) {
+      const cards = [...panel.querySelectorAll(".pin-mails-card")];
+      const focusKey = cards.some(card => card.dataset.stableKey === selectedPanelKey)
+        ? selectedPanelKey
+        : (cards.find(card => card.tabIndex === 0)?.dataset.stableKey || cards[0]?.dataset.stableKey || "");
+      cards.forEach((card, index) => {
         const key = card.dataset.stableKey;
         const selected = selectedPanelKeys.has(key);
         const active = selectedPanelKey === key;
         card.toggleAttribute("data-selected", selected);
         card.toggleAttribute("data-active", active);
         card.setAttribute("aria-selected", String(selected));
+        card.setAttribute("aria-posinset", String(index + 1));
+        card.setAttribute("aria-setsize", String(cards.length));
+        card.tabIndex = key === focusKey ? 0 : -1;
         if (active) card.setAttribute("aria-current", "true");
         else card.removeAttribute("aria-current");
-      }
+      });
       const bulk = panel.querySelector(".pin-mails-bulk-actions");
       if (bulk) {
-        bulk.hidden = selectedPanelKeys.size < 2;
+        bulk.hidden = selectedPanelKeys.size < 2 || !this._settings.enableBulkActions;
         bulk.querySelector(".pin-mails-bulk-count").textContent = `${selectedPanelKeys.size} sélection(s)`;
       }
     };
@@ -4960,11 +5358,19 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
 
     const createCard = entry => {
       const {ref, hdr} = entry;
+      const renderToken = PIN_MODULES.PinPerformance?.cardToken(entry, this._settings) || `${ref.stableKey}|${ref.updatedAt || 0}`;
+      const cached = cardCache.get(ref.stableKey);
+      if (cached?.token === renderToken && cached.node) {
+        cached.node._pinMessageHeader = hdr;
+        cached.node.draggable = this._settings.sortMode === "manual" && Boolean(hdr) && !this._settings.safeMode;
+        this._performance.reusedCards = (this._performance.reusedCards || 0) + 1;
+        return cached.node;
+      }
       const color = this._settings.showAccountColor
         ? this._getAccountColor(ref.accountKey)
         : "#0f6cbd";
       const card = createNode("article", "pin-mails-card");
-      card.setAttribute("role", "option"); card.tabIndex = 0; card.dataset.stableKey = ref.stableKey; card._pinMessageHeader = hdr;
+      card.setAttribute("role", "option"); card.tabIndex = -1; card.dataset.stableKey = ref.stableKey; card._pinMessageHeader = hdr;
       card.draggable = this._settings.sortMode === "manual" && Boolean(hdr) && !this._settings.safeMode;
       card.style.setProperty("--pin-account-color", color);
       card.toggleAttribute("data-unread", Boolean(hdr && !(hdr.flags & Ci.nsMsgMessageFlags.Read)));
@@ -4979,7 +5385,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       if (hdr && !(hdr.flags & Ci.nsMsgMessageFlags.Read)) { const dot = createNode("span", "pin-mails-unread-dot"); dot.title = "Non lu"; top.appendChild(dot); }
       const author = createNode("span", "pin-mails-author", hdr ? formatAuthor(hdr) : ref.author || "Message introuvable"); author.title = author.textContent;
       const date = createNode("time", "pin-mails-date", this._formatDate(about3Pane, hdr, ref));
-      const more = createQuickButton("more", "Plus d’actions", "⋯");
+      const more = createQuickButton("more", this._t("moreActions", "Plus d’actions"), "⋯");
       more.classList.add("pin-mails-card-more");
       more.setAttribute("aria-haspopup", "menu");
       more.setAttribute("aria-expanded", "false");
@@ -4995,6 +5401,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       pin.classList.add("pin-mails-card-pin");
       top.append(author, date, more, pin);
       const subject = createNode("div", "pin-mails-subject", hdr ? formatSubject(hdr) : ref.subject || "Message déplacé ou supprimé"); subject.title = subject.textContent;
+      card.setAttribute("aria-label", `${subject.textContent} — ${author.textContent}${ref.completedAt ? " — Terminé" : ""}${!hdr ? " — Message introuvable" : ""}`);
       card.append(top, subject);
 
       if (this._settings.showNotes && ref.note) card.appendChild(createNode("div", "pin-mails-note", ref.note));
@@ -5004,6 +5411,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       else if (ref.workflowStatus === "planned") statusLine.appendChild(createNode("span", "pin-mails-workflow-chip planned", "Planifié"));
       if (ref.completedAt || ref.workflowStatus === "completed") statusLine.appendChild(createNode("span", "pin-mails-completed-chip", "Terminé"));
       if (ref.followUpAt && ref.workflowStatus !== "completed") statusLine.appendChild(createNode("span", `pin-mails-follow-up-chip${ref.followUpAt < Date.now() ? " overdue" : ""}`, `${ref.followUpAt < Date.now() ? "Relance en retard · " : "Relance · "}${this._formatTimestamp(about3Pane, ref.followUpAt)}`));
+      if (ref.noReplyTracking && ref.noReplyAt) statusLine.appendChild(createNode("span", `pin-mails-no-reply-chip${ref.noReplyAt < Date.now() ? " overdue" : ""}`, `${ref.noReplyAt < Date.now() ? "Sans réponse · à relancer" : "Sans réponse · " + this._formatTimestamp(about3Pane, ref.noReplyAt)}`));
       if (ref.recurrenceRule) statusLine.appendChild(createNode("span", "pin-mails-recurrence-chip", `Récurrent · ${ref.recurrenceInterval > 1 ? `${ref.recurrenceInterval}× ` : ""}${({daily:"jour",weekdays:"jours ouvrés",weekly:"semaine",monthly:"mois",quarterly:"trimestre",yearly:"an"})[ref.recurrenceRule] || ref.recurrenceRule}`));
       const caseItem = (this._data.cases || []).find(item => item.id === ref.caseId);
       if (caseItem) { const chip = createNode("span", "pin-mails-case-chip", `Affaire · ${caseItem.name}`); chip.style.setProperty("--pin-case-color", caseItem.color); statusLine.appendChild(chip); }
@@ -5039,6 +5447,8 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       } else if (!this._settings.safeMode && (this._settings.showNotes || this._settings.showDeadlines || this._settings.showGroups)) {
         const actions = createNode("div", "pin-mails-card-actions"); actions.appendChild(createQuickButton("edit", "Modifier le suivi", "✎")); card.appendChild(actions);
       }
+      cardCache.set(ref.stableKey, {token: renderToken, node: card});
+      this._performance.createdCards = (this._performance.createdCards || 0) + 1;
       return card;
     };
 
@@ -5069,18 +5479,23 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       const enabled = isEnabled();
       document.documentElement.toggleAttribute(INBOX_ATTRIBUTE, enabled);
       document.documentElement.setAttribute("pin-mails-density", this._settings.density);
-      document.documentElement.setAttribute("pin-mails-animate", String(this._settings.animateChanges && !this._settings.safeMode));
+      document.documentElement.setAttribute("pin-mails-ui-preset", this._settings.uiPreset || "balanced");
+      const systemReducedMotion = Boolean(about3Pane.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches);
+      const reduceMotion = this._settings.reduceMotion === "always" || (this._settings.reduceMotion === "auto" && systemReducedMotion);
+      document.documentElement.setAttribute("pin-mails-animate", String(this._settings.animateChanges && !this._settings.safeMode && !reduceMotion));
       document.documentElement.style.setProperty("--pin-mails-max-height", `${this._settings.panelMaxHeight}px`);
       panel.hidden = !enabled || !panelVisible(); allHeader.hidden = !enabled || !panelVisible();
       updatePanelToggle();
       if (!enabled) return;
       panel.toggleAttribute("data-collapsed", panelCollapsed());
-      panel.querySelector(".pin-mails-collapse-button").setAttribute("aria-label", panelCollapsed() ? "Développer la section Épinglés" : "Réduire la section Épinglés");
+      panel.querySelector(".pin-mails-collapse-button").setAttribute("aria-label", panelCollapsed() ? this._t("expandPinned", "Développer la section Épinglés") : this._t("collapsePinned", "Réduire la section Épinglés"));
       panel.querySelector(".pin-mails-header-select").value = this._settings.panelScope;
       panel.querySelector(".pin-mails-header-select[data-secondary]").value = this._settings.sortMode;
       panel.querySelector(".pin-mails-panel-tools").hidden = panelCollapsed();
       panel.querySelector(".pin-mails-search-wrap").hidden = !this._settings.showSearch;
       panel.querySelector(".pin-mails-search").value = searchText;
+      const smartViewControl = panel.querySelector(".pin-mails-smart-view-select");
+      if (smartViewControl) { smartViewControl.hidden = !this._settings.enableSmartViews; smartViewControl.value = panelSmartView; }
       panel.querySelector(".pin-mails-action-conversation").hidden = !this._settings.enableConversationPins || this._settings.safeMode;
       panel.querySelector(".pin-mails-action-dashboard").hidden = !this._settings.enableGlobalDashboard;
       panel.querySelector(".pin-mails-action-add-group").hidden = !this._settings.showGroups || this._settings.safeMode;
@@ -5094,23 +5509,58 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       };
       panel.querySelector(".pin-mails-count").textContent = String(stats.total);
       panel.querySelector(".pin-mails-summary").textContent = this._settings.showCounters ? `${stats.unread} non lu(s) · ${stats.overdue} en retard${stats.completed ? ` · ${stats.completed} terminé(s)` : ""}` : "";
+      const healthButton = panel.querySelector(".pin-mails-health-indicator");
+      if (healthButton) {
+        const health = this._settings.enableHealthCenter ? PIN_MODULES.PinHealth?.build({
+          data: this._data,
+          settings: this._settings,
+          compatibility: this._compatibility,
+          performance: this._getPerformanceReport(),
+          diagnostics: PIN_MODULES.PinDiagnostics?.summary(this._diagnosticEvents || [])
+        }) : null;
+        const visible = Boolean(this._settings.enableHealthNotifications && health && health.status !== "healthy");
+        healthButton.hidden = !visible;
+        healthButton.textContent = visible ? `Santé ${health.score}/100` : "";
+        healthButton.dataset.status = health?.status || "healthy";
+        healthButton.title = visible ? `${health.issues?.length || 0} point(s) à vérifier dans le centre de santé` : this._t("healthHealthy", "Santé MailPerch correcte");
+      }
       updateFolderBadge(stats);
       const query = sanitizeSearchText(searchText);
       let entries = query ? allEntries.filter(entry => {
         const group = this._groupForId(entry.ref.groupId);
         return sanitizeSearchText([entry.ref.author, entry.ref.subject, entry.ref.accountName, entry.ref.folderName, entry.ref.note, group?.name].join(" ")).includes(query);
       }) : allEntries;
+      if (this._settings.enableSmartViews && panelSmartView !== "all") {
+        entries = entries.filter(entry => PIN_MODULES.PinSmartViews?.matches(panelSmartView, entry.ref, {unread:Boolean(entry.hdr && !(entry.hdr.flags & Ci.nsMsgMessageFlags.Read)),missing:!entry.hdr,calendarError:Boolean(entry.ref.calendarSyncError)}) ?? true);
+      }
       const totalFiltered = entries.length;
-      entries = entries.slice(0, renderLimit);
-      const list = panel.querySelector(".pin-mails-panel-list"); list.replaceChildren();
-      if (!entries.length) { list.appendChild(createNode("div", "pin-mails-empty", query ? "Aucun résultat" : "Aucun message épinglé")); updatePanelSelection(); return; }
+      const virtualizationThreshold = Math.max(this._settings.panelPageSize, this._settings.panelVirtualizationThreshold || 180);
+      const effectiveLimit = totalFiltered <= virtualizationThreshold ? totalFiltered : renderLimit;
+      entries = entries.slice(0, effectiveLimit);
+      const list = panel.querySelector(".pin-mails-panel-list");
+      const grouping = this._settings.showSmartSections ? "smart" : (this._settings.groupByCustomGroup && this._settings.showGroups ? "group" : (this._settings.groupByAccount ? "account" : "flat"));
+      const renderSignature = PIN_MODULES.PinPerformance?.listSignature(entries, {
+        mode:`panel:${panelSmartView}`,search:query,limit:renderLimit,scope:this._settings.panelScope,sort:this._settings.sortMode,grouping,settings:this._settings
+      }) || `${grouping}|${query}|${entries.map(entry => `${entry.ref.stableKey}:${entry.ref.updatedAt || 0}`).join(",")}`;
+      if (renderSignature === lastRenderSignature && list.childElementCount) {
+        this._performance.skippedRenders = (this._performance.skippedRenders || 0) + 1;
+        updatePanelSelection();
+        panel.querySelector(".pin-mails-live").textContent = `${totalFiltered} message(s) affiché(s).`;
+        return;
+      }
+      lastRenderSignature = renderSignature;
+      list.replaceChildren();
+      if (!entries.length) { list.appendChild(createNode("div", "pin-mails-empty", query ? this._t("noResult", "Aucun résultat") : this._t("noPinned", "Aucun message épinglé"))); updatePanelSelection(); return; }
       const fragment = document.createDocumentFragment();
       if (this._settings.showSmartSections) {
         const buckets = new Map();
-        for (const entry of entries) { const id = smartSectionForRef(entry.ref); const bucket = buckets.get(id) || []; bucket.push(entry); buckets.set(id, bucket); }
-        for (const id of ["overdue", "today", "week", "later", "noDue", "completed"]) {
+        for (const entry of entries) {
+          const id = PIN_MODULES.PinSmartViews?.sectionFor(entry.ref, {unread:Boolean(entry.hdr && !(entry.hdr.flags & Ci.nsMsgMessageFlags.Read)),missing:!entry.hdr,calendarError:Boolean(entry.ref.calendarSyncError)}) || smartSectionForRef(entry.ref);
+          const bucket = buckets.get(id) || []; bucket.push(entry); buckets.set(id, bucket);
+        }
+        for (const id of ["overdue", "today", "week", "waiting", "noReply", "calendarError", "missing", "later", "noDue", "recentCompleted", "completed"]) {
           const bucket = buckets.get(id); if (!bucket?.length) continue;
-          const colors = {overdue: "#d13438", today: "#ca5010", week: "#0f6cbd", later: "#6264a7", noDue: "#777777", completed: "#107c10"};
+          const colors = {overdue: "#d13438", today: "#ca5010", week: "#0f6cbd", waiting: "#8a4b00", noReply: "#6264a7", calendarError: "#d13438", missing: "#777777", later: "#6264a7", noDue: "#777777", recentCompleted: "#107c10", completed: "#107c10"};
           fragment.appendChild(createGroupSection(id, SMART_SECTION_LABELS[id], colors[id], bucket, "smart"));
         }
       } else if (this._settings.groupByCustomGroup && this._settings.showGroups) {
@@ -5135,6 +5585,10 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         for (const entry of entries) fragment.appendChild(createCard(entry));
       }
       list.appendChild(fragment);
+      const visibleKeys = new Set(entries.map(entry => entry.ref.stableKey));
+      for (const [key, cached] of cardCache) {
+        if (!visibleKeys.has(key)) { cached.node?.remove(); cardCache.delete(key); }
+      }
       if (totalFiltered > entries.length) {
         const more = createNode("button", "pin-mails-load-more", `Afficher ${Math.min(this._settings.panelPageSize, totalFiltered - entries.length)} message(s) de plus`); more.type = "button";
         more.addEventListener("click", () => { renderLimit += this._settings.panelPageSize; renderPanel(); }); list.appendChild(more);
@@ -5144,6 +5598,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       if (this._settings.enablePerformanceMetrics) {
         const elapsed = about3Pane.performance.now() - renderStarted; this._performance.renders++; this._performance.totalRenderMs += elapsed;
         this._performance.lastRenderMs = elapsed; this._performance.maxRenderMs = Math.max(this._performance.maxRenderMs, elapsed);
+        if (elapsed > 120) this._recordDiagnostic("info", "Rendu du panneau lent", `${Math.round(elapsed)} ms pour ${entries.length} carte(s)`, {component:"performance",action:"render-panel"});
       }
     };
 
@@ -5155,8 +5610,8 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       }, immediate ? 0 : REFRESH_DELAY_MS);
     };
 
-    const applySettings = () => { renderLimit = this._settings.panelPageSize; updatePanelToggle(); scheduleRefresh(true); };
-    const updateFolderMode = () => { selectedPanelKeys.clear(); selectedPanelKey = null; selectionAnchorKey = null; searchText = ""; renderLimit = this._settings.panelPageSize; patchAllRows(); renderPanel(); this._updateMainMenuWindow(about3Pane.top); };
+    const applySettings = () => { lastRenderSignature = ""; renderLimit = this._settings.panelPageSize; updatePanelToggle(); scheduleRefresh(true); };
+    const updateFolderMode = () => { lastRenderSignature = ""; cardCache.clear(); selectedPanelKeys.clear(); selectedPanelKey = null; selectionAnchorKey = null; searchText = ""; panelSmartView = "all"; renderLimit = this._settings.panelPageSize; patchAllRows(); renderPanel(); this._updateMainMenuWindow(about3Pane.top); };
 
     const observer = new about3Pane.MutationObserver(() => scheduleRefresh());
     observer.observe(threadTree, {subtree: true, childList: true, attributes: true, attributeFilter: ["data-properties"]});
@@ -5208,6 +5663,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       document.documentElement.removeAttribute("pin-mails-density");
       document.documentElement.removeAttribute("pin-mails-animate");
       document.documentElement.style.removeProperty("--pin-mails-max-height");
+      cardCache.clear(); lastRenderSignature = "";
       panel?.remove(); allHeader?.remove(); panelToggle?.remove(); editor?.remove(); contextMenu?.remove(); ownedPopupSet?.remove(); groupDialog?.remove(); groupAssignmentDialog?.remove(); for (const badge of document.querySelectorAll(".pin-mails-folder-badge")) badge.remove();
       for (const button of document.querySelectorAll(`.${INDEPENDENT_BUTTON_CLASS}`)) button.remove();
       for (const button of document.querySelectorAll(`.${BUTTON_CLASS}`)) restoreNativeButton(button);

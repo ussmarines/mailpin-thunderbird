@@ -1,11 +1,13 @@
 # Plan de test
 
-Le plan de référence se trouve dans `docs/MANUAL_TEST_PLAN.md`.
+Le plan manuel complet se trouve dans `docs/MANUAL_TEST_PLAN.md`.
 
-Les contrôles automatiques disponibles sans environnement Thunderbird sont lancés par :
+Les contrôles disponibles sans environnement Thunderbird sont lancés par :
 
 ```bash
 npm run ci
 ```
 
-Les fichiers `tests/browser/` et `tests/xpcshell/` sont des points de départ pour le harnais Thunderbird. Ils doivent être intégrés et exécutés dans un checkout Thunderbird avant toute affirmation de compatibilité complète.
+Ils couvrent structure, sécurité, versions, accessibilité, localisation FR/EN, données, migrations, vues intelligentes, actions groupées, fournisseurs, santé, diagnostic, performances, modèles SQLite et build reproductible.
+
+Les fichiers `tests/browser/` et `tests/xpcshell/` restent des points d’entrée pour un checkout Thunderbird. Aucune compatibilité graphique complète ne doit être affirmée avant leur exécution et la matrice manuelle Windows/Linux.

@@ -78,7 +78,7 @@ assert "pointer-events: none" in css
 assert ".pin-mails-card:hover .pin-mails-card-actions" in css
 assert ".pin-mails-card[data-active] .pin-mails-card-actions" in css
 assert "pointer-events: auto" in css
-assert 'createQuickButton("more", "Plus d’actions"' in impl
+assert 'createQuickButton("more", this._t("moreActions", "Plus d’actions")' in impl
 assert ".pin-mails-card-more" in css
 
 # Pin colours and hover states must be driven by account variables, not white.

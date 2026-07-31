@@ -12,7 +12,7 @@ Voir `BRANDING.md` pour les règles de nommage et les identifiants techniques co
 
 ## État
 
-La build actuelle n’est pas déclarée prête pour Add-ons for Thunderbird.
+La build 3.2.0 reste une Release Candidate de développement et n’est pas déclarée prête pour Add-ons for Thunderbird.
 
 Avant publication :
 
@@ -20,7 +20,7 @@ Avant publication :
 - remplacer l’ID de développement par un ID définitif et durable ;
 - rendre accessibles publiquement la page d’accueil, le support et la politique de confidentialité ;
 - exécuter la matrice `docs/MANUAL_TEST_PLAN.md` ;
-- compléter la localisation de toutes les interfaces ;
+- relire les traductions FR/EN et compléter les rares diagnostics techniques encore uniquement en français ;
 - fournir aux reviewers le code source lisible et `python3 scripts/build.py --source` ;
 - justifier l’API Experiment et son avertissement d’accès complet ;
 - confirmer la licence et les mentions légales avec un professionnel ;

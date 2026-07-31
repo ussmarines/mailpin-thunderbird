@@ -7,7 +7,7 @@
 
 MailPerch est une extension Thunderbird qui ajoute un panneau d’épingles au-dessus de la liste native des messages, avec suivi local, rappels, groupes, affaires, Kanban, règles et intégration Agenda.
 
-> **État : build de développement 3.1.5.** Les contrôles statiques, les tests de modèle et les gardes de régression sont exécutés automatiquement. Une validation graphique complète dans Thunderbird reste obligatoire avant publication.
+> **État : build de développement 3.2.0.** Les contrôles statiques, les tests de modèle et les gardes de régression sont exécutés automatiquement. Une validation graphique complète dans Thunderbird reste obligatoire avant publication.
 
 ## Fonctions principales
 
@@ -16,19 +16,22 @@ MailPerch est une extension Thunderbird qui ajoute un panneau d’épingles au-d
 - couleurs personnalisables par compte, groupes, notes et priorités ;
 - suivi « À traiter / En attente / Planifié / Terminé » ;
 - conversations, échéances, rappels et récurrences ;
-- affaires et tableau Kanban ;
+- affaires, tableau Kanban, vues intelligentes et actions groupées ;
+- suivi automatique des conversations sans réponse ;
 - règles locales avec simulation et protections anti-boucle ;
-- tâches et événements Agenda ;
-- sauvegardes, réparation, diagnostic et stockage SQLite local ;
-- menu contextuel sur toute la surface des cartes épinglées ;
-- tableau de bord global adapté aux thèmes clair et sombre ;
-- retours d’action visibles dans les paramètres et le dashboard.
+- tâches et événements Agenda avec matrice de compatibilité ;
+- sauvegardes prévisualisées, migrations protégées et stockage SQLite local ;
+- centre de santé et diagnostic local expurgé exportable ;
+- menu contextuel natif sur toute la surface des cartes épinglées ;
+- tableau de bord global adapté aux thèmes clair, sombre et contraste élevé ;
+- paramètres guidés, recherche, aides contextuelles et retours d’action non invasifs ;
+- rendu différentiel et chargement progressif pour les grands volumes.
 
 ## Installation de test
 
 1. Construire avec `npm run build`, ou utiliser le XPI fourni séparément.
 2. Dans Thunderbird : **Extensions et thèmes → roue dentée → Installer un module depuis un fichier**.
-3. Sélectionner `dist/MailPerch_v3.1.5.xpi`.
+3. Sélectionner `dist/MailPerch_v3.2.0.xpi`.
 4. Redémarrer complètement Thunderbird.
 5. Utiliser un profil de test et des messages sans importance pour les opérations de suppression, archivage et règles.
 
@@ -51,7 +54,7 @@ Le contenu de `extension/` est placé à la racine du XPI. Le dossier `dist/` n�
 extension/       code installable Thunderbird
 docs/            architecture, sécurité, tests et décisions
 scripts/         contrôle, secrets et build reproductible
-tests/           tests statiques et modèles
+tests/           tests statiques, modèles, accessibilité, données et UX 3.2
 release/         modèle de manifeste pour la future publication
 .github/         CI et modèles de contribution
 AGENTS.md        consignes compactes pour Codex et les contributeurs

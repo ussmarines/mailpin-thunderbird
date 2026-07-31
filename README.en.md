@@ -7,7 +7,7 @@
 
 MailPerch is a Thunderbird extension that adds a separate pinned-message panel above the native message list, plus local workflows, reminders, groups, cases, Kanban, rules and Calendar integration.
 
-> **Status: development build 3.1.5.** Static checks, model tests and regression guards run automatically. A complete real-Thunderbird GUI validation is still required before release.
+> **Status: development build 3.2.0.** Static checks, model tests and regression guards run automatically. A complete real-Thunderbird GUI validation is still required before release.
 
 ## Main features
 
@@ -16,12 +16,19 @@ MailPerch is a Thunderbird extension that adds a separate pinned-message panel a
 - account colours, groups, notes, priorities and deadlines;
 - active, waiting, planned and completed workflows;
 - conversations, reminders and recurring follow-ups;
-- cases, Kanban and bulk actions;
+- cases, Kanban, smart views and bulk actions;
+- automatic local no-reply follow-up tracking;
 - local rules with simulation and loop protection;
-- Thunderbird Calendar tasks and events;
-- local SQLite storage, backups, repair and diagnostics;
-- a context menu on the whole pinned card;
-- visible success, busy and error feedback in settings and dashboard.
+- Thunderbird Calendar tasks and events with a compatibility matrix;
+- protected migrations, previewed restores and local SQLite storage;
+- a health center and an exportable redacted diagnostic log;
+- a native context menu on the whole pinned card;
+- guided, searchable settings with contextual help and unobtrusive feedback;
+- incremental rendering and progressive loading for large pin collections.
+
+## Test installation
+
+Build with `npm run build`, then install `dist/MailPerch_v3.2.0.xpi` from Thunderbird’s Add-ons Manager. Restart Thunderbird completely and use a test profile for destructive actions.
 
 ## Development
 

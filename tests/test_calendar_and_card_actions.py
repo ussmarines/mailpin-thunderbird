@@ -37,7 +37,9 @@ assert 'let popupSet = document.querySelector("popupset") || document.getElement
 assert 'contextMenu.openPopup(trigger, "after_end"' in impl
 assert 'contextMenu.openPopupAtScreen(screenX, screenY, true, triggerEvent)' in impl
 assert 'contextMenu.addEventListener("command"' in impl
-assert 'contextMenu.addEventListener("popuphidden", resetContextMenuState)' in impl
+assert 'contextMenu.addEventListener("popuphidden", () => {' in impl
+assert "resetContextMenuState();" in impl
+assert "trigger?.isConnected" in impl and "trigger.focus()" in impl
 assert 'more.addEventListener("click"' in impl
 assert 'more.setAttribute("aria-expanded", "false")' in impl
 assert 'dispatchCardAction(card, "more", more, event)' in impl
@@ -79,7 +81,7 @@ assert "enhanceSettingsPage" in options_js
 assert "setLocalStatus" in options_js
 assert "CONTROL_HELP" in options_js
 assert "BUTTON_HELP" in options_js
-assert ".settings-toolbar" in options_css and "position: sticky" in options_css
+assert ".settings-sidebar" in options_css and "position: sticky" in options_css
 assert ".control-feedback" in options_css
 assert ".status-toast" in options_css and "position: fixed" in options_css
 assert ".save-dock" in options_css and "position: fixed" in options_css

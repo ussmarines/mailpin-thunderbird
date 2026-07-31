@@ -1,23 +1,49 @@
 "use strict";
 
+const api = globalThis.messenger || globalThis.browser;
+const $ = id => document.getElementById(id);
+const selected = new Set();
+let current = null;
+let configuration = null;
+let calendars = [];
+let loadGeneration = 0;
+let searchTimer = null;
+let statusTimer = null;
+let pendingCalendarKeys = [];
+let loading = false;
+
+const ACTION_MESSAGES = Object.freeze({
+  open: "Message ouvert.", reply: "Fenêtre de réponse ouverte.", active: "Message remis à traiter.",
+  waiting: "Message placé en attente.", planned: "Message planifié.", complete: "Message terminé.",
+  uncomplete: "Message rouvert.", read: "Message marqué comme lu.", unread: "Message marqué comme non lu.",
+  archive: "Message archivé.", delete: "Message supprimé.", unpin: "Message désépinglé.",
+  trackNoReply: "Suivi sans réponse activé.", cancelNoReply: "Suivi sans réponse arrêté.",
+  priority: "Priorité mise à jour.", deadline: "Échéance mise à jour.", group: "Groupe mis à jour.",
+  case: "Affaire mise à jour.", template: "Modèle appliqué.", calendar: "Élément Agenda créé."
+});
+
+function msg(key, fallback) {
+  try { return api.i18n.getMessage(key) || fallback; } catch { return fallback; }
+}
+
 function localize() {
-  document.documentElement.lang = (messenger.i18n.getUILanguage?.() || "fr").split("-")[0];
+  document.documentElement.lang = (api.i18n.getUILanguage?.() || "fr").split("-")[0];
   for (const element of document.querySelectorAll("[data-i18n]")) {
-    const value = messenger.i18n.getMessage(element.dataset.i18n);
+    const value = msg(element.dataset.i18n, "");
     if (value) element.textContent = value;
+  }
+  for (const element of document.querySelectorAll("[data-i18n-placeholder]")) {
+    const value = msg(element.dataset.i18nPlaceholder, "");
+    if (value) element.placeholder = value;
   }
 }
 
-const api = globalThis.messenger || globalThis.browser;
-const selected = new Set();
-let current = null;
-let searchTimer = null;
-let statusTimer = null;
-let loadGeneration = 0;
-let loading = false;
-let calendarDescriptors = [];
-
-const $ = id => document.getElementById(id);
+function node(tag, className = "", text) {
+  const element = document.createElement(tag);
+  if (className) element.className = className;
+  if (text !== undefined) element.textContent = String(text);
+  return element;
+}
 
 function eventElement(event) {
   const path = typeof event.composedPath === "function" ? event.composedPath() : [];
@@ -36,20 +62,20 @@ function normalizeTimestamp(value) {
 function formatDate(value) {
   const timestamp = normalizeTimestamp(value);
   if (!timestamp) return "";
-  try {
-    return new Intl.DateTimeFormat(undefined, {
-      dateStyle: "short",
-      timeStyle: "short"
-    }).format(new Date(timestamp));
-  } catch {
-    return new Date(timestamp).toLocaleString();
-  }
+  try { return new Intl.DateTimeFormat(undefined, {dateStyle: "short", timeStyle: "short"}).format(new Date(timestamp)); }
+  catch { return new Date(timestamp).toLocaleString(); }
 }
 
-function clearKanbanDropState() {
-  for (const list of document.querySelectorAll(".kanban-list[data-drop-active]")) {
-    delete list.dataset.dropActive;
-  }
+function downloadJson(filename, data) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type: "application/json"});
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 0);
 }
 
 function setLoading(value) {
@@ -58,46 +84,25 @@ function setLoading(value) {
   loading = next;
   document.body.toggleAttribute("data-loading", loading);
   for (const control of document.querySelectorAll("button, select, input")) {
-    if (control.id === "retry") continue;
+    if (control.id === "retry" || control.closest("dialog")) continue;
     if (loading) {
       control.dataset.mailperchLoadingWasDisabled = String(control.disabled);
       control.disabled = true;
-    } else {
+      control.setAttribute("aria-busy", "true");
+    } else if (Object.prototype.hasOwnProperty.call(control.dataset, "mailperchLoadingWasDisabled")) {
       control.disabled = control.dataset.mailperchLoadingWasDisabled === "true";
       delete control.dataset.mailperchLoadingWasDisabled;
+      control.removeAttribute("aria-busy");
     }
-  }
-}
-
-function clearStatus() {
-  if (statusTimer) {
-    clearTimeout(statusTimer);
-    statusTimer = null;
-  }
-  const status = $("status");
-  status.textContent = "";
-  status.className = "status";
-  status.hidden = true;
-}
-
-function setStatus(message, type = "", {persistent = false} = {}) {
-  if (statusTimer) {
-    clearTimeout(statusTimer);
-    statusTimer = null;
-  }
-  const status = $("status");
-  status.textContent = String(message || "");
-  status.className = `status ${type}`.trim();
-  status.hidden = !message;
-  if (message && !persistent && type !== "busy") {
-    statusTimer = setTimeout(clearStatus, type === "error" ? 12000 : 6500);
   }
 }
 
 function setButtonBusy(control, busy) {
   if (!(control instanceof HTMLButtonElement)) return;
   if (busy) {
-    control.dataset.mailperchBusyWasDisabled = String(control.disabled);
+    if (!Object.prototype.hasOwnProperty.call(control.dataset, "mailperchBusyWasDisabled")) {
+      control.dataset.mailperchBusyWasDisabled = String(control.disabled);
+    }
     control.disabled = true;
     control.dataset.busy = "true";
     control.setAttribute("aria-busy", "true");
@@ -109,24 +114,31 @@ function setButtonBusy(control, busy) {
   }
 }
 
-function button(action, label) {
-  const element = document.createElement("button");
-  element.type = "button";
-  element.className = "button secondary";
-  element.dataset.action = action;
-  element.textContent = label;
-  element.title = label;
-  element.setAttribute("aria-label", label);
-  return element;
+function clearStatus() {
+  if (statusTimer) clearTimeout(statusTimer);
+  statusTimer = null;
+  const host = $("status");
+  host.hidden = true;
+  host.className = "status";
+  $("status-message").textContent = "";
 }
 
-function stat(label, value) {
-  const element = document.createElement("div");
-  element.className = "stat";
-  const strong = document.createElement("strong");
-  strong.textContent = String(value ?? 0);
-  element.append(strong, document.createTextNode(label));
-  return element;
+function setStatus(message, type = "", {persistent = false} = {}) {
+  if (statusTimer) clearTimeout(statusTimer);
+  statusTimer = null;
+  const host = $("status");
+  $("status-message").textContent = String(message || "");
+  host.className = `status ${type}`.trim();
+  host.hidden = !message;
+  if (message && !persistent && type !== "busy") {
+    statusTimer = setTimeout(clearStatus, type === "error" ? 12000 : 6500);
+  }
+}
+
+function setFatal(error) {
+  $("fatal-message").textContent = String(error?.message || error || "Erreur inconnue");
+  $("fatal-error").hidden = false;
+  setLoading(false);
 }
 
 function option(value, label) {
@@ -136,160 +148,184 @@ function option(value, label) {
   return element;
 }
 
+function calendarIdFor(itemType = "task") {
+  const preferred = configuration?.settings?.preferredCalendarId || "";
+  const compatible = calendars.filter(calendar => itemType === "event" ? calendar.eventCompatible : calendar.taskCompatible);
+  return compatible.some(calendar => calendar.id === preferred) ? preferred : (compatible[0]?.id || "");
+}
+
+function statCard(label, value, tone = "") {
+  const card = node("article", `stat ${tone}`.trim());
+  card.append(node("strong", "", value ?? 0), node("span", "", label));
+  return card;
+}
+
+function actionButton(action, label, tone = "") {
+  const button = node("button", `button ${tone || "secondary"}`.trim(), label);
+  button.type = "button";
+  button.dataset.action = action;
+  return button;
+}
+
 function createEmpty(message) {
-  const element = document.createElement("div");
-  element.className = "empty-state";
-  element.textContent = message;
-  return element;
+  const host = node("div", "empty-state");
+  host.append(node("div", "", message));
+  return host;
+}
+
+function badge(host, condition, label, className = "") {
+  if (!condition) return;
+  host.append(node("span", `badge ${className}`.trim(), label));
 }
 
 function badgesFor(item) {
-  const badges = document.createElement("div");
-  badges.className = "badges";
-  const entries = [
-    [item.unread, "Non lu", ""],
-    [item.workflowStatus === "waiting", "En attente", "waiting"],
-    [item.workflowStatus === "planned", "Planifié", "planned"],
-    [
-      item.dueAt || item.followUpAt,
-      `${item.smartSection === "overdue" ? "En retard" : "Échéance"} ${formatDate(item.followUpAt || item.dueAt)}`,
-      item.smartSection === "overdue" ? "overdue" : ""
-    ],
-    [item.completedAt, "Terminé", ""],
-    [item.trackingMode === "conversation", `${item.conversationCount || 1} messages`, ""],
-    [item.caseName, `Affaire : ${item.caseName}`, ""],
-    [item.recurrenceRule, `Récurrent : ${item.recurrenceRule}`, ""],
-    [item.missing, "Introuvable", "overdue"]
-  ];
-  for (const [condition, label, className] of entries) {
-    if (!condition) continue;
-    const badge = document.createElement("span");
-    badge.className = `badge ${className}`.trim();
-    badge.textContent = label;
-    badges.append(badge);
-  }
-  return badges;
+  const host = node("div", "badges");
+  badge(host, item.unread, msg("unread", "Non lu"));
+  badge(host, item.workflowStatus === "waiting", msg("statusWaiting", "En attente"), "waiting");
+  badge(host, item.workflowStatus === "planned", msg("statusPlanned", "Planifié"), "planned");
+  badge(host, item.noReplyTracking, item.noReplyAt && item.noReplyAt <= Date.now()
+    ? msg("noReplyDue", "Sans réponse · à relancer")
+    : `${msg("noReplyTracking", "Sans réponse")} · ${formatDate(item.noReplyAt)}`, "no-reply");
+  badge(host, item.dueAt || item.followUpAt,
+    `${item.smartSection === "overdue" ? msg("overdue", "En retard") : msg("deadline", "Échéance")} · ${formatDate(item.followUpAt || item.dueAt)}`,
+    item.smartSection === "overdue" ? "overdue" : "");
+  badge(host, item.completedAt, msg("statusComplete", "Terminé"));
+  badge(host, item.priorityLevel === "high", msg("priorityHigh", "Priorité haute"));
+  badge(host, item.priorityLevel === "urgent", msg("priorityUrgent", "Priorité urgente"), "overdue");
+  badge(host, item.trackingMode === "conversation", `${item.conversationCount || 1} ${msg("messages", "messages")}`);
+  badge(host, item.groupName, `${msg("group", "Groupe")} · ${item.groupName}`);
+  badge(host, item.caseName, `${msg("case", "Affaire")} · ${item.caseName}`);
+  badge(host, item.calendarSyncError, msg("calendarError", "Agenda à vérifier"), "error");
+  badge(host, item.missing, msg("missingMessage", "Message introuvable"), "error");
+  return host;
 }
 
-function createCard(item, {checkbox = true, compact = false} = {}) {
-  const card = document.createElement("article");
-  card.className = `item${compact ? " compact" : ""}`;
+function updateSelectionBar() {
+  const count = selected.size;
+  $("selection-bar").hidden = count === 0 || configuration?.settings?.enableBulkActions === false;
+  $("selection-count").textContent = count === 1 ? "1 message sélectionné" : `${count} messages sélectionnés`;
+  for (const input of document.querySelectorAll('.item input[type="checkbox"]')) {
+    const card = input.closest(".item");
+    input.checked = selected.has(card?.dataset.key || "");
+  }
+}
+
+function createCard(item, {compact = false, selectable = true} = {}) {
+  const card = node("article", `item${compact ? " compact" : ""}`);
   card.dataset.key = item.stableKey;
-  card.dataset.status = item.workflowStatus;
-  card.dataset.completed = String(Boolean(item.completedAt));
+  card.dataset.status = item.workflowStatus || "active";
+  card.draggable = !compact;
   card.style.setProperty("--item-color", item.accountColor || "var(--accent)");
 
-  if (checkbox) {
+  if (selectable && !compact) {
     const check = document.createElement("input");
     check.type = "checkbox";
     check.checked = selected.has(item.stableKey);
     check.setAttribute("aria-label", `Sélectionner ${item.subject || "ce message"}`);
     check.addEventListener("change", () => {
-      if (check.checked) selected.add(item.stableKey);
-      else selected.delete(item.stableKey);
+      if (check.checked) selected.add(item.stableKey); else selected.delete(item.stableKey);
+      updateSelectionBar();
     });
     card.append(check);
   }
 
-  const body = document.createElement("div");
-  const title = document.createElement("h3");
-  title.textContent = item.subject || "(sans objet)";
-  const meta = document.createElement("div");
-  meta.className = "meta";
-  meta.textContent = [item.author, item.accountName, item.folderName, formatDate(item.date)]
-    .filter(Boolean)
-    .join(" · ");
-  body.append(title, meta);
-  if (item.note) {
-    const note = document.createElement("div");
-    note.className = "note";
-    note.textContent = item.note;
-    body.append(note);
-  }
+  const body = node("div", "item-body");
+  body.append(node("h3", "", item.subject || msg("noSubject", "(sans objet)")));
+  body.append(node("div", "meta", [item.author, item.accountName, item.folderName, formatDate(item.date)].filter(Boolean).join(" · ")));
+  if (item.note) body.append(node("div", "note", item.note));
   body.append(badgesFor(item));
+  card.append(body);
 
-  const actions = document.createElement("div");
-  actions.className = "actions";
-  actions.append(
-    button("open", "Ouvrir"),
-    button(
-      item.workflowStatus === "completed" ? "active" : "complete",
-      item.workflowStatus === "completed" ? "Rouvrir" : "Terminer"
-    ),
-    button("waiting", "Attente"),
-    button("planned", "Planifier"),
-    button("snooze", "Reporter 1 h"),
-    button("calendar", "Agenda"),
-    button("unpin", "Désépingler")
-  );
-  card.append(body, actions);
+  if (!compact) {
+    const actions = node("div", "item-actions");
+    actions.append(
+      actionButton("open", msg("open", "Ouvrir")),
+      actionButton("reply", msg("reply", "Répondre")),
+      actionButton(item.completedAt ? "active" : "complete", item.completedAt ? msg("reopen", "Rouvrir") : msg("statusComplete", "Terminer")),
+      actionButton("waiting", msg("statusWaiting", "Attente")),
+      actionButton(item.noReplyTracking ? "cancelNoReply" : "trackNoReply", item.noReplyTracking ? msg("cancelNoReplyTracking", "Arrêter la relance") : msg("trackNoReply", "Relancer sans réponse")),
+      actionButton("calendar", msg("calendar", "Agenda")),
+      actionButton("unpin", msg("unpin", "Désépingler"))
+    );
+    card.append(actions);
+  }
   return card;
+}
+
+function renderStats() {
+  const stats = current?.stats || {};
+  $("stats").replaceChildren(
+    statCard(msg("allPins", "Toutes"), stats.total || 0),
+    statCard(msg("statusActive", "À traiter"), stats.active || 0),
+    statCard(msg("statusWaiting", "En attente"), stats.waiting || 0),
+    statCard(msg("statusPlanned", "Planifiées"), stats.planned || 0),
+    statCard(msg("overdue", "En retard"), stats.overdue || 0, stats.overdue ? "warning" : ""),
+    statCard(msg("noReplyTracking", "Sans réponse"), stats.noReply || 0),
+    statCard(msg("statusComplete", "Terminées"), stats.completed || 0)
+  );
+}
+
+function renderSmartViews() {
+  const host = $("smart-views");
+  host.replaceChildren();
+  const views = current?.smartViews?.length ? current.smartViews : [
+    {id: "all", fallback: "Toutes"}, {id: "today", fallback: "Aujourd’hui"},
+    {id: "overdue", fallback: "En retard"}, {id: "week", fallback: "Cette semaine"},
+    {id: "waiting", fallback: "En attente"}, {id: "noReply", fallback: "Relances sans réponse"},
+    {id: "noDue", fallback: "Sans échéance"}, {id: "unread", fallback: "Non lus"},
+    {id: "missing", fallback: "Messages introuvables"}, {id: "calendarError", fallback: "Agenda à vérifier"},
+    {id: "recentCompleted", fallback: "Récemment terminés"}
+  ];
+  for (const view of views) {
+    const button = node("button", "smart-view");
+    button.type = "button";
+    button.dataset.smartView = view.id;
+    button.setAttribute("aria-pressed", String((current.smartView || "all") === view.id));
+    button.append(node("span", "", msg(view.labelKey || "", view.fallback || view.id)), node("span", "smart-view-count", current.smartCounts?.[view.id] || 0));
+    host.append(button);
+  }
 }
 
 function renderList() {
   const host = $("items");
   host.replaceChildren();
-  if (!current.items.length) {
-    host.append(createEmpty("Aucune épingle ne correspond aux filtres actuels."));
+  if (!current.items?.length) {
+    host.append(createEmpty(msg("noPinsForFilters", "Aucune épingle ne correspond à cette vue.")));
     return;
   }
-  for (const item of current.items) host.append(createCard(item));
+  const fragment = document.createDocumentFragment();
+  for (const item of current.items) fragment.append(createCard(item));
+  host.append(fragment);
+}
+
+function clearKanbanDropState() {
+  for (const list of document.querySelectorAll(".kanban-list[data-drop-active]")) delete list.dataset.dropActive;
 }
 
 function renderKanban() {
   const host = $("kanban");
   host.replaceChildren();
-  const columns = [
-    ["active", "À traiter"],
-    ["waiting", "En attente"],
-    ["planned", "Planifié"],
-    ["completed", "Terminé"]
-  ];
+  const columns = [["active", "À traiter"], ["waiting", "En attente"], ["planned", "Planifié"], ["completed", "Terminé"]];
   for (const [status, label] of columns) {
-    const column = document.createElement("section");
-    column.className = "kanban-column";
-    const title = document.createElement("h2");
-    const items = current.items.filter(item => item.workflowStatus === status);
-    title.textContent = `${label} · ${items.length}`;
-    column.append(title);
-    const list = document.createElement("div");
-    list.className = "kanban-list";
+    const items = (current.items || []).filter(item => (item.workflowStatus || "active") === status);
+    const column = node("section", "kanban-column");
+    column.append(node("h2", "", `${label} · ${items.length}`));
+    const list = node("div", "kanban-list");
     list.dataset.status = status;
-    list.addEventListener("dragenter", event => {
-      event.preventDefault();
-      clearKanbanDropState();
-      list.dataset.dropActive = "true";
-    });
-    list.addEventListener("dragover", event => {
-      event.preventDefault();
-      if (event.dataTransfer) event.dataTransfer.dropEffect = "move";
-    });
-    list.addEventListener("dragleave", event => {
-      if (!list.contains(event.relatedTarget)) delete list.dataset.dropActive;
-    });
+    list.addEventListener("dragover", event => { event.preventDefault(); clearKanbanDropState(); list.dataset.dropActive = "true"; });
+    list.addEventListener("dragleave", () => delete list.dataset.dropActive);
     list.addEventListener("drop", async event => {
       event.preventDefault();
       clearKanbanDropState();
-      const key = event.dataTransfer?.getData("text/x-pin-mails-key") || "";
+      const key = event.dataTransfer.getData("text/x-mailperch-key");
       if (!key) return;
-      setStatus("Déplacement de la carte…", "busy", {persistent: true});
-      try {
-        await api.pinInbox.setWorkflowStatus([key], status, {});
-        await load({announce: false});
-        setStatus("Carte déplacée.", "success");
-      } catch (error) {
-        setStatus(`Déplacement impossible : ${error?.message || error}`, "error");
-      }
+      await perform([key], status === "completed" ? "complete" : status);
     });
     for (const item of items) {
-      const card = createCard(item, {checkbox: false, compact: true});
+      const card = createCard(item, {compact: true, selectable: false});
       card.draggable = true;
-      card.addEventListener("dragstart", event => {
-        if (!event.dataTransfer) return;
-        event.dataTransfer.setData("text/x-pin-mails-key", item.stableKey);
-        event.dataTransfer.effectAllowed = "move";
-      });
-      card.addEventListener("dragend", clearKanbanDropState);
+      card.addEventListener("dragstart", event => { event.dataTransfer.setData("text/x-mailperch-key", item.stableKey); event.dataTransfer.effectAllowed = "move"; });
+      card.addEventListener("dblclick", () => perform([item.stableKey], "open", {}, {reload: false}));
       list.append(card);
     }
     column.append(list);
@@ -300,324 +336,345 @@ function renderKanban() {
 function renderCases() {
   const host = $("cases");
   host.replaceChildren();
-  const byCase = new Map();
-  for (const item of current.items) {
-    const key = item.caseId || "__none";
-    const list = byCase.get(key) || [];
-    list.push(item);
-    byCase.set(key, list);
+  if (!current.cases?.length) { host.append(createEmpty(msg("noCases", "Aucune affaire."))); return; }
+  for (const caseItem of current.cases) {
+    const refs = (current.items || []).filter(item => item.caseId === caseItem.id);
+    const card = node("article", "case-card");
+    card.style.setProperty("--case-color", caseItem.color || "var(--accent)");
+    card.append(node("h2", "", caseItem.name || "Affaire"));
+    card.append(node("p", "case-meta", `${refs.length} message(s) · ${caseItem.status || "active"}${caseItem.dueAt ? ` · ${formatDate(caseItem.dueAt)}` : ""}`));
+    if (caseItem.note) card.append(node("p", "", caseItem.note));
+    const actions = node("div", "item-actions");
+    const selectCase = actionButton("select-case", msg("selectMessages", "Sélectionner les messages"));
+    selectCase.dataset.caseId = caseItem.id;
+    actions.append(selectCase);
+    card.append(actions);
+    host.append(card);
   }
-  const allCases = [...current.cases, {id: "__none", name: "Sans affaire", color: "#777777"}];
-  let rendered = 0;
-  for (const caseItem of allCases) {
-    const entries = byCase.get(caseItem.id) || [];
-    if (!entries.length) continue;
-    rendered++;
-    const section = document.createElement("section");
-    section.className = "case-section";
-    section.style.setProperty("--case-color", caseItem.color || "#777777");
-    const header = document.createElement("div");
-    header.className = "case-header";
-    const heading = document.createElement("h2");
-    heading.textContent = `${caseItem.name} · ${entries.length}`;
-    header.append(heading);
-    if (caseItem.id !== "__none") {
-      const agenda = button(
-        "case-calendar",
-        caseItem.calendarItemId ? "Synchroniser Agenda" : "Créer une tâche Agenda"
-      );
-      agenda.dataset.caseId = caseItem.id;
-      header.append(agenda);
-    }
-    section.append(header);
-    for (const item of entries) section.append(createCard(item, {checkbox: false, compact: true}));
-    host.append(section);
-  }
-  if (!rendered) host.append(createEmpty("Aucune affaire ne correspond aux filtres actuels."));
 }
 
 function renderHistory() {
   const host = $("history");
   host.replaceChildren();
-  if (!current.history.length) {
-    host.append(createEmpty("Aucun élément dans l’historique."));
-    return;
-  }
+  if (!current.history?.length) { host.append(createEmpty(msg("noHistory", "Aucun élément dans l’historique."))); return; }
   for (const item of current.history) {
-    const row = document.createElement("article");
-    row.className = "history-item";
-    const title = document.createElement("strong");
-    title.textContent = item.subject || "(sans objet)";
-    const meta = document.createElement("span");
-    meta.textContent = `${item.action} · ${formatDate(item.completedAt)} · durée ${Math.round((item.durationMs || 0) / 3_600_000)} h`;
-    row.append(title, meta);
-    host.append(row);
+    const entry = node("article", "history-entry");
+    entry.append(node("strong", "", item.subject || "(sans objet)"));
+    entry.append(node("div", "history-meta", [item.author, item.accountName, item.action, formatDate(item.completedAt)].filter(Boolean).join(" · ")));
+    host.append(entry);
   }
 }
 
-function renderTechnical() {
-  $("technical").textContent = JSON.stringify({
-    revision: current.revision,
-    compatibility: current.compatibility,
-    performance: current.performance,
-    counterRegressionEvents: current.counterRegressionEvents
-  }, null, 2);
+function renderHealth() {
+  const host = $("health");
+  host.replaceChildren();
+  const report = current.health || {score: 0, status: "unknown", issues: [], counts: {}};
+  const hero = node("section", "health-hero");
+  const score = node("div", "health-score");
+  score.style.setProperty("--score", String(report.score || 0));
+  score.append(node("strong", "", `${report.score || 0}/100`));
+  const copy = node("div", "");
+  copy.append(node("h2", "", report.status === "healthy" ? "MailPerch est en bonne santé" : report.status === "attention" ? "Quelques points sont à surveiller" : "Une intervention est recommandée"));
+  copy.append(node("p", "", `${report.issues?.length || 0} point(s) détecté(s) · ${current.diagnostics?.total || 0} événement(s) diagnostic récent(s).`));
+  const actions = node("div", "item-actions");
+  actions.classList.add("health-tools");
+  actions.append(actionButton("health-refresh", msg("runHealthCheck", "Analyser")), actionButton("health-repair", msg("repairSafeIssues", "Réparer les anomalies sûres")), actionButton("provider-check", msg("checkProviders", "Tester les fournisseurs")), actionButton("diagnostic-export", msg("exportDiagnostic", "Exporter le diagnostic")), actionButton("diagnostic-clear", msg("clearDiagnostics", "Vider le journal")));
+  hero.append(score, copy, actions);
+  host.append(hero);
 
-  const activity = $("activity");
-  activity.replaceChildren();
-  for (const event of current.activity.slice(0, 30)) {
-    const row = document.createElement("div");
-    row.className = "activity";
-    row.textContent = `${formatDate(event.time)} · ${event.type} · ${event.label || ""}`;
-    activity.append(row);
+  const issues = node("section", "health-card");
+  issues.append(node("h2", "", "Points à examiner"));
+  const issueList = node("div", "health-issues");
+  for (const issue of report.issues || []) {
+    const card = node("article", `health-issue ${issue.severity || "info"}`);
+    card.append(node("strong", "", issue.title || "Information"), node("span", "", issue.detail || ""));
+    issueList.append(card);
   }
-  if (!activity.childElementCount) activity.append(createEmpty("Aucune activité récente."));
+  if (!issueList.childElementCount) issueList.append(node("p", "", "Aucune anomalie détectée par les contrôles locaux."));
+  issues.append(issueList);
+  host.append(issues);
 
-  const log = $("rule-log");
-  log.replaceChildren();
-  for (const event of current.ruleLog.slice(0, 30)) {
-    const row = document.createElement("div");
-    row.className = "activity";
-    row.textContent = `${formatDate(event.time)} · ${event.ruleName} · ${event.result} · ${event.subject || ""}`;
-    log.append(row);
+  const matrix = current.providerMatrix || {};
+  const providers = node("section", "health-card");
+  providers.append(node("h2", "", "Compatibilité des comptes et calendriers"));
+  const rows = node("div", "provider-matrix");
+  for (const row of matrix.accounts || []) {
+    const line = node("div", "provider-row");
+    line.append(node("strong", "", row.accountName || row.accountKey || "Compte"), node("span", "", row.provider || "inconnu"), node("span", "", (row.protocol || "inconnu").toUpperCase()), node("span", "", row.supportsFolders ? "Dossiers ✓" : "Dossiers limités"), node("span", "", row.offlineSupport ? "Hors ligne ✓" : "Hors ligne —"));
+    rows.append(line);
   }
-  if (!log.childElementCount) log.append(createEmpty("Aucune règle exécutée récemment."));
+  if (!rows.childElementCount) rows.append(node("p", "", "La matrice n’a pas encore été exécutée."));
+  providers.append(rows);
+  host.append(providers);
 }
 
-async function renderCalendarTarget(generation) {
-  const select = $("calendar-target");
-  const previous = select.value;
-  const [calendars, configuration] = await Promise.all([
-    api.pinInbox.getCalendars(),
-    api.pinInbox.getConfiguration().catch(() => ({settings: {}}))
-  ]);
-  if (generation !== loadGeneration) return false;
-  calendarDescriptors = calendars;
-  select.replaceChildren(option("", "Choisir un calendrier…"));
-  for (const calendar of calendars) {
-    const item = option(
-      calendar.id,
-      `${calendar.name} — tâches ${calendar.taskCompatible ? "✓" : "✕"} · événements ${calendar.eventCompatible ? "✓" : "✕"}${calendar.reason ? ` · ${calendar.reason}` : ""}`
-    );
-    item.disabled = !calendar.taskCompatible && !calendar.eventCompatible;
-    item.dataset.taskCompatible = String(calendar.taskCompatible);
-    item.dataset.eventCompatible = String(calendar.eventCompatible);
-    item.dataset.reason = calendar.reason || "";
-    select.appendChild(item);
-  }
-  const preferred = previous || configuration.settings?.preferredCalendarId || "";
-  select.value = [...select.options].some(item => item.value === preferred && !item.disabled) ? preferred : "";
-  updateCalendarTargetHelp();
-  return true;
+function renderActivity() {
+  const renderEntries = (host, entries, formatter) => {
+    host.replaceChildren();
+    if (!entries?.length) { host.append(node("p", "", "Aucune activité.")); return; }
+    for (const entry of entries) host.append(node("div", "activity-entry", formatter(entry)));
+  };
+  renderEntries($("activity"), current.activity, item => `${formatDate(item.time)} · ${item.action || item.type || "action"} · ${item.subject || item.details || ""}`);
+  renderEntries($("rule-log"), current.ruleLog, item => `${formatDate(item.time)} · ${item.ruleName || "Règle"} · ${item.result || ""} · ${item.subject || ""}`);
+  $("technical").textContent = JSON.stringify({revision: current.revision, compatibility: current.compatibility, performance: current.performance, diagnostics: current.diagnostics, providerMatrix: current.providerMatrix}, null, 2);
 }
 
-function updateCalendarTargetHelp() {
-  const select = $("calendar-target");
-  const help = $("calendar-target-help");
-  const calendar = calendarDescriptors.find(item => item.id === select.value);
-  if (!calendar) {
-    help.textContent = "Choisissez le calendrier utilisé par les actions Agenda. Les calendriers incompatibles sont affichés mais désactivés.";
-    return;
-  }
-  help.textContent = `${calendar.name} · tâches ${calendar.taskCompatible ? "autorisées" : "indisponibles"} · événements ${calendar.eventCompatible ? "autorisés" : "indisponibles"}${calendar.reason ? ` · ${calendar.reason}` : ""}.`;
+function populateBulkControls() {
+  const fill = (id, first, values) => {
+    const select = $(id);
+    const previous = select.value;
+    select.replaceChildren(option("", first), ...values.map(([value, label]) => option(value, label)));
+    select.value = [...select.options].some(item => item.value === previous) ? previous : "";
+  };
+  fill("bulk-group", "Sans groupe", (current.groups || []).map(item => [item.id, item.name]));
+  fill("bulk-case", "Sans affaire", (current.cases || []).map(item => [item.id, item.name]));
+  fill("bulk-template", "Choisir un modèle…", (current.templates || []).map(item => [item.id, item.name]));
 }
 
-function calendarIdFor(itemType) {
-  const select = $("calendar-target");
-  const calendar = calendarDescriptors.find(item => item.id === select.value);
-  if (!calendar) throw new Error("Choisissez d’abord un calendrier Agenda dans la barre d’outils.");
-  const compatible = itemType === "event" ? calendar.eventCompatible : calendar.taskCompatible;
-  if (!compatible) {
-    throw new Error(`Le calendrier « ${calendar.name} » n’est pas compatible avec ${itemType === "event" ? "les événements" : "les tâches"}${calendar.reason ? ` : ${calendar.reason}` : ""}.`);
-  }
-  return calendar.id;
+function setView(view) {
+  const valid = new Set(["list", "kanban", "cases", "history", "health"]);
+  const next = valid.has(view) ? view : "list";
+  for (const button of document.querySelectorAll("[data-view]")) button.setAttribute("aria-pressed", String(button.dataset.view === next));
+  for (const id of valid) $(id).hidden = id !== next;
 }
 
-function setView() {
-  const view = $("view").value;
-  const visibleId = {
-    list: "items",
-    kanban: "kanban",
-    cases: "cases",
-    history: "history"
-  }[view] || "items";
-  for (const id of ["items", "kanban", "cases", "history"]) {
-    $(id).hidden = id !== visibleId;
-  }
+function render() {
+  renderStats();
+  renderSmartViews();
+  populateBulkControls();
+  renderList();
+  renderKanban();
+  renderCases();
+  renderHistory();
+  renderHealth();
+  renderActivity();
+  setView(current.view || "list");
+  updateSelectionBar();
 }
 
-async function load({announce = true} = {}) {
+async function load({silent = false} = {}) {
   const generation = ++loadGeneration;
-  setLoading(true);
-  if (announce) setStatus("Chargement…", "busy", {persistent: true});
+  if (!silent) setLoading(true);
   try {
-    if (!api?.pinInbox?.getDashboardData) {
-      throw new Error("L’API interne des épingles n’est pas disponible.");
-    }
-    if (!await renderCalendarTarget(generation)) return;
-    const result = await api.pinInbox.getDashboardData({
-      filter: $("filter").value,
-      search: $("search").value,
-      view: $("view").value
-    });
-    if (generation !== loadGeneration) return;
-    current = result;
-    const visibleKeys = new Set(current.items.map(item => item.stableKey));
-    for (const key of [...selected]) {
-      if (!visibleKeys.has(key)) selected.delete(key);
-    }
+    if (!configuration) configuration = await api.pinInbox.getConfiguration();
+    const options = {
+      search: $("search").value.trim(),
+      smartView: current?.smartView || configuration.settings?.defaultSmartView || "today",
+      view: current?.view || "list",
+      useSmartView: true
+    };
+    const [data, calendarList] = await Promise.all([
+      api.pinInbox.getDashboardData(options),
+      api.pinInbox.getCalendars().catch(() => [])
+    ]);
+    if (generation !== loadGeneration) return false;
+    current = data;
+    calendars = calendarList;
+    $("search").value = data.search || options.search;
+    selected.forEach(key => { if (!(data.items || []).some(item => item.stableKey === key)) selected.delete(key); });
+    render();
     $("fatal-error").hidden = true;
-    $("stats").replaceChildren(
-      stat("Total", current.stats.total),
-      stat("À traiter", current.stats.active),
-      stat("En attente", current.stats.waiting),
-      stat("Planifiés", current.stats.planned),
-      stat("En retard", current.stats.overdue),
-      stat("Terminés", current.stats.completed)
-    );
-    $("bulk-case").replaceChildren(
-      option("", "Aucune affaire"),
-      ...current.cases.map(item => option(item.id, item.name))
-    );
-    $("bulk-template").replaceChildren(
-      option("", "Appliquer un modèle…"),
-      ...current.templates.map(item => option(item.id, item.name))
-    );
-    renderList();
-    renderKanban();
-    renderCases();
-    renderHistory();
-    renderTechnical();
-    setView();
-    if (announce) setStatus(`${current.items.length} élément(s) affiché(s).`, "success");
+    if (!silent) clearStatus();
+    return true;
   } catch (error) {
-    if (generation !== loadGeneration) return;
-    console.error("MailPerch : chargement du tableau de bord impossible", error);
-    $("fatal-error-message").textContent = String(error?.message || error);
-    $("fatal-error").hidden = false;
-    setStatus("Chargement impossible.", "error");
-    throw error;
+    if (generation === loadGeneration) setFatal(error);
   } finally {
     if (generation === loadGeneration) setLoading(false);
   }
 }
 
-async function actionFor(key, action) {
-  if (action === "snooze") return api.pinInbox.snoozeReminder(key, 3_600_000);
-  if (action === "calendar") return api.pinInbox.createCalendarItem(key, "task", calendarIdFor("task"));
-  if (["active", "waiting", "planned"].includes(action)) {
-    return api.pinInbox.setWorkflowStatus([key], action, {});
-  }
-  if (action === "complete") {
-    return api.pinInbox.setWorkflowStatus([key], "completed", {});
-  }
-  return api.pinInbox.performReferenceAction([key], action, {});
+function destructive(action) { return ["delete", "archive", "unpin"].includes(action); }
+
+function actionOptions(action) {
+  if (action === "priority") return {priorityLevel: $("bulk-priority").value};
+  if (action === "deadline") return {dueAt: $("bulk-deadline").value ? new Date($("bulk-deadline").value).getTime() : 0};
+  if (action === "group") return {groupId: $("bulk-group").value};
+  if (action === "case") return {caseId: $("bulk-case").value};
+  if (action === "template") return {templateId: $("bulk-template").value};
+  if (action === "trackNoReply") return {days: configuration?.settings?.noReplyDefaultDays || 5};
+  return {};
 }
 
-const ACTION_MESSAGES = {
-  open: "Message ouvert.",
-  active: "Message replacé à traiter.",
-  complete: "Message marqué comme terminé.",
-  waiting: "Message placé en attente.",
-  planned: "Message planifié.",
-  snooze: "Rappel reporté d’une heure.",
-  calendar: "Élément Agenda créé ou synchronisé.",
-  unpin: "Message désépinglé.",
-  "case-calendar": "Affaire synchronisée avec l’Agenda."
-};
+async function perform(keys, action, options = {}, {reload = true, control = null} = {}) {
+  const safeKeys = [...new Set((keys || []).map(String).filter(Boolean))];
+  if (!safeKeys.length || !action) return null;
+  if (destructive(action) && configuration?.settings?.confirmBulkDestructiveActions !== false) {
+    const label = action === "delete" ? "supprimer" : action === "archive" ? "archiver" : "désépingler";
+    if (!confirm(`${label[0].toUpperCase()}${label.slice(1)} ${safeKeys.length} message(s) ?`)) return null;
+  }
+  setButtonBusy(control, true);
+  setStatus("Action en cours…", "busy", {persistent: true});
+  try {
+    const result = await api.pinInbox.performReferenceAction(safeKeys, action, options);
+    if (action !== "open" && action !== "reply") safeKeys.forEach(key => selected.delete(key));
+    if (reload) await load({silent: true});
+    setStatus(ACTION_MESSAGES[action] || `${result?.count || safeKeys.length} élément(s) mis à jour.`, "success");
+    return result;
+  } catch (error) {
+    setStatus(`Action impossible : ${error.message || error}`, "error", {persistent: true});
+    return null;
+  } finally {
+    setButtonBusy(control, false);
+  }
+}
 
-for (const hostId of ["items", "kanban", "cases"]) {
-  $(hostId).addEventListener("click", async event => {
-    const target = eventElement(event);
-    const actionButton = target?.closest?.("[data-action]");
-    if (!actionButton) return;
-    event.preventDefault();
-    event.stopPropagation();
-    const action = actionButton.dataset.action;
-    setButtonBusy(actionButton, true);
-    setStatus("Application de l’action…", "busy", {persistent: true});
-    try {
-      if (action === "case-calendar" && actionButton.dataset.caseId) {
-        await api.pinInbox.createCaseCalendarItem(actionButton.dataset.caseId, "task", calendarIdFor("task"));
-      } else {
-        const card = target.closest(".item");
-        if (!card) throw new Error("La carte ciblée est introuvable.");
-        await actionFor(card.dataset.key, action);
-      }
-      await load({announce: false});
-      setStatus(ACTION_MESSAGES[action] || "Action appliquée.", "success");
-    } catch (error) {
-      setStatus(`Action impossible : ${error?.message || error}`, "error");
-    } finally {
-      setButtonBusy(actionButton, false);
+function updateBulkVisibility() {
+  const action = $("bulk-action").value;
+  for (const [id, visible] of [
+    ["bulk-priority-wrap", action === "priority"], ["bulk-deadline-wrap", action === "deadline"],
+    ["bulk-group-wrap", action === "group"], ["bulk-case-wrap", action === "case"], ["bulk-template-wrap", action === "template"]
+  ]) $(id).hidden = !visible;
+}
+
+function openCalendarDialog(keys) {
+  pendingCalendarKeys = [...keys];
+  const type = $("calendar-item-type").value || configuration?.settings?.calendarItemType || "task";
+  const target = $("calendar-target");
+  target.replaceChildren();
+  for (const calendar of calendars) {
+    const compatible = type === "event" ? calendar.eventCompatible : calendar.taskCompatible;
+    const item = option(calendar.id, `${calendar.name}${calendar.reason ? ` · ${calendar.reason}` : ""}`);
+    item.disabled = !compatible;
+    target.append(item);
+  }
+  const preferred = configuration?.settings?.preferredCalendarId || "";
+  target.value = [...target.options].some(item => item.value === preferred && !item.disabled) ? preferred : ([...target.options].find(item => !item.disabled)?.value || "");
+  $("calendar-confirm").disabled = !target.value;
+  $("calendar-dialog").showModal();
+}
+
+async function refreshHealth(control = null) {
+  setButtonBusy(control, true);
+  setStatus("Analyse de la santé MailPerch…", "busy", {persistent: true});
+  try {
+    current.health = await api.pinInbox.getHealthReport();
+    renderHealth();
+    setStatus(`Analyse terminée : score ${current.health.score}/100.`, "success");
+  } catch (error) { setStatus(`Analyse impossible : ${error.message || error}`, "error", {persistent: true}); }
+  finally { setButtonBusy(control, false); }
+}
+
+function bindEvents() {
+  $("status-close").addEventListener("click", clearStatus);
+  $("retry").addEventListener("click", () => load());
+  $("refresh").addEventListener("click", () => load());
+  $("settings").addEventListener("click", () => api.runtime.openOptionsPage());
+  $("search").addEventListener("input", () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => load({silent: true}), 220);
+  });
+  $("clear-filters").addEventListener("click", () => {
+    $("search").value = "";
+    if (current) current.smartView = "all";
+    load({silent: true});
+  });
+  $("smart-views").addEventListener("click", event => {
+    const button = eventElement(event)?.closest("[data-smart-view]");
+    if (!button || !current) return;
+    current.smartView = button.dataset.smartView;
+    load({silent: true});
+  });
+  $("select-visible").addEventListener("click", () => { for (const item of current?.items || []) selected.add(item.stableKey); updateSelectionBar(); });
+  $("clear-selection").addEventListener("click", () => { selected.clear(); updateSelectionBar(); });
+  $("bulk-action").addEventListener("change", updateBulkVisibility);
+  $("apply").addEventListener("click", event => {
+    const action = $("bulk-action").value;
+    if (!action) { setStatus("Choisissez une action groupée.", "error"); return; }
+    perform([...selected], action, actionOptions(action), {control: event.currentTarget});
+  });
+  for (const button of document.querySelectorAll("[data-view]")) {
+    button.addEventListener("click", () => {
+      if (!current) return;
+      current.view = button.dataset.view;
+      if (current.view === "health") current.smartView = "all";
+      load({silent: true});
+    });
+  }
+
+  const actionHost = $("items");
+  actionHost.addEventListener("click", event => {
+    const control = eventElement(event)?.closest("[data-action]");
+    const card = control?.closest(".item");
+    if (!control || !card) return;
+    const action = control.dataset.action;
+    if (action === "calendar") { openCalendarDialog([card.dataset.key]); return; }
+    perform([card.dataset.key], action, actionOptions(action), {reload: !["open", "reply"].includes(action), control});
+  });
+
+  $("cases").addEventListener("click", event => {
+    const control = eventElement(event)?.closest('[data-action="select-case"]');
+    if (!control) return;
+    selected.clear();
+    for (const item of current.items || []) if (item.caseId === control.dataset.caseId) selected.add(item.stableKey);
+    current.view = "list";
+    setView("list");
+    updateSelectionBar();
+  });
+
+  $("health").addEventListener("click", async event => {
+    const control = eventElement(event)?.closest("[data-action]");
+    const action = control?.dataset.action;
+    if (!action) return;
+    if (action === "health-refresh") return refreshHealth(control);
+    if (action === "health-repair") {
+      if (!confirm("Exécuter les réparations non destructives ?")) return;
+      setButtonBusy(control, true);
+      setStatus("Réparation en cours…", "busy", {persistent: true});
+      try {
+        const result = await api.pinInbox.repairHealthIssues({actions: ["orphan-links", "repair-references"]});
+        current.health = result.health;
+        await load({silent: true});
+        setStatus(`${result.repaired || 0} élément(s) réparé(s).`, "success");
+      } catch (error) { setStatus(`Réparation impossible : ${error.message || error}`, "error", {persistent: true}); }
+      finally { setButtonBusy(control, false); }
     }
+    if (action === "diagnostic-export") {
+      setButtonBusy(control, true);
+      setStatus(msg("diagnosticExportBusy", "Préparation du diagnostic…"), "busy", {persistent: true});
+      try {
+        const bundle = await api.pinInbox.exportDiagnosticBundle();
+        const date = new Date().toISOString().slice(0, 10);
+        downloadJson(`mailperch-diagnostic-${date}.json`, bundle);
+        setStatus(msg("diagnosticExported", "Diagnostic local exporté."), "success");
+      } catch (error) { setStatus(`${msg("diagnosticExportFailed", "Export impossible")} : ${error.message || error}`, "error", {persistent: true}); }
+      finally { setButtonBusy(control, false); }
+      return;
+    }
+    if (action === "diagnostic-clear") {
+      if (!confirm(msg("diagnosticClearConfirm", "Vider le journal diagnostic local ?"))) return;
+      setButtonBusy(control, true);
+      try {
+        await api.pinInbox.clearDiagnostics();
+        await load({silent: true});
+        setStatus(msg("diagnosticCleared", "Journal diagnostic vidé."), "success");
+      } catch (error) { setStatus(`${msg("diagnosticClearFailed", "Nettoyage impossible")} : ${error.message || error}`, "error", {persistent: true}); }
+      finally { setButtonBusy(control, false); }
+      return;
+    }
+    if (action === "provider-check") {
+      setButtonBusy(control, true);
+      setStatus("Analyse des fournisseurs…", "busy", {persistent: true});
+      try { current.providerMatrix = await api.pinInbox.runProviderCompatibilityCheck(); renderHealth(); setStatus("Matrice de compatibilité actualisée.", "success"); }
+      catch (error) { setStatus(`Analyse impossible : ${error.message || error}`, "error", {persistent: true}); }
+      finally { setButtonBusy(control, false); }
+    }
+  });
+
+  $("calendar-item-type").addEventListener("change", () => openCalendarDialog(pendingCalendarKeys));
+  $("calendar-target").addEventListener("change", () => { $("calendar-confirm").disabled = !$("calendar-target").value; });
+  $("calendar-dialog").addEventListener("close", async () => {
+    if ($("calendar-dialog").returnValue !== "default" || !pendingCalendarKeys.length) { pendingCalendarKeys = []; return; }
+    const key = pendingCalendarKeys[0];
+    const type = $("calendar-item-type").value;
+    const calendarId = $("calendar-target").value;
+    pendingCalendarKeys = [];
+    await perform([key], "calendar", {itemType: type, calendarId});
   });
 }
 
-$("calendar-target").addEventListener("change", updateCalendarTargetHelp);
-
-$("refresh").addEventListener("click", async event => {
-  setButtonBusy(event.currentTarget, true);
-  try {
-    await load();
-  } catch {
-    // load() already provides a visible error.
-  } finally {
-    setButtonBusy(event.currentTarget, false);
-  }
-});
-$("retry").addEventListener("click", () => load().catch(() => {}));
-$("filter").addEventListener("change", () => load().catch(() => {}));
-$("view").addEventListener("change", () => {
-  setView();
-  load().catch(() => {});
-});
-$("search").addEventListener("input", () => {
-  clearTimeout(searchTimer);
-  searchTimer = setTimeout(() => load().catch(() => {}), 220);
-});
-
-$("apply").addEventListener("click", async event => {
-  if (!selected.size) {
-    setStatus("Sélectionnez au moins un élément.", "error");
-    return;
-  }
-  const action = $("bulk").value;
-  const caseId = $("bulk-case").value;
-  const templateId = $("bulk-template").value;
-  setButtonBusy(event.currentTarget, true);
-  setStatus("Application de l’action groupée…", "busy", {persistent: true});
-  try {
-    if (templateId) await api.pinInbox.applyTemplate([...selected], templateId);
-    else if (caseId) await api.pinInbox.performReferenceAction([...selected], "case", {caseId});
-    else if (["active", "waiting", "planned"].includes(action)) {
-      await api.pinInbox.setWorkflowStatus([...selected], action, {});
-    } else if (action === "complete") {
-      await api.pinInbox.setWorkflowStatus([...selected], "completed", {});
-    } else if (action) {
-      await api.pinInbox.performReferenceAction([...selected], action, {});
-    } else {
-      setStatus("Choisissez une action, une affaire ou un modèle.", "error");
-      return;
-    }
-    $("bulk").value = "";
-    $("bulk-case").value = "";
-    $("bulk-template").value = "";
-    selected.clear();
-    await load({announce: false});
-    setStatus("Action groupée appliquée.", "success");
-  } catch (error) {
-    setStatus(`Action groupée impossible : ${error?.message || error}`, "error");
-  } finally {
-    setButtonBusy(event.currentTarget, false);
-  }
-});
-
-document.addEventListener("visibilitychange", () => {
-  if (!document.hidden && !loading) load({announce: false}).catch(() => {});
-});
-window.addEventListener("blur", clearKanbanDropState);
-window.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("DOMContentLoaded", async () => {
   localize();
-  load().catch(() => {});
-}, {once: true});
+  $("app-version").textContent = `v${api.runtime.getManifest().version}`;
+  bindEvents();
+  await load();
+});

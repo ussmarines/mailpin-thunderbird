@@ -15,7 +15,7 @@
     "message": "Keep important mail within reach."
   },
   "dashboardHeading": {
-    "message": "MailPerch Dashboard"
+    "message": "Dashboard"
   },
   "dashboardSubtitle": {
     "message": "List, Kanban, cases, history, and activity — stored locally."
@@ -39,10 +39,10 @@
     "message": "Move selected pins back to To do"
   },
   "optionsTitle": {
-    "message": "MailPerch Settings"
+    "message": "MailPerch settings"
   },
   "dashboardTitle": {
-    "message": "MailPerch Dashboard"
+    "message": "MailPerch dashboard"
   },
   "commandToggle": {
     "message": "Pin or unpin selected messages"
@@ -79,5 +79,1001 @@
   },
   "menuOptions": {
     "message": "MailPerch Settings"
+  },
+  "accountColor": {
+    "message": "Account color"
+  },
+  "accountsColors": {
+    "message": "Accounts and colors"
+  },
+  "accountsColorsHelp": {
+    "message": "Colors are used only to visually distinguish accounts."
+  },
+  "actionsPerMinute": {
+    "message": "Maximum actions per minute"
+  },
+  "addCase": {
+    "message": "Add case"
+  },
+  "addGroup": {
+    "message": "Add group"
+  },
+  "addRule": {
+    "message": "Add rule"
+  },
+  "addTemplate": {
+    "message": "Add template"
+  },
+  "advancedReminders": {
+    "message": "Repeat and snooze"
+  },
+  "allPins": {
+    "message": "All"
+  },
+  "allowAllFolders": {
+    "message": "Allow all folders"
+  },
+  "allowSimulation": {
+    "message": "Allow simulation"
+  },
+  "animate": {
+    "message": "Animations"
+  },
+  "apply": {
+    "message": "Apply"
+  },
+  "applyTemplate": {
+    "message": "Apply template"
+  },
+  "archive": {
+    "message": "Archive"
+  },
+  "askWhenCreating": {
+    "message": "Ask when creating"
+  },
+  "assignCase": {
+    "message": "Assign case"
+  },
+  "assignGroup": {
+    "message": "Assign group"
+  },
+  "attachments": {
+    "message": "Attachments"
+  },
+  "autoNoReply": {
+    "message": "Automatic no-reply tracking"
+  },
+  "autoNoReplyHelp": {
+    "message": "After a sent message, create a local follow-up that is cancelled as soon as a reply arrives."
+  },
+  "autoPinSenders": {
+    "message": "Senders, one per line"
+  },
+  "autoPinSources": {
+    "message": "Simple automatic pinning"
+  },
+  "autoPinTags": {
+    "message": "Tags, one per line"
+  },
+  "automaticBackups": {
+    "message": "Automatic backups"
+  },
+  "automaticCleanup": {
+    "message": "Automatic cleanup"
+  },
+  "backupFolder": {
+    "message": "Backup folder"
+  },
+  "backupHistory": {
+    "message": "Include history"
+  },
+  "backupInterval": {
+    "message": "Interval"
+  },
+  "backupMigration": {
+    "message": "Back up before migration or restore"
+  },
+  "backupNow": {
+    "message": "Back up now"
+  },
+  "backupRetention": {
+    "message": "Retention"
+  },
+  "bidirectionalCalendar": {
+    "message": "Two-way synchronization"
+  },
+  "builtInActions": {
+    "message": "Built-in automatic actions"
+  },
+  "bulkAction": {
+    "message": "Bulk action"
+  },
+  "bulkActions": {
+    "message": "Bulk actions"
+  },
+  "calendar": {
+    "message": "Calendar"
+  },
+  "calendarCreate": {
+    "message": "Create in Calendar"
+  },
+  "calendarCreateHelp": {
+    "message": "Only compatible writable calendars can be selected."
+  },
+  "calendarError": {
+    "message": "Calendar needs attention"
+  },
+  "calendarIntro": {
+    "message": "MailPerch checks write access, ACLs, and task/event capabilities before each creation."
+  },
+  "calendarItemType": {
+    "message": "Type"
+  },
+  "calendarTarget": {
+    "message": "Calendar"
+  },
+  "calendarTitle": {
+    "message": "Thunderbird Calendar"
+  },
+  "cancel": {
+    "message": "Cancel"
+  },
+  "cancelChanges": {
+    "message": "Discard"
+  },
+  "cancelNoReply": {
+    "message": "Cancel follow-up when a reply arrives"
+  },
+  "cancelNoReplyTracking": {
+    "message": "Stop no-reply tracking"
+  },
+  "cardDetails": {
+    "message": "Information shown on cards"
+  },
+  "cardLines": {
+    "message": "Information per card"
+  },
+  "cardThreeLines": {
+    "message": "Detailed — 3 lines"
+  },
+  "cardTwoLines": {
+    "message": "Essential — 2 lines"
+  },
+  "cards": {
+    "message": "cards"
+  },
+  "case": {
+    "message": "Case"
+  },
+  "cases": {
+    "message": "Multi-message cases"
+  },
+  "casesHelp": {
+    "message": "Group several messages into the same tracking case."
+  },
+  "changeDeadline": {
+    "message": "Change deadline"
+  },
+  "changePriority": {
+    "message": "Change priority"
+  },
+  "checkProviders": {
+    "message": "Test providers"
+  },
+  "checkStorage": {
+    "message": "Check database"
+  },
+  "checkThunderbird": {
+    "message": "Check Thunderbird"
+  },
+  "chooseAction": {
+    "message": "Choose an action…"
+  },
+  "chooseFolder": {
+    "message": "Choose folder"
+  },
+  "cleanupDelay": {
+    "message": "Delay before cleanup"
+  },
+  "cleanupMissing": {
+    "message": "Clean up missing messages"
+  },
+  "clear": {
+    "message": "Clear"
+  },
+  "clearDiagnostics": {
+    "message": "Clear log"
+  },
+  "clearLog": {
+    "message": "Clear log"
+  },
+  "clearSelection": {
+    "message": "Clear selection"
+  },
+  "clearStarsAfterImport": {
+    "message": "Remove stars after import"
+  },
+  "compatAuto": {
+    "message": "Automatic"
+  },
+  "compatFull": {
+    "message": "Force full mode"
+  },
+  "compatReduced": {
+    "message": "Reduced mode"
+  },
+  "compatibilityMode": {
+    "message": "Compatibility mode"
+  },
+  "completeArchive": {
+    "message": "Complete after archiving"
+  },
+  "completeCalendar": {
+    "message": "Complete task with pin"
+  },
+  "completedRetention": {
+    "message": "Keep completed items"
+  },
+  "confirmBulk": {
+    "message": "Confirm destructive bulk actions"
+  },
+  "confirmDelete": {
+    "message": "Confirm deletion"
+  },
+  "conversationPins": {
+    "message": "Pinned conversations"
+  },
+  "create": {
+    "message": "Create"
+  },
+  "customGroups": {
+    "message": "Custom groups"
+  },
+  "customGroupsHelp": {
+    "message": "Simple color-coded categories."
+  },
+  "customRules": {
+    "message": "Custom rules"
+  },
+  "customRulesHelp": {
+    "message": "Priority, stop, rate limit, account, folder, and local log."
+  },
+  "dashboardIntro": {
+    "message": "Quickly find what needs your attention without browsing every folder."
+  },
+  "dashboardTip": {
+    "message": "Select multiple messages to apply a bulk action. Destructive operations require confirmation."
+  },
+  "dashboardTipTitle": {
+    "message": "Tip"
+  },
+  "dashboardUnavailable": {
+    "message": "The dashboard could not be loaded."
+  },
+  "days": {
+    "message": "days"
+  },
+  "deadline": {
+    "message": "Deadline"
+  },
+  "deadlines": {
+    "message": "Deadlines"
+  },
+  "defaultCalendarType": {
+    "message": "Default type"
+  },
+  "defaultFollowUp": {
+    "message": "Default manual follow-up"
+  },
+  "defaultSmartView": {
+    "message": "Initial smart view"
+  },
+  "defaultTarget": {
+    "message": "Default target"
+  },
+  "delete": {
+    "message": "Delete"
+  },
+  "deleteCalendarOnUnpin": {
+    "message": "Delete item when unpinned"
+  },
+  "density": {
+    "message": "Card density"
+  },
+  "diagnosticClearConfirm": {
+    "message": "Clear the local diagnostic log?"
+  },
+  "diagnosticClearFailed": {
+    "message": "Cleanup failed"
+  },
+  "diagnosticCleared": {
+    "message": "Diagnostic log cleared."
+  },
+  "diagnosticExportBusy": {
+    "message": "Preparing diagnostic…"
+  },
+  "diagnosticExportFailed": {
+    "message": "Export failed"
+  },
+  "diagnosticExported": {
+    "message": "Local diagnostic exported."
+  },
+  "diagnosticLevel": {
+    "message": "Minimum log level"
+  },
+  "diagnosticLimit": {
+    "message": "Stored events"
+  },
+  "dragDrop": {
+    "message": "Drag and drop"
+  },
+  "enableCalendar": {
+    "message": "Enable Calendar/Tasks"
+  },
+  "enableCases": {
+    "message": "Enable cases"
+  },
+  "enableDiagnostics": {
+    "message": "Local diagnostic log"
+  },
+  "enableHealthCenter": {
+    "message": "Enable health center"
+  },
+  "enableKanban": {
+    "message": "Kanban view"
+  },
+  "enableReminders": {
+    "message": "Enable local reminders"
+  },
+  "enableRules": {
+    "message": "Enable rules"
+  },
+  "enableRulesHelp": {
+    "message": "Rules remain local and are rate-limited to prevent loops."
+  },
+  "enableSmartViews": {
+    "message": "Smart views"
+  },
+  "enableTemplates": {
+    "message": "Enable templates"
+  },
+  "error": {
+    "message": "Error"
+  },
+  "errorsBeforeDisable": {
+    "message": "Errors before disabling"
+  },
+  "event": {
+    "message": "Event"
+  },
+  "exportBackup": {
+    "message": "Export"
+  },
+  "exportDiagnostic": {
+    "message": "Export diagnostic"
+  },
+  "featureMapDashboard": {
+    "message": "In the dashboard"
+  },
+  "featureMapDashboardHelp": {
+    "message": "Smart views, multi-select, Kanban, and health center."
+  },
+  "featureMapMail": {
+    "message": "From a message"
+  },
+  "featureMapMailHelp": {
+    "message": "Right-click or use the ⋯ button to open all actions."
+  },
+  "featureMapSettings": {
+    "message": "In settings"
+  },
+  "featureMapSettingsHelp": {
+    "message": "Enable features and immediately review their status."
+  },
+  "files": {
+    "message": "files"
+  },
+  "folder": {
+    "message": "Folder"
+  },
+  "globalDashboard": {
+    "message": "Global dashboard"
+  },
+  "group": {
+    "message": "Group"
+  },
+  "groupAccount": {
+    "message": "Group by account"
+  },
+  "groupCustom": {
+    "message": "Group by custom group"
+  },
+  "groups": {
+    "message": "Groups"
+  },
+  "guidedTipText": {
+    "message": "Recommended settings are already enabled. Change only what matches your workflow."
+  },
+  "guidedTipTitle": {
+    "message": "Tip"
+  },
+  "healthNotifications": {
+    "message": "Show important alerts only"
+  },
+  "hideCompleted": {
+    "message": "Hide completed items"
+  },
+  "history": {
+    "message": "Completed history"
+  },
+  "hours": {
+    "message": "hours"
+  },
+  "importStars": {
+    "message": "Import stars"
+  },
+  "importStarsTitle": {
+    "message": "Import Thunderbird stars"
+  },
+  "interactionSettings": {
+    "message": "Interactions and safety"
+  },
+  "keepOnMove": {
+    "message": "Keep pin when moved"
+  },
+  "markRead": {
+    "message": "Mark read"
+  },
+  "markUnread": {
+    "message": "Mark unread"
+  },
+  "messages": {
+    "message": "messages"
+  },
+  "missedIgnore": {
+    "message": "Ignore old reminders"
+  },
+  "missedNext": {
+    "message": "Postpone until next startup"
+  },
+  "missedNotify": {
+    "message": "Notify at next startup"
+  },
+  "missedReminders": {
+    "message": "Missed reminders"
+  },
+  "missingMessage": {
+    "message": "Message not found"
+  },
+  "motionAuto": {
+    "message": "Follow system"
+  },
+  "motionFull": {
+    "message": "Full animations"
+  },
+  "motionReduce": {
+    "message": "Reduce animations"
+  },
+  "moveWaitingReply": {
+    "message": "Move to waiting after sending a reply"
+  },
+  "multiSelect": {
+    "message": "Multiple selection"
+  },
+  "multiWindow": {
+    "message": "Synchronize windows"
+  },
+  "noCases": {
+    "message": "No cases."
+  },
+  "noHistory": {
+    "message": "No history entries."
+  },
+  "noPinsForFilters": {
+    "message": "No pinned messages match this view."
+  },
+  "noReplyDelay": {
+    "message": "No-reply follow-up"
+  },
+  "noReplyDue": {
+    "message": "No reply · follow up now"
+  },
+  "noReplyTracking": {
+    "message": "No reply"
+  },
+  "noSubject": {
+    "message": "(no subject)"
+  },
+  "notes": {
+    "message": "Notes"
+  },
+  "open": {
+    "message": "Open"
+  },
+  "openDashboard": {
+    "message": "Open dashboard"
+  },
+  "optionsIntro": {
+    "message": "Customize MailPerch without getting lost: start with the essentials, then open advanced settings only when needed."
+  },
+  "overdue": {
+    "message": "Overdue"
+  },
+  "overviewAttention": {
+    "message": "Needs attention"
+  },
+  "overviewAttentionHelp": {
+    "message": "overdue items and follow-ups"
+  },
+  "overviewBackup": {
+    "message": "Backup"
+  },
+  "overviewBackupHelp": {
+    "message": "latest local protection"
+  },
+  "overviewHealth": {
+    "message": "Health"
+  },
+  "overviewHealthHelp": {
+    "message": "local MailPerch status"
+  },
+  "overviewPinned": {
+    "message": "Pinned"
+  },
+  "overviewPinnedHelp": {
+    "message": "tracked messages"
+  },
+  "panelHeight": {
+    "message": "Maximum height"
+  },
+  "panelScope": {
+    "message": "Scope"
+  },
+  "performanceMetrics": {
+    "message": "Local performance measurements"
+  },
+  "pinIndependent": {
+    "message": "Independent of stars — recommended"
+  },
+  "pinNative": {
+    "message": "Native Thunderbird stars"
+  },
+  "pinStorage": {
+    "message": "Pin storage"
+  },
+  "preferredCalendar": {
+    "message": "Preferred calendar"
+  },
+  "previewRestore": {
+    "message": "Preview restore"
+  },
+  "priority": {
+    "message": "Priority"
+  },
+  "priorityHigh": {
+    "message": "High"
+  },
+  "priorityNormal": {
+    "message": "Normal"
+  },
+  "priorityUrgent": {
+    "message": "Urgent"
+  },
+  "protectCounters": {
+    "message": "Protect Thunderbird counters"
+  },
+  "quickActions": {
+    "message": "Quick actions"
+  },
+  "readyToSave": {
+    "message": "Ready to save?"
+  },
+  "recentActivity": {
+    "message": "Recent activity"
+  },
+  "recommended": {
+    "message": "Recommended"
+  },
+  "recurringFollowUps": {
+    "message": "Recurring follow-ups"
+  },
+  "reduceMotion": {
+    "message": "Animations"
+  },
+  "refresh": {
+    "message": "Refresh"
+  },
+  "rememberCollapsed": {
+    "message": "Remember collapsed state"
+  },
+  "reminderLead": {
+    "message": "Default advance notice"
+  },
+  "reminderSettings": {
+    "message": "Advanced reminders"
+  },
+  "removeCompleted": {
+    "message": "Remove completed items immediately"
+  },
+  "renderBatch": {
+    "message": "Render batch"
+  },
+  "reopen": {
+    "message": "Reopen"
+  },
+  "reopenOnReply": {
+    "message": "Move back to active when a reply arrives"
+  },
+  "repairReferences": {
+    "message": "Repair references"
+  },
+  "repairSafeIssues": {
+    "message": "Repair safe issues"
+  },
+  "reply": {
+    "message": "Reply"
+  },
+  "rescanPins": {
+    "message": "Rescan pins"
+  },
+  "resetInterface": {
+    "message": "Reset interface"
+  },
+  "resetMaintenance": {
+    "message": "Reset and maintenance"
+  },
+  "resetSettings": {
+    "message": "Reset settings"
+  },
+  "retry": {
+    "message": "Retry"
+  },
+  "ruleLog": {
+    "message": "Rule log"
+  },
+  "runHealthCheck": {
+    "message": "Analyze now"
+  },
+  "safeMode": {
+    "message": "Safe mode"
+  },
+  "save": {
+    "message": "Save"
+  },
+  "saveSettings": {
+    "message": "Save settings"
+  },
+  "saveShortcut": {
+    "message": "Save shortcut"
+  },
+  "scopeAccount": {
+    "message": "Current account"
+  },
+  "scopeGlobal": {
+    "message": "All accounts"
+  },
+  "scopeInbox": {
+    "message": "Current folder"
+  },
+  "searchPins": {
+    "message": "Search"
+  },
+  "searchSettings": {
+    "message": "Search settings"
+  },
+  "sectionAutomation": {
+    "message": "Rules and automatic actions"
+  },
+  "sectionAutomationEyebrow": {
+    "message": "Automation"
+  },
+  "sectionAutomationIntro": {
+    "message": "Start by simulating a rule. Enable it only when the result is correct."
+  },
+  "sectionData": {
+    "message": "Backup, restore, and maintenance"
+  },
+  "sectionDataEyebrow": {
+    "message": "Local data"
+  },
+  "sectionDataIntro": {
+    "message": "Preview every import before writing and automatically back up before migrations."
+  },
+  "sectionFollowUp": {
+    "message": "Follow-ups and no reply"
+  },
+  "sectionFollowUpEyebrow": {
+    "message": "Tracking"
+  },
+  "sectionFollowUpIntro": {
+    "message": "MailPerch can automatically remind you when a conversation remains unanswered."
+  },
+  "sectionHealth": {
+    "message": "Health center and diagnostics"
+  },
+  "sectionHealthEyebrow": {
+    "message": "Reliability"
+  },
+  "sectionHealthIntro": {
+    "message": "A clear summary of the local database, missing messages, Calendar, backups, and performance."
+  },
+  "sectionIntegrations": {
+    "message": "Accounts and Calendar"
+  },
+  "sectionIntegrationsEyebrow": {
+    "message": "Integrations"
+  },
+  "sectionIntegrationsIntro": {
+    "message": "Check each account’s compatibility and select calendars that are actually writable."
+  },
+  "sectionOrganization": {
+    "message": "Groups, cases, and templates"
+  },
+  "sectionOrganizationEyebrow": {
+    "message": "Organization"
+  },
+  "sectionOrganizationIntro": {
+    "message": "Structure your tracking without overloading the main panel."
+  },
+  "sectionPanel": {
+    "message": "Panel and cards"
+  },
+  "sectionPanelEyebrow": {
+    "message": "Interface"
+  },
+  "sectionPanelIntro": {
+    "message": "Keep useful information visible and hide the rest."
+  },
+  "sectionPins": {
+    "message": "Pinning and compatibility"
+  },
+  "sectionPinsEyebrow": {
+    "message": "Foundations"
+  },
+  "sectionPinsIntro": {
+    "message": "Define what a pin is and how MailPerch integrates with Thunderbird."
+  },
+  "sectionShortcut": {
+    "message": "Keyboard shortcut"
+  },
+  "sectionShortcutEyebrow": {
+    "message": "Quick access"
+  },
+  "sectionShortcutIntro": {
+    "message": "Pin or unpin the current selection without leaving the keyboard."
+  },
+  "sectionStart": {
+    "message": "Get started"
+  },
+  "sectionStartEyebrow": {
+    "message": "Start"
+  },
+  "sectionStartIntro": {
+    "message": "Choose a simple or advanced experience, then let MailPerch adjust density and animations."
+  },
+  "selectMessages": {
+    "message": "Select messages"
+  },
+  "selectVisible": {
+    "message": "Select all in view"
+  },
+  "settings": {
+    "message": "Settings"
+  },
+  "settingsAdvanced": {
+    "message": "Advanced"
+  },
+  "settingsExperience": {
+    "message": "Settings level"
+  },
+  "settingsGuided": {
+    "message": "Guided — recommended"
+  },
+  "showCounters": {
+    "message": "Show counters"
+  },
+  "showSearch": {
+    "message": "Show search"
+  },
+  "simulate": {
+    "message": "Simulate"
+  },
+  "skipToDashboard": {
+    "message": "Skip directly to content"
+  },
+  "skipToSettings": {
+    "message": "Skip directly to settings"
+  },
+  "smartDates": {
+    "message": "Smart dates"
+  },
+  "smartSections": {
+    "message": "Smart sections in panel"
+  },
+  "smartViewAll": {
+    "message": "All"
+  },
+  "smartViewCalendarError": {
+    "message": "Calendar needs attention"
+  },
+  "smartViewMissing": {
+    "message": "Missing messages"
+  },
+  "smartViewNoDue": {
+    "message": "No deadline"
+  },
+  "smartViewNoReply": {
+    "message": "No-reply follow-ups"
+  },
+  "smartViewOverdue": {
+    "message": "Overdue"
+  },
+  "smartViewRecentCompleted": {
+    "message": "Recently completed"
+  },
+  "smartViewToday": {
+    "message": "Today"
+  },
+  "smartViewUnread": {
+    "message": "Unread"
+  },
+  "smartViewWaiting": {
+    "message": "Waiting"
+  },
+  "smartViewWeek": {
+    "message": "This week"
+  },
+  "smartViews": {
+    "message": "Smart views"
+  },
+  "sort": {
+    "message": "Sort"
+  },
+  "sortAccount": {
+    "message": "Account"
+  },
+  "sortDate": {
+    "message": "Message date"
+  },
+  "sortDeadline": {
+    "message": "Deadline"
+  },
+  "sortManual": {
+    "message": "Manual order"
+  },
+  "sortPinned": {
+    "message": "Pinned date"
+  },
+  "sortPriority": {
+    "message": "Priority"
+  },
+  "sortSender": {
+    "message": "Sender"
+  },
+  "statusActive": {
+    "message": "Active"
+  },
+  "statusComplete": {
+    "message": "Complete"
+  },
+  "statusPlanned": {
+    "message": "Plan"
+  },
+  "statusWaiting": {
+    "message": "Waiting"
+  },
+  "syncNow": {
+    "message": "Synchronize now"
+  },
+  "tags": {
+    "message": "Tags"
+  },
+  "targetConversation": {
+    "message": "Entire conversation"
+  },
+  "targetMessage": {
+    "message": "Specific message"
+  },
+  "task": {
+    "message": "Task"
+  },
+  "technicalDetails": {
+    "message": "Technical details"
+  },
+  "technicalStatus": {
+    "message": "Technical status"
+  },
+  "template": {
+    "message": "Template"
+  },
+  "templates": {
+    "message": "Tracking templates"
+  },
+  "templatesHelp": {
+    "message": "Apply priority, status, deadline, or recurrence in one click."
+  },
+  "trackNoReply": {
+    "message": "Remind me if there is no reply"
+  },
+  "transferHelp": {
+    "message": "Before restoring, MailPerch shows the contents and conflicts and offers Merge or Replace."
+  },
+  "transferTitle": {
+    "message": "Export or restore"
+  },
+  "uiBalanced": {
+    "message": "Balanced — recommended"
+  },
+  "uiComfortable": {
+    "message": "Very spacious"
+  },
+  "uiCompact": {
+    "message": "Compact"
+  },
+  "uiPreset": {
+    "message": "Visual comfort"
+  },
+  "undo": {
+    "message": "Undo"
+  },
+  "undoDuration": {
+    "message": "Undo button duration"
+  },
+  "undoLast": {
+    "message": "Undo last action"
+  },
+  "unpin": {
+    "message": "Unpin"
+  },
+  "unpinArchive": {
+    "message": "Unpin after archiving"
+  },
+  "unpinDelete": {
+    "message": "Unpin after deletion"
+  },
+  "unpinRead": {
+    "message": "Unpin after reading"
+  },
+  "unpinReply": {
+    "message": "Unpin after replying"
+  },
+  "unread": {
+    "message": "Unread"
+  },
+  "unsavedChanges": {
+    "message": "Some changes have not been saved yet."
+  },
+  "viewCases": {
+    "message": "Cases"
+  },
+  "viewHealth": {
+    "message": "Health center"
+  },
+  "viewHistory": {
+    "message": "History"
+  },
+  "viewKanban": {
+    "message": "Kanban"
+  },
+  "viewList": {
+    "message": "List"
+  },
+  "virtualizationThreshold": {
+    "message": "Optimization threshold"
+  },
+  "waitingGroup": {
+    "message": "“Waiting” group"
+  },
+  "waitingWorkflow": {
+    "message": "“Waiting” status"
+  },
+  "warning": {
+    "message": "Warning"
+  },
+  "searchSettingsPlaceholder": {
+    "message": "Search a setting…"
+  },
+  "dashboardSearchPlaceholder": {
+    "message": "Subject, sender, note, group…"
   }
 }

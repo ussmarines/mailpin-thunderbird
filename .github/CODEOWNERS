@@ -1,0 +1,6 @@
+# Privileged Thunderbird integration and local storage require owner review.
+/extension/api/pinInbox/ @ussmarines
+/extension/manifest.json @ussmarines
+/scripts/ @ussmarines
+/tests/ @ussmarines
+/.github/workflows/ @ussmarines

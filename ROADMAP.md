@@ -1,22 +1,23 @@
 # Feuille de route
 
-## 3.1.x — stabilisation
+## 3.2.x — consolidation en cours
 
-- valider le menu contextuel, le dashboard et le drag-and-drop dans Thunderbird Windows ;
-- corriger les régressions trouvées par la matrice manuelle ;
-- réduire les rafraîchissements complets du panneau ;
-- compléter la localisation des pages et de l’interface injectée.
+- exécuter les tests browser/XPCShell dans un checkout Thunderbird réel ;
+- compléter la matrice manuelle Windows/Linux pour IMAP, POP, Gmail, Microsoft, boîte unifiée, dossiers virtuels et calendriers ;
+- mesurer le panneau avec 100, 500 et 2 000 épingles réelles ;
+- corriger les résultats de l’audit lecteur d’écran NVDA/Orca ;
+- finir la traduction des messages techniques rares et des journaux de maintenance.
 
-## 3.2.x — qualité publique
+## 3.3.x — préparation publique
 
-- tests XPCShell/Mochitest exécutés dans un environnement Thunderbird ;
-- profils IMAP, POP, Gmail, boîte unifiée et dossiers virtuels ;
-- audit d’accessibilité au clavier et avec lecteur d’écran ;
-- choix définitif du nom, de l’identifiant et de la licence publique.
+- stabiliser l’identifiant public, le nom et la licence ;
+- figer une plage Thunderbird réellement testée ;
+- ajouter un harnais Thunderbird téléchargeable pour la CI graphique ;
+- préparer captures, notes reviewers, politique de support et procédure de retour arrière.
 
 ## Publication ATN
 
-- identifier une plage de versions réellement testée ;
-- préparer captures, notes aux reviewers et procédure de reproduction ;
-- fournir le code source lisible et les instructions de build ;
-- confirmer la conformité des marques et de la licence.
+- fournir le code source lisible et les instructions de build reproductible ;
+- joindre la matrice de compatibilité réelle et les hashes SHA-256 ;
+- confirmer la conformité des marques, de la licence et des données personnelles ;
+- publier d’abord une Release Candidate, puis une version stable après validation manuelle.

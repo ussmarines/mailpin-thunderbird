@@ -1,0 +1,56 @@
+name: Build release candidate
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Expected MailPerch version (for example 3.2.0)
+        required: true
+        type: string
+      create_draft_release:
+        description: Create a draft GitHub release
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  release-candidate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install review helpers
+        run: python -m pip install --disable-pip-version-check beautifulsoup4 tinycss2
+      - name: Verify requested version
+        shell: bash
+        run: |
+          ACTUAL="$(node -p "require('./package.json').version")"
+          test "$ACTUAL" = "${{ inputs.version }}" || { echo "Expected ${{ inputs.version }}, found $ACTUAL"; exit 1; }
+          python3 scripts/check_versions.py
+      - name: Run complete verification
+        run: npm run ci
+      - name: Upload release candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: MailPerch-${{ inputs.version }}-release-candidate
+          if-no-files-found: error
+          path: |
+            dist/*.xpi
+            dist/*Repository*.zip
+            dist/SHA256SUMS.txt
+      - name: Create draft release
+        if: ${{ inputs.create_draft_release }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v${{ inputs.version }}" dist/*.xpi dist/*Repository*.zip dist/SHA256SUMS.txt \
+            --draft --title "MailPerch ${{ inputs.version }}" \
+            --notes-file CHANGELOG.md

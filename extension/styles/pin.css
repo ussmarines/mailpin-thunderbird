@@ -1,4 +1,4 @@
-/* MailPerch — Email Pins & Follow-up 3.1.5 */
+/* MailPerch — Email Pins & Follow-up 3.2.0 */
 
 :root {
   --pin-mails-accent: light-dark(#0f6cbd, #62b0e8);
@@ -1086,4 +1086,97 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   background: var(--layout-background-1);
   color: inherit;
   font: inherit;
+}
+
+/* 3.2.0 — vues intelligentes, confort visuel et suivi sans réponse. */
+.pin-mails-smart-view-select {
+  min-block-size: 30px;
+  max-inline-size: 220px;
+  padding: 4px 26px 4px 8px;
+  border: 1px solid var(--pin-mails-border);
+  border-radius: 7px;
+  background: var(--layout-background-1);
+  color: inherit;
+  font: inherit;
+  font-size: .84rem;
+}
+.pin-mails-no-reply-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: light-dark(#eee9ff, #322750);
+  color: light-dark(#5636a0, #c9b7ff);
+  font-size: .75rem;
+  font-weight: 650;
+}
+.pin-mails-no-reply-chip.overdue {
+  background: light-dark(#fff0ef, #431d1d);
+  color: light-dark(#b42318, #ff9ca2);
+}
+:root[pin-mails-ui-preset="compact"] #pin-mails-panel {
+  --pin-mails-card-padding: 5px;
+  font-size: .92em;
+}
+:root[pin-mails-ui-preset="comfortable"] #pin-mails-panel {
+  --pin-mails-card-padding: 11px;
+}
+:root[pin-mails-ui-preset="comfortable"] .pin-mails-card {
+  padding-block: 10px;
+}
+@media (forced-colors: active) {
+  .pin-mails-smart-view-select,
+  .pin-mails-no-reply-chip { border: 1px solid CanvasText; }
+}
+
+.pin-mails-health-indicator {
+  min-block-size: 28px;
+  padding: 3px 9px;
+  border: 1px solid color-mix(in srgb, #ca5010 45%, var(--pin-mails-border));
+  border-radius: 999px;
+  background: light-dark(#fff4ce, #493b16);
+  color: light-dark(#7a3e00, #ffd580);
+  font: inherit;
+  font-size: .76rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.pin-mails-health-indicator[data-status="critical"] {
+  border-color: color-mix(in srgb, #d13438 58%, var(--pin-mails-border));
+  background: light-dark(#fde7e9, #442021);
+  color: light-dark(#a4262c, #ffb3b8);
+}
+.pin-mails-health-indicator:hover,
+.pin-mails-health-indicator:focus-visible {
+  filter: brightness(1.05);
+  outline: 2px solid color-mix(in srgb, currentColor 38%, transparent);
+  outline-offset: 1px;
+}
+
+/* 3.2.0 — zone d’épinglage plus confortable dans la liste générale. */
+#threadTree tr.card-layout .thread-card-row:has(.pin-mails-independent-button) {
+  min-block-size: 40px;
+  padding-block: 4px;
+  align-items: center;
+}
+#threadTree tr.card-layout .pin-mails-independent-button {
+  inline-size: 36px !important;
+  block-size: 36px !important;
+  min-inline-size: 36px !important;
+  min-block-size: 36px !important;
+  margin-block: 3px !important;
+  align-self: center;
+}
+#threadTree tr.card-layout .pin-mails-independent-button::before {
+  inline-size: 24px;
+  block-size: 24px;
+  -webkit-mask-size: 24px 24px;
+  mask-size: 24px 24px;
+}
+.pin-mails-table-host {
+  padding-inline-end: 46px !important;
+}
+.pin-mails-table-host > .pin-mails-independent-button {
+  inset-inline-end: 6px;
 }

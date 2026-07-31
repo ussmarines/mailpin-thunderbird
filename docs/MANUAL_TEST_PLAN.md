@@ -109,3 +109,51 @@ Consigner version Thunderbird, OS, thème, vue, type de compte et résultat.
 - vérifier les couleurs de compte et le centrage des punaises dans les deux thèmes ;
 - exécuter chaque action du dashboard : état occupé puis succès ou erreur visible ;
 - déplacer une carte Kanban et vérifier le feedback et l’absence de contour résiduel.
+
+## Validation ciblée 3.2.0
+
+### Vues intelligentes et performances
+
+- vérifier Toutes, Aujourd’hui, En retard, Cette semaine, En attente, Sans réponse, Sans échéance, Non lus, Introuvables, Agenda à vérifier et Récemment terminés ;
+- comparer les compteurs entre panneau et dashboard ;
+- tester 100, 500, 1 000 et 2 000 épingles ;
+- confirmer que le chargement progressif ne perd ni sélection ni ordre ;
+- modifier une carte et vérifier que seules les cartes nécessaires sont remplacées.
+
+### Actions groupées
+
+- sélectionner avec Ctrl/Cmd, Maj, clavier et Tout sélectionner dans la vue ;
+- tester statut, priorité, échéance, groupe, affaire, modèle, lu/non lu et suivi sans réponse ;
+- tester archivage, désépinglage et suppression avec confirmation ;
+- confirmer le résultat partiel et le message d’erreur lorsqu’un message n’est plus disponible.
+
+### Suivi automatique sans réponse
+
+- envoyer un message avec le suivi automatique activé ;
+- vérifier la date de relance, la vue Sans réponse et le redémarrage ;
+- recevoir une réponse dans la conversation et confirmer l’annulation ;
+- tester Message-ID dupliqué, conversation déplacée et compte hors ligne.
+
+### Santé, diagnostic et fournisseurs
+
+- exécuter l’analyse de santé sur une base saine puis avec une référence introuvable ;
+- exporter le diagnostic et confirmer l’absence de corps, pièce jointe, adresse brute et chemin privé ;
+- vider le diagnostic sans modifier les épingles ;
+- exécuter la matrice sur IMAP, POP, Gmail, Microsoft, dossiers locaux et chaque calendrier ;
+- vérifier les réparations sûres après création automatique d’une sauvegarde.
+
+### Restauration et migration
+
+- prévisualiser une sauvegarde valide, ancienne, conflictuelle, trop volumineuse et malformée ;
+- vérifier les stratégies Fusionner et Remplacer ;
+- confirmer la sauvegarde de sécurité avant chaque écriture ;
+- interrompre volontairement une restauration et vérifier le rollback ou la récupération.
+
+### UX, accessibilité et liste générale
+
+- utiliser la navigation groupée des paramètres, la recherche et Échap pour effacer la recherche ;
+- tester les modes Guidé/Avancé et Compact/Équilibré/Très aéré ;
+- vérifier zoom 125 %, 150 % et 200 %, thèmes clair/sombre/contraste élevé ;
+- tester Tab, flèches, Home, End, PageUp, PageDown, Entrée, Espace, Shift+F10 et Échap ;
+- confirmer que le focus revient au bouton après fermeture du menu ;
+- vérifier que la ligne générale est légèrement plus haute et que la punaise 36×36 est centrée, éloignée du bord supérieur et ne chevauche aucun texte.

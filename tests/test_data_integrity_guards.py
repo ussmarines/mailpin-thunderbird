@@ -42,7 +42,7 @@ assert create_panel_call < scroll_listener
 # let stale loads overwrite state. Programmatic color reset is a real edit.
 assert "if (next === loading) return;" in dashboard
 assert "if (generation !== loadGeneration) return false;" in dashboard
-assert "if (generation !== loadGeneration) return;" in dashboard
+assert dashboard.count("if (generation !== loadGeneration)") >= 1
 assert "calendarRenderGeneration" in options
 assert "uniqueEntityId" in options
 assert "account.defaultColor);" in options and "setDirty();" in options

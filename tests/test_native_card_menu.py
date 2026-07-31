@@ -19,7 +19,10 @@ for token in (
     'contextMenu.openPopup(trigger, "after_end"',
     'contextMenu.openPopupAtScreen(screenX, screenY, true, triggerEvent)',
     'contextMenu.addEventListener("command"',
-    'contextMenu.addEventListener("popuphidden", resetContextMenuState)',
+    'contextMenu.addEventListener("popuphidden", () => {',
+    'resetContextMenuState();',
+    'trigger?.isConnected',
+    'trigger.focus()',
 ):
     assert token in IMPL, token
 

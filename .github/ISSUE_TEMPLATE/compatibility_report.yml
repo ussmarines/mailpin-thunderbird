@@ -1,0 +1,48 @@
+name: Test de compatibilité
+about: Consigner un test réel avec un fournisseur, un calendrier ou une version Thunderbird
+body:
+  - type: input
+    id: mailperch
+    attributes:
+      label: Version MailPerch
+      placeholder: 3.2.0
+    validations:
+      required: true
+  - type: input
+    id: thunderbird
+    attributes:
+      label: Version Thunderbird et système
+      placeholder: Thunderbird 153.0.1 — Windows 11
+    validations:
+      required: true
+  - type: dropdown
+    id: provider
+    attributes:
+      label: Fournisseur ou stockage
+      options: [IMAP standard, Gmail, Outlook/Hotmail, POP, Dossiers locaux, Boîte unifiée, Dossier virtuel, CalDAV, Agenda local, Autre]
+    validations:
+      required: true
+  - type: dropdown
+    id: theme
+    attributes:
+      label: Thème
+      options: [Clair, Sombre, Contraste élevé, Autre]
+  - type: checkboxes
+    id: scenarios
+    attributes:
+      label: Scénarios validés
+      options:
+        - label: Épinglage et désépinglage
+        - label: Clic droit et bouton Plus d’actions
+        - label: Déplacement, archivage et suppression
+        - label: Vues intelligentes et actions groupées
+        - label: Suivi automatique sans réponse
+        - label: Agenda/Tâches
+        - label: Sauvegarde, prévisualisation et restauration
+        - label: Redémarrage et plusieurs fenêtres
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Résultat et éventuelles anomalies
+    validations:
+      required: true

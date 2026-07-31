@@ -15,10 +15,11 @@ const accountControls = new Map();
 const inboxControls = new Map();
 const $ = id => document.getElementById(id);
 const BOOLEAN_IDS=[
-  "allowPinOutsideInbox","enableConversationPins","safeMode","showSmartSections","hideCompleted","autoRemoveCompleted","groupByAccount","groupByCustomGroup","showSearch","showCounters","rememberCollapsed","showAccountColor","showAttachments","showTags","showPriority","smartDates","showFolder","showNotes","showDeadlines","showGroups","showQuickActions","enableDragFromInbox","enableMultiSelect","enableUndo","confirmDelete","animateChanges","enableReminders","enableAdvancedReminders","enableAutomaticRules","enableRuleSimulation","autoUnpinOnArchive","autoCompleteOnArchive","autoUnpinOnDelete","autoUnpinOnRead","autoUnpinOnReply","keepPinOnMove","moveToWaitingOnReply","enableCalendarIntegration","enableBidirectionalCalendarSync","calendarCompleteOnPinComplete","calendarDeleteOnUnpin","enableGlobalDashboard","enablePerformanceMetrics","autoCleanup","enableWaitingWorkflow","reopenOnConversationReply","enableRecurringFollowUps","enableHistory","enableCases","enableKanban","enableTemplates","enableAutomaticBackups","backupBeforeMigration","backupIncludeHistory","enableConcurrentWriteProtection","enableCounterRegressionGuard"
+  "allowPinOutsideInbox","enableConversationPins","safeMode","showSmartSections","hideCompleted","autoRemoveCompleted","groupByAccount","groupByCustomGroup","showSearch","showCounters","rememberCollapsed","showAccountColor","showAttachments","showTags","showPriority","smartDates","showFolder","showNotes","showDeadlines","showGroups","showQuickActions","enableDragFromInbox","enableMultiSelect","enableBulkActions","confirmBulkDestructiveActions","enableUndo","confirmDelete","animateChanges","enableReminders","enableAdvancedReminders","enableAutomaticRules","enableRuleSimulation","autoUnpinOnArchive","autoCompleteOnArchive","autoUnpinOnDelete","autoUnpinOnRead","autoUnpinOnReply","keepPinOnMove","moveToWaitingOnReply","enableCalendarIntegration","enableBidirectionalCalendarSync","calendarCompleteOnPinComplete","calendarDeleteOnUnpin","enableGlobalDashboard","enablePerformanceMetrics","autoCleanup","enableWaitingWorkflow","reopenOnConversationReply","enableRecurringFollowUps","enableHistory","enableCases","enableKanban","enableTemplates","enableAutomaticBackups","backupBeforeMigration","backupIncludeHistory","enableConcurrentWriteProtection","enableCounterRegressionGuard","enableAutomaticNoReplyTracking","noReplyCancelOnIncomingReply","enableSmartViews","enableHealthCenter","enableHealthNotifications","enableDiagnostics"
 ];
-const SELECT_IDS=["pinMode","defaultPinTarget","compatibilityMode","panelScope","sortMode","density","missedReminderPolicy","calendarItemType"];
-const NUMBER_IDS=["cardLines","panelMaxHeight","panelPageSize","completedRetentionDays","undoTimeoutMs","reminderLeadMinutes","cleanupGraceDays","defaultFollowUpDays","ruleErrorDisableThreshold","ruleDefaultMaxPerMinute","backupIntervalHours","backupRetention"];
+const SELECT_IDS=["pinMode","defaultPinTarget","compatibilityMode","panelScope","sortMode","density","missedReminderPolicy","calendarItemType","settingsExperience","uiPreset","reduceMotion","defaultSmartView","diagnosticLevel"];
+const NUMBER_IDS=["cardLines","panelMaxHeight","panelPageSize","panelVirtualizationThreshold","completedRetentionDays","undoTimeoutMs","reminderLeadMinutes","cleanupGraceDays","defaultFollowUpDays","noReplyDefaultDays","ruleErrorDisableThreshold","ruleDefaultMaxPerMinute","backupIntervalHours","backupRetention","diagnosticMaxEntries"];
+
 
 const CONTROL_HELP = {
   pinMode: "Le mode indépendant conserve les épingles dans le stockage local MailPerch sans modifier les étoiles Thunderbird.",
@@ -69,6 +70,32 @@ const BUTTON_HELP = {
   reset: "Réinitialise les réglages, groupes, affaires, modèles et règles. Les épingles sont conservées."
 };
 
+Object.assign(CONTROL_HELP, {
+  settingsExperience: "Le mode Guidé masque les réglages avancés. Le mode Avancé affiche tous les réglages sans modifier leur valeur.",
+  uiPreset: "Ajuste uniquement l’espacement de cette page et des interfaces MailPerch.",
+  reduceMotion: "Réduit les animations pour plus de confort, sans désactiver les retours d’action.",
+  panelVirtualizationThreshold: "Au-delà de ce nombre d’épingles, MailPerch limite le rendu initial afin de préserver la fluidité.",
+  enableSmartViews: "Ajoute les vues Aujourd’hui, En retard, Sans réponse, Sans échéance et autres vues calculées localement.",
+  enableBulkActions: "Permet d’appliquer une action à plusieurs épingles sélectionnées dans le panneau ou le tableau de bord.",
+  confirmBulkDestructiveActions: "Demande une confirmation avant une suppression, un archivage ou un désépinglage groupé.",
+  enableAutomaticNoReplyTracking: "Après un message envoyé, crée localement une date de relance et l’annule lorsqu’une réponse arrive.",
+  noReplyCancelOnIncomingReply: "Désactive automatiquement le suivi sans réponse lorsque MailPerch détecte une réponse dans la conversation.",
+  noReplyDefaultDays: "Nombre de jours avant qu’une conversation sans réponse apparaisse dans la vue À relancer.",
+  defaultSmartView: "Vue sélectionnée lorsque le tableau de bord ou le panneau s’ouvre.",
+  enableHealthCenter: "Calcule un score local à partir de l’intégrité, des sauvegardes, des références, de l’Agenda et des performances.",
+  enableHealthNotifications: "N’affiche que les alertes utiles et évite les notifications répétitives.",
+  enableDiagnostics: "Conserve localement un journal technique expurgé des adresses, chemins et contenus de messages.",
+  diagnosticLevel: "Les niveaux plus élevés réduisent le nombre d’événements conservés.",
+  diagnosticMaxEntries: "Limite la taille du journal local entre 50 et 500 événements."
+});
+
+Object.assign(BUTTON_HELP, {
+  "provider-check": "Analyse les types de comptes et les calendriers disponibles, sans connexion réseau supplémentaire.",
+  "health-check": "Contrôle la base locale, les références, l’Agenda, les sauvegardes et les performances.",
+  "health-repair": "Exécute uniquement les réparations considérées comme non destructives et crée une sauvegarde préalable.",
+  "clear-diagnostics": "Efface le journal technique local, sans toucher aux épingles ni à l’historique utilisateur."
+});
+
 function genericControlHelp(control) {
   if (control.type === "checkbox") return "Active ou désactive cette fonction après l’enregistrement des paramètres.";
   if (control.tagName === "SELECT") return "Choisissez le comportement utilisé par MailPerch, puis enregistrez les paramètres.";
@@ -107,22 +134,63 @@ function enhanceSettingsPage() {
   const nav = $("settings-nav");
   nav.replaceChildren();
   const sections = [...document.querySelectorAll("#settings-form > section")];
-  sections.forEach((section, index) => {
+  const groups = new Map();
+  const links = new Map();
+  const navFragment = document.createDocumentFragment();
+
+  for (const [index, section] of sections.entries()) {
     const heading = section.querySelector("h2");
-    if (!heading) return;
+    if (!heading) continue;
     section.id ||= `settings-${slugify(heading.textContent)}-${index + 1}`;
     section.dataset.searchText = section.textContent.toLowerCase();
-    const link = node("a", "settings-nav-link", heading.textContent.trim());
+    const groupName = section.dataset.navGroup || "Autres";
+    let group = groups.get(groupName);
+    if (!group) {
+      group = node("section", "settings-nav-group");
+      group.dataset.navGroup = groupName;
+      const title = node("strong", "settings-nav-group-title", groupName);
+      const list = node("div", "settings-nav-group-links");
+      group.append(title, list);
+      groups.set(groupName, group);
+      navFragment.appendChild(group);
+    }
+    const link = node("a", "settings-nav-link");
     link.href = `#${section.id}`;
     link.dataset.sectionId = section.id;
-    nav.appendChild(link);
-  });
+    const icon = node("span", "settings-nav-icon", section.dataset.navIcon || "•");
+    icon.setAttribute("aria-hidden", "true");
+    link.append(icon, node("span", "", heading.textContent.trim()));
+    link.addEventListener("click", event => {
+      event.preventDefault();
+      section.scrollIntoView({behavior: document.body.dataset.reduceMotion === "always" ? "auto" : "smooth", block: "start"});
+      history.replaceState(null, "", `#${section.id}`);
+      section.querySelector("input, select, textarea, button, summary")?.focus({preventScroll: true});
+    });
+    group.querySelector(".settings-nav-group-links").appendChild(link);
+    links.set(section.id, link);
+  }
+  nav.appendChild(navFragment);
+
+  const setActiveSection = sectionId => {
+    for (const [id, link] of links) {
+      const active = id === sectionId;
+      link.classList.toggle("is-active", active);
+      if (active) link.setAttribute("aria-current", "location"); else link.removeAttribute("aria-current");
+    }
+  };
+  const observer = "IntersectionObserver" in window ? new IntersectionObserver(entries => {
+    const visible = entries.filter(entry => entry.isIntersecting && !entry.target.hidden)
+      .sort((a, b) => Math.abs(a.boundingClientRect.top) - Math.abs(b.boundingClientRect.top));
+    if (visible[0]) setActiveSection(visible[0].target.id);
+  }, {rootMargin: "-18% 0px -68% 0px", threshold: [0, 0.1, 0.5]}) : null;
+  if (observer) for (const section of sections) observer.observe(section);
+  setActiveSection(location.hash.slice(1) || sections[0]?.id || "");
 
   for (const label of document.querySelectorAll("#settings-form section label")) {
     const control = label.querySelector("input:not([type='file']), select, textarea");
     if (!control || label.querySelector(":scope > .control-help")) continue;
     const help = node("small", "control-help", CONTROL_HELP[control.id] || genericControlHelp(control));
-    const helpId = `help-${control.id || Math.random().toString(36).slice(2)}`;
+    const helpId = `help-${control.id || slugify(label.textContent)}`;
     help.id = helpId;
     control.setAttribute("aria-describedby", [control.getAttribute("aria-describedby"), helpId].filter(Boolean).join(" "));
     label.appendChild(help);
@@ -133,28 +201,38 @@ function enhanceSettingsPage() {
     const wrapper = node("span", "button-help-wrap");
     button.before(wrapper);
     wrapper.appendChild(button);
-    const help = node("small", "button-help", BUTTON_HELP[button.id] || "Exécute cette action localement et affiche son résultat sous ce bouton et dans une notification visible.");
+    const help = node("small", "button-help", BUTTON_HELP[button.id] || "Exécute cette action localement et affiche son résultat près du bouton.");
     wrapper.appendChild(help);
   }
 
   const search = $("settings-search");
   const applySearch = () => {
-    const query = search.value.trim().toLowerCase();
+    const query = search.value.trim().toLocaleLowerCase();
     let visible = 0;
     for (const section of sections) {
-      const match = !query || section.textContent.toLowerCase().includes(query);
+      const match = !query || section.dataset.searchText.includes(query);
       section.hidden = !match;
-      const link = nav.querySelector(`[data-section-id="${section.id}"]`);
+      const link = links.get(section.id);
       if (link) link.hidden = !match;
       if (match) visible++;
+    }
+    for (const group of groups.values()) {
+      group.hidden = ![...group.querySelectorAll(".settings-nav-link")].some(link => !link.hidden);
     }
     $("settings-search-summary").textContent = query
       ? `${visible} section(s) contenant « ${search.value.trim()} ».`
       : `${sections.length} sections disponibles.`;
+    if (query) setActiveSection(sections.find(section => !section.hidden)?.id || "");
   };
   search.addEventListener("input", applySearch);
+  search.addEventListener("keydown", event => {
+    if (event.key !== "Escape" || !search.value) return;
+    search.value = "";
+    applySearch();
+  });
   applySearch();
 }
+
 function setDirty(value = true) {
   dirty = Boolean(value);
   document.body.toggleAttribute("data-dirty", dirty);
@@ -482,6 +560,118 @@ async function renderCalendars(selected) {
   el.value = [...el.options].some(option => option.value === selected && !option.disabled) ? selected : "";
 }
 
+
+function applyUxPreferences(settings = configuration?.settings || {}) {
+  document.body.dataset.settingsExperience = settings.settingsExperience || "guided";
+  document.body.dataset.uiPreset = settings.uiPreset || "balanced";
+  document.body.dataset.reduceMotion = settings.reduceMotion || "auto";
+  const advanced = settings.settingsExperience === "advanced";
+  for (const details of document.querySelectorAll("details.advanced-group")) {
+    if (!advanced && !details.hasAttribute("data-guided-visible")) details.open = false;
+  }
+}
+
+function humanTime(value) {
+  const timestamp = Number(value) || 0;
+  if (!timestamp) return "Jamais";
+  try { return new Intl.DateTimeFormat(undefined, {dateStyle: "short", timeStyle: "short"}).format(new Date(timestamp)); }
+  catch { return new Date(timestamp).toLocaleString(); }
+}
+
+function renderHealth(report) {
+  const host = $("health-info");
+  if (!host) return;
+  host.replaceChildren();
+  if (!report) {
+    host.append(node("p", "hint", "Le centre de santé n’a pas encore été analysé."));
+    $("health-score-badge").textContent = "—";
+    $("overview-health").textContent = "—";
+    return;
+  }
+  const score = Math.max(0, Math.min(100, Number(report.score) || 0));
+  const statusLabels = {healthy: "Sain", attention: "À surveiller", critical: "Action requise"};
+  const summary = node("div", "health-summary");
+  const title = node("strong", "", `${score}/100 · ${statusLabels[report.status] || "État inconnu"}`);
+  const meta = node("small", "", `${report.counts?.pinned || 0} épingle(s) · ${report.issues?.length || 0} point(s) à examiner`);
+  summary.append(title, meta);
+  host.append(summary);
+  const issues = node("div", "health-issues");
+  for (const issue of report.issues || []) {
+    const card = node("article", `health-issue ${issue.severity || "info"}`);
+    card.append(node("strong", "", issue.title || "Information"), node("small", "", issue.detail || ""));
+    issues.append(card);
+  }
+  if (!issues.childElementCount) issues.append(node("p", "hint", "Aucune anomalie détectée par les contrôles locaux."));
+  host.append(issues);
+  $("health-score-badge").textContent = `${score}/100`;
+  $("health-score-badge").dataset.status = report.status || "unknown";
+  $("overview-health").textContent = `${score}/100`;
+}
+
+function renderProviderMatrix(matrix) {
+  const host = $("provider-info");
+  if (!host) return;
+  host.replaceChildren();
+  if (!matrix?.checkedAt) {
+    host.append(node("p", "hint", "Lancez le test pour obtenir la matrice de vos comptes et calendriers."));
+    return;
+  }
+  host.append(node("p", "hint", `Dernier contrôle : ${humanTime(matrix.checkedAt)} · ${(matrix.accounts || []).length} compte(s) · ${(matrix.calendars || []).length} calendrier(s).`));
+  for (const row of matrix.accounts || []) {
+    const card = node("div", "provider-row");
+    card.append(
+      node("strong", "", row.accountName || row.accountKey || "Compte"),
+      node("span", "", row.provider || "inconnu"),
+      node("span", "", (row.protocol || "inconnu").toUpperCase()),
+      node("span", "", row.supportsFolders ? "Dossiers ✓" : "Dossiers limités"),
+      node("span", "", row.offlineSupport ? "Hors ligne ✓" : "Hors ligne —")
+    );
+    if ((row.knownRisks || []).length) card.title = row.knownRisks.join(", ");
+    host.append(card);
+  }
+}
+
+function renderImportPreview(preview, configurationData) {
+  const host = $("import-preview");
+  host.replaceChildren();
+  host.hidden = !preview;
+  if (!preview) return;
+  const incoming = preview.incoming || {};
+  host.append(
+    node("h3", "", "Prévisualisation de la restauration"),
+    node("p", "", `Format : ${preview.format || "inconnu"} · version ${preview.version || "inconnue"}`),
+    node("p", "", `${incoming.refs || 0} épingle(s), ${incoming.groups || 0} groupe(s), ${incoming.rules || 0} règle(s), ${incoming.cases || 0} affaire(s), ${incoming.templates || 0} modèle(s).`),
+    node("p", preview.conflicts ? "warning-text" : "hint", `${preview.conflicts || 0} conflit(s) d’identifiant détecté(s).`)
+  );
+  const actions = node("div", "actions-row");
+  const merge = node("button", "secondary", "Fusionner avec les données actuelles");
+  merge.type = "button";
+  merge.id = "restore-merge";
+  const replace = node("button", "danger", "Remplacer les données actuelles");
+  replace.type = "button";
+  replace.id = "restore-replace";
+  const restore = async (strategy, control) => {
+    if (strategy === "replace" && !confirm("Remplacer les données MailPerch actuelles par cette sauvegarde ? Une sauvegarde de sécurité sera créée avant l’opération lorsque cette option est active.")) return;
+    try {
+      await withBusy(control, "Restauration en cours…", async () => {
+        await messenger.pinInbox.restoreConfiguration(configurationData, strategy);
+        if (typeof configurationData.shortcut === "string") {
+          await messenger.commands.update({name: "toggle-pin-selected", shortcut: configurationData.shortcut}).catch(() => {});
+        }
+        await reload();
+      });
+      host.hidden = true;
+      setStatus(strategy === "merge" ? "Sauvegarde fusionnée avec succès." : "Sauvegarde restaurée avec succès.", "success", {control});
+    } catch (error) {
+      setStatus(`Restauration impossible : ${error.message || error}`, "error", {control, persistent: true});
+    }
+  };
+  merge.addEventListener("click", event => restore("merge", event.currentTarget));
+  replace.addEventListener("click", event => restore("replace", event.currentTarget));
+  actions.append(merge, replace);
+  host.append(actions);
+}
+
 function updateRuntimeSummary(config, backup = null) {
   if (!config) return;
   const stats = config.stats || {};
@@ -498,11 +688,15 @@ function updateRuntimeSummary(config, backup = null) {
   $("performance-info").textContent =
     `Rendu : ${perf.renders || 0} · moyenne ${perf.averageRenderMs || 0} ms · ` +
     `max ${perf.maxRenderMs || 0} ms`;
+  if ($("overview-pinned")) $("overview-pinned").textContent = String(stats.pinned || 0);
+  if ($("overview-attention")) $("overview-attention").textContent = String((stats.overdue || 0) + (stats.waiting || 0));
   if (backup) {
     $("backup-info").textContent =
       `Dossier : ${backup.directory || "non défini"} · dernière sauvegarde : ` +
       `${backup.lastBackupAt ? new Date(backup.lastBackupAt).toLocaleString() : "aucune"}`;
+    if ($("overview-backup")) $("overview-backup").textContent = backup.lastBackupAt ? humanTime(backup.lastBackupAt).split(" ")[0] : "Jamais";
   }
+  if (config.providerMatrix) renderProviderMatrix(config.providerMatrix);
 }
 
 function applyConfiguration(config) {
@@ -526,7 +720,9 @@ function applyConfiguration(config) {
   renderAccounts(config.accounts || []);
   renderWaitingGroups(settings.waitingGroupId);
   void renderCalendars(settings.preferredCalendarId);
+  applyUxPreferences(settings);
   updateRuntimeSummary(config);
+  renderProviderMatrix(config.providerMatrix);
   setDirty(false);
 }
 
@@ -549,10 +745,11 @@ function collectSettings() {
 }
 
 async function reload({preserveEdits = false} = {}) {
-  const [config, shortcut, backup] = await Promise.all([
+  const [config, shortcut, backup, health] = await Promise.all([
     messenger.pinInbox.getConfiguration(),
     getShortcut(),
-    messenger.pinInbox.getBackupStatus().catch(() => null)
+    messenger.pinInbox.getBackupStatus().catch(() => null),
+    messenger.pinInbox.getHealthReport().catch(() => null)
   ]);
   config.shortcut = shortcut;
   if (preserveEdits && configuration) {
@@ -561,13 +758,16 @@ async function reload({preserveEdits = false} = {}) {
       stats: config.stats,
       storage: config.storage,
       compatibility: config.compatibility,
-      performance: config.performance
+      performance: config.performance,
+      providerMatrix: config.providerMatrix
     };
     updateRuntimeSummary(config, backup);
   } else {
     applyConfiguration(config);
     updateRuntimeSummary(config, backup);
   }
+  renderHealth(health);
+  renderProviderMatrix(config.providerMatrix || health?.providerMatrix);
   return config;
 }
 
@@ -643,28 +843,18 @@ async function importFile(event) {
   input.value = "";
   if (!file) return;
   if (file.size > 10 * 1024 * 1024) {
-    setStatus("Fichier trop volumineux.", "error");
+    setStatus("Fichier trop volumineux.", "error", {control: input, persistent: true});
     return;
   }
   try {
     const parsed = JSON.parse(await file.text());
-    await withBusy(null, "Import de la sauvegarde…", async () => {
-      await messenger.pinInbox.importConfiguration(parsed);
-      if (typeof parsed.shortcut === "string") {
-        try {
-          await messenger.commands.update({
-            name: "toggle-pin-selected",
-            shortcut: parsed.shortcut
-          });
-        } catch (error) {
-          console.warn("MailPerch : raccourci importé non appliqué", error);
-        }
-      }
-      await reload();
-    });
-    setStatus("Sauvegarde importée.", "success");
+    const preview = await withBusy(null, "Analyse de la sauvegarde…", () => messenger.pinInbox.previewImport(parsed));
+    if (!preview?.valid) throw new Error("Format de sauvegarde non reconnu");
+    renderImportPreview(preview, parsed);
+    setStatus("Sauvegarde analysée. Choisissez Fusionner ou Remplacer dans cette section.", "success", {control: $("import-preview")});
   } catch (error) {
-    setStatus(`Import impossible : ${error.message || error}`, "error");
+    renderImportPreview(null, null);
+    setStatus(`Prévisualisation impossible : ${error.message || error}`, "error", {persistent: true});
   }
 }
 
@@ -673,6 +863,14 @@ function localize() {
   for (const element of document.querySelectorAll("[data-i18n]")) {
     const value = messenger.i18n.getMessage(element.dataset.i18n);
     if (value) element.textContent = value;
+  }
+  for (const element of document.querySelectorAll("[data-i18n-placeholder]")) {
+    const value = messenger.i18n.getMessage(element.dataset.i18nPlaceholder);
+    if (value) element.placeholder = value;
+  }
+  for (const element of document.querySelectorAll("[data-i18n-title]")) {
+    const value = messenger.i18n.getMessage(element.dataset.i18nTitle);
+    if (value) element.title = value;
   }
 }
 
@@ -786,6 +984,53 @@ window.addEventListener("DOMContentLoaded", async () => {
     }));
   };
 
+  $("settingsExperience").addEventListener("change", () => applyUxPreferences({...configuration.settings, settingsExperience: $("settingsExperience").value}));
+  $("uiPreset").addEventListener("change", () => applyUxPreferences({...configuration.settings, uiPreset: $("uiPreset").value}));
+  $("reduceMotion").addEventListener("change", () => applyUxPreferences({...configuration.settings, reduceMotion: $("reduceMotion").value}));
+
+  $("provider-check").addEventListener("click", async event => {
+    const matrix = await run(
+      () => messenger.pinInbox.runProviderCompatibilityCheck(),
+      value => `${value.accounts?.length || 0} compte(s) et ${value.calendars?.length || 0} calendrier(s) analysé(s).`,
+      {control: event.currentTarget, busyMessage: "Analyse des fournisseurs…", reloadAfter: false}
+    );
+    if (matrix) {
+      renderProviderMatrix(matrix);
+      if (configuration) configuration.providerMatrix = matrix;
+    }
+  });
+
+  $("health-check").addEventListener("click", async event => {
+    try {
+      const health = await withBusy(event.currentTarget, "Analyse de la santé MailPerch…", () => messenger.pinInbox.getHealthReport());
+      renderHealth(health);
+      setStatus(`Analyse terminée : score ${health.score}/100.`, health.status === "critical" ? "error" : "success", {control: event.currentTarget});
+    } catch (error) {
+      setStatus(`Analyse impossible : ${error.message || error}`, "error", {control: event.currentTarget, persistent: true});
+    }
+  });
+
+  $("health-repair").addEventListener("click", async event => {
+    if (!confirm("Exécuter les réparations non destructives ? MailPerch créera une sauvegarde avant la restauration lorsque cette option est active.")) return;
+    try {
+      const result = await withBusy(event.currentTarget, "Réparation des anomalies sûres…", () => messenger.pinInbox.repairHealthIssues({actions: ["orphan-links", "repair-references"]}));
+      renderHealth(result.health);
+      await reload({preserveEdits: dirty});
+      setStatus(`${result.repaired || 0} élément(s) réparé(s).`, "success", {control: event.currentTarget});
+    } catch (error) {
+      setStatus(`Réparation impossible : ${error.message || error}`, "error", {control: event.currentTarget, persistent: true});
+    }
+  });
+
+  $("clear-diagnostics").addEventListener("click", async event => {
+    const result = await run(
+      () => messenger.pinInbox.clearDiagnostics(),
+      value => `${value.cleared || 0} événement(s) diagnostic supprimé(s).`,
+      {control: event.currentTarget, busyMessage: "Suppression du journal diagnostic…", reloadAfter: false}
+    );
+    if (result) renderHealth(await messenger.pinInbox.getHealthReport().catch(() => null));
+  });
+
   bindRun(
     "clear-rule-log",
     () => messenger.pinInbox.clearRuleLog(),
@@ -881,7 +1126,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       const report = await withBusy(
         event.currentTarget,
         "Préparation du diagnostic…",
-        () => messenger.pinInbox.getDiagnosticReport()
+        () => messenger.pinInbox.exportDiagnosticBundle()
       );
       downloadJson(
         `mailperch-diagnostic-${new Date().toISOString().slice(0, 10)}.json`,
