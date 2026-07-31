@@ -102,7 +102,7 @@ assert "contentTab" not in impl
 assert "settings.showFolderBadge = false" in impl
 assert 'this._extensionVersion = String(context.extension.manifest?.version || "0.0.0")' in impl
 assert 'extension: {version: this._extensionVersion || "0.0.0"' in impl
-assert 'document.documentElement.appendChild(contextMenu)' in impl
+assert '(document.body || document.documentElement).appendChild(contextMenu)' in impl
 assert 'contextMenu?.remove()' in impl
 
 css = (EXT / "styles/pin.css").read_text(encoding="utf-8")

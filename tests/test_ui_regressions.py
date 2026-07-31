@@ -50,7 +50,7 @@ assert "event.composedPath()" in impl
 assert "event.stopImmediatePropagation()" in impl
 assert 'event.key === "ContextMenu"' in impl
 assert 'event.shiftKey && event.key === "F10"' in impl
-assert "document.documentElement.appendChild(contextMenu)" in impl
+assert "(document.body || document.documentElement).appendChild(contextMenu)" in impl
 assert "contextMenu?.remove()" in impl
 assert ".pin-mails-context-menu" in css and "position: fixed" in css
 assert "openContextMenuForCard" in impl

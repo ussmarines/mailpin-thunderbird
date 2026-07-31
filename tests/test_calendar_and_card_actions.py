@@ -21,6 +21,20 @@ assert 'about3Pane.addEventListener("click", onPanelClickCapture, true)' in impl
 assert 'about3Pane.addEventListener("contextmenu", onPanelContextMenu, true)' in impl
 assert 'about3Pane.removeEventListener("click", onPanelClickCapture, true)' in impl
 
+
+# The native folder picker must receive a BrowsingContext on current Thunderbird.
+assert 'const browsingContext=win?.browsingContext' in impl
+assert 'picker.init(browsingContext' in impl
+assert 'picker.init(win,' not in impl
+assert 'Ci.nsIFilePicker.modeGetFolder' in impl
+
+# The overflow menu must be mounted in the visible document and resist card dragging.
+assert '(document.body || document.documentElement).appendChild(contextMenu)' in impl
+assert 'more.addEventListener("click"' in impl
+assert 'more.setAttribute("aria-expanded", "false")' in impl
+assert 'openContextMenuForCard(card, rect.right, rect.bottom, sourceButton)' in impl
+assert 'event.target.closest("button, input, select, textarea, a")' in impl
+
 # Calendar inventory and writes must check ACL, disabled/read-only state and capabilities.
 for token in [
     "lazy.cal.acl.isCalendarWritable",

@@ -2156,10 +2156,29 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
   async _chooseBackupDirectory() {
-    const win=Services.wm.getMostRecentWindow("mail:3pane");
+    const win=Services.wm.getMostRecentWindow("mail:3pane") || Services.wm.getMostRecentWindow(null);
+    const browsingContext=win?.browsingContext;
+    if (!browsingContext) {
+      throw new ExtensionError("Aucune fenêtre Thunderbird active ne permet d’ouvrir le sélecteur de dossier.");
+    }
     const picker=Cc["@mozilla.org/filepicker;1"].createInstance(Ci.nsIFilePicker);
-    picker.init(win, "Choisir le dossier des sauvegardes MailPerch", Ci.nsIFilePicker.modeGetFolder);
-    const result=await new Promise(resolve=>picker.open(resolve));
+    picker.init(browsingContext, "Choisir le dossier des sauvegardes MailPerch", Ci.nsIFilePicker.modeGetFolder);
+    if (this._settings.backupDirectory) {
+      try {
+        const currentDirectory=Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsIFile);
+        currentDirectory.initWithPath(this._settings.backupDirectory);
+        if (currentDirectory.exists() && currentDirectory.isDirectory()) picker.displayDirectory=currentDirectory;
+      } catch (error) {
+        this._recordDiagnostic("warning", "Dossier de sauvegarde actuel inutilisable par le sélecteur", error);
+      }
+    }
+    const result=await new Promise((resolve,reject)=>{
+      try {
+        picker.open(value=>resolve(value));
+      } catch (error) {
+        reject(error);
+      }
+    });
     if(result===Ci.nsIFilePicker.returnCancel||!picker.file)return {selected:false};
     this._settings.backupDirectory=picker.file.path;this._saveSettings();
     return {selected:true,path:picker.file.path};
@@ -3807,6 +3826,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     let inboxDragHeaders = [];
     let contextMenuKey = "";
     let contextMenu = null;
+    let contextMenuTrigger = null;
     let groupDialog = null;
     let groupAssignmentDialog = null;
     let onPanelContextMenu = null;
@@ -4287,6 +4307,8 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       if (!contextMenu) return;
       contextMenu.hidden = true;
       contextMenuKey = "";
+      if (contextMenuTrigger) contextMenuTrigger.setAttribute("aria-expanded", "false");
+      contextMenuTrigger = null;
     };
 
     const setActionBusy = (button, busy) => {
@@ -4401,12 +4423,17 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       contextMenu.querySelector(".pin-mails-context-item:not([disabled])")?.focus();
     };
 
-    const openContextMenuForCard = (card, clientX, clientY) => {
-      if (!card || !panel?.contains(card)) return false;
+    const openContextMenuForCard = (card, clientX, clientY, trigger = null) => {
+      if (!card?.isConnected || card.ownerDocument !== document || !panel?.contains(card)) return false;
+      if (contextMenuTrigger && contextMenuTrigger !== trigger) {
+        contextMenuTrigger.setAttribute("aria-expanded", "false");
+      }
       selectedPanelKey = card.dataset.stableKey;
       selectionAnchorKey = card.dataset.stableKey;
       updatePanelSelection();
       contextMenuKey = card.dataset.stableKey;
+      contextMenuTrigger = trigger;
+      if (contextMenuTrigger) contextMenuTrigger.setAttribute("aria-expanded", "true");
       positionContextMenu(clientX, clientY);
       return true;
     };
@@ -4491,7 +4518,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       const key = card.dataset.stableKey;
       if (action === "more") {
         const rect = sourceButton?.getBoundingClientRect?.() || card.getBoundingClientRect();
-        return openContextMenuForCard(card, rect.right, rect.bottom);
+        return openContextMenuForCard(card, rect.right, rect.bottom, sourceButton);
       }
       void runCardAction(key, action, sourceButton);
       return true;
@@ -4575,7 +4602,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         contextMenu.appendChild(item);
       }
       panel.append(header, tools, list, live, toast);
-      document.documentElement.appendChild(contextMenu);
+      (document.body || document.documentElement).appendChild(contextMenu);
       allHeader = document.getElementById(ALL_HEADER_ID) || createNode("div", "", "Tous les messages");
       allHeader.id = ALL_HEADER_ID;
       threadTree.before(panel, allHeader);
@@ -4770,6 +4797,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       });
 
       list.addEventListener("dragstart", event => {
+        if (event.target.closest("button, input, select, textarea, a")) { event.preventDefault(); return; }
         const card = event.target.closest(".pin-mails-card");
         if (!card || this._settings.sortMode !== "manual" || this._settings.safeMode) { event.preventDefault(); return; }
         cardDragKey = card.dataset.stableKey; card.toggleAttribute("data-dragging", true); event.dataTransfer.effectAllowed = "move"; event.dataTransfer.setData("text/x-pin-mails-card", cardDragKey);
@@ -4876,7 +4904,16 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       const more = createQuickButton("more", "Plus d’actions", "⋯");
       more.classList.add("pin-mails-card-more");
       more.setAttribute("aria-haspopup", "menu");
+      more.setAttribute("aria-expanded", "false");
+      more.draggable = false;
+      more.addEventListener("click", event => {
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        dispatchCardAction(card, "more", more);
+      }, true);
       const pin = createQuickButton("unpin", "Désépingler", "");
+      pin.draggable = false;
       pin.classList.add("pin-mails-card-pin");
       top.append(author, date, more, pin);
       const subject = createNode("div", "pin-mails-subject", hdr ? formatSubject(hdr) : ref.subject || "Message déplacé ou supprimé"); subject.title = subject.textContent;
@@ -5046,7 +5083,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     const observer = new about3Pane.MutationObserver(() => scheduleRefresh());
     observer.observe(threadTree, {subtree: true, childList: true, attributes: true, attributeFilter: ["data-properties"]});
     const onFolderChanged = () => {
-      if (contextMenu) { contextMenu.hidden = true; contextMenuKey = ""; }
+      closeContextMenu();
       clearDropFeedback();
       about3Pane.setTimeout(updateFolderMode, 0);
     };
@@ -5056,17 +5093,13 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       const target = elementFromEvent(event);
       if (event.button === 2 && cardFromEvent(event)) return;
       if (contextMenu?.hidden || target?.closest?.(".pin-mails-context-menu")) return;
-      contextMenu.hidden = true;
-      contextMenuKey = "";
+      closeContextMenu();
     };
     const onDocumentKeyDown = event => {
-      if (event.key === "Escape" && contextMenu && !contextMenu.hidden) {
-        contextMenu.hidden = true;
-        contextMenuKey = "";
-      }
+      if (event.key === "Escape" && contextMenu && !contextMenu.hidden) closeContextMenu();
     };
-    const onWindowBlur = () => { if (contextMenu) { contextMenu.hidden = true; contextMenuKey = ""; } clearDropFeedback(); };
-    const onViewportChange = () => { if (contextMenu) { contextMenu.hidden = true; contextMenuKey = ""; } clearDropTargets(); };
+    const onWindowBlur = () => { closeContextMenu(); clearDropFeedback(); };
+    const onViewportChange = () => { closeContextMenu(); clearDropTargets(); };
     const onThreadDragEnd = () => clearDropFeedback();
     const onDocumentClick = event => {
       const custom = event.target?.closest?.(`.${INDEPENDENT_BUTTON_CLASS}`);
