@@ -1,5 +1,16 @@
 # Journal des modifications
 
+## 3.2.1 — tableau de bord, menus et lisibilité de la liste
+
+- correction du crash du tableau de bord causé par la correspondance erronée entre la vue `list` et la section DOM `items` ;
+- contrat automatisé entre les identifiants utilisés par le JavaScript du tableau de bord et ceux réellement présents dans son HTML ;
+- simplification du menu contextuel des messages : une action claire pour la sélection et une action distincte pour toute la conversation ;
+- suppression du second menu privilégié historique afin d’éviter deux systèmes de commandes concurrents ;
+- ajout d’une action directe et contextualisée pour retirer une épingle de son groupe ;
+- lignes de messages générales légèrement plus hautes, avec davantage d’espace sous l’aperçu ;
+- nouveaux messages signalés par une bordure plus forte, un fond discret, une typographie renforcée et une icône de statut agrandie ;
+- nouvelles gardes de régression pour le tableau de bord, les menus, les groupes et les états `unread` / `new`.
+
 ## 3.2.0 — workflows intelligents, fiabilité et refonte UX
 
 - refonte guidée et aérée des paramètres avec navigation groupée, recherche, section active, aides contextuelles et retours non invasifs ;

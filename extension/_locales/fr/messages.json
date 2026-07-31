@@ -56,18 +56,6 @@
   "commandDashboard": {
     "message": "Ouvrir le tableau de bord MailPerch"
   },
-  "menuToggle": {
-    "message": "Épingler ou désépingler la sélection"
-  },
-  "menuPin": {
-    "message": "Épingler la sélection"
-  },
-  "menuUnpin": {
-    "message": "Désépingler la sélection"
-  },
-  "menuConversation": {
-    "message": "Épingler ou désépingler la conversation"
-  },
   "menuDisplayed": {
     "message": "Épingler ou désépingler ce message"
   },
@@ -1075,5 +1063,26 @@
   },
   "dashboardSearchPlaceholder": {
     "message": "Objet, expéditeur, note, groupe…"
+  },
+  "menuPinMessage": {
+    "message": "Épingler ce message"
+  },
+  "menuUnpinMessage": {
+    "message": "Désépingler ce message"
+  },
+  "menuPinMessages": {
+    "message": "Épingler les messages sélectionnés"
+  },
+  "menuUnpinMessages": {
+    "message": "Désépingler les messages sélectionnés"
+  },
+  "menuPinConversation": {
+    "message": "Épingler toute la conversation liée"
+  },
+  "menuUnpinConversation": {
+    "message": "Désépingler toute la conversation liée"
+  },
+  "removeFromGroup": {
+    "message": "Retirer du groupe"
   }
 }

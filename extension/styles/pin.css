@@ -1,4 +1,4 @@
-/* MailPerch — Email Pins & Follow-up 3.2.0 */
+/* MailPerch — Email Pins & Follow-up 3.2.1 */
 
 :root {
   --pin-mails-accent: light-dark(#0f6cbd, #62b0e8);
@@ -1154,10 +1154,21 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   outline-offset: 1px;
 }
 
-/* 3.2.0 — zone d’épinglage plus confortable dans la liste générale. */
+/* 3.2.1 — lignes générales plus aérées et nouveaux messages repérables immédiatement. */
+:root[pin-mails-inbox] #threadTree tr.card-layout .card-container {
+  min-block-size: 46px;
+  box-sizing: border-box;
+}
+:root[pin-mails-inbox] #threadTree tr.card-layout .thread-card-column {
+  padding-block-start: 4px;
+  padding-block-end: 6px;
+}
+:root[pin-mails-inbox] #threadTree tr.card-layout .thread-card-dynamic-row {
+  padding-block-end: 3px;
+}
 #threadTree tr.card-layout .thread-card-row:has(.pin-mails-independent-button) {
-  min-block-size: 40px;
-  padding-block: 4px;
+  min-block-size: 42px;
+  padding-block: 4px 5px;
   align-items: center;
 }
 #threadTree tr.card-layout .pin-mails-independent-button {
@@ -1165,7 +1176,7 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   block-size: 36px !important;
   min-inline-size: 36px !important;
   min-block-size: 36px !important;
-  margin-block: 3px !important;
+  margin-block: 4px !important;
   align-self: center;
 }
 #threadTree tr.card-layout .pin-mails-independent-button::before {
@@ -1174,9 +1185,60 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   -webkit-mask-size: 24px 24px;
   mask-size: 24px 24px;
 }
+:root[pin-mails-inbox] #threadTree tr.card-layout[data-properties~="unread"] .card-container {
+  border-inline-start: 3px solid color-mix(in srgb, var(--pin-mails-accent) 78%, CanvasText);
+  font-weight: 620;
+}
+:root[pin-mails-inbox] #threadTree tr.card-layout[data-properties~="unread"]:not(.selected):not(.current) .card-container {
+  background: color-mix(in srgb, var(--pin-mails-accent) 8%, transparent);
+}
+:root[pin-mails-inbox] #threadTree tr.card-layout[data-properties~="new"] .card-container {
+  border-inline-start-width: 5px;
+  border-inline-start-color: light-dark(#b75c00, #ffbf66);
+}
+:root[pin-mails-inbox] #threadTree tr.card-layout[data-properties~="new"]:not(.selected):not(.current) .card-container {
+  background: light-dark(color-mix(in srgb, #ffb100 13%, white), color-mix(in srgb, #ffb100 12%, transparent));
+}
+:root[pin-mails-inbox] #threadTree tr.card-layout[data-properties~="new"] .sender,
+:root[pin-mails-inbox] #threadTree tr.card-layout[data-properties~="new"] .subject {
+  font-weight: 760;
+}
+:root[pin-mails-inbox] #threadTree tr.card-layout[data-properties~="new"] .read-status {
+  --read-status-size: 20px;
+  color: light-dark(#9a4d00, #ffc46b);
+  filter: drop-shadow(0 0 3px color-mix(in srgb, currentColor 45%, transparent));
+}
 .pin-mails-table-host {
   padding-inline-end: 46px !important;
 }
 .pin-mails-table-host > .pin-mails-independent-button {
   inset-inline-end: 6px;
+}
+.pin-mails-group-remove {
+  min-block-size: 24px;
+  padding: 2px 8px;
+  border: 1px solid color-mix(in srgb, var(--pin-group-color) 58%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--pin-group-color) 18%, transparent);
+  color: inherit;
+  font: inherit;
+  font-size: .75rem;
+  font-weight: 650;
+  line-height: 1.15;
+  opacity: .9;
+}
+.pin-mails-group-remove:hover,
+.pin-mails-group-remove:focus-visible {
+  opacity: 1;
+  background: color-mix(in srgb, var(--pin-group-color) 28%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--pin-group-color) 45%, transparent);
+  outline-offset: 1px;
+}
+@media (forced-colors: active) {
+  :root[pin-mails-inbox] #threadTree tr.card-layout[data-properties~="unread"] .card-container,
+  :root[pin-mails-inbox] #threadTree tr.card-layout[data-properties~="new"] .card-container,
+  .pin-mails-group-remove {
+    border-color: Highlight;
+  }
+  .pin-mails-group-remove { forced-color-adjust: auto; }
 }

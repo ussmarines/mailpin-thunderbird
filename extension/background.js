@@ -2,8 +2,6 @@
 
 const MENU_IDS = Object.freeze({
   toggle: "pin-mails-toggle-selection",
-  pin: "pin-mails-pin-selection",
-  unpin: "pin-mails-unpin-selection",
   conversation: "pin-mails-toggle-conversation",
   displayed: "pin-mails-toggle-displayed",
   dashboard: "pin-mails-dashboard",
@@ -67,28 +65,30 @@ async function openDashboard() {
   }
 }
 
+function selectionMenuTitle(state) {
+  const multiple = Number(state?.count || 0) > 1;
+  if (state?.allPinned) {
+    return translate(multiple ? "menuUnpinMessages" : "menuUnpinMessage", multiple ? "Désépingler les messages sélectionnés" : "Désépingler ce message");
+  }
+  return translate(multiple ? "menuPinMessages" : "menuPinMessage", multiple ? "Épingler les messages sélectionnés" : "Épingler ce message");
+}
+
+function conversationMenuTitle(state) {
+  return state?.allConversationsPinned
+    ? translate("menuUnpinConversation", "Désépingler toute la conversation liée")
+    : translate("menuPinConversation", "Épingler toute la conversation liée");
+}
+
 function createMenus() {
   messenger.menus.create({
     id: MENU_IDS.toggle,
-    title: translate("menuToggle", "Épingler ou désépingler la sélection"),
+    title: translate("menuPinMessage", "Épingler ce message"),
     contexts: ["message_list"],
     icons: {16: "icons/pin-regular.svg", 32: "icons/pin-regular.svg"}
   });
   messenger.menus.create({
-    id: MENU_IDS.pin,
-    title: translate("menuPin", "Épingler la sélection"),
-    contexts: ["message_list"],
-    visible: false
-  });
-  messenger.menus.create({
-    id: MENU_IDS.unpin,
-    title: translate("menuUnpin", "Désépingler la sélection"),
-    contexts: ["message_list"],
-    visible: false
-  });
-  messenger.menus.create({
     id: MENU_IDS.conversation,
-    title: translate("menuConversation", "Épingler ou désépingler la conversation"),
+    title: translate("menuPinConversation", "Épingler toute la conversation liée"),
     contexts: ["message_list"]
   });
   messenger.menus.create({
@@ -121,13 +121,12 @@ messenger.menus.onShown.addListener(async (_info, tab) => {
     await Promise.all([
       messenger.menus.update(MENU_IDS.toggle, {
         visible: usable,
-        title: state?.allPinned
-          ? translate("menuUnpin", "Désépingler la sélection")
-          : translate("menuPin", "Épingler la sélection")
+        title: selectionMenuTitle(state)
       }),
-      messenger.menus.update(MENU_IDS.pin, {visible: usable && !state?.allPinned}),
-      messenger.menus.update(MENU_IDS.unpin, {visible: usable && Boolean(state?.anyPinned)}),
-      messenger.menus.update(MENU_IDS.conversation, {visible: usable})
+      messenger.menus.update(MENU_IDS.conversation, {
+        visible: usable && state?.conversationEnabled !== false && Boolean(state?.conversationCount),
+        title: conversationMenuTitle(state)
+      })
     ]);
     await messenger.menus.refresh();
   } catch (error) {
@@ -152,10 +151,6 @@ messenger.menus.onClicked.addListener(async (info, tab) => {
     switch (info.menuItemId) {
       case MENU_IDS.toggle:
         return await toggleSelected(tab.id);
-      case MENU_IDS.pin:
-        return await toggleSelected(tab.id, true);
-      case MENU_IDS.unpin:
-        return await toggleSelected(tab.id, false);
       case MENU_IDS.conversation:
         return await toggleConversation(tab.id);
       case MENU_IDS.displayed:

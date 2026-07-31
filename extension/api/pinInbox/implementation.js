@@ -1472,7 +1472,6 @@ class PinStructuredStore {
 var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   getAPI(context) {
     this._states ??= new Set();
-    this._menuWindows ??= new Map();
     this._context = context;
     this._rootURI = context.extension.rootURI;
     this._extensionVersion = String(context.extension.manifest?.version || "0.0.0");
@@ -2675,16 +2674,31 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
   _selectionState(about3Pane) {
+    const empty = {
+      count: 0,
+      allPinned: false,
+      anyPinned: false,
+      conversationEnabled: Boolean(this._settings.enableConversationPins),
+      conversationCount: 0,
+      allConversationsPinned: false,
+      anyConversationPinned: false
+    };
     const folder = about3Pane.gFolder;
     if (!folder || (!(folder.flags & Ci.nsMsgFolderFlags.Inbox) && !this._settings.allowPinOutsideInbox)) {
-      return {count: 0, allPinned: false, anyPinned: false};
+      return empty;
     }
     const headers = this._getSelectedHeaders(about3Pane);
     const pinnedCount = headers.filter(hdr => this._isPinnedHeader(hdr)).length;
+    const conversationKeys = [...new Set(headers.map(hdr => conversationStableKey(hdr)).filter(Boolean))];
+    const conversationPinnedCount = conversationKeys.filter(key => hasOwn(this._data.refs, key)).length;
     return {
       count: headers.length,
       allPinned: Boolean(headers.length && pinnedCount === headers.length),
-      anyPinned: pinnedCount > 0
+      anyPinned: pinnedCount > 0,
+      conversationEnabled: Boolean(this._settings.enableConversationPins),
+      conversationCount: conversationKeys.length,
+      allConversationsPinned: Boolean(conversationKeys.length && conversationPinnedCount === conversationKeys.length),
+      anyConversationPinned: conversationPinnedCount > 0
     };
   }
 
@@ -2692,7 +2706,15 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     const about3Pane = this._about3PaneForTab(context, tabId);
     return about3Pane
       ? this._selectionState(about3Pane)
-      : {count: 0, allPinned: false, anyPinned: false};
+      : {
+          count: 0,
+          allPinned: false,
+          anyPinned: false,
+          conversationEnabled: Boolean(this._settings.enableConversationPins),
+          conversationCount: 0,
+          allConversationsPinned: false,
+          anyConversationPinned: false
+        };
   }
 
   async _toggleSelectedInPane(about3Pane, forceState) {
@@ -4809,9 +4831,12 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       setLabel("cancel-no-reply", "Arrêter le suivi sans réponse");
       disable("cancel-no-reply", !ref?.noReplyTracking);
       setLabel("unpin", hdr ? "Désépingler" : "Retirer la référence introuvable");
+      const group = this._groupForId(ref?.groupId);
+      setLabel("remove-group", group ? `Retirer du groupe « ${group.name} »` : "Retirer du groupe");
 
       for (const action of ["open", "reply", "toggleRead", "archive", "delete"]) disable(action, !hdr);
       disable("group", !this._data.groups.length);
+      disable("remove-group", !group);
       const calendars = this._settings.enableCalendarIntegration ? this._getCalendars() : [];
       disable("calendar-task", !calendars.some(calendar => calendar.taskCompatible));
       disable("calendar-event", !calendars.some(calendar => calendar.eventCompatible));
@@ -4886,6 +4911,11 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         }
         if (action === "edit") { openEditor(key); return; }
         if (action === "group") { openGroupAssignmentDialog([key]); return; }
+        if (action === "remove-group") {
+          this._performReferenceAction([key], "group", {groupId: ""});
+          showToast("Message retiré du groupe.", true, "success");
+          return;
+        }
         if (action === "waiting") {
           const waiting = ref.workflowStatus !== "waiting";
           this._setWorkflowStatus([key], waiting ? "waiting" : "active");
@@ -5026,6 +5056,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         ["planned", this._t("planned", "Planifier")],
         ["complete", this._t("markComplete", "Marquer comme terminé")],
         ["group", this._t("assignGroup", "Classer dans un groupe")],
+        ["remove-group", this._t("removeFromGroup", "Retirer du groupe")],
         ["track-no-reply", this._t("trackNoReply", "Me relancer si aucune réponse")],
         ["cancel-no-reply", this._t("cancelNoReply", "Arrêter le suivi sans réponse")],
         ["snooze", this._t("snoozeOneHour", "Reporter le rappel d’une heure")],
@@ -5420,7 +5451,12 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         const due = createNode("span", "pin-mails-due", `${ref.dueAt < Date.now() ? "En retard · " : "Échéance · "}${this._formatTimestamp(about3Pane, ref.dueAt)}`); statusLine.appendChild(due);
       }
       const group = this._groupForId(ref.groupId);
-      if (this._settings.showGroups && group) { const chip = createNode("span", "pin-mails-group-chip", group.name); chip.style.setProperty("--pin-group-color", group.color); statusLine.appendChild(chip); }
+      if (this._settings.showGroups && group) {
+        const chip = createQuickButton("remove-group", `Retirer du groupe « ${group.name} »`, `${group.name} ×`);
+        chip.classList.add("pin-mails-group-chip", "pin-mails-group-remove");
+        chip.style.setProperty("--pin-group-color", group.color);
+        statusLine.appendChild(chip);
+      }
       if (ref.priorityLevel !== "normal") statusLine.appendChild(createNode("span", `pin-mails-priority-chip ${ref.priorityLevel}`, ref.priorityLevel === "urgent" ? "Urgent" : "Priorité haute"));
       if (statusLine.childNodes.length) card.appendChild(statusLine);
 
@@ -5606,12 +5642,12 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       if (disposed) return;
       if (refreshTimer !== null) about3Pane.clearTimeout(refreshTimer);
       refreshTimer = about3Pane.setTimeout(() => {
-        refreshTimer = null; patchAllRows(); renderPanel(); this._updateMainMenuWindow(about3Pane.top);
+        refreshTimer = null; patchAllRows(); renderPanel();
       }, immediate ? 0 : REFRESH_DELAY_MS);
     };
 
     const applySettings = () => { lastRenderSignature = ""; renderLimit = this._settings.panelPageSize; updatePanelToggle(); scheduleRefresh(true); };
-    const updateFolderMode = () => { lastRenderSignature = ""; cardCache.clear(); selectedPanelKeys.clear(); selectedPanelKey = null; selectionAnchorKey = null; searchText = ""; panelSmartView = "all"; renderLimit = this._settings.panelPageSize; patchAllRows(); renderPanel(); this._updateMainMenuWindow(about3Pane.top); };
+    const updateFolderMode = () => { lastRenderSignature = ""; cardCache.clear(); selectedPanelKeys.clear(); selectedPanelKey = null; selectionAnchorKey = null; searchText = ""; panelSmartView = "all"; renderLimit = this._settings.panelPageSize; patchAllRows(); renderPanel(); };
 
     const observer = new about3Pane.MutationObserver(() => scheduleRefresh());
     observer.observe(threadTree, {subtree: true, childList: true, attributes: true, attributeFilter: ["data-properties"]});
@@ -5621,7 +5657,6 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       about3Pane.setTimeout(updateFolderMode, 0);
     };
     const onRowCountChange = () => scheduleRefresh();
-    const onSelectionChange = () => this._updateMainMenuWindow(about3Pane.top);
     const onWindowBlur = () => { closeContextMenu(); clearDropFeedback(); };
     const onViewportChange = () => { closeContextMenu(); clearDropTargets(); };
     const onThreadDragEnd = () => clearDropFeedback();
@@ -5650,7 +5685,6 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       about3Pane.removeEventListener("folderURIChanged", onFolderChanged);
       document.removeEventListener("click", onDocumentClick, true);
       if (onPanelContextMenu) about3Pane.removeEventListener("contextmenu", onPanelContextMenu, true);
-      document.removeEventListener("select", onSelectionChange, true);
       about3Pane.removeEventListener("blur", onWindowBlur, true);
       about3Pane.removeEventListener("resize", onViewportChange);
       panel?.querySelector(".pin-mails-panel-list")?.removeEventListener("scroll", onViewportChange);
@@ -5678,14 +5712,12 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     this._states.add(state);
     about3Pane.addEventListener("folderURIChanged", onFolderChanged);
     document.addEventListener("click", onDocumentClick, true);
-    document.addEventListener("select", onSelectionChange, true);
     about3Pane.addEventListener("blur", onWindowBlur, true);
     about3Pane.addEventListener("resize", onViewportChange);
     threadTree.addEventListener("rowcountchange", onRowCountChange);
     threadTree.addEventListener("dragstart", onThreadDragStart);
     threadTree.addEventListener("dragend", onThreadDragEnd);
     about3Pane.addEventListener("unload", cleanup, {once: true});
-    this._ensureMainMenuWindow(about3Pane.top);
     ensurePanelToggle();
     createPanel();
     panel?.querySelector(".pin-mails-panel-list")?.addEventListener("scroll", onViewportChange, {passive: true});
@@ -5698,74 +5730,6 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     return new about3Pane.Intl.DateTimeFormat(undefined, {
       day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit"
     }).format(new Date(timestamp));
-  }
-
-  _stateForTopWindow(topWindow) {
-    const active = topWindow?.gTabmail?.currentTabInfo?.chromeBrowser?.contentWindow;
-    return [...(this._states || [])].find(state => state.about3Pane === active) || null;
-  }
-
-  _ensureMainMenuWindow(topWindow) {
-    if (!topWindow?.document || this._menuWindows.has(topWindow)) {
-      return;
-    }
-    const document = topWindow.document;
-    const popup = document.getElementById("messageMenuPopup");
-    const before = document.getElementById("markMenu");
-    if (!popup || !before) {
-      return;
-    }
-    const separator = document.createXULElement("menuseparator");
-    separator.id = "pin-mails-message-separator";
-    const item = document.createXULElement("menuitem");
-    item.id = "pin-mails-message-command";
-    item.setAttribute("label", "Épingler la sélection");
-    item.setAttribute("accesskey", "p");
-    popup.insertBefore(separator, before);
-    popup.insertBefore(item, before);
-
-    const onCommand = () => {
-      const state = this._stateForTopWindow(topWindow);
-      state?.toggleSelected(null);
-    };
-    const onShowing = () => this._updateMainMenuWindow(topWindow);
-    item.addEventListener("command", onCommand);
-    popup.addEventListener("popupshowing", onShowing);
-    this._menuWindows.set(topWindow, {popup, item, separator, onCommand, onShowing});
-    this._updateMainMenuWindow(topWindow);
-  }
-
-  _updateMainMenuWindow(topWindow) {
-    const record = this._menuWindows?.get(topWindow);
-    if (!record) {
-      return;
-    }
-    const state = this._stateForTopWindow(topWindow);
-    const selection = state?.getSelectionState() || {
-      count: 0,
-      allPinned: false,
-      anyPinned: false
-    };
-    record.item.hidden = !selection.count;
-    record.separator.hidden = !selection.count;
-    record.item.setAttribute(
-      "label",
-      selection.allPinned ? "Désépingler la sélection" : "Épingler la sélection"
-    );
-  }
-
-  _cleanupMainMenus() {
-    for (const [window, record] of this._menuWindows || []) {
-      try {
-        record.item.removeEventListener("command", record.onCommand);
-        record.popup.removeEventListener("popupshowing", record.onShowing);
-        record.item.remove();
-        record.separator.remove();
-      } catch {
-        // Window may already be closed.
-      }
-      this._menuWindows.delete(window);
-    }
   }
 
   onShutdown(isAppShutdown) {
@@ -5786,7 +5750,6 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         try { state.cleanup(); } catch (error) { console.error("Épingles : nettoyage incomplet", error); }
       }
     }
-    this._cleanupMainMenus();
     this._dashboardRequestPending = false;
     this._dashboardRequestListeners?.clear();
     // Start an atomic emergency-file write before the asynchronous SQLite

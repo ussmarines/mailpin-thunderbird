@@ -51,7 +51,7 @@ check(en_locale.get("brandSubtitle", {}).get("message") == "Pin, organize and fo
 check(en_locale.get("brandSlogan", {}).get("message") == "Keep important mail within reach.", "slogan MailPerch incohérent")
 
 required_root = [
-    "AGENTS.md", "BRANDING.md", "README.md", "README.en.md", "LICENSE", "NOTICE.md", "CHANGELOG.md", "AUDIT_REPORT_3.1.0.md", "AUDIT_REPORT_3.1.4.md", "AUDIT_REPORT_3.2.0.md",
+    "AGENTS.md", "BRANDING.md", "README.md", "README.en.md", "LICENSE", "NOTICE.md", "CHANGELOG.md", "AUDIT_REPORT_3.1.0.md", "AUDIT_REPORT_3.1.4.md", "AUDIT_REPORT_3.2.0.md", "HOTFIX_REPORT_3.2.1.md",
     "CONTRIBUTING.md", "CODE_OF_CONDUCT.md", "SECURITY.md", "PRIVACY.md", "ROADMAP.md", "SUPPORT.md",
     "package.json", ".editorconfig", ".gitattributes", ".gitignore", "extension/AGENTS.md",
     "extension/api/pinInbox/AGENTS.md", "tests/AGENTS.md",

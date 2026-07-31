@@ -2,9 +2,17 @@
 
 ## État exact
 
-Produit : **MailPerch — Email Pins & Follow-up**. Build locale : **3.2.0**, ID de développement `pin-mails@MailPerch.local`.
+Produit : **MailPerch — Email Pins & Follow-up**. Build locale : **3.2.1**, ID de développement `pin-mails@MailPerch.local`.
 
-La base distante utilisée pour cette évolution est `main` en **3.1.5**, commit `ecce60f7b8395b6c19b680e3fe8bc38dbcff1a46`. La version 3.2.0 est construite localement et ne doit pas être considérée comme publiée tant qu’un commit/push explicite n’a pas été réalisé.
+La base distante utilisée pour ce correctif est `main` en **3.2.0**, commit `387f1ab86aa3ec699e98388ac9f93b585b7e8072`. La version 3.2.1 est construite localement et ne doit pas être considérée comme publiée tant qu’un commit/push explicite n’a pas été réalisé.
+
+## Correctif 3.2.1
+
+- tableau de bord réparé par une correspondance explicite entre les onglets de vue et les sections DOM ;
+- menu de messages simplifié à une action de sélection et une action de conversation clairement distinctes ;
+- ancien menu privilégié parallèle supprimé ;
+- retrait rapide d’un groupe depuis la puce de la carte ou son menu natif ;
+- liste générale plus aérée et états non lu/nouveau renforcés sans toucher aux compteurs Thunderbird.
 
 ## Évolution 3.2.0
 

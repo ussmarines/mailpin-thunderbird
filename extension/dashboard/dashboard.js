@@ -431,11 +431,24 @@ function populateBulkControls() {
   fill("bulk-template", "Choisir un modèle…", (current.templates || []).map(item => [item.id, item.name]));
 }
 
+const VIEW_SECTION_IDS = Object.freeze({
+  list: "items",
+  kanban: "kanban",
+  cases: "cases",
+  history: "history",
+  health: "health"
+});
+
 function setView(view) {
-  const valid = new Set(["list", "kanban", "cases", "history", "health"]);
-  const next = valid.has(view) ? view : "list";
-  for (const button of document.querySelectorAll("[data-view]")) button.setAttribute("aria-pressed", String(button.dataset.view === next));
-  for (const id of valid) $(id).hidden = id !== next;
+  const next = Object.prototype.hasOwnProperty.call(VIEW_SECTION_IDS, view) ? view : "list";
+  for (const button of document.querySelectorAll("[data-view]")) {
+    button.setAttribute("aria-pressed", String(button.dataset.view === next));
+  }
+  for (const [name, sectionId] of Object.entries(VIEW_SECTION_IDS)) {
+    const section = $(sectionId);
+    if (!section) throw new Error(`Section du tableau de bord introuvable : ${sectionId}`);
+    section.hidden = name !== next;
+  }
 }
 
 function render() {

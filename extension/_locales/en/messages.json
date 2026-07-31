@@ -56,18 +56,6 @@
   "commandDashboard": {
     "message": "Open the MailPerch dashboard"
   },
-  "menuToggle": {
-    "message": "Pin or unpin the selection"
-  },
-  "menuPin": {
-    "message": "Pin the selection"
-  },
-  "menuUnpin": {
-    "message": "Unpin the selection"
-  },
-  "menuConversation": {
-    "message": "Pin or unpin the conversation"
-  },
   "menuDisplayed": {
     "message": "Pin or unpin this message"
   },
@@ -1075,5 +1063,26 @@
   },
   "dashboardSearchPlaceholder": {
     "message": "Subject, sender, note, group…"
+  },
+  "menuPinMessage": {
+    "message": "Pin this message"
+  },
+  "menuUnpinMessage": {
+    "message": "Unpin this message"
+  },
+  "menuPinMessages": {
+    "message": "Pin selected messages"
+  },
+  "menuUnpinMessages": {
+    "message": "Unpin selected messages"
+  },
+  "menuPinConversation": {
+    "message": "Pin the entire related conversation"
+  },
+  "menuUnpinConversation": {
+    "message": "Unpin the entire related conversation"
+  },
+  "removeFromGroup": {
+    "message": "Remove from group"
   }
 }

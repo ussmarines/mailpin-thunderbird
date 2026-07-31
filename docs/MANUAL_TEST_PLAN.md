@@ -157,3 +157,25 @@ Consigner version Thunderbird, OS, thème, vue, type de compte et résultat.
 - tester Tab, flèches, Home, End, PageUp, PageDown, Entrée, Espace, Shift+F10 et Échap ;
 - confirmer que le focus revient au bouton après fermeture du menu ;
 - vérifier que la ligne générale est légèrement plus haute et que la punaise 36×36 est centrée, éloignée du bord supérieur et ne chevauche aucun texte.
+
+## Validation ciblée 3.2.1
+
+### Tableau de bord
+
+- ouvrir successivement Liste, Kanban, Affaires, Historique et Centre de santé ;
+- confirmer l’absence d’écran d’erreur et le retour correct à la vue Liste ;
+- vérifier Réessayer après une erreur provoquée volontairement dans un profil de test.
+
+### Menu des messages généraux
+
+- sur un message non épinglé, vérifier les libellés « Épingler ce message » et « Épingler toute la conversation liée » ;
+- après épinglage, vérifier les libellés inverses sans entrée dupliquée ;
+- tester une sélection multiple et confirmer l’emploi du pluriel ;
+- confirmer que l’action Conversation agit sur toute la conversation et non uniquement sur le message sélectionné.
+
+### Groupes et liste générale
+
+- affecter une épingle à un groupe, puis cliquer sur la puce `Nom du groupe ×` ;
+- vérifier aussi « Retirer du groupe » dans le menu natif de la carte ;
+- contrôler l’espacement des lignes et de l’aperçu en vue Cartes ;
+- recevoir un message neuf et vérifier sa bordure, son fond, sa typographie et son icône agrandie en thèmes clair, sombre et contraste élevé.
