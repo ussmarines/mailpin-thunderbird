@@ -2,23 +2,28 @@
 
 ## État exact
 
-Produit : **MailPerch — Email Pins & Follow-up**. Build locale : **3.1.4**, ID de développement `pin-mails@MailPerch.local`.
+Produit : **MailPerch — Email Pins & Follow-up**. Build locale : **3.1.5**, ID de développement `pin-mails@MailPerch.local`.
 
-La branche distante `main` est en **3.1.3** au commit `bd562373a3dab54958102e2186611ebbe0e0623d`. L’audit 3.1.4 est effectué localement depuis cette base propre et n’est pas publié automatiquement.
+La branche distante `main` utilisée comme base est en **3.1.4** au commit `99bf0da7570ae123c5bf2355af933f40133f1584`. La correction 3.1.5 remplace l’ancien menu HTML des cartes par un menu XUL natif et n’est pas publiée automatiquement.
 
-## Audit et correctifs 3.1.4
+## Correctif 3.1.5
 
-- répartiteur partagé pour le clic droit, le bouton « Plus », les actions rapides et le désépinglage ;
-- aucune dépendance à `CSS.escape` dans la fenêtre privilégiée ;
-- écouteurs capturés sur `about:3pane` et retirés symétriquement au nettoyage ;
+- menu d’actions construit avec `menupopup`, `menuitem` et `menuseparator` dans le `popupset` Thunderbird ;
+- bouton « Plus d’actions » ouvert avec `openPopup` sur son ancre ;
+- clic droit ouvert avec `openPopupAtScreen` aux coordonnées du pointeur ;
+- capture précoce sur `about:3pane` et solution de secours sur la liste des cartes ;
+- commandes traitées par l’événement XUL `command` et état nettoyé par `popuphidden` ;
+- glisser-déposer temporairement neutralisé pendant l’utilisation d’un bouton ;
+- ancien overlay HTML, positionnement manuel et CSS associés supprimés ;
+- test de régression dédié dans `tests/test_native_card_menu.py`.
+
+## Audit et correctifs 3.1.4 conservés
+
 - validation Agenda de la lecture seule, de l’état désactivé, des ACL et des capacités tâches/événements ;
 - choix du calendrier cible dans le panneau, l’éditeur et le dashboard ;
-- erreurs Agenda contextualisées au lieu du seul code `MODIFICATION_FAILED` ;
 - recherche et navigation par sections dans les paramètres ;
-- descriptions visibles sous les contrôles et boutons ;
-- feedback local près de l’action, toast fixe dans le viewport et barre persistante Enregistrer/Annuler.
-
-Le détail de la troisième passe vidéo est consigné dans `docs/VIDEO_REVIEW_2026-07-30_3.md`.
+- feedback local près de l’action, toast fixe dans le viewport et barre persistante Enregistrer/Annuler ;
+- protections d’intégrité des imports, références, priorités, écritures et chargements concurrents.
 
 ## Ce qui doit encore être validé dans Thunderbird
 

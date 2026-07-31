@@ -60,7 +60,7 @@ required_root = [
     "docs/MANUAL_TEST_PLAN.md", "docs/SCREENSHOT_FINDINGS.md", "docs/DECISIONS.md",
     "docs/KNOWN_LIMITATIONS.md", "docs/VIDEO_REVIEW_2026-07-30.md", "scripts/build.py", "scripts/check_repo.py", "scripts/deep_audit.py", "scripts/scan_secrets.py",
     "release/BUILD_INSTRUCTIONS.md", "release/ATN_REVIEW_NOTES_TEMPLATE.md", "release/manifest-store-template.json",
-    "tests/test_build_reproducible.py", "tests/test_ui_regressions.py", "tests/test_api_schema_contract.py", "tests/test_data_integrity_guards.py"
+    "tests/test_build_reproducible.py", "tests/test_ui_regressions.py", "tests/test_api_schema_contract.py", "tests/test_data_integrity_guards.py", "tests/test_native_card_menu.py"
 ]
 for relative in required_root:
     check((ROOT / relative).is_file(), f"fichier dépôt manquant: {relative}")

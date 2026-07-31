@@ -10,7 +10,7 @@ manifest = json.loads((EXT / "manifest.json").read_text(encoding="utf-8"))
 version = manifest["version"]
 
 assert manifest["manifest_version"] == 3
-assert version == "3.1.4"
+assert version == "3.1.5"
 assert manifest["permissions"] == ["menus"]
 assert manifest["browser_specific_settings"]["gecko"]["id"] == "pin-mails@MailPerch.local"
 assert manifest["browser_specific_settings"]["gecko"]["strict_min_version"] == "128.0"
@@ -91,6 +91,7 @@ for needle in [
     "_syncReferenceToCalendar", "_applyCustomRules", "_simulateRules", "_scheduleCounterRegressionCheck",
     "MailUtils.displayMessageInFolderTab", "pin-mails-independent-button", "about3Pane.messagePane.displayMessage",
     "onDashboardRequested", "event.stopImmediatePropagation()", 'event.key === "ContextMenu"',
+    'document.createXULElement("menupopup")', 'contextMenu.openPopupAtScreen',
     "clearDropTargets", "startupcache-invalidate"
 ]:
     assert needle in impl, needle
@@ -102,17 +103,18 @@ assert "contentTab" not in impl
 assert "settings.showFolderBadge = false" in impl
 assert 'this._extensionVersion = String(context.extension.manifest?.version || "0.0.0")' in impl
 assert 'extension: {version: this._extensionVersion || "0.0.0"' in impl
-assert '(document.body || document.documentElement).appendChild(contextMenu)' in impl
+assert 'let popupSet = document.querySelector("popupset") || document.getElementById("mainPopupSet")' in impl
 assert 'contextMenu?.remove()' in impl
 
 css = (EXT / "styles/pin.css").read_text(encoding="utf-8")
 for needle in [
-    "#pin-mails-qfb-toggle", ".pin-mails-independent-button", ".pin-mails-context-menu",
+    "#pin-mails-qfb-toggle", ".pin-mails-independent-button",
     "position: fixed", ".pin-mails-action-dashboard", "#pin-mails-panel [data-drop-target]",
     "@media (prefers-reduced-motion: reduce)", "@media (forced-colors: active)",
     ".pin-mails-folder-badge { display: none !important; }"
 ]:
     assert needle in css, needle
+assert ".pin-mails-context-menu" not in css
 
 background = (EXT / "background.js").read_text(encoding="utf-8")
 assert "messenger.pinInbox?.onDashboardRequested.addListener(openDashboard)" in background

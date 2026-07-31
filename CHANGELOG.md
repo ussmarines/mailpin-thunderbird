@@ -1,5 +1,15 @@
 # Journal des modifications
 
+## 3.1.5 — menu d’actions natif des messages épinglés
+
+- remplacement du menu HTML positionné manuellement par un `menupopup` natif Thunderbird ;
+- ouverture ancrée au bouton « Plus d’actions » et ouverture aux coordonnées écran pour le clic droit ;
+- capture du clic droit au niveau de `about:3pane`, avec solution de secours directement sur la liste des cartes ;
+- gestion native des commandes et de la fermeture du menu, avec restauration correcte de `aria-expanded` ;
+- neutralisation temporaire du glisser-déposer de la carte lorsqu’un bouton est pressé ;
+- suppression du CSS et des gestionnaires devenus obsolètes pour l’ancien menu HTML ;
+- ajout d’une garde de régression dédiée à la construction, à l’ouverture et à l’activation du menu natif.
+
 ## 3.1.4 — audit complet, intégrité et fiabilité
 
 - correction du sens de comparaison des priorités Thunderbird ;

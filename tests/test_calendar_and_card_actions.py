@@ -17,9 +17,10 @@ assert "const dispatchCardAction" in impl
 assert "const runCardAction" in impl
 assert "const openContextMenuForCard" in impl
 assert impl.index("const runCardAction") < impl.index("const createPanel")
-assert 'about3Pane.addEventListener("click", onPanelClickCapture, true)' in impl
 assert 'about3Pane.addEventListener("contextmenu", onPanelContextMenu, true)' in impl
-assert 'about3Pane.removeEventListener("click", onPanelClickCapture, true)' in impl
+assert 'list.addEventListener("contextmenu"' in impl
+assert 'about3Pane.removeEventListener("contextmenu", onPanelContextMenu, true)' in impl
+assert 'onPanelClickCapture' not in impl
 
 
 # The native folder picker must receive a BrowsingContext on current Thunderbird.
@@ -28,12 +29,21 @@ assert 'picker.init(browsingContext' in impl
 assert 'picker.init(win,' not in impl
 assert 'Ci.nsIFilePicker.modeGetFolder' in impl
 
-# The overflow menu must be mounted in the visible document and resist card dragging.
-assert '(document.body || document.documentElement).appendChild(contextMenu)' in impl
+# The overflow menu must use Thunderbird's native popup layer and resist card dragging.
+assert 'document.createXULElement("menupopup")' in impl
+assert 'document.createXULElement("menuitem")' in impl
+assert 'document.createXULElement("menuseparator")' in impl
+assert 'let popupSet = document.querySelector("popupset") || document.getElementById("mainPopupSet")' in impl
+assert 'contextMenu.openPopup(trigger, "after_end"' in impl
+assert 'contextMenu.openPopupAtScreen(screenX, screenY, true, triggerEvent)' in impl
+assert 'contextMenu.addEventListener("command"' in impl
+assert 'contextMenu.addEventListener("popuphidden", resetContextMenuState)' in impl
 assert 'more.addEventListener("click"' in impl
 assert 'more.setAttribute("aria-expanded", "false")' in impl
-assert 'openContextMenuForCard(card, rect.right, rect.bottom, sourceButton)' in impl
-assert 'event.target.closest("button, input, select, textarea, a")' in impl
+assert 'dispatchCardAction(card, "more", more, event)' in impl
+assert 'button.addEventListener("pointerdown"' in impl
+assert 'createNode("div", "pin-mails-context-menu")' not in impl
+assert 'contextMenu.style.left' not in impl
 
 # Calendar inventory and writes must check ACL, disabled/read-only state and capabilities.
 for token in [

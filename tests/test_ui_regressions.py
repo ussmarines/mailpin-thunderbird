@@ -42,17 +42,20 @@ assert "preserveEdits" in options_js
 assert "beforeunload" in options_js
 assert 'setStatus("Paramètres enregistrés."' in options_js
 
-# Pinned cards have a context menu captured before Thunderbird's native menu.
+# Pinned cards use Thunderbird's native popup layer and capture right-click early.
 assert 'about3Pane.addEventListener("contextmenu", onPanelContextMenu, true)' in impl
-assert 'about3Pane.addEventListener("pointerdown", onPanelRightPointerDown, true)' in impl
-assert 'list.addEventListener("contextmenu"' not in impl
+assert 'list.addEventListener("contextmenu"' in impl
+assert 'onPanelRightPointerDown' not in impl
 assert "event.composedPath()" in impl
 assert "event.stopImmediatePropagation()" in impl
 assert 'event.key === "ContextMenu"' in impl
 assert 'event.shiftKey && event.key === "F10"' in impl
-assert "(document.body || document.documentElement).appendChild(contextMenu)" in impl
+assert 'document.createXULElement("menupopup")' in impl
+assert 'contextMenu.openPopup(trigger, "after_end"' in impl
+assert 'contextMenu.openPopupAtScreen(screenX, screenY, true, triggerEvent)' in impl
+assert 'contextMenu.addEventListener("command"' in impl
 assert "contextMenu?.remove()" in impl
-assert ".pin-mails-context-menu" in css and "position: fixed" in css
+assert ".pin-mails-context-menu" not in css
 assert "openContextMenuForCard" in impl
 assert "runCardAction" in impl
 

@@ -5,7 +5,7 @@ Consigner version Thunderbird, OS, thème, vue, type de compte et résultat.
 ## Installation et migration
 
 - installation propre ;
-- mise à niveau 3.1.3 → 3.1.4 ;
+- mise à niveau 3.1.4 → 3.1.5 ;
 - redémarrage normal et redémarrage forcé ;
 - sauvegarde puis restauration.
 
@@ -53,12 +53,14 @@ Consigner version Thunderbird, OS, thème, vue, type de compte et résultat.
 - limite et anti-boucle ;
 - veille, réveil et rappel manqué.
 
-## Validation ciblée 3.1.4
+## Validation ciblée 3.1.5
 
 ### Cartes épinglées
 
-- clic droit sur auteur, objet, espace vide, bouton d’action et punaise : le menu MailPerch s’ouvre ;
-- bouton « Plus » : même menu, positionné dans le viewport ;
+- clic droit sur auteur, objet, espace vide, bouton d’action et punaise : le menu natif MailPerch s’ouvre à l’emplacement du pointeur ;
+- bouton « Plus d’actions » : le même menu natif s’ouvre sous le bouton ;
+- vérifier que le menu reste visible en thème clair, sombre et contraste élevé, puis qu’il se ferme après une commande, Échap, un changement de dossier ou une perte de focus ;
+- tester après un tri manuel et un glisser-déposer afin de confirmer que les boutons ne déclenchent jamais le déplacement de la carte ;
 - exécuter ouvrir, répondre, lu/non lu, archiver, supprimer, groupe, attente, planifier, terminer, rappel et Agenda ;
 - désépingler par la punaise puis par le menu ;
 - vérifier le résultat visible et l’absence de double exécution ;
