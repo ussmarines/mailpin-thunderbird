@@ -2370,7 +2370,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     };
   }
 
-  _setConfiguration(configuration) {
+  async _setConfiguration(configuration) {
     assertStructuredInput(configuration, "Configuration", {maxBytes: 2 * 1024 * 1024, maxNodes: 25_000});
     if (!configuration || typeof configuration !== "object") {
       throw new ExtensionError("Configuration invalide.");
@@ -2436,6 +2436,9 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     }
     this._applyRuntimeSettings();
     this._refreshAllStates(true);
+    // setConfiguration is an explicit user save boundary. Do not acknowledge
+    // success until all queued SQLite writes have completed.
+    await this._storage?.flush();
     return this._getConfiguration();
   }
 
@@ -4806,9 +4809,12 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         button.type = "button";
         button.dataset.pinMailsAction = "toggle-row-pin";
         if (row.classList.contains("card-layout")) {
-          const headerRow = row.querySelector(".thread-card-row");
-          const more = headerRow?.querySelector(".tree-button-more");
-          headerRow?.insertBefore(button, more || null);
+          // Keep MailPerch's pin beside Thunderbird's native star in the
+          // official icon-info container. The star stays in its native DOM
+          // position; no cloning or reparenting is required.
+          const iconInfo = row.querySelector(".thread-card-icon-info");
+          const nativeStar = iconInfo?.querySelector(".button-star, .tree-button-flag");
+          iconInfo?.insertBefore(button, nativeStar || null);
         } else {
           const host = row.querySelector("td.subjectcol-column") || row.lastElementChild;
           host?.classList.add("pin-mails-table-host");

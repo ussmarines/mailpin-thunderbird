@@ -273,8 +273,8 @@ function enhanceSettingsPage() {
 function syncSaveControls() {
   const save = $("save-all-floating");
   const discard = $("discard-changes");
-  if (save) save.disabled = !configurationReady || !dirty || saveInFlight;
-  if (discard) discard.disabled = !configurationReady || !dirty || saveInFlight;
+  if (save) save.disabled = !configurationReady || saveInFlight;
+  if (discard) discard.disabled = !configurationReady || saveInFlight;
 }
 
 function setDirty(value = true) {
@@ -846,6 +846,16 @@ function applyConfiguration(config) {
   setConfigurationReady(true);
 }
 
+function readFiniteControlNumber(id, fallback) {
+  const control = $(id);
+  const parsed = Number(control?.value);
+  if (!Number.isFinite(parsed)) return Number(fallback) || 0;
+  const minimum = control?.min === "" ? -Infinity : Number(control?.min);
+  const maximum = control?.max === "" ? Infinity : Number(control?.max);
+  return Math.min(Number.isFinite(maximum) ? maximum : Infinity,
+    Math.max(Number.isFinite(minimum) ? minimum : -Infinity, parsed));
+}
+
 function collectSettings() {
   const accountColors = {};
   const inboxEnabled = {};
@@ -853,7 +863,7 @@ function collectSettings() {
   for (const [uri, input] of inboxControls) inboxEnabled[uri] = input.checked;
   const result = {...requireConfiguration().settings, accountColors, inboxEnabled};
   for (const id of SELECT_IDS) result[id] = $(id).value;
-  for (const id of NUMBER_IDS) result[id] = Number($(id).value);
+  for (const id of NUMBER_IDS) result[id] = readFiniteControlNumber(id, result[id]);
   for (const id of BOOLEAN_IDS) result[id] = $(id).checked;
   result.showFolderBadge = false;
   result.waitingGroupId = $("waitingGroupId").value;
@@ -903,10 +913,6 @@ async function saveAll(event = null) {
     setStatus("Les paramètres sont encore en cours de chargement.", "error", {control: submitter, persistent: true});
     return;
   }
-  if (!dirty) {
-    setStatus("Aucune modification à enregistrer.", "success", {control: submitter});
-    return;
-  }
   if (saveInFlight) {
     setStatus("Une opération sur les paramètres est déjà en cours.", "busy", {control: submitter, persistent: true});
     return;
@@ -916,19 +922,27 @@ async function saveAll(event = null) {
   try {
     if (!configuration?.settings) await reload();
     const config = await withBusy(submitter, "Enregistrement des paramètres…", async () => {
-      const saved = await messenger.pinInbox.setConfiguration({
+      const requested = {
         settings: collectSettings(),
         groups,
         rules,
         cases,
         templates
-      });
+      };
+      const saved = await messenger.pinInbox.setConfiguration(requested);
       if (!saved?.settings || typeof saved.settings !== "object") {
         throw new Error("MailPerch n’a pas confirmé l’enregistrement des paramètres.");
       }
+      // Read back through the public API. This verifies the complete path from
+      // the form to the privileged preference/SQLite stores before showing a
+      // success message.
+      const persisted = await messenger.pinInbox.getConfiguration();
+      if (!persisted?.settings || typeof persisted.settings !== "object") {
+        throw new Error("La relecture des paramètres enregistrés a échoué.");
+      }
       return {
-        ...saved,
-        settings: {...saved.settings},
+        ...persisted,
+        settings: {...persisted.settings},
         shortcut: await getShortcut()
       };
     });
@@ -952,10 +966,6 @@ async function discardChanges(event = null) {
       : $("discard-changes");
   if (!configurationReady) {
     setStatus("Les paramètres sont encore en cours de chargement.", "error", {control, persistent: true});
-    return;
-  }
-  if (!dirty) {
-    setStatus("Aucune modification à annuler.", "success", {control});
     return;
   }
   if (saveInFlight) {
@@ -1057,12 +1067,29 @@ function localize() {
   }
 }
 
+
+function installCriticalSettingsActions() {
+  const form = $("settings-form");
+  if (!form || form.dataset.criticalActionsBound === "true") return;
+  form.dataset.criticalActionsBound = "true";
+  form.noValidate = true;
+  form.addEventListener("submit", saveAll);
+  form.addEventListener("reset", discardChanges);
+  document.addEventListener("click", event => {
+    const button = event.target?.closest?.("#save-all-floating, #discard-changes");
+    if (!button) return;
+    if (button.id === "save-all-floating") void saveAll(event);
+    else void discardChanges(event);
+  }, true);
+}
+
 function renderBrandVersion() {
   const version = messenger.runtime.getManifest().version;
   $("app-version").textContent = version ? `v${version}` : "";
 }
 
 window.addEventListener("DOMContentLoaded", async () => {
+  installCriticalSettingsActions();
   localize();
   renderBrandVersion();
   enhanceSettingsPage();
@@ -1075,10 +1102,6 @@ window.addEventListener("DOMContentLoaded", async () => {
   // out-of-form submitters. Keep native form events for keyboard/assistive
   // technology, and bind the visible controls directly as the authoritative
   // click path. Both routes converge on the same guarded functions.
-  form.addEventListener("submit", saveAll);
-  form.addEventListener("reset", discardChanges);
-  saveButton.addEventListener("click", saveAll);
-  discardButton.addEventListener("click", discardChanges);
   form.addEventListener("input", event => {
     if (event.target.id === "shortcut" || event.target.id === "import-file") return;
     setDirty();

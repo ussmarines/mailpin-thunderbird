@@ -15,13 +15,12 @@ assert 'button = createNode("button", INDEPENDENT_BUTTON_CLASS);' in IMPLEMENTAT
 assert '`${INDEPENDENT_BUTTON_CLASS} button icon-button icon-only`' not in IMPLEMENTATION
 assert 'button.classList.remove("button", "icon-button", "icon-only", "button-star", "tree-button-flag");' in IMPLEMENTATION
 
-# In independent mode, Thunderbird owns and positions its native star. The
-# MailPerch rail contains only the pin and the More button.
-rail = PIN_CSS.split('/* Le bouton « Plus » et la punaise MailPerch forment un rail centré.', 1)[1]
-rail = rail.split('/* 3.2.4 — une seule étoile native par ligne.', 1)[0]
-assert '.button-star' not in rail
-assert 'padding-inline-end: 58px;' in rail
-assert 'padding-inline-end: 66px;' in rail
+# In independent mode, Thunderbird still owns the native star node. MailPerch
+# may align it visually, but implementation.js must never reparent it.
+independent = IMPLEMENTATION.split('const ensureIndependentButton', 1)[1].split('const patchRow', 1)[0]
+assert 'iconInfo?.insertBefore(button, nativeStar || null);' in independent
+assert 'insertBefore(star' not in independent
+assert 'appendChild(star' not in independent
 
 # Save/cancel live inside the form and use direct click handlers. Native form
 # events remain as a keyboard/assistive fallback, but no cross-form association
@@ -33,8 +32,8 @@ assert form_start < dock_pos < form_end
 assert 'id="discard-changes" type="button"' in OPTIONS_HTML
 assert 'id="save-all-floating" type="button"' in OPTIONS_HTML
 assert 'form="settings-form"' not in OPTIONS_HTML[OPTIONS_HTML.index('id="save-dock"'):form_end]
-assert 'saveButton.addEventListener("click", saveAll);' in OPTIONS_JS
-assert 'discardButton.addEventListener("click", discardChanges);' in OPTIONS_JS
+assert 'document.addEventListener("click", event => {' in OPTIONS_JS
+assert '#save-all-floating, #discard-changes' in OPTIONS_JS
 assert 'form.addEventListener("submit", saveAll);' in OPTIONS_JS
 assert 'event?.stopPropagation?.();' in OPTIONS_JS
 assert 'form.requestSubmit($("save-all-floating"));' not in OPTIONS_JS
@@ -42,6 +41,6 @@ assert 'form.requestSubmit($("save-all-floating"));' not in OPTIONS_JS
 # Reopened bugs stay visible until real Thunderbird validation.
 for bug_id in ("MP-2026-004", "MP-2026-005"):
     row = next(line for line in TRACKER.splitlines() if line.startswith(f"| {bug_id} |"))
-    assert "| À VALIDER | 3.2.6 |" in row
+    assert "| À VALIDER | 3.2.7 |" in row
 
-print("MailPerch 3.2.6 real-interaction regression guards: OK")
+print("MailPerch 3.2.6/3.2.7 real-interaction regression guards: OK")

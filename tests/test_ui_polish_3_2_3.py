@@ -18,7 +18,7 @@ options_js = (ROOT / "extension/options/options.js").read_text(encoding="utf-8")
 options_css = (ROOT / "extension/options/options.css").read_text(encoding="utf-8")
 deep_audit = (ROOT / "scripts/deep_audit.py").read_text(encoding="utf-8")
 
-VERSION = "3.2.6"
+VERSION = "3.2.7"
 assert package["version"] == VERSION
 assert manifest["version"] == VERSION
 assert state["extensionVersion"] == VERSION
@@ -117,4 +117,4 @@ for path in state["entrypoints"].values():
     assert (ROOT / path).is_file(), path
     assert path in memory, path
 
-print("MailPerch 3.2.6 UI polish and project-memory guards: OK")
+print("MailPerch 3.2.7 UI polish and project-memory guards: OK")

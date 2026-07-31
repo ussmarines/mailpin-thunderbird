@@ -315,7 +315,7 @@ Consigner version Thunderbird, OS, thème, vue, type de compte et résultat.
 Après chaque résultat, mettre à jour `docs/BUG_TRACKER.md` : `À VALIDER` vers `CORRIGÉ`, ou rouvrir l’entrée avec les nouvelles preuves.
 
 
-## Validation ciblée 3.2.6 — bugs rouverts
+## Validation ciblée 3.2.7 — bugs rouverts
 
 ### MP-2026-004 — étoile et punaise
 

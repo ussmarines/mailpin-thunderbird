@@ -40,7 +40,7 @@ Dans Thunderbird, vérifier séparément :
 3. Enregistrer, Annuler, Entrée/Espace et `Ctrl/Cmd+S` dans les paramètres ;
 4. le job Windows GitHub Actions, qui ne doit plus signaler `dist/.gitkeep\r`.
 
-## Régressions ciblées 3.2.6
+## Régressions ciblées 3.2.7
 
 1. Défilement rapide de 200 messages : une étoile native, une punaise MailPerch et un bouton Plus par carte.
 2. Modifier un sélecteur, cliquer Enregistrer, fermer puis rouvrir les paramètres et vérifier la valeur.

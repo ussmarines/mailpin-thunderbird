@@ -1,6 +1,15 @@
 # Journal des modifications
 
-## 3.2.6 — interaction réelle des paramètres et icônes natives
+## 3.2.7 — rail natif et sauvegarde vérifiée de bout en bout
+
+- alignement de l’étoile native, de la punaise MailPerch et du menu sur un rail vertical commun sans déplacer l’étoile dans le DOM ;
+- déplacement de la punaise indépendante dans le conteneur natif `thread-card-icon-info` ;
+- liaison des commandes Enregistrer/Annuler en capture avant toute initialisation visuelle ;
+- sauvegarde explicite autorisée même sans état `dirty`, valeurs numériques bornées et relecture de confirmation après écriture ;
+- `setConfiguration` attend désormais la fin des écritures SQLite avant de confirmer le succès ;
+- suppression d’une duplication de groupe dans la normalisation des paramètres.
+
+## 3.2.7 — interaction réelle des paramètres et icônes natives
 
 - retrait des classes génériques Thunderbird du bouton de punaise indépendant afin d’empêcher le dessin d’une icône parasite ;
 - l’étoile native reste dans son conteneur Thunderbird en mode indépendant, sans repositionnement CSS par MailPerch ;

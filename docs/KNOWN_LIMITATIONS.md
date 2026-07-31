@@ -21,4 +21,4 @@
 
 ## Validation des correctifs récents
 
-Les incidents MP-2026-004 et MP-2026-005 ont été rouverts après l’échec de la 3.2.5 dans Thunderbird réel. La 3.2.6 change la frontière responsable, mais ces bugs restent `À VALIDER` dans `docs/BUG_TRACKER.md`. Les tests statiques ne remplacent pas un clic réel dans l’onglet Options ni le rendu des lignes virtualisées.
+Les incidents MP-2026-004 et MP-2026-005 ont été rouverts après l’échec de la 3.2.5 dans Thunderbird réel. La 3.2.7 change la frontière responsable, mais ces bugs restent `À VALIDER` dans `docs/BUG_TRACKER.md`. Les tests statiques ne remplacent pas un clic réel dans l’onglet Options ni le rendu des lignes virtualisées.

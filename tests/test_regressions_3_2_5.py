@@ -26,7 +26,7 @@ assert ':root[pin-mails-inbox] #threadTree [data-pin-mails-duplicate-star]' not 
 assert 'form.addEventListener("submit", saveAll);' in OPTIONS_JS
 assert 'form.addEventListener("reset", discardChanges);' in OPTIONS_JS
 assert 'async function discardChanges(event = null)' in OPTIONS_JS
-assert 'settings: {...saved.settings}' in OPTIONS_JS
+assert 'settings: {...persisted.settings}' in OPTIONS_JS
 
 # Windows subprocesses use NUL-delimited binary streams, so CRLF conversion
 # can never become part of a Git pathname.

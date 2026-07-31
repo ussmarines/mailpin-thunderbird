@@ -1393,3 +1393,40 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
 /* En mode indépendant, MailPerch ne masque, ne déplace et ne redessine
  * jamais les étoiles natives. Le masquage de doublon est strictement limité
  * au mode où l'étoile native sert elle-même d'épingle MailPerch. */
+
+/* 3.2.7 — rail d’actions des cartes Thunderbird.
+ * L’étoile reste dans son conteneur natif, mais est positionnée visuellement
+ * avec la punaise et le menu sur l’axe vertical de la carte. */
+:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-column:last-child {
+  padding-inline-end: 88px;
+}
+:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-icon-info .button-star {
+  position: absolute !important;
+  inset-block-start: 50%;
+  inset-inline-end: 60px;
+  display: grid !important;
+  place-items: center !important;
+  inline-size: 24px !important;
+  block-size: 24px !important;
+  min-inline-size: 24px !important;
+  min-block-size: 24px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: translateY(-50%);
+}
+:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-icon-info .pin-mails-independent-button {
+  position: absolute !important;
+  inset-block-start: 50%;
+  inset-inline-end: 32px;
+  transform: translateY(-50%);
+}
+:root[uidensity="touch"][pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-column:last-child {
+  padding-inline-end: 100px;
+}
+:root[uidensity="touch"][pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-icon-info .button-star {
+  inset-inline-end: 68px;
+  inline-size: 28px !important;
+  block-size: 28px !important;
+  min-inline-size: 28px !important;
+  min-block-size: 28px !important;
+}

@@ -1,6 +1,6 @@
 # Feuille de route
 
-## 3.2.6 — seconde correction des interactions réelles
+## 3.2.7 — seconde correction des interactions réelles
 
 - confirmer dans Thunderbird 153 qu’une seule étoile native, une seule punaise MailPerch et un seul bouton Plus sont visibles par ligne ;
 - confirmer les clics directs Enregistrer et Annuler, puis la persistance après fermeture/réouverture ;
