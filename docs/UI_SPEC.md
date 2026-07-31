@@ -64,3 +64,13 @@
 - sélection multiple et options contextuelles pour les actions groupées ;
 - diagnostic exportable, matrice fournisseurs et réparations sûres ;
 - état de chargement, erreurs réessayables et mise en page utilisable à largeur réduite.
+
+
+## Sécurité de l’interface
+
+- aucun état `admin`, rôle caché ou permission simulée dans le DOM ;
+- désactiver Enregistrer/Annuler tant que la configuration n’est pas chargée ou qu’une écriture est en cours ;
+- une modification du DOM ne doit jamais définir un chemin local : le dossier de sauvegarde passe par le sélecteur natif ;
+- les imports affichent un aperçu et sont restaurés en mode sûr, automatismes désactivés ;
+- les confirmations UX complètent les contrôles privilégiés mais ne constituent jamais la seule barrière de sécurité ;
+- après désinstallation/réinstallation, l’interface doit repartir sur les valeurs recommandées sans données résiduelles.

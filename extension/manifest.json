@@ -3,7 +3,7 @@
   "name": "__MSG_extensionName__",
   "short_name": "__MSG_extensionShortName__",
   "description": "__MSG_extensionDescription__",
-  "version": "3.2.3",
+  "version": "3.2.4",
   "author": "ussmarines",
   "browser_specific_settings": {
     "gecko": {
@@ -88,6 +88,6 @@
   },
   "default_locale": "fr",
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'none'"
+    "extension_pages": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; connect-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'"
   }
 }

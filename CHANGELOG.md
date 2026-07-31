@@ -1,5 +1,21 @@
 # Journal des modifications
 
+## 3.2.4 — durcissement sécurité, désinstallation propre et fiabilité
+- chaîne CI autonome : suppression des helpers Python téléchargés, actions GitHub épinglées par SHA, checkout sans identifiants persistés et suivi Dependabot ;
+
+- validation bornée de toutes les sauvegardes et des principaux objets traversant l’API Experiment ;
+- neutralisation des automatismes, liens Agenda et paramètres dépendants de l’environnement lors d’un import ;
+- fermeture du stockage avant la purge et suppression complète des données MailPerch à la désinstallation ;
+- sentinelle native effacée par Gecko : une réinstallation purge les résidus avant toute ouverture SQLite, sans effacer les données lors de la migration initiale 3.2.3 → 3.2.4 ;
+- profil recommandé rendu conservateur par défaut : workflows automatiques, récurrences, complétion Agenda et nettoyage automatique désactivés ;
+- CSP sans réseau, code distant, formulaire externe, framing ou ressource `data:` ;
+- conservation du chemin de sauvegarde uniquement via le sélecteur natif Thunderbird ;
+- correction des boutons Enregistrer/Annuler et protection contre les doubles enregistrements ;
+- garde supplémentaire contre la duplication de l’étoile native ;
+- secret scanner renforcé et test de sécurité 3.2.4 dédié ;
+- suppression des rapports techniques et journaux CI historiques devenus obsolètes ; consolidation dans la mémoire Codex et les documents durables.
+
+
 ## 3.2.3 — mémoire projet et harmonisation UX
 
 - ajout de `PROJECT_MEMORY.md`, point d’entrée unique pour Codex, et de `docs/PROJECT_STATE.json` ;
@@ -123,7 +139,7 @@
 
 ### Validation
 
-- nouvelle passe vidéo du 30 juillet 2026 documentée dans `docs/VIDEO_REVIEW_2026-07-30_2.md` ;
+- constats de la passe vidéo consolidés dans les tests de régression et la documentation durable ;
 - build et tests portés en version 3.1.2.
 
 ## 3.1.0 — passe de débogage, dashboard et dépôt

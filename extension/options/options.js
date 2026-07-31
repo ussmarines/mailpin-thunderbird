@@ -1,6 +1,8 @@
 "use strict";
 
 let configuration = null;
+let configurationReady = false;
+let saveInFlight = false;
 let groups = [];
 let rules = [];
 let cases = [];
@@ -28,13 +30,11 @@ function requireConfiguration() {
 }
 
 function setConfigurationReady(ready) {
-  document.documentElement.toggleAttribute("data-configuration-ready", Boolean(ready));
+  configurationReady = Boolean(ready);
+  document.body.toggleAttribute("data-configuration-ready", configurationReady);
   const form = $("settings-form");
-  form?.setAttribute("aria-busy", String(!ready));
-  for (const id of ["save-all-floating", "discard-changes"]) {
-    const control = $(id);
-    if (control) control.disabled = !ready;
-  }
+  if (form) form.setAttribute("aria-busy", String(!configurationReady));
+  syncSaveControls();
 }
 
 async function fetchConfigurationWithRetry(attempts = 4) {
@@ -270,11 +270,19 @@ function enhanceSettingsPage() {
   applySearch();
 }
 
+function syncSaveControls() {
+  const save = $("save-all-floating");
+  const discard = $("discard-changes");
+  if (save) save.disabled = !configurationReady || !dirty || saveInFlight;
+  if (discard) discard.disabled = !configurationReady || !dirty || saveInFlight;
+}
+
 function setDirty(value = true) {
   dirty = Boolean(value);
   document.body.toggleAttribute("data-dirty", dirty);
   const dock = $("save-dock");
   if (dock) dock.hidden = !dirty;
+  syncSaveControls();
   if ($("save-dock-message")) {
     $("save-dock-message").textContent = dirty
       ? "Modifications non enregistrées — elles ne seront appliquées qu’après Enregistrer."
@@ -850,7 +858,7 @@ function collectSettings() {
   result.showFolderBadge = false;
   result.waitingGroupId = $("waitingGroupId").value;
   result.preferredCalendarId = $("preferredCalendarId").value;
-  result.backupDirectory = $("backupDirectory").value;
+  result.backupDirectory = requireConfiguration().settings.backupDirectory || "";
   result.autoPinSenders = lines($("autoPinSenders").value);
   result.autoPinTags = lines($("autoPinTags").value);
   return result;
@@ -883,9 +891,12 @@ async function reload({preserveEdits = false} = {}) {
   return config;
 }
 
-async function saveAll(event) {
-  event.preventDefault();
-  const submitter = event.submitter || $("save-all-floating");
+async function saveAll(event = null) {
+  event?.preventDefault?.();
+  if (!configurationReady || !dirty || saveInFlight) return;
+  saveInFlight = true;
+  syncSaveControls();
+  const submitter = event?.submitter || event?.currentTarget || $("save-all-floating");
   try {
     if (!configuration?.settings) await reload();
     const config = await withBusy(submitter, "Enregistrement des paramètres…", async () => {
@@ -903,6 +914,9 @@ async function saveAll(event) {
     setStatus("Paramètres enregistrés.", "success");
   } catch (error) {
     setStatus(`Erreur : ${error.message || error}`, "error");
+  } finally {
+    saveInFlight = false;
+    syncSaveControls();
   }
 }
 
@@ -1000,6 +1014,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   const form = $("settings-form");
   form.addEventListener("submit", saveAll);
+  $("save-all-floating").addEventListener("click", saveAll);
   form.addEventListener("input", event => {
     if (event.target.id === "shortcut" || event.target.id === "import-file") return;
     setDirty();
@@ -1012,8 +1027,14 @@ window.addEventListener("DOMContentLoaded", async () => {
   $("status-close").addEventListener("click", clearStatus);
   $("save-shortcut").addEventListener("click", saveShortcut);
   $("discard-changes").addEventListener("click", async event => {
-    await withBusy(event.currentTarget, "Restauration des paramètres enregistrés…", () => reload());
-    setStatus("Modifications annulées.", "success");
+    if (!configurationReady || !dirty) return;
+    try {
+      await withBusy(event.currentTarget, "Restauration des paramètres enregistrés…", () => reload());
+      setDirty(false);
+      setStatus("Modifications annulées.", "success");
+    } catch (error) {
+      setStatus(`Annulation impossible : ${error.message || error}`, "error");
+    }
   });
 
   $("add-group").addEventListener("click", () => {

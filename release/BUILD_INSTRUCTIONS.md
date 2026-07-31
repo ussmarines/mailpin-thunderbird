@@ -1,6 +1,6 @@
 # Instructions de build pour reviewers
 
-Prérequis : Python 3.11+ et Node.js 20+. Aucun téléchargement de dépendance npm n’est nécessaire. Les deux aides Python utilisées par le contrôle du dépôt (`beautifulsoup4` et `tinycss2`) sont installées dans la CI ; elles doivent être présentes localement pour `npm run check`.
+Prérequis : Python 3.11+ et Node.js 20+. Aucun téléchargement de dépendance npm ou Python n’est nécessaire : les contrôles utilisent uniquement la bibliothèque standard Python et Node fourni par l’environnement.
 
 ```bash
 npm run ci

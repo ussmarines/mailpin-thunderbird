@@ -35,5 +35,10 @@ with tempfile.TemporaryDirectory() as directory:
         assert not any(name.startswith("dist/") and name != "dist/.gitkeep" for name in names)
         assert not any("__pycache__" in name or name.endswith(".pyc") for name in names)
         assert not any(name.lower().endswith((".xpi", ".sqlite", ".sqlite-wal", ".sqlite-shm")) for name in names)
+        assert not any(Path(name).match("CI_LOG_*.txt") or Path(name).match("ROUNDTRIP_CI_LOG_*.txt") for name in names)
+
+build_source = (ROOT / "scripts/build.py").read_text(encoding="utf-8")
+assert "source.is_symlink()" in build_source
+assert "resolved.is_relative_to(root.resolve())" in build_source
 
 print("Reproducible XPI/source builds: OK")

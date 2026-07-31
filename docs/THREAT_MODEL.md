@@ -2,35 +2,55 @@
 
 ## Actifs
 
-- métadonnées des messages épinglés ;
-- notes et échéances personnelles ;
-- base locale et sauvegardes ;
-- accès privilégié à Thunderbird ;
-- intégrité des messages et compteurs.
+- métadonnées des messages épinglés, notes et échéances ;
+- base SQLite, préférences, récupération et sauvegardes ;
+- accès privilégié aux messages, dossiers et calendriers Thunderbird ;
+- intégrité des messages, compteurs natifs et historique ;
+- confidentialité du profil local.
 
-## Menaces principales
+## Acteurs considérés
 
-1. injection de contenu provenant d’un objet/auteur de message ;
-2. fuite de données par réseau ou journal ;
-3. suppression/archivage involontaire ;
-4. corruption ou écrasement concurrent de la base ;
-5. règle automatique en boucle ;
-6. observateur/minuterie restant actif après mise à jour ;
-7. incompatibilité d’une version Thunderbird interne ;
-8. import de sauvegarde malformée ou trop volumineuse.
+1. contenu de message non fiable : objet, auteur, tags et aperçu ;
+2. sauvegarde JSON malformée, énorme ou construite volontairement ;
+3. autre page non privilégiée tentant d’atteindre l’Experiment ;
+4. action utilisateur accidentelle ou règle locale en boucle ;
+5. version Thunderbird devenue incompatible ;
+6. fermeture, mise à jour ou désinstallation interrompant une écriture.
 
-## Mesures
+Le propriétaire local du profil et un logiciel ayant déjà le contrôle du système
+sont hors du périmètre d’isolation. Ils ne doivent toutefois trouver aucun secret,
+jeton maître, rôle admin caché ou exécution arbitraire dans MailPerch.
 
-- DOM construit avec `textContent` ;
-- CSP restrictive, aucun réseau et aucun code distant ;
-- confirmation des actions destructives ;
-- transactions, révisions, WAL, récupération et checksums ;
-- limites de règles, garde anti-boucle et désactivation sur erreurs ;
-- mode de compatibilité réduit ;
-- normalisation et limites d’import ;
-- nettoyage complet de l’Experiment ;
-- tests dédiés aux compteurs natifs.
+## Frontières de confiance
+
+- message/import → page WebExtension : données non fiables ;
+- page WebExtension → Experiment : données structurées mais toujours non fiables ;
+- Experiment → Thunderbird/SQLite/fichiers : frontière privilégiée ;
+- export téléchargé → extérieur du profil : responsabilité explicite utilisateur.
+
+## Menaces et mesures
+
+| Menace | Mesure principale |
+|---|---|
+| Injection HTML/script/style | `textContent`, CSSOM avec valeurs normalisées, CSP locale |
+| Exfiltration réseau | aucune permission réseau, `connect-src 'none'`, aucun appel réseau |
+| Escalade par paramètre admin | aucun rôle admin ; validation au niveau Experiment |
+| Objet/API géant ou cyclique | limites de profondeur, nœuds, octets et sélections |
+| Prototype pollution | rejet de `__proto__`, `prototype`, `constructor` |
+| Import activant une automatisation | règles, suivi auto, Agenda bidirectionnel et listes auto désactivés |
+| Chemin disque arbitraire | chemin conservé côté privilégié, sélecteur natif uniquement |
+| Suppression involontaire | confirmation UI et actions fermées |
+| Corruption concurrente | transactions, WAL, révision et sérialisation |
+| Règle en boucle | débit, garde temporelle, seuil d’erreurs, désactivation |
+| Données persistantes après désinstallation | arrêt/flush puis purge DB, fichiers, sauvegardes et préférences ; sentinelle native absente à la réinstallation ⇒ purge avant initialisation |
+| Réécriture après purge | récupération de shutdown interdite pendant désinstallation |
+| Diagnostic sensible | expurgation des comptes, calendriers, chemins et contenus |
+| Incompatibilité Thunderbird | plage déclarée, mode réduit, tests manuels |
+| Compromission de la chaîne CI | aucune installation helper, actions épinglées par SHA, checkout sans identifiants persistés |
 
 ## Risque résiduel
 
-L’Experiment a un accès complet au client et dépend de DOM/API internes. Une validation humaine du code et des tests dans chaque version Thunderbird ciblée restent nécessaires.
+L’Experiment possède un accès complet au client et dépend d’API internes. Une
+nouvelle faille peut apparaître avec une évolution Thunderbird ou une fonction
+privilégiée future. Toute extension du périmètre exige une mise à jour du présent
+modèle, de `docs/SECURITY_BOUNDARY.md`, des tests et du rapport de sécurité.

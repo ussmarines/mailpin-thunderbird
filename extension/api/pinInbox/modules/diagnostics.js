@@ -1,13 +1,15 @@
 (function(scope) {
   "use strict";
   const ADDRESS_RE = /(?:[a-z0-9.!#$%&'*+/=?^_`{|}~-]+)@(?:[a-z0-9-]+\.)+[a-z]{2,}/gi;
-  const PATH_RE = /(?:[a-z]:\\|\/Users\/|\/home\/)[^\s"']+/gi;
+  const PATH_RE = /(?:[a-z]:\\|\/Users\/|\/home\/|\/var\/folders\/)[^\s"']+/gi;
 
   function redact(value, maxLength = 900) {
     return String(value ?? "")
       .replace(ADDRESS_RE, "<email>")
       .replace(PATH_RE, "<local-path>")
-      .replace(/\b(?:imap|mailbox|news):\/\/[^\s"']+/gi, "<folder-uri>")
+      .replace(/\b(?:imap|mailbox|news|moz-extension):\/\/[^\s"']+/gi, "<internal-uri>")
+      .replace(/\b(?:sk|pk|rk)_(?:live|test)_[a-z0-9_-]{12,}\b/gi, "<secret>")
+      .replace(/\beyJ[a-z0-9_-]{8,}\.[a-z0-9_-]{8,}\.[a-z0-9_-]{8,}\b/gi, "<token>")
       .slice(0, maxLength);
   }
 

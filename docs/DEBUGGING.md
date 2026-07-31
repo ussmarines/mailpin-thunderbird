@@ -23,10 +23,11 @@ Vérifier :
 
 ## Clic droit
 
-- inspecter `.pin-mails-context-menu` dans le document `about:3pane` ;
-- vérifier `hidden`, `left`, `top` et `z-index` ;
-- essayer `Shift+F10` sur une carte focalisée ;
-- confirmer que l’événement `contextmenu` est capturé en phase capture sur le document `about:3pane`, puis limité aux cartes du panneau.
+- inspecter `#pin-mails-card-context-menu`, qui doit être un `menupopup` dans le `popupset` de la fenêtre `about:3pane` ;
+- vérifier son état XUL (`closed`, `showing`, `open`) et l’attribut `aria-expanded` du bouton déclencheur ;
+- essayer le bouton « Plus d’actions », le clic droit, `Shift+F10`, la touche Menu et Échap ;
+- confirmer que l’événement `contextmenu` est capturé en phase capture puis limité aux cartes du panneau ;
+- ne pas réintroduire d’overlay HTML, de coordonnées CSS ou de `z-index` pour ce menu.
 
 ## Drag-and-drop
 
@@ -64,3 +65,13 @@ Vérifier :
 
 `deep_audit.py` normalise `\r` et `\n` dans les sorties `git ls-files` et `git check-ignore`.
 Un échec mentionnant `dist/.gitkeep\r` indique que cette normalisation a régressé.
+
+
+## Sécurité et désinstallation 3.2.4
+
+- exécuter `python tests/test_security_hardening_3_2_4.py` puis `npm run ci` ;
+- rechercher toute permission nouvelle, URL distante, sink HTML/code, rôle admin ou chemin disque fourni par une page ;
+- pour un import refusé, vérifier la taille, la profondeur, les clés interdites et le checksum de l’enveloppe ;
+- pour Enregistrer/Annuler, inspecter `configurationReady`, `dirty` et `saveInFlight` plutôt que de forcer les boutons dans le DOM ;
+- pour une désinstallation, utiliser un profil de test, fermer les opérations, supprimer le module puis vérifier les fichiers et préférences décrits dans `docs/MANUAL_TEST_PLAN.md` ;
+- ne jamais tester la purge sur un profil de production sans sauvegarde indépendante.

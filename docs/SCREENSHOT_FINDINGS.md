@@ -4,7 +4,7 @@
 
 - les anciens contrôles « C », « ↗ » et « + » étaient cryptiques ; remplacés par des icônes avec libellés accessibles ;
 - une carte sélectionnée affichait trop d’actions symboliques ; la barre rapide est réduite et le reste passe dans un menu ;
-- le clic droit ne produisait pas de résultat visible ; le menu est désormais capturé, fixé au viewport et accessible au clavier.
+- le clic droit ne produisait pas de résultat visible ; le menu est désormais un `menupopup` Thunderbird natif, accessible au bouton, au pointeur et au clavier.
 
 ## Capture du dashboard
 
@@ -36,3 +36,12 @@ Ces correctifs restent à confirmer dans une session Thunderbird réelle.
 
 Les règles 3.2.3 corrigent ces points et une garde vérifie désormais que chaque classe utilisée par les paramètres
 possède une règle CSS.
+
+
+## Captures du 31 juillet 2026 — passe 3.2.4
+
+- le bandeau Enregistrer/Annuler apparaissait mais ses actions pouvaient rester inopérantes lorsque l’état de configuration n’était pas initialisé ; les états `configurationReady`, `dirty` et `saveInFlight` sont désormais explicites et protégés ;
+- la liste native pouvait afficher deux glyphes d’étoile lorsque Thunderbird exposait simultanément `.button-star` et `.tree-button-flag` ; un seul contrôle canonique est conservé et les attributs sont nettoyés à la fermeture ;
+- une réinstallation conservait les données de profil historiques ; le cycle de désinstallation ferme maintenant SQLite avant de purger base, récupération, sauvegardes internes et préférences, et une sentinelle native déclenche une purge avant initialisation si des résidus subsistent ;
+- les valeurs recommandées d’une installation neuve sont Guidé, Équilibré, densité Normale et automatismes sensibles désactivés ;
+- la demande de sécurité a conduit à documenter la frontière réelle : aucune notion d’administrateur client, validation au niveau Experiment, imports non fiables et chemins de fichiers réservés au sélecteur natif.

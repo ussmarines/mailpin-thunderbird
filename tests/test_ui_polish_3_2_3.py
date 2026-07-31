@@ -18,11 +18,11 @@ options_js = (ROOT / "extension/options/options.js").read_text(encoding="utf-8")
 options_css = (ROOT / "extension/options/options.css").read_text(encoding="utf-8")
 deep_audit = (ROOT / "scripts/deep_audit.py").read_text(encoding="utf-8")
 
-VERSION = "3.2.3"
+VERSION = "3.2.4"
 assert package["version"] == VERSION
 assert manifest["version"] == VERSION
 assert state["extensionVersion"] == VERSION
-assert state["baseGitHub"]["commit"] == "8b3495baca5d89358d703c42add9d773c09517af"
+assert state["baseGitHub"]["commit"] == "3e8852d4ffcd05c3235000489452ffef6dc752b0"
 assert f"Version de travail : **{VERSION}**" in memory
 
 # Settings spacing must stay scoped to the settings page. Stale attributes are
@@ -115,4 +115,4 @@ for path in state["entrypoints"].values():
     assert (ROOT / path).is_file(), path
     assert path in memory, path
 
-print("MailPerch 3.2.3 UI polish and project-memory guards: OK")
+print("MailPerch 3.2.4 UI polish and project-memory guards: OK")

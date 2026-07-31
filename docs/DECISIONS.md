@@ -8,9 +8,9 @@
 
 L’Experiment émet un événement ; le background utilise `tabs.create`. Cela évite de charger une page d’extension avec un principal privilégié incorrect.
 
-## D003 — Menu contextuel HTML fixé au viewport
+## D003 — Menu contextuel Thunderbird natif
 
-Le menu est placé dans `document.body` avec `position: fixed`. Il échappe ainsi au défilement interne et aux conteneurs `overflow` du panneau.
+Les cartes utilisent un `menupopup` dans le `popupset` de la fenêtre Thunderbird. Le bouton « Plus d’actions » ouvre le popup sur son ancre et le clic droit l’ouvre aux coordonnées écran. Aucun overlay HTML positionné manuellement n’est conservé.
 
 ## D004 — Aucun badge dans l’arbre des dossiers
 
@@ -42,3 +42,24 @@ restent la source détaillée, mais ne doivent pas recopier l’intégralité du
 
 Dans la vue Cartes Thunderbird, étoile, punaise et menu utilisent un rail centré verticalement.
 La hauteur virtuelle native reste inchangée.
+
+## 2026-07-31 — aucune notion d’administrateur client
+
+MailPerch est une extension locale mono-utilisateur. Aucun `admin`, `isAdmin`, rôle caché, jeton maître ou permission simulée dans le DOM n’est ajouté. Toute autorisation réelle est définie par le manifeste, le schéma de l’API Experiment et les contrôles privilégiés. Le propriétaire du profil Thunderbird reste un acteur de confiance.
+
+## 2026-07-31 — imports traités comme hostiles
+
+Une restauration ne réactive jamais automatiquement les règles, relances, synchronisations bidirectionnelles, suppressions Agenda, chemins de sauvegarde ou liens environnementaux. Le mode sûr est activé et l’utilisateur doit revoir puis réactiver explicitement les automatismes.
+
+## 2026-07-31 — chemin de sauvegarde uniquement natif
+
+Le chemin de sauvegarde n’est jamais accepté depuis `setConfiguration` ni depuis un import. Seul `nsIFilePicker` dans l’Experiment peut le modifier.
+
+## 2026-07-31 — purge à la désinstallation
+
+Les API Experiment ne pouvant pas utiliser les événements statiques `uninstall`, MailPerch s’abonne au cycle cœur `Management` pendant son activité. `onUninstalling` marque la désinstallation avant l’arrêt et `onOperationCancelled` annule ce marquage si nécessaire ; l’événement cœur `uninstall`, attendu par Gecko, ferme SQLite puis purge les données de profil et préférences. Une mise à jour retire l’ancien écouteur sans purge. Les exports téléchargés manuellement sont hors périmètre. Dans un dossier externe, seules les enveloppes MailPerch munies d’un checksum local vérifiable sont candidates à la suppression.
+
+Une sentinelle primitive est en plus enregistrée dans `ExtensionStorage`, effacé par Gecko à la désinstallation. Son absence est contrôlée avant toute ouverture de la base. Pour éviter une perte de données lors du premier déploiement 3.2.4, une vraie mise à jour depuis une installation plus ancienne conserve une seule fois les données préexistantes et initialise la sentinelle ; une installation neuve ou une réinstallation purge les résidus.
+## 2026-07-31 — chaîne CI immuable et autonome
+
+Les contrôles HTML/CSS reposent sur la bibliothèque standard Python. Les workflows ne téléchargent aucun helper Python, les actions GitHub sont épinglées à des commits immuables, `persist-credentials` est désactivé et Dependabot propose les mises à jour. Cette décision réduit la chaîne d’approvisionnement sans rendre les vérifications dépendantes d’un lockfile externe.

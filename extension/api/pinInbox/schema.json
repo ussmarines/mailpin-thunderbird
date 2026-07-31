@@ -84,7 +84,8 @@
           },
           {
             "name": "action",
-            "type": "string"
+            "type": "string",
+            "maxLength": 64
           }
         ]
       },
@@ -235,7 +236,8 @@
           {
             "name": "strategy",
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 64
           }
         ]
       },
@@ -248,8 +250,10 @@
             "name": "stableKeys",
             "type": "array",
             "items": {
-              "type": "string"
-            }
+              "type": "string",
+              "maxLength": 8192
+            },
+            "maxItems": 500
           },
           {
             "name": "options",
@@ -277,7 +281,8 @@
         "parameters": [
           {
             "name": "stableKey",
-            "type": "string"
+            "type": "string",
+            "maxLength": 8192
           }
         ]
       },
@@ -290,12 +295,15 @@
             "name": "stableKeys",
             "type": "array",
             "items": {
-              "type": "string"
-            }
+              "type": "string",
+              "maxLength": 8192
+            },
+            "maxItems": 500
           },
           {
             "name": "action",
-            "type": "string"
+            "type": "string",
+            "maxLength": 64
           },
           {
             "name": "options",
@@ -317,17 +325,20 @@
         "parameters": [
           {
             "name": "stableKey",
-            "type": "string"
+            "type": "string",
+            "maxLength": 8192
           },
           {
             "name": "itemType",
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 64
           },
           {
             "name": "calendarId",
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 512
           }
         ]
       },
@@ -338,17 +349,20 @@
         "parameters": [
           {
             "name": "caseId",
-            "type": "string"
+            "type": "string",
+            "maxLength": 512
           },
           {
             "name": "itemType",
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 64
           },
           {
             "name": "calendarId",
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 512
           }
         ]
       },
@@ -359,7 +373,8 @@
         "parameters": [
           {
             "name": "stableKey",
-            "type": "string"
+            "type": "string",
+            "maxLength": 8192
           },
           {
             "name": "durationMs",
@@ -393,7 +408,8 @@
           {
             "name": "reason",
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 128
           }
         ]
       },
@@ -460,12 +476,15 @@
             "name": "stableKeys",
             "type": "array",
             "items": {
-              "type": "string"
-            }
+              "type": "string",
+              "maxLength": 8192
+            },
+            "maxItems": 500
           },
           {
             "name": "status",
-            "type": "string"
+            "type": "string",
+            "maxLength": 64
           },
           {
             "name": "options",
@@ -492,7 +511,8 @@
         "parameters": [
           {
             "name": "caseId",
-            "type": "string"
+            "type": "string",
+            "maxLength": 512
           },
           {
             "name": "details",
@@ -507,7 +527,8 @@
         "parameters": [
           {
             "name": "caseId",
-            "type": "string"
+            "type": "string",
+            "maxLength": 512
           }
         ]
       },
@@ -529,7 +550,8 @@
         "parameters": [
           {
             "name": "templateId",
-            "type": "string"
+            "type": "string",
+            "maxLength": 512
           },
           {
             "name": "details",
@@ -544,7 +566,8 @@
         "parameters": [
           {
             "name": "templateId",
-            "type": "string"
+            "type": "string",
+            "maxLength": 512
           }
         ]
       },
@@ -557,12 +580,15 @@
             "name": "stableKeys",
             "type": "array",
             "items": {
-              "type": "string"
-            }
+              "type": "string",
+              "maxLength": 8192
+            },
+            "maxItems": 500
           },
           {
             "name": "templateId",
-            "type": "string"
+            "type": "string",
+            "maxLength": 512
           }
         ]
       },
@@ -588,7 +614,8 @@
         "properties": {
           "format": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 64
           },
           "version": {
             "type": "integer",
@@ -596,11 +623,13 @@
           },
           "exportedAt": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 64
           },
           "shortcut": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 64
           },
           "settings": {
             "type": "any",
@@ -611,31 +640,60 @@
             "items": {
               "type": "any"
             },
-            "optional": true
+            "optional": true,
+            "maxItems": 40
           },
           "rules": {
             "type": "array",
             "items": {
               "type": "any"
             },
-            "optional": true
+            "optional": true,
+            "maxItems": 200
           },
           "cases": {
             "type": "array",
             "items": {
               "type": "any"
             },
-            "optional": true
+            "optional": true,
+            "maxItems": 200
           },
           "templates": {
             "type": "array",
             "items": {
               "type": "any"
             },
-            "optional": true
+            "optional": true,
+            "maxItems": 100
           },
           "data": {
             "type": "any",
+            "optional": true
+          },
+          "formatVersion": {
+            "type": "integer",
+            "optional": true
+          },
+          "createdAt": {
+            "type": "number",
+            "optional": true
+          },
+          "checksum": {
+            "type": "string",
+            "maxLength": 128,
+            "optional": true
+          },
+          "metadata": {
+            "type": "any",
+            "optional": true
+          },
+          "undo": {
+            "type": "array",
+            "items": {
+              "type": "any"
+            },
+            "maxItems": 20,
             "optional": true
           }
         },
@@ -649,23 +707,28 @@
         "properties": {
           "filter": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 64
           },
           "search": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 500
           },
           "view": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 64
           },
           "historySearch": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 500
           },
           "smartView": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 64
           },
           "useSmartView": {
             "type": "boolean",
@@ -683,27 +746,33 @@
           },
           "itemType": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 64
           },
           "calendarId": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 512
           },
           "groupId": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 64
           },
           "caseId": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 64
           },
           "templateId": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 64
           },
           "note": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 1200
           },
           "dueAt": {
             "type": "number",
@@ -715,11 +784,13 @@
           },
           "priorityLevel": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 32
           },
           "workflowStatus": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 32
           },
           "completed": {
             "type": "boolean",
@@ -727,11 +798,13 @@
           },
           "repeatRule": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 32
           },
           "recurrenceRule": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 32
           },
           "recurrenceInterval": {
             "type": "number",
@@ -755,7 +828,8 @@
           },
           "action": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 64
           },
           "days": {
             "type": "number",
@@ -781,7 +855,8 @@
         "properties": {
           "trigger": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 64
           },
           "limit": {
             "type": "integer",
@@ -789,11 +864,13 @@
           },
           "accountKey": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 256
           },
           "folderURI": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 4096
           }
         }
       },
@@ -803,11 +880,13 @@
         "properties": {
           "search": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 500
           },
           "caseId": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 64
           },
           "limit": {
             "type": "integer",
@@ -821,7 +900,8 @@
         "properties": {
           "action": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 64
           },
           "followUpAt": {
             "type": "number",
@@ -843,15 +923,18 @@
           },
           "name": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 120
           },
           "color": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 16
           },
           "note": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 1200
           },
           "dueAt": {
             "type": "number",
@@ -859,7 +942,8 @@
           },
           "status": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 32
           },
           "createdAt": {
             "type": "number",
@@ -871,11 +955,13 @@
           },
           "calendarId": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 512
           },
           "calendarItemId": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 1024
           }
         }
       },
@@ -889,23 +975,28 @@
           },
           "name": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 120
           },
           "groupId": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 64
           },
           "caseId": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 64
           },
           "priorityLevel": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 32
           },
           "workflowStatus": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 32
           },
           "dueOffsetDays": {
             "type": "number",
@@ -921,7 +1012,8 @@
           },
           "recurrenceRule": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 32
           },
           "recurrenceInterval": {
             "type": "number",
@@ -929,7 +1021,8 @@
           },
           "notePrefix": {
             "type": "string",
-            "optional": true
+            "optional": true,
+            "maxLength": 500
           },
           "updatedAt": {
             "type": "number",
@@ -944,9 +1037,11 @@
           "actions": {
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "string",
+              "maxLength": 256
             },
-            "optional": true
+            "optional": true,
+            "maxItems": 50
           }
         }
       },

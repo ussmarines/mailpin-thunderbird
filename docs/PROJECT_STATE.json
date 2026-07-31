@@ -2,10 +2,10 @@
   "format": "mailperch-project-state",
   "version": 1,
   "project": "MailPerch — Email Pins & Follow-up",
-  "extensionVersion": "3.2.3",
+  "extensionVersion": "3.2.4",
   "baseGitHub": {
     "branch": "main",
-    "commit": "8b3495baca5d89358d703c42add9d773c09517af"
+    "commit": "3e8852d4ffcd05c3235000489452ffef6dc752b0"
   },
   "extensionId": "pin-mails@MailPerch.local",
   "thunderbird": {
@@ -14,7 +14,7 @@
   },
   "schemas": {
     "sqlite": 5,
-    "settings": 5,
+    "settings": 6,
     "data": 6
   },
   "entrypoints": {
@@ -24,7 +24,8 @@
     "experiment": "extension/api/pinInbox/implementation.js",
     "options": "extension/options/options.html",
     "dashboard": "extension/dashboard/dashboard.html",
-    "projectMemory": "PROJECT_MEMORY.md"
+    "projectMemory": "PROJECT_MEMORY.md",
+    "securityBoundary": "docs/SECURITY_BOUNDARY.md"
   },
   "commands": [
     "npm run check",
@@ -40,7 +41,12 @@
     "No eval/new Function/innerHTML/outerHTML",
     "SQLite writes remain incremental, transactional and serialized",
     "All injected resources are cleaned up",
-    "No remote publication without explicit approval"
+    "No remote publication without explicit approval",
+    "No client-side administrator role or privilege switch",
+    "Privileged API inputs are bounded and normalized",
+    "Uninstall closes storage before deleting all MailPerch profile data",
+    "Missing native install sentinel triggers residue purge before preferences/SQLite load",
+    "CI installs no third-party Python helper and pins GitHub Actions by immutable SHA"
   ],
   "ui": {
     "settingsSpacingAffects": [
@@ -60,6 +66,13 @@
     "_resolveReference",
     "calendar observers",
     "folder observers",
-    "automatic rules"
-  ]
+    "automatic rules",
+    "imports and restores",
+    "uninstall lifecycle",
+    "privileged API input validation"
+  ],
+  "security": {
+    "uninstallLifecycle": "AddonManager early signal + awaited Gecko Management uninstall purge + core-cleared ExtensionStorage reinstall sentinel",
+    "ciSupplyChain": "stdlib-only checks, immutable action SHAs, no persisted checkout credentials, Dependabot monitoring"
+  }
 }

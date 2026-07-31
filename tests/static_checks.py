@@ -10,7 +10,7 @@ manifest = json.loads((EXT / "manifest.json").read_text(encoding="utf-8"))
 version = manifest["version"]
 
 assert manifest["manifest_version"] == 3
-assert version == "3.2.3"
+assert version == "3.2.4"
 assert manifest["permissions"] == ["menus"]
 assert manifest["browser_specific_settings"]["gecko"]["id"] == "pin-mails@MailPerch.local"
 assert manifest["browser_specific_settings"]["gecko"]["strict_min_version"] == "128.0"
@@ -26,7 +26,7 @@ assert fr_locale["brandSubtitle"]["message"] == "Épinglez, organisez et suivez 
 assert en_locale["brandSubtitle"]["message"] == "Pin, organize and follow up on your emails in Thunderbird."
 assert en_locale["brandSlogan"]["message"] == "Keep important mail within reach."
 assert manifest["options_ui"]["page"] == "options/options.html"
-assert manifest["content_security_policy"]["extension_pages"] == "script-src 'self'; object-src 'none'"
+assert manifest["content_security_policy"]["extension_pages"] == "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; connect-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'"
 
 required_commands = {
     "toggle-pin-selected", "toggle-conversation-selected", "complete-selected-pin",

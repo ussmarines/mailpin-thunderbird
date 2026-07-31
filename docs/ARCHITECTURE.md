@@ -33,6 +33,20 @@ Experiment privilégié pinInbox
 - Les paramètres et retours traversant l’API sont normalisés et doivent rester clonables.
 - Les imports sont analysés avant écriture, les clés dangereuses sont rejetées et une restauration crée une sauvegarde de sécurité.
 
+## Barrière de sécurité de l’API Experiment
+
+L’API `pinInbox` est une frontière privilégiée et ne fait jamais confiance aux objets provenant des pages Options ou Dashboard. Le schéma borne les collections et les chaînes ; l’implémentation applique en plus une validation récursive, refuse les clés de pollution de prototype, limite profondeur/taille/nombre de nœuds et normalise chaque action avant tout accès à Thunderbird, SQLite, Agenda ou au système de fichiers.
+
+Il n’existe aucun rôle administrateur dans le produit. Les pages d’extension peuvent demander uniquement les opérations exposées par `schema.json`. Les chemins de sauvegarde sont modifiés exclusivement par le sélecteur natif privilégié ; `setConfiguration` conserve toujours le chemin déjà validé.
+
+Les imports sont des données non fiables : les automatismes, règles actives, liens Agenda et chemins locaux sont neutralisés avant persistance. Le diagnostic remplace les identités de comptes et calendriers par des libellés anonymes.
+
+## Désinstallation
+
+Les API Experiment ne peuvent pas déclarer le cycle statique `uninstall` dans leur manifeste. Pendant que l’extension est chargée, MailPerch utilise donc deux signaux du cœur Gecko : AddonManager `onUninstalling` positionne immédiatement l’état de désinstallation avant `onShutdown`, et `onOperationCancelled` le réinitialise si l’utilisateur annule ; l’événement WebExtension `Management.uninstall`, dont la promesse est attendue par Gecko, attend la fermeture SQLite puis supprime la base, les fichiers WAL/SHM/journal, la récupération d’urgence, les sauvegardes internes et toutes les préférences `extensions.pinMails.*`. Lors d’une mise à jour, l’ancien écouteur se retire sans purger les données. Dans un dossier externe choisi par l’utilisateur, seules les enveloppes MailPerch au checksum vérifiable peuvent être supprimées ; le dossier et les autres fichiers sont conservés.
+
+Avant toute lecture de préférences ou ouverture de SQLite, l’Experiment vérifie aussi une sentinelle primitive dans `ExtensionStorage`, la zone locale native de l’extension. Gecko efface cette zone lors d’une désinstallation normale. Si la sentinelle manque, MailPerch distingue la migration initiale depuis une version antérieure à 3.2.4 d’une installation nouvelle ; hors migration, il purge les éventuels résidus puis écrit une nouvelle sentinelle. Cette seconde barrière garantit un redémarrage propre à la réinstallation même si l’Experiment n’était pas chargé au moment d’une désinstallation antérieure.
+
 ## Panneau `about:3pane`
 
 `_setupAbout3Pane()` injecte :

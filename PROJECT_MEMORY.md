@@ -4,8 +4,8 @@
 > Lire ce document avant tout autre fichier. Il donne l’état courant, les invariants,
 > la carte du dépôt et les chemins exacts à ouvrir selon la tâche.
 >
-> Version de travail : **3.2.3**
-> Base GitHub vérifiée : `main` au commit `8b3495baca5d89358d703c42add9d773c09517af`
+> Version de travail : **3.2.4**
+> Base GitHub vérifiée : `main` au commit `3e8852d4ffcd05c3235000489452ffef6dc752b0`
 > Produit : **MailPerch — Email Pins & Follow-up**
 > Extension ID de développement : `pin-mails@MailPerch.local`
 
@@ -22,9 +22,7 @@ L’extension comporte deux mondes :
 2. **Experiment privilégié** : `api/pinInbox/implementation.js`, accès à
    `about:3pane`, SQLite, dossiers, en-têtes de messages et Agenda.
 
-La version 3.2.3 stabilise l’interface : rail d’actions centré dans les lignes
-Thunderbird, densités de cartes sûres, paramètres réorganisés, toast corrigé,
-comptes non dupliqués, capacités Agenda lisibles et CI Windows robuste.
+La version 3.2.4 durcit la frontière privilégiée et stabilise l’interface : entrées API bornées, imports rendus inertes (automatismes et confirmations sensibles réinitialisés), diagnostic anonymisé, chemin de sauvegarde réservé au sélecteur natif, purge des données à la désinstallation, sentinelle de réinstallation, Enregistrer/Annuler réparés, étoile native dédupliquée, paramètres réorganisés et CI multiplateforme robuste.
 
 ## 2. Invariants non négociables
 
@@ -43,24 +41,29 @@ comptes non dupliqués, capacités Agenda lisibles et CI Windows robuste.
 11. Une sauvegarde de sécurité précède une migration ou une restauration.
 12. Toute action destructrice groupée respecte les confirmations configurées.
 13. Aucune publication, branche distante ou release sans accord explicite.
+14. Aucun rôle administrateur client, secret maître ou autorisation fondée sur le DOM.
+15. Toute entrée de page/import est revalidée et bornée dans l’Experiment.
+16. Une désinstallation ferme le stockage avant de purger les données gérées.
+17. Une sentinelle native effacée par Gecko distingue une installation active d’une réinstallation et force la purge avant l’ouverture de SQLite.
+18. Les workflows n’installent aucun helper Python depuis le réseau et toutes les actions externes sont épinglées par SHA.
 
 ## 3. État technique courant
 
 | Élément | Valeur |
 |---|---|
-| Version extension/package | `3.2.3` |
+| Version extension/package | `3.2.4` |
 | Thunderbird déclaré | `128.0` à `153.*` |
 | Manifest | MV3 |
 | Permission WebExtension | `menus` uniquement |
 | Base SQLite | `pin-mails-v2.sqlite` |
 | Schéma SQLite | `5` |
-| Schéma paramètres observé | `5` |
+| Schéma paramètres | `6` |
 | Schéma données | `6` |
 | Stockage | SQLite incrémental + WAL + récupération atomique |
 | Réseau | Aucun |
 | Locales | Français et anglais |
-| Build | Python standard, sans dépendance npm |
-| CI | Linux complet + contrôles Windows |
+| Build | Python standard, sans dépendance npm ni helper téléchargé |
+| CI | Linux complet + contrôles Windows, actions épinglées par SHA |
 
 ## 4. Parcours d’exécution
 
@@ -89,8 +92,11 @@ comptes non dupliqués, capacités Agenda lisibles et CI Windows robuste.
 - Les références de messages utilisent des clés stables.
 - Les recherches privilégient dossier + Message-ID + propriétés normalisées.
 - Les écritures passent par `PinStructuredStore`.
-- Les sauvegardes JSON sont validées et vérifiées avant fusion/remplacement.
-- Le diagnostic exporté est expurgé.
+- Les sauvegardes JSON sont validées, bornées et vérifiées avant fusion/remplacement.
+- Les automatismes, chemins locaux et liens Agenda importés sont neutralisés.
+- Le diagnostic exporté est expurgé et anonymise les comptes/calendriers.
+- La désinstallation arrête les ressources, ferme SQLite puis purge les fichiers et préférences gérés.
+- Une sentinelle primitive dans le stockage local natif de l’extension est vérifiée avant toute lecture des préférences ou ouverture SQLite ; son absence déclenche une purge sur une installation neuve/réinstallation, avec conservation unique des données lors de la migration depuis une version antérieure à 3.2.4.
 
 ## 5. Où modifier quoi
 
@@ -142,8 +148,6 @@ comptes non dupliqués, capacités Agenda lisibles et CI Windows robuste.
 - `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SUPPORT.md` : contribution/support.
 - `BRANDING.md`, `STORE_RELEASE.md`, `THIRD_PARTY_NOTICES.md` : publication.
 - `TEST_PLAN.md` : point d’entrée vers la validation.
-- `AUDIT_REPORT_*.md`, `HOTFIX_REPORT_*.md` : archives historiques ; ne les lire
-  que pour comprendre une régression ancienne.
 - `package.json` : commandes et version.
 - `dist/.gitkeep` : conserve le répertoire de build vide.
 
@@ -154,6 +158,7 @@ comptes non dupliqués, capacités Agenda lisibles et CI Windows robuste.
 - `PULL_REQUEST_TEMPLATE.md` : checklist PR.
 - `workflows/ci.yml` : CI Linux/Windows.
 - `workflows/release.yml` : Release Candidate manuelle.
+- `dependabot.yml` : suivi hebdomadaire des GitHub Actions épinglées.
 
 ### `extension/`
 
@@ -166,7 +171,7 @@ comptes non dupliqués, capacités Agenda lisibles et CI Windows robuste.
 - `options/options.html` : structure de la page paramètres.
 - `options/options.js` : chargement, rendu, sauvegarde et outils.
 - `options/options.css` : design responsive et accessible.
-- `dashboard/dashboard.html` : structure dashboard.
+- `extension/dashboard/dashboard.html` : structure dashboard.
 - `dashboard/dashboard.js` : vues, actions et santé.
 - `dashboard/dashboard.css` : style dashboard.
 
@@ -235,7 +240,6 @@ comptes non dupliqués, capacités Agenda lisibles et CI Windows robuste.
 - `UI_SPEC.md` : règles UX/UI.
 - `THREAT_MODEL.md` : menaces.
 - `ATN_RELEASE_CHECKLIST.md` : publication.
-- `VIDEO_REVIEW_*.md` : analyses historiques de vidéos.
 
 ### `release/`
 
@@ -339,14 +343,28 @@ Une modification est terminée seulement si :
 - aucune publication distante n’a été faite sans accord.
 
 
-## 13. Points d’entrée exacts pour les outils
+## Frontière de sécurité 3.2.4
 
-Ces chemins doivent rester écrits intégralement afin que les vérifications et les agents puissent les ouvrir sans recherche supplémentaire :
+Lire `docs/SECURITY_BOUNDARY.md` et `SECURITY_AUDIT_3.2.4.md` avant toute
+modification de l’Experiment, des imports, des sauvegardes ou du cycle de vie.
 
-- `extension/manifest.json`
-- `extension/background.js`
-- `extension/api/pinInbox/schema.json`
-- `extension/api/pinInbox/implementation.js`
-- `extension/options/options.html`
-- `extension/dashboard/dashboard.html`
-- `PROJECT_MEMORY.md`
+Règles essentielles :
+
+- MailPerch n’a aucun serveur, compte applicatif ou rôle administrateur ;
+- ne jamais ajouter de `admin`, `isAdmin`, jeton maître ou secret client ;
+- toute entrée de page ou de sauvegarde reste non fiable dans l’Experiment ;
+- ne jamais accepter un chemin disque depuis `setConfiguration` ;
+- toute action automatique importée reste désactivée jusqu’à validation ;
+- toute donnée persistante nouvelle doit être ajoutée à la purge d’uninstall ;
+- le propriétaire local du profil contrôle sa Boîte à outils : la protection doit
+  être au niveau de la frontière privilégiée, jamais dans un bouton caché.
+
+Points de contrôle rapides :
+
+| Besoin | Fichier principal | Test obligatoire |
+|---|---|---|
+| Entrée API/import | `extension/api/pinInbox/implementation.js` | `tests/test_security_hardening_3_2_4.py` |
+| Forme API | `extension/api/pinInbox/schema.json` | `tests/test_api_schema_contract.py` |
+| Secrets/CSP | `scripts/scan_secrets.py`, `extension/manifest.json` | `npm run check` |
+| Désinstallation | `implementation.js` (`registerMailPerchLifecycle`, `_prepareForUninstall`) | test sécurité 3.2.4 |
+| Politique | `SECURITY.md`, `docs/SECURITY_BOUNDARY.md`, `docs/THREAT_MODEL.md` | revue documentaire |

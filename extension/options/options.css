@@ -682,3 +682,21 @@ button.danger-quiet {
     max-width: 100%;
   }
 }
+
+
+/* 3.2.4 — la barre de validation reste au-dessus du contenu et ses actions
+ * ne peuvent pas être neutralisées par un panneau ou un pseudo-élément. */
+.save-dock {
+  pointer-events: auto;
+  z-index: 10000;
+}
+.save-dock-actions,
+.save-dock-actions button {
+  position: relative;
+  pointer-events: auto;
+  z-index: 1;
+}
+.save-dock-actions button:disabled {
+  cursor: not-allowed;
+  opacity: .58;
+}

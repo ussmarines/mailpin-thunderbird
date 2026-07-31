@@ -9,9 +9,14 @@ var { MailUtils } = ChromeUtils.importESModule(
 var { MessageArchiver } = ChromeUtils.importESModule(
   "resource:///modules/MessageArchiver.sys.mjs"
 );
+var { Management } = ChromeUtils.importESModule(
+  "resource://gre/modules/Extension.sys.mjs"
+);
 
 const lazy = {};
 ChromeUtils.defineESModuleGetters(lazy, {
+  AddonManager: "resource://gre/modules/AddonManager.sys.mjs",
+  ExtensionStorage: "resource://gre/modules/ExtensionStorage.sys.mjs",
   Sqlite: "resource://gre/modules/Sqlite.sys.mjs",
   cal: "resource:///modules/calendar/calUtils.sys.mjs",
   CalEvent: "resource:///modules/CalEvent.sys.mjs",
@@ -32,6 +37,10 @@ const PREF_STRUCTURED_MIGRATED = "extensions.pinMails.structuredMigrated";
 const PREF_STORAGE_FALLBACK = "extensions.pinMails.storageFallback";
 const PREF_LAST_BACKUP_AT = "extensions.pinMails.lastBackupAt";
 const PREF_LAST_BACKUP_PATH = "extensions.pinMails.lastBackupPath";
+const PREF_BRANCH = "extensions.pinMails.";
+const INSTALL_SENTINEL_KEY = "mailperch.installation";
+const INSTALL_SENTINEL_VALUE = "mailperch-installation-v1";
+const MAILPERCH_BACKUP_FILE_RE = /^pin-mails-.*\.json(?:\.tmp)?$/i;
 const DB_FILENAME = "pin-mails-v2.sqlite";
 const DB_SCHEMA_VERSION = 5;
 const MAX_IMPORT_BYTES = 10 * 1024 * 1024;
@@ -73,6 +82,204 @@ const MAX_UNDO = 20;
 const RESOLVE_CACHE_MS = 30_000;
 const CONVERSATION_CACHE_MS = 45_000;
 const COMPATIBILITY_CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000;
+const MAX_API_INPUT_NODES = 100_000;
+const MAX_API_INPUT_DEPTH = 24;
+const MAX_BULK_KEYS = 500;
+const SQLITE_LIST_TABLE_COLUMNS = Object.freeze({
+  groups_data: "group_id",
+  rules: "rule_id",
+  cases_data: "case_id",
+  templates: "template_id"
+});
+const SQLITE_REF_COLUMN_DEFINITIONS = Object.freeze([
+  "account_key TEXT NOT NULL DEFAULT ''",
+  "due_at INTEGER NOT NULL DEFAULT 0",
+  "completed_at INTEGER NOT NULL DEFAULT 0",
+  "group_id TEXT NOT NULL DEFAULT ''",
+  "case_id TEXT NOT NULL DEFAULT ''",
+  "conversation_key TEXT NOT NULL DEFAULT ''",
+  "workflow_status TEXT NOT NULL DEFAULT 'active'",
+  "follow_up_at INTEGER NOT NULL DEFAULT 0"
+]);
+
+let MAILPERCH_UNINSTALLING = false;
+const ACTIVE_PIN_INBOX_INSTANCES = new Set();
+const MAILPERCH_LIFECYCLE_HANDLERS = new Map();
+
+async function removePathIfPresent(path, options = {}) {
+  if (!path) return;
+  try {
+    if (await IOUtils.exists(path)) await IOUtils.remove(path, options);
+  } catch (error) {
+    console.warn("MailPerch : suppression locale incomplète", path, error);
+  }
+}
+
+async function isVerifiedMailPerchBackup(path) {
+  try {
+    const info = await IOUtils.stat(path);
+    if (!info || info.type !== "regular" || info.size > MAX_IMPORT_BYTES * 4) return false;
+    const envelope = JSON.parse(await IOUtils.readUTF8(path));
+    // External directories can contain unrelated files. Only delete a backup
+    // whose signed envelope can be verified by the same code that imports it.
+    return Boolean(
+      envelope?.checksum &&
+      PIN_MODULES.PinStorageHelpers?.verifyBackupEnvelope?.(envelope)
+    );
+  } catch {
+    return false;
+  }
+}
+
+async function removeMailPerchBackupFiles(directory, {removeDirectory = false} = {}) {
+  if (!directory) return;
+  try {
+    if (!(await IOUtils.exists(directory))) return;
+    if (removeDirectory) {
+      await IOUtils.remove(directory, {recursive: true});
+      return;
+    }
+    for (const child of await IOUtils.getChildren(directory)) {
+      if (MAILPERCH_BACKUP_FILE_RE.test(PathUtils.filename(child)) &&
+          await isVerifiedMailPerchBackup(child)) {
+        await removePathIfPresent(child);
+      }
+    }
+  } catch (error) {
+    console.warn("MailPerch : nettoyage des sauvegardes incomplet", error);
+  }
+}
+
+async function hasMailPerchProfileData() {
+  try {
+    if (Services.prefs.getBranch(PREF_BRANCH).getChildList("").length) return true;
+  } catch {}
+  for (const filename of [DB_FILENAME, `${DB_FILENAME}-wal`, RECOVERY_FILENAME]) {
+    try {
+      if (await IOUtils.exists(PathUtils.join(PathUtils.profileDir, filename))) return true;
+    } catch {}
+  }
+  return false;
+}
+
+async function shouldPreservePreSentinelData(extensionId) {
+  if (!(await hasMailPerchProfileData())) return false;
+  try {
+    const addon = await lazy.AddonManager.getAddonByID(extensionId);
+    const installedAt = Number(addon?.installDate?.getTime?.()) || 0;
+    const updatedAt = Number(addon?.updateDate?.getTime?.()) || 0;
+    // The sentinel is new in 3.2.4. Preserve data once when this build is
+    // reached through a real update. A reinstall has a fresh install date and
+    // therefore falls through to the purge path below.
+    return Boolean(installedAt && updatedAt > installedAt + 1000);
+  } catch {
+    // Never destroy an existing profile merely because AddonManager metadata
+    // is temporarily unavailable. The active uninstall hook still performs
+    // the normal purge; this conservative fallback only affects migration.
+    return true;
+  }
+}
+
+async function ensureMailPerchInstallationState(extensionId) {
+  const id = String(extensionId || "");
+  if (!id) return {fresh: false, storageAvailable: false};
+  try {
+    const jsonFile = await lazy.ExtensionStorage.getFile(id);
+    const marker = jsonFile?.data?.get(INSTALL_SENTINEL_KEY);
+    if (marker === INSTALL_SENTINEL_VALUE) {
+      return {fresh: false, storageAvailable: true};
+    }
+    const preserveExisting = await shouldPreservePreSentinelData(id);
+    if (!preserveExisting) await purgeMailPerchProfileData();
+    await lazy.ExtensionStorage.set(id, {[INSTALL_SENTINEL_KEY]: INSTALL_SENTINEL_VALUE});
+    return {fresh: !preserveExisting, storageAvailable: true};
+  } catch (error) {
+    console.warn("MailPerch : état d’installation impossible à vérifier", error);
+    return {fresh: false, storageAvailable: false};
+  }
+}
+
+async function purgeMailPerchProfileData() {
+  const stored = parseStored(PREF_SETTINGS, {});
+  const customBackupDirectory = typeof stored?.backupDirectory === "string" ? stored.backupDirectory : "";
+  const internalBackupDirectory = PathUtils.join(PathUtils.profileDir, DEFAULT_BACKUP_FOLDER);
+  const profileFiles = [
+    DB_FILENAME,
+    `${DB_FILENAME}-wal`,
+    `${DB_FILENAME}-shm`,
+    `${DB_FILENAME}-journal`,
+    RECOVERY_FILENAME,
+    `${RECOVERY_FILENAME}.tmp`
+  ];
+  for (const filename of profileFiles) {
+    await removePathIfPresent(PathUtils.join(PathUtils.profileDir, filename));
+  }
+  await removeMailPerchBackupFiles(internalBackupDirectory, {removeDirectory: true});
+  if (customBackupDirectory && customBackupDirectory !== internalBackupDirectory) {
+    // A user-selected directory may contain unrelated files. Remove only the
+    // files created by MailPerch and never delete the directory itself.
+    await removeMailPerchBackupFiles(customBackupDirectory);
+  }
+  try { Services.prefs.getBranch(PREF_BRANCH).deleteBranch(""); } catch {}
+  Services.obs.notifyObservers(null, "startupcache-invalidate");
+}
+
+
+function registerMailPerchLifecycle(extensionId) {
+  const id = String(extensionId || "");
+  if (!id || MAILPERCH_LIFECYCLE_HANDLERS.has(id)) return;
+
+  const handlers = {
+    uninstallPending: false,
+    preparationPromise: null,
+    beginPreparation() {
+      MAILPERCH_UNINSTALLING = true;
+      this.preparationPromise ??= Promise.allSettled(
+        [...ACTIVE_PIN_INBOX_INSTANCES].map(instance => instance._prepareForUninstall())
+      );
+      return this.preparationPromise;
+    },
+    unregister() {
+      try { lazy.AddonManager.removeAddonListener(this.addonListener); } catch {}
+      try { Management.off("uninstall", this.onUninstall); } catch {}
+      try { Management.off("update", this.onUpdate); } catch {}
+      MAILPERCH_LIFECYCLE_HANDLERS.delete(id);
+    },
+    async onUninstall(_eventName, details = {}) {
+      if (details?.id !== id) return;
+      try {
+        await this.beginPreparation();
+        ACTIVE_PIN_INBOX_INSTANCES.clear();
+        await purgeMailPerchProfileData();
+      } finally {
+        this.unregister();
+      }
+    },
+    onUpdate(_eventName, details = {}) {
+      if (details?.id === id) this.unregister();
+    },
+    addonListener: {
+      onUninstalling(addon) {
+        if (addon?.id !== id) return;
+        handlers.uninstallPending = true;
+        MAILPERCH_UNINSTALLING = true;
+      },
+      onOperationCancelled(addon) {
+        if (addon?.id !== id || !handlers.uninstallPending) return;
+        handlers.uninstallPending = false;
+        MAILPERCH_UNINSTALLING = false;
+      }
+    }
+  };
+
+  for (const name of ["beginPreparation", "unregister", "onUninstall", "onUpdate"]) {
+    handlers[name] = handlers[name].bind(handlers);
+  }
+  MAILPERCH_LIFECYCLE_HANDLERS.set(id, handlers);
+  lazy.AddonManager.addAddonListener(handlers.addonListener);
+  Management.on("uninstall", handlers.onUninstall);
+  Management.on("update", handlers.onUpdate);
+}
 
 const DEFAULT_COLORS = [
   "#0f6cbd",
@@ -128,7 +335,7 @@ const DEFAULT_SETTINGS = Object.freeze({
   missedReminderPolicy: "notify",
   enableAutomaticRules: false,
   autoUnpinOnArchive: false,
-  autoCompleteOnArchive: true,
+  autoCompleteOnArchive: false,
   autoUnpinOnDelete: true,
   autoUnpinOnRead: false,
   autoUnpinOnReply: false,
@@ -152,18 +359,18 @@ const DEFAULT_SETTINGS = Object.freeze({
   diagnosticMaxEntries: 500,
   compatibilityMode: "auto",
   enablePerformanceMetrics: true,
-  enableBidirectionalCalendarSync: true,
+  enableBidirectionalCalendarSync: false,
   calendarDeleteOnUnpin: false,
-  calendarCompleteOnPinComplete: true,
-  enableWaitingWorkflow: true,
-  enableAutomaticNoReplyTracking: true,
+  calendarCompleteOnPinComplete: false,
+  enableWaitingWorkflow: false,
+  enableAutomaticNoReplyTracking: false,
   noReplyDefaultDays: 5,
   noReplyCancelOnIncomingReply: true,
   defaultFollowUpDays: 3,
-  reopenOnConversationReply: true,
+  reopenOnConversationReply: false,
   enableCases: true,
   enableKanban: true,
-  enableRecurringFollowUps: true,
+  enableRecurringFollowUps: false,
   enableTemplates: true,
   enableHistory: true,
   enableAutomaticBackups: true,
@@ -177,7 +384,7 @@ const DEFAULT_SETTINGS = Object.freeze({
   ruleDefaultMaxPerMinute: 60,
   enableConcurrentWriteProtection: true,
   enableCounterRegressionGuard: true,
-  autoCleanup: true,
+  autoCleanup: false,
   cleanupGraceDays: 7,
   animateChanges: true,
   enableUndo: true,
@@ -216,13 +423,29 @@ function clone(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
+function portableSettingsSnapshot(value) {
+  const settings = clone(value || DEFAULT_SETTINGS);
+  // Filesystem and provider identifiers are tied to one Thunderbird profile.
+  // They are selected again after restore instead of being exported.
+  settings.backupDirectory = "";
+  settings.preferredCalendarId = "";
+  return settings;
+}
+
+function portableDataSnapshot(value) {
+  const data = clone(value || DEFAULT_DATA);
+  data.providerMatrix = clone(DEFAULT_DATA.providerMatrix);
+  return data;
+}
+
 function parseStored(prefName, fallback) {
   try {
     const raw = Services.prefs.getStringPref(prefName, "");
-    if (!raw) {
-      return clone(fallback);
-    }
-    return JSON.parse(raw);
+    if (!raw) return clone(fallback);
+    if (raw.length > MAX_IMPORT_BYTES) throw new Error("Préférence trop volumineuse");
+    const parsed = JSON.parse(raw);
+    assertStructuredInput(parsed, `Préférence ${prefName}`, {maxBytes: MAX_IMPORT_BYTES});
+    return parsed;
   } catch (error) {
     console.warn(`Épingles : préférence invalide ${prefName}`, error);
     return clone(fallback);
@@ -263,6 +486,62 @@ function normalizeRecord(value, {maxKeyLength = 4096} = {}) {
     if (isSafeRecordKey(key, maxKeyLength)) result[key] = item;
   }
   return result;
+}
+
+function assertStructuredInput(value, label = "Données", {
+  maxBytes = MAX_IMPORT_BYTES,
+  maxDepth = MAX_API_INPUT_DEPTH,
+  maxNodes = MAX_API_INPUT_NODES
+} = {}) {
+  const seen = new WeakSet();
+  const stack = [{value, depth: 0}];
+  let nodes = 0;
+  let estimatedBytes = 0;
+
+  while (stack.length) {
+    const current = stack.pop();
+    const item = current.value;
+    const type = typeof item;
+    nodes += 1;
+    if (nodes > maxNodes) throw new ExtensionError(`${label} trop complexe.`);
+    if (current.depth > maxDepth) throw new ExtensionError(`${label} trop imbriquées.`);
+
+    if (item === null || type === "boolean") continue;
+    if (type === "number") {
+      if (!Number.isFinite(item)) throw new ExtensionError(`${label} contient un nombre non fini.`);
+      continue;
+    }
+    if (type === "string") {
+      estimatedBytes += item.length * 2;
+      if (estimatedBytes > maxBytes) throw new ExtensionError(`${label} trop volumineuses.`);
+      continue;
+    }
+    if (type !== "object") throw new ExtensionError(`${label} contient un type non autorisé.`);
+    if (seen.has(item)) throw new ExtensionError(`${label} contient une référence cyclique.`);
+    seen.add(item);
+
+    const isArray = Array.isArray(item);
+    if (!isArray && Object.prototype.toString.call(item) !== "[object Object]") {
+      throw new ExtensionError(`${label} contient un objet non autorisé.`);
+    }
+    const entries = isArray ? item.entries() : Object.entries(item);
+    for (const [rawKey, child] of entries) {
+      const key = String(rawKey);
+      if (!isArray && !isSafeRecordKey(key, 4096)) {
+        throw new ExtensionError(`${label} contient une clé interdite.`);
+      }
+      estimatedBytes += key.length * 2;
+      if (estimatedBytes > maxBytes) throw new ExtensionError(`${label} trop volumineuses.`);
+      stack.push({value: child, depth: current.depth + 1});
+    }
+  }
+  return value;
+}
+
+function normalizeStableKeyList(value, {maxItems = MAX_BULK_KEYS} = {}) {
+  if (!Array.isArray(value)) throw new ExtensionError("La sélection de messages est invalide.");
+  if (value.length > maxItems) throw new ExtensionError(`La sélection dépasse ${maxItems} messages.`);
+  return uniqueStrings(value.map(item => boundedText(item, 8192).trim()).filter(Boolean)).slice(0, maxItems);
 }
 
 function uniqueStrings(values, predicate = () => true) {
@@ -395,8 +674,109 @@ function normalizeSettings(value) {
   // This legacy option is intentionally forced off. Pin counts must never be
   // presented as Thunderbird unread/new-message counters in the folder tree.
   settings.showFolderBadge = false;
-  settings.schemaVersion = 5;
+  settings.schemaVersion = 6;
   return settings;
+}
+
+function hardenImportedConfiguration(settingsValue, dataValue, currentBackupDirectory = "") {
+  const settings = normalizeSettings(settingsValue);
+  const data = normalizeData(dataValue);
+
+  // Environment-bound and automatically executable values are never trusted
+  // from an imported JSON file. The user must explicitly re-enable them after
+  // reviewing the restored configuration.
+  settings.backupDirectory = String(currentBackupDirectory || "").slice(0, 2048);
+  settings.enableAutomaticRules = false;
+  settings.enableAutomaticNoReplyTracking = false;
+  settings.enableWaitingWorkflow = false;
+  settings.moveToWaitingOnReply = false;
+  settings.reopenOnConversationReply = false;
+  settings.enableRecurringFollowUps = false;
+  settings.autoUnpinOnArchive = false;
+  settings.autoCompleteOnArchive = false;
+  settings.autoUnpinOnRead = false;
+  settings.autoUnpinOnReply = false;
+  settings.enableBidirectionalCalendarSync = false;
+  settings.calendarDeleteOnUnpin = false;
+  settings.calendarCompleteOnPinComplete = false;
+  settings.autoCleanup = false;
+  settings.confirmDelete = true;
+  settings.confirmBulkDestructiveActions = true;
+  settings.preferredCalendarId = "";
+  settings.autoPinSenders = [];
+  settings.autoPinTags = [];
+  settings.safeMode = true;
+  data.rules = (data.rules || []).map(rule => ({...rule, enabled: false, errorCount: 0, lastError: ""}));
+  data.providerMatrix = clone(DEFAULT_DATA.providerMatrix);
+  for (const ref of Object.values(data.refs || {})) {
+    ref.calendarId = "";
+    ref.calendarItemId = "";
+    ref.calendarSyncError = "";
+    ref.calendarLastSyncAt = 0;
+    ref.noReplyTracking = false;
+    ref.noReplyAt = 0;
+    ref.noReplyStartedAt = 0;
+    ref.noReplyBaselineMessageId = "";
+  }
+  for (const item of data.cases || []) {
+    item.calendarId = "";
+    item.calendarItemId = "";
+  }
+  return {settings, data};
+}
+
+function normalizeProviderMatrix(matrix) {
+  const source = matrix && typeof matrix === "object" ? matrix : DEFAULT_DATA.providerMatrix;
+  return {
+    checkedAt: Math.max(0, Number(source.checkedAt) || 0),
+    providers: uniqueStrings(source.providers || [], value => value.length <= 40).slice(0, 20),
+    accounts: (Array.isArray(source.accounts) ? source.accounts : []).slice(0, 100).map(account => ({
+      accountKey: boundedText(account?.accountKey, 256),
+      accountName: boundedText(account?.accountName, 320),
+      provider: boundedText(account?.provider, 40),
+      protocol: boundedText(account?.protocol, 40),
+      secure: Boolean(account?.secure),
+      offlineSupport: Boolean(account?.offlineSupport),
+      inboxCount: clampNumber(account?.inboxCount, 0, 10000, 0),
+      supportsFolders: Boolean(account?.supportsFolders),
+      knownRisks: uniqueStrings(account?.knownRisks || [], value => value.length <= 120).slice(0, 20)
+    })),
+    calendars: (Array.isArray(source.calendars) ? source.calendars : []).slice(0, 200).map(calendar => ({
+      id: boundedText(calendar?.id, 512),
+      name: boundedText(calendar?.name, 320),
+      type: boundedText(calendar?.type, 40),
+      writable: Boolean(calendar?.writable),
+      taskCompatible: Boolean(calendar?.taskCompatible),
+      eventCompatible: Boolean(calendar?.eventCompatible),
+      reason: boundedText(calendar?.reason, 500)
+    }))
+  };
+}
+
+function anonymizeProviderMatrix(matrix) {
+  const source = matrix && typeof matrix === "object" ? matrix : DEFAULT_DATA.providerMatrix;
+  return {
+    checkedAt: Math.max(0, Number(source.checkedAt) || 0),
+    providers: uniqueStrings(source.providers || [], value => value.length <= 40).slice(0, 20),
+    accounts: (Array.isArray(source.accounts) ? source.accounts : []).slice(0, 100).map((account, index) => ({
+      account: `account-${index + 1}`,
+      provider: boundedText(account?.provider, 40),
+      protocol: boundedText(account?.protocol, 40),
+      secure: Boolean(account?.secure),
+      offlineSupport: Boolean(account?.offlineSupport),
+      inboxCount: clampNumber(account?.inboxCount, 0, 10000, 0),
+      supportsFolders: Boolean(account?.supportsFolders),
+      knownRisks: uniqueStrings(account?.knownRisks || [], value => value.length <= 120).slice(0, 20)
+    })),
+    calendars: (Array.isArray(source.calendars) ? source.calendars : []).slice(0, 200).map((calendar, index) => ({
+      calendar: `calendar-${index + 1}`,
+      type: boundedText(calendar?.type, 40),
+      writable: Boolean(calendar?.writable),
+      taskCompatible: Boolean(calendar?.taskCompatible),
+      eventCompatible: Boolean(calendar?.eventCompatible),
+      reason: PIN_MODULES.PinDiagnostics?.redact(calendar?.reason || "", 180) || ""
+    }))
+  };
 }
 
 function normalizeGroup(value, fallbackIndex = 0) {
@@ -626,7 +1006,7 @@ function normalizeData(value) {
     search: boundedText(source.dashboard?.search, 500),
     view: ["list", "kanban", "cases", "history", "health"].includes(source.dashboard?.view) ? source.dashboard.view : "list"
   };
-  data.providerMatrix = source.providerMatrix && typeof source.providerMatrix === "object" ? clone(source.providerMatrix) : clone(DEFAULT_DATA.providerMatrix);
+  data.providerMatrix = normalizeProviderMatrix(source.providerMatrix);
   data.migration = {
     from: Number(source.migration?.from) || Number(source.schemaVersion) || 1,
     to: 6,
@@ -761,7 +1141,9 @@ function getTagMetadata(hdr) {
       tags.push({
         key,
         name,
-        color: MailServices.tags.getColorForKey(key) || "currentColor"
+        color: COLOR_RE.test(String(MailServices.tags.getColorForKey(key) || ""))
+          ? String(MailServices.tags.getColorForKey(key)).toLowerCase()
+          : "currentColor"
       });
     } catch {
       // Ignore unknown keywords which are not Thunderbird tags.
@@ -1037,8 +1419,11 @@ class PinStructuredStore {
   }
 
   async _columnExists(table, column) {
+    if (table !== "refs" || !/^[a-z_][a-z0-9_]*$/i.test(column)) {
+      throw new Error("Identifiant SQLite non autorisé");
+    }
     try {
-      const rows = await this.connection.execute(`PRAGMA table_info(${table})`);
+      const rows = await this.connection.execute("PRAGMA table_info(refs)");
       return rows.some(row => row.getResultByName("name") === column);
     } catch {
       return false;
@@ -1046,9 +1431,12 @@ class PinStructuredStore {
   }
 
   async _addColumn(table, definition) {
+    if (table !== "refs" || !SQLITE_REF_COLUMN_DEFINITIONS.includes(definition)) {
+      throw new Error("Migration SQLite non autorisée");
+    }
     const column = definition.trim().split(/\s+/)[0];
     if (!(await this._columnExists(table, column))) {
-      await this.connection.execute(`ALTER TABLE ${table} ADD COLUMN ${definition}`);
+      await this.connection.execute(`ALTER TABLE refs ADD COLUMN ${definition}`);
     }
   }
 
@@ -1060,12 +1448,9 @@ class PinStructuredStore {
     await c.execute("PRAGMA busy_timeout=5000");
     await c.execute("CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL)");
     await c.execute("CREATE TABLE IF NOT EXISTS refs (stable_key TEXT PRIMARY KEY, payload TEXT NOT NULL, updated_at INTEGER NOT NULL)");
-    for (const definition of [
-      "account_key TEXT NOT NULL DEFAULT ''", "due_at INTEGER NOT NULL DEFAULT 0",
-      "completed_at INTEGER NOT NULL DEFAULT 0", "group_id TEXT NOT NULL DEFAULT ''",
-      "case_id TEXT NOT NULL DEFAULT ''", "conversation_key TEXT NOT NULL DEFAULT ''",
-      "workflow_status TEXT NOT NULL DEFAULT 'active'", "follow_up_at INTEGER NOT NULL DEFAULT 0"
-    ]) await this._addColumn("refs", definition);
+    for (const definition of SQLITE_REF_COLUMN_DEFINITIONS) {
+      await this._addColumn("refs", definition);
+    }
     await c.execute("CREATE TABLE IF NOT EXISTS groups_data (group_id TEXT PRIMARY KEY, payload TEXT NOT NULL, sort_order INTEGER NOT NULL)");
     await c.execute("CREATE TABLE IF NOT EXISTS state_data (key TEXT PRIMARY KEY, payload TEXT NOT NULL)");
     await c.execute("CREATE TABLE IF NOT EXISTS undo_actions (id INTEGER PRIMARY KEY AUTOINCREMENT, label TEXT NOT NULL, payload TEXT NOT NULL, created_at INTEGER NOT NULL)");
@@ -1225,6 +1610,9 @@ class PinStructuredStore {
   }
 
   async _upsertList(table, idColumn, previous, next, keyOf, payloadColumns = (_item, _index) => ({}), concurrentWrite = false) {
+    if (SQLITE_LIST_TABLE_COLUMNS[table] !== idColumn) {
+      throw new Error("Table SQLite non autorisée");
+    }
     const diff = PIN_MODULES.PinStorageHelpers?.listDiff(previous, next, keyOf) || {upsert: [], remove: []};
     const previousOrder = new Map((previous || []).map((item, index) => [String(keyOf(item) || ""), index]));
     const previousByKey = new Map((previous || []).map(item => [String(keyOf(item) || ""), item]));
@@ -1424,13 +1812,13 @@ class PinStructuredStore {
     const stamp=new Date().toISOString().replace(/[:.]/g,"-");
     const safeReason=PIN_MODULES.PinStorageHelpers?.sanitizeFilename(reason)||"backup";
     const path=PathUtils.join(directory,`pin-mails-${stamp}-${safeReason}.json`);
-    const backupData=clone(data);
+    const backupData=portableDataSnapshot(data);
     if (!this.owner._settings?.backupIncludeHistory) {
       backupData.history=[];
       backupData.ruleLog=[];
       backupData.activity=[];
     }
-    const metadata={reason,revision:this.revision,extensionVersion:this.owner?._extensionVersion||"0.0.0",schemaVersion:DB_SCHEMA_VERSION,settings:clone(this.owner._settings||DEFAULT_SETTINGS)};
+    const metadata={reason,revision:this.revision,extensionVersion:this.owner?._extensionVersion||"0.0.0",schemaVersion:DB_SCHEMA_VERSION,settings:portableSettingsSnapshot(this.owner._settings||DEFAULT_SETTINGS)};
     const envelope=PIN_MODULES.PinStorageHelpers?.backupEnvelope(backupData,undo,metadata)||{format:"pin-mails-backup",createdAt:Date.now(),metadata,data:backupData,undo};
     await IOUtils.writeUTF8(path,JSON.stringify(envelope,null,2),{tmpPath:`${path}.tmp`});
     const children=(await IOUtils.getChildren(directory))
@@ -1472,7 +1860,9 @@ class PinStructuredStore {
 var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   getAPI(context) {
     this._states ??= new Set();
+    ACTIVE_PIN_INBOX_INSTANCES.add(this);
     this._context = context;
+    registerMailPerchLifecycle(context.extension.id);
     this._rootURI = context.extension.rootURI;
     this._extensionVersion = String(context.extension.manifest?.version || "0.0.0");
     this._locale = String(context.extension.localeData?.selectedLocale || Services.locale?.appLocaleAsBCP47 || "fr");
@@ -1483,58 +1873,59 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       this._modulesLoaded = true;
     }
     if (!this._readyPromise) {
-    const rawSettings = parseStored(PREF_SETTINGS, DEFAULT_SETTINGS);
-    const rawData = parseStored(PREF_DATA, DEFAULT_DATA);
-    this._settings = normalizeSettings(rawSettings);
-    this._data = normalizeData(rawData);
-    this._undoStack = [];
-    this._resolveCache = new Map();
-    this._conversationCache = new Map();
-    this._diagnosticEvents = [];
-    this._performance = {renders: 0, skippedRenders: 0, createdCards: 0, reusedCards: 0, totalRenderMs: 0, maxRenderMs: 0, resolves: 0, cacheHits: 0, ruleRuns: 0, lastRenderMs: 0};
-    this._compatibility = {mode: "checking", missing: [], checkedAt: 0, reduced: false};
-    this._instanceId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    this._ruleGuard = new Map();
-    this._ruleRates = new Map();
-    this._calendarObservers = new Map();
-    this._pendingDeleteKeys = new Set();
-    this._pendingDeleteTimers = new Set();
-    this._lastCalendarSyncAt = 0;
-    this._counterRegressionEvents = [];
-    this._dashboardRequestPending = false;
-    this._storage = new PinStructuredStore(this);
-    this._readyPromise = this._storage.initialize(this._data, this._undoStack).then(result => {
-      this._data = normalizeData(result.data);
-      this._undoStack = Array.isArray(result.undo) ? result.undo.slice(-MAX_UNDO) : [];
-      this._storageBackend = result.backend;
-      this._data.revision = Math.max(Number(this._data.revision) || 0, Number(result.revision) || 0);
-      return this._migrateFromLegacy(rawSettings, rawData).then(() => {
-      this._registerStyleSheet(context);
-      this._checkCompatibility(true);
-      this._registerFolderListener();
-      this._registerDataObserver();
-      this._registerCalendarObservers();
-      this._startReminderTimer();
-      this._startCalendarSyncTimer();
-      this._startBackupTimer();
-      if (String(result.backend || "").startsWith("sqlite")) {
-        try { Services.prefs.clearUserPref(PREF_DATA); } catch {}
-      }
-      return true;
-      });
-    }).catch(error => {
-      this._recordDiagnostic("error", "Initialisation incomplète", error);
-      this._storageBackend = "preference-fallback";
-      this._registerStyleSheet(context);
-      this._checkCompatibility(true);
-      this._registerFolderListener();
-      this._registerDataObserver();
-      this._registerCalendarObservers();
-      this._startReminderTimer();
-      this._startCalendarSyncTimer();
-      this._startBackupTimer();
-      return false;
-    });
+      this._readyPromise = (async () => {
+        await ensureMailPerchInstallationState(context.extension.id);
+        const rawSettings = parseStored(PREF_SETTINGS, DEFAULT_SETTINGS);
+        const rawData = parseStored(PREF_DATA, DEFAULT_DATA);
+        this._settings = normalizeSettings(rawSettings);
+        this._data = normalizeData(rawData);
+        this._undoStack = [];
+        this._resolveCache = new Map();
+        this._conversationCache = new Map();
+        this._diagnosticEvents = [];
+        this._performance = {renders: 0, skippedRenders: 0, createdCards: 0, reusedCards: 0, totalRenderMs: 0, maxRenderMs: 0, resolves: 0, cacheHits: 0, ruleRuns: 0, lastRenderMs: 0};
+        this._compatibility = {mode: "checking", missing: [], checkedAt: 0, reduced: false};
+        this._instanceId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        this._ruleGuard = new Map();
+        this._ruleRates = new Map();
+        this._calendarObservers = new Map();
+        this._pendingDeleteKeys = new Set();
+        this._pendingDeleteTimers = new Set();
+        this._lastCalendarSyncAt = 0;
+        this._counterRegressionEvents = [];
+        this._dashboardRequestPending = false;
+        this._storage = new PinStructuredStore(this);
+
+        const registerRuntime = () => {
+          this._registerStyleSheet(context);
+          this._checkCompatibility(true);
+          this._registerFolderListener();
+          this._registerDataObserver();
+          this._registerCalendarObservers();
+          this._startReminderTimer();
+          this._startCalendarSyncTimer();
+          this._startBackupTimer();
+        };
+
+        try {
+          const result = await this._storage.initialize(this._data, this._undoStack);
+          this._data = normalizeData(result.data);
+          this._undoStack = Array.isArray(result.undo) ? result.undo.slice(-MAX_UNDO) : [];
+          this._storageBackend = result.backend;
+          this._data.revision = Math.max(Number(this._data.revision) || 0, Number(result.revision) || 0);
+          await this._migrateFromLegacy(rawSettings, rawData);
+          registerRuntime();
+          if (String(result.backend || "").startsWith("sqlite")) {
+            try { Services.prefs.clearUserPref(PREF_DATA); } catch {}
+          }
+          return true;
+        } catch (error) {
+          this._recordDiagnostic("error", "Initialisation incomplète", error);
+          this._storageBackend = "preference-fallback";
+          registerRuntime();
+          return false;
+        }
+      })();
     }
 
     const ready = callback => async (...args) => {
@@ -1596,7 +1987,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         runCompatibilityCheck: ready(() => this._checkCompatibility(true)),
         getPerformanceReport: ready(() => this._getPerformanceReport()),
         checkStorageIntegrity: ready(() => this._storage.integrityCheck()),
-        runBackup: ready(reason => this._storage.createFileBackup(this._data, this._undoStack, reason || "manual")),
+        runBackup: ready(reason => this._storage.createFileBackup(this._data, this._undoStack, boundedText(reason, 128) || "manual")),
         getBackupStatus: ready(() => this._storage.getBackupStatus()),
         chooseBackupDirectory: ready(() => this._chooseBackupDirectory()),
         simulateRules: ready(options => this._simulateRules(options || {})),
@@ -1980,13 +2371,18 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
   _setConfiguration(configuration) {
+    assertStructuredInput(configuration, "Configuration", {maxBytes: 2 * 1024 * 1024, maxNodes: 25_000});
     if (!configuration || typeof configuration !== "object") {
       throw new ExtensionError("Configuration invalide.");
     }
     this._pushUndo("Modification des paramètres");
     const previousPinMode = this._settings.pinMode;
     if (configuration.settings) {
+      const currentBackupDirectory = this._settings.backupDirectory || "";
       this._settings = normalizeSettings({...this._settings, ...configuration.settings});
+      // Arbitrary filesystem paths are not accepted through page JavaScript.
+      // Only the native folder picker may update this privileged setting.
+      this._settings.backupDirectory = currentBackupDirectory;
       this._saveSettings();
     }
     if (previousPinMode !== this._settings.pinMode && this._settings.pinMode === "nativeStar") {
@@ -2048,12 +2444,13 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       format: "thunderbird-pin-mails",
       version: 6,
       exportedAt: new Date().toISOString(),
-      settings: clone(this._settings),
-      data: clone(this._data)
+      settings: portableSettingsSnapshot(this._settings),
+      data: portableDataSnapshot(this._data)
     };
   }
 
   _importConfiguration(configuration) {
+    assertStructuredInput(configuration, "Sauvegarde", {maxBytes: MAX_IMPORT_BYTES});
     if (configuration?.format === "pin-mails-backup" &&
         !PIN_MODULES.PinStorageHelpers?.verifyBackupEnvelope(configuration)) {
       throw new ExtensionError("La sauvegarde est incomplète ou corrompue.");
@@ -2078,13 +2475,17 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     const serialized = JSON.stringify(configuration);
     if (serialized.length > MAX_IMPORT_BYTES) throw new ExtensionError("La sauvegarde dépasse la taille maximale autorisée.");
     this._pushUndo("Import de la sauvegarde");
-    const importUndoAction=this._undoStack?.at(-1)||null;
-    this._settings = normalizeSettings(configuration.settings);
-    this._data = normalizeData(configuration.data);
-    if (Array.isArray(configuration.undo)) {
-      this._undoStack = configuration.undo.slice(-(MAX_UNDO - (importUndoAction ? 1 : 0)));
-      if (importUndoAction) this._undoStack.push(importUndoAction);
-    }
+    const importUndoAction = this._undoStack?.at(-1) || null;
+    const hardened = hardenImportedConfiguration(
+      configuration.settings,
+      configuration.data,
+      this._settings.backupDirectory || ""
+    );
+    this._settings = hardened.settings;
+    this._data = hardened.data;
+    // Undo payloads can contain privileged message operations. They are local
+    // runtime state, not portable backup data, and are never imported.
+    this._undoStack = importUndoAction ? [importUndoAction] : [];
     this._data.migration = {
       from: Number(configuration.version) || 1,
       to: 6,
@@ -2202,6 +2603,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
   _getHistory(options = {}) {
+    assertStructuredInput(options, "Options d’historique", {maxBytes: 64 * 1024, maxNodes: 1000});
     const search = sanitizeSearchText(options.search || "");
     const caseId = String(options.caseId || "");
     const limit = clampNumber(options.limit, 1, MAX_HISTORY, 500);
@@ -2209,9 +2611,10 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
   _setWorkflowStatus(stableKeys, status, options = {}) {
+    assertStructuredInput(options, "Options de workflow", {maxBytes: 64 * 1024, maxNodes: 1000});
     const allowed = new Set(["active", "waiting", "planned", "completed"]);
     const target = allowed.has(status) ? status : "active";
-    const keys = Array.isArray(stableKeys) ? stableKeys.map(String) : [String(stableKeys || "")];
+    const keys = normalizeStableKeyList(stableKeys);
     const refs = keys.map(key => this._data.refs[key]).filter(Boolean);
     if (!refs.length) return {count:0,status:target};
     this._pushUndo(`Statut ${target}`);
@@ -2250,6 +2653,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
   _createCase(details = {}) {
+    assertStructuredInput(details, "Affaire", {maxBytes: 64 * 1024, maxNodes: 1000});
     if (!this._settings.enableCases) throw new ExtensionError("Les affaires sont désactivées.");
     if ((this._data.cases || []).length >= MAX_CASES) throw new ExtensionError("Nombre maximal d’affaires atteint.");
     const values = this._data.cases || [];
@@ -2261,6 +2665,8 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
   _updateCase(caseId, details = {}) {
+    assertStructuredInput(details, "Affaire", {maxBytes: 64 * 1024, maxNodes: 1000});
+    caseId = boundedText(caseId, 64);
     const index=(this._data.cases||[]).findIndex(item=>item.id===String(caseId));
     if(index<0) throw new ExtensionError("Affaire introuvable.");
     const item=normalizeCase({...this._data.cases[index],...details,id:this._data.cases[index].id,updatedAt:Date.now()},index);
@@ -2268,7 +2674,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
   _deleteCase(caseId) {
-    const id=String(caseId||""); const before=(this._data.cases||[]).length;
+    const id=boundedText(caseId, 64); const before=(this._data.cases||[]).length;
     const removedCase=(this._data.cases||[]).find(item=>item.id===id)||null;
     if (removedCase?.calendarItemId && this._settings.calendarDeleteOnUnpin) {
       this._deleteLinkedCaseCalendarItem(removedCase).catch(error=>this._recordDiagnostic("warning","Suppression Agenda de l’affaire impossible",error));
@@ -2280,6 +2686,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
   _createTemplate(details = {}) {
+    assertStructuredInput(details, "Modèle", {maxBytes: 64 * 1024, maxNodes: 1000});
     if (!this._settings.enableTemplates) throw new ExtensionError("Les modèles sont désactivés.");
     if ((this._data.templates || []).length >= MAX_TEMPLATES) throw new ExtensionError("Nombre maximal de modèles atteint.");
     const values = this._data.templates || [];
@@ -2290,6 +2697,8 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
   _updateTemplate(templateId, details = {}) {
+    assertStructuredInput(details, "Modèle", {maxBytes: 64 * 1024, maxNodes: 1000});
+    templateId = boundedText(templateId, 64);
     const index=(this._data.templates||[]).findIndex(item=>item.id===String(templateId));
     if(index<0) throw new ExtensionError("Modèle introuvable.");
     const item=normalizeTemplate({...this._data.templates[index],...details,id:this._data.templates[index].id},index);
@@ -2297,7 +2706,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
   _deleteTemplate(templateId) {
-    const id=String(templateId||"");const before=(this._data.templates||[]).length;
+    const id=boundedText(templateId, 64);const before=(this._data.templates||[]).length;
     this._data.templates=(this._data.templates||[]).filter(item=>item.id!==id);
     for(const ref of Object.values(this._data.refs)) if(ref.templateId===id) ref.templateId="";
     if(before!==this._data.templates.length)this._saveData("template-delete");
@@ -2305,9 +2714,10 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
   _applyTemplate(stableKeys, templateId, {pushUndo=true, save=true, refresh=true} = {}) {
-    const template=(this._data.templates||[]).find(item=>item.id===String(templateId));
+    templateId = boundedText(templateId, 64);
+    const template=(this._data.templates||[]).find(item=>item.id===templateId);
     if(!template) throw new ExtensionError("Modèle introuvable.");
-    const keys=Array.isArray(stableKeys)?stableKeys.map(String):[String(stableKeys||"")];const refs=keys.map(key=>this._data.refs[key]).filter(Boolean);const now=Date.now();
+    const keys=normalizeStableKeyList(stableKeys);const refs=keys.map(key=>this._data.refs[key]).filter(Boolean);const now=Date.now();
     if (pushUndo) this._pushUndo(`Application du modèle ${template.name}`);
     for(const ref of refs){
       ref.templateId=template.id;ref.groupId=template.groupId||ref.groupId;ref.caseId=template.caseId||ref.caseId;ref.priorityLevel=template.priorityLevel;ref.workflowStatus=template.workflowStatus;ref.completedAt=0;
@@ -2743,20 +3153,22 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
   async _performSelectedByTab(context, tabId, action) {
+    const normalizedAction = boundedText(action, 64);
+    const allowedActions = new Set(["read", "unread", "toggleRead", "reply", "archive", "delete", "complete", "uncomplete", "unpin", "active", "waiting", "planned"]);
+    if (!allowedActions.has(normalizedAction)) return {count: 0, unsupported: true};
     const pane = this._about3PaneForTab(context, tabId);
     const headers = pane ? this._getSelectedHeaders(pane) : [];
     if (!headers.length) return {count: 0};
-    if (["complete", "uncomplete", "unpin", "active", "waiting", "planned"].includes(action)) {
+    if (["complete", "uncomplete", "unpin", "active", "waiting", "planned"].includes(normalizedAction)) {
       const keys = [];
       for (const hdr of headers) {
         const conversationKey = conversationStableKey(hdr);
         const key = hasOwn(this._data.refs, conversationKey) ? conversationKey : messageStableKey(hdr);
         if (hasOwn(this._data.refs, key) && !keys.includes(key)) keys.push(key);
       }
-      return this._performReferenceAction(keys, action, {});
+      return this._performReferenceAction(keys, normalizedAction, {});
     }
-    this._performMessageAction(action, headers, pane);
-    return {count: headers.length};
+    return this._performMessageAction(normalizedAction, headers, pane);
   }
 
   _about3PaneForTab(context, tabId) {
@@ -3094,7 +3506,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         performance: this._getPerformanceReport(),
         diagnostics: PIN_MODULES.PinDiagnostics?.summary(this._diagnosticEvents || [])
       }) || null,
-      providerMatrix: clone(this._data.providerMatrix || DEFAULT_DATA.providerMatrix)
+      providerMatrix: anonymizeProviderMatrix(this._data.providerMatrix || DEFAULT_DATA.providerMatrix)
     };
   }
 
@@ -3121,6 +3533,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
   async _repairHealthIssues(options = {}) {
+    assertStructuredInput(options, "Options de réparation", {maxBytes: 64 * 1024, maxNodes: 1000});
     const actions = Array.isArray(options.actions) ? new Set(options.actions.map(String)) : new Set(["orphan-links", "repair-references"]);
     if (this._settings.backupBeforeMigration && this._storage) {
       await this._storage.createFileBackup(this._data, this._undoStack, "before-health-repair");
@@ -3144,6 +3557,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
   _previewImport(configuration) {
+    assertStructuredInput(configuration, "Sauvegarde", {maxBytes: MAX_IMPORT_BYTES});
     if (!configuration || typeof configuration !== "object") throw new ExtensionError("Configuration invalide.");
     const preview = PIN_MODULES.PinMigrations?.analyze(configuration, this._data) || {valid: false, errors: ["analysis-unavailable"]};
     if (!preview.valid) this._recordDiagnostic("warning", "Sauvegarde refusée lors de la prévisualisation", (preview.errors || []).join(", "), {component: "migration", action: "preview"});
@@ -3187,7 +3601,8 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
   _setNoReplyTracking(stableKeys, options = {}) {
-    const keys = Array.isArray(stableKeys) ? stableKeys.map(String) : [String(stableKeys || "")];
+    assertStructuredInput(options, "Options de relance", {maxBytes: 64 * 1024, maxNodes: 1000});
+    const keys = normalizeStableKeyList(stableKeys);
     const refs = keys.map(key => this._data.refs[key]).filter(Boolean);
     if (!refs.length) return {count:0};
     const enabled = options.enabled !== false;
@@ -3406,6 +3821,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
   async _simulateRules(options = {}) {
+    assertStructuredInput(options, "Options de simulation", {maxBytes: 64 * 1024, maxNodes: 1000});
     const trigger=["messageAdded","read","archive","reply","move","delete","complete","calendar"].includes(options.trigger)?options.trigger:"messageAdded";
     const limit=clampNumber(options.limit,1,10000,1000);const matches=[];let scanned=0;
     for(const account of MailServices.accounts.accounts){
@@ -3608,6 +4024,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
   _getDashboardData(options = {}) {
+    assertStructuredInput(options, "Options du tableau de bord", {maxBytes: 64 * 1024, maxNodes: 1000});
     const validFilters = new Set(["active","all","overdue","today","week","completed","unread","waiting","planned","noReply","noDue","missing","calendarError","recentCompleted"]);
     const validViews = new Set(["list","kanban","cases","history","health"]);
     const filter = validFilters.has(options.filter) ? options.filter : (this._data.dashboard?.filter || "active");
@@ -3647,7 +4064,8 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
   _openReference(stableKey) {
-    const ref = this._data.refs[String(stableKey || "")];
+    stableKey = boundedText(stableKey, 8192);
+    const ref = this._data.refs[stableKey];
     if (!ref) return {opened: false};
     let hdr = this._resolveReference(ref, true);
     if (hdr && ref.trackingMode === "conversation") hdr = this._updateConversationReference(ref, hdr);
@@ -3657,9 +4075,11 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
   _performReferenceAction(stableKeys, action, options = {}) {
+    assertStructuredInput(options, "Options d’action", {maxBytes: 64 * 1024, maxNodes: 1000});
     const bulk = PIN_MODULES.PinBulk;
-    const normalizedAction = String(action || "");
-    const keys = bulk?.normalizeKeys(stableKeys) || [...new Set((Array.isArray(stableKeys) ? stableKeys : [stableKeys]).map(value => String(value || "")).filter(Boolean))];
+    const normalizedAction = boundedText(action, 64);
+    const boundedKeys = normalizeStableKeyList(stableKeys);
+    const keys = bulk?.normalizeKeys(boundedKeys, MAX_BULK_KEYS) || boundedKeys;
     if (!keys.length || (bulk && !bulk.supported(normalizedAction))) return {count: 0, unsupported: Boolean(normalizedAction)};
     const actionKeys = bulk?.requiresSingle(normalizedAction) ? keys.slice(0, 1) : keys;
     const refs = actionKeys.map(key => this._data.refs[key]).filter(Boolean);
@@ -3998,6 +4418,8 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
   async _createCalendarItem(stableKey, itemType = "", calendarId = "") {
+    stableKey = boundedText(stableKey, 8192);
+    calendarId = boundedText(calendarId, 512);
     if (!this._settings.enableCalendarIntegration) throw new ExtensionError("L’intégration Agenda est désactivée.");
     const ref = this._data.refs[String(stableKey || "")];
     if (!ref) throw new ExtensionError("Message épinglé introuvable.");
@@ -4063,6 +4485,8 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
   async _createCaseCalendarItem(caseId, itemType = "task", calendarId = "", {save=true,refresh=true,createIfMissing=true} = {}) {
+    caseId = boundedText(caseId, 64);
+    calendarId = boundedText(calendarId, 512);
     if(!this._settings.enableCalendarIntegration)throw new ExtensionError("L’intégration Agenda est désactivée.");
     const caseItem=(this._data.cases||[]).find(item=>item.id===String(caseId||""));if(!caseItem)throw new ExtensionError("Affaire introuvable.");
     const type = itemType === "event" ? "event" : "task";
@@ -4126,6 +4550,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
   _snoozeReminder(stableKey, durationMs) {
+    stableKey = boundedText(stableKey, 8192);
     const ref = this._data.refs[String(stableKey || "")];
     if (!ref) return {snoozed: false};
     const duration = clampNumber(durationMs, 60_000, 30 * DAY_MS, 3600000);
@@ -4377,7 +4802,12 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     const patchRow = row => {
       if (!(row instanceof about3Pane.HTMLElement) || row.dataset.properties?.includes("dummy")) return;
       const hdr = headerForRow(row);
-      const star = row.querySelector(".tree-button-flag");
+      const starCandidates = [...new Set(row.querySelectorAll(".button-star, .tree-button-flag"))];
+      const star = starCandidates.find(item => item.classList.contains("button-star")) || starCandidates[0] || null;
+      for (const candidate of starCandidates) {
+        candidate.toggleAttribute("data-pin-mails-duplicate-star", candidate !== star);
+        candidate.toggleAttribute("data-pin-mails-native-star", candidate === star);
+      }
       if (this._settings.pinMode === "nativeStar" && isEnabled()) {
         row.querySelector(`.${INDEPENDENT_BUTTON_CLASS}`)?.remove();
         if (star) {
@@ -5701,6 +6131,10 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       panel?.remove(); allHeader?.remove(); panelToggle?.remove(); editor?.remove(); contextMenu?.remove(); ownedPopupSet?.remove(); groupDialog?.remove(); groupAssignmentDialog?.remove(); for (const badge of document.querySelectorAll(".pin-mails-folder-badge")) badge.remove();
       for (const button of document.querySelectorAll(`.${INDEPENDENT_BUTTON_CLASS}`)) button.remove();
       for (const button of document.querySelectorAll(`.${BUTTON_CLASS}`)) restoreNativeButton(button);
+      for (const star of document.querySelectorAll("[data-pin-mails-native-star], [data-pin-mails-duplicate-star]")) {
+        star.removeAttribute("data-pin-mails-native-star");
+        star.removeAttribute("data-pin-mails-duplicate-star");
+      }
       this._states.delete(state);
     };
 
@@ -5732,33 +6166,49 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     }).format(new Date(timestamp));
   }
 
-  onShutdown(isAppShutdown) {
+  _stopRuntimeResources() {
     this._unregisterFolderListener();
     this._unregisterDataObserver();
     this._unregisterCalendarObservers();
     if (this._calendarSyncTimer) { try { this._calendarSyncTimer.cancel(); } catch {} this._calendarSyncTimer = null; }
     if (this._backupTimer) { try { this._backupTimer.cancel(); } catch {} this._backupTimer = null; }
-    if (this._reminderTimer) {
-      try { this._reminderTimer.cancel(); } catch {}
-      this._reminderTimer = null;
-    }
+    if (this._reminderTimer) { try { this._reminderTimer.cancel(); } catch {} this._reminderTimer = null; }
     for (const timer of this._pendingDeleteTimers || []) { try { timer.cancel(); } catch {} }
     this._pendingDeleteTimers?.clear();
     this._pendingDeleteKeys?.clear();
-    if (this._states) {
-      for (const state of [...this._states]) {
-        try { state.cleanup(); } catch (error) { console.error("Épingles : nettoyage incomplet", error); }
-      }
+    for (const state of [...(this._states || [])]) {
+      try { state.cleanup(); } catch (error) { console.error("Épingles : nettoyage incomplet", error); }
     }
     this._dashboardRequestPending = false;
     this._dashboardRequestListeners?.clear();
-    // Start an atomic emergency-file write before the asynchronous SQLite
-    // close. The next startup compares it with the last committed revision and
-    // only restores it when it contains newer, different data.
-    this._storage?.writeEmergencyRecovery(this._data, this._undoStack, "shutdown").catch(() => {});
-    // Flush and close asynchronously. Extension shutdown does not await this
-    // hook, but PinStructuredStore serializes pending writes before closing.
-    this._storage?.close();
+  }
+
+  async _prepareForUninstall() {
+    this._uninstallPreparationPromise ??= (async () => {
+      try { await this._readyPromise; } catch {}
+      this._stopRuntimeResources();
+      const storage = this._storage;
+      this._storage = null;
+      if (storage) await storage.close();
+      this._readyPromise = Promise.resolve(false);
+    })();
+    return this._uninstallPreparationPromise;
+  }
+
+
+  onShutdown(isAppShutdown) {
+    this._stopRuntimeResources();
+    if (MAILPERCH_UNINSTALLING) {
+      // The core uninstall event will await this same idempotent promise. Keep
+      // the instance discoverable until the SQLite writer has fully closed.
+      this._prepareForUninstall().finally(() => ACTIVE_PIN_INBOX_INSTANCES.delete(this));
+    } else {
+      ACTIVE_PIN_INBOX_INSTANCES.delete(this);
+      // Start an atomic emergency-file write before the asynchronous SQLite
+      // close. The next startup restores it only when it is newer.
+      this._storage?.writeEmergencyRecovery(this._data, this._undoStack, "shutdown").catch(() => {});
+      this._storage?.close();
+    }
     if (!isAppShutdown) {
       if (this._styleSheetService && this._styleUri &&
           this._styleSheetService.sheetRegistered(this._styleUri, this._styleSheetService.AUTHOR_SHEET)) {

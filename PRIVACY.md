@@ -16,11 +16,14 @@ La build ne contient aucun appel réseau, télémétrie, publicité ou service d
 
 ## Sauvegardes et diagnostics
 
-- les sauvegardes complètes sont déclenchées/configurées localement ;
-- le diagnostic expurgé utilise des identifiants hachés et des compteurs lorsque possible ;
-- l’utilisateur doit vérifier un fichier avant de le partager ;
+- les sauvegardes sont déclenchées/configurées localement ;
+- les exports retirent le chemin de sauvegarde, le calendrier préféré et la matrice de fournisseurs, qui sont propres au profil ;
+- le diagnostic expurgé utilise des identifiants hachés ou anonymes et des compteurs ;
+- l’utilisateur doit vérifier un fichier avant de le partager : une sauvegarde contient encore les métadonnées nécessaires aux épingles ;
 - aucune sauvegarde n’est téléversée automatiquement.
 
 ## Suppression
 
-Désinstaller l’extension ne garantit pas l’effacement automatique de toutes les sauvegardes externes créées par l’utilisateur. Les données du profil et les sauvegardes doivent être supprimées séparément si nécessaire.
+La désinstallation ferme le stockage puis supprime la base, les fichiers de récupération, les préférences et les sauvegardes internes gérées par MailPerch. Dans un dossier externe choisi avec le sélecteur natif, seules les enveloppes MailPerch munies d’un checksum local vérifiable sont supprimées ; les autres fichiers et le dossier sont conservés. Une sentinelle minimale stockée dans la zone locale native de l’extension ne contient aucune donnée utilisateur ; Gecko l’efface à la désinstallation. Son absence lors d’une installation neuve ou d’une réinstallation oblige MailPerch à purger les éventuels résidus avant de charger ses données.
+
+Les exports téléchargés manuellement ne sont pas suivis par l’extension et restent sous le contrôle de l’utilisateur.

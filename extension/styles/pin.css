@@ -1,4 +1,4 @@
-/* MailPerch — Email Pins & Follow-up 3.2.3 */
+/* MailPerch — Email Pins & Follow-up 3.2.4 */
 
 :root {
   --pin-mails-accent: light-dark(#0f6cbd, #62b0e8);
@@ -1144,7 +1144,7 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   outline-offset: 1px;
 }
 
-/* 3.2.3 — géométrie équilibrée des lignes générales Thunderbird.
+/* 3.2.4 — géométrie équilibrée des lignes générales Thunderbird.
  * ThreadCard conserve une hauteur virtuelle native de 46 px : l’amélioration
  * doit donc répartir l’espace intérieur sans agrandir artificiellement une
  * seule sous-ligne, sous peine de pousser l’objet contre la bordure basse. */
@@ -1270,7 +1270,7 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   .pin-mails-group-remove { forced-color-adjust: auto; }
 }
 
-/* 3.2.3 — rail d’actions centré et densités sûres.
+/* 3.2.4 — rail d’actions centré et densités sûres.
  * Le confort visuel des paramètres ne modifie plus about:3pane. Seule la
  * densité explicite des cartes MailPerch agit sur le panneau d’épingles. */
 .pin-mails-card {
@@ -1367,4 +1367,40 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
 }
 :root[uidensity="touch"][pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .button-star {
   inset-inline-end: 68px;
+}
+
+
+/* 3.2.4 — une seule étoile native par ligne. Thunderbird peut exposer deux
+ * contrôles de drapeau lors de la réutilisation d'une carte virtualisée ; le
+ * contrôleur marque le contrôle canonique et masque seulement le doublon. */
+:root[pin-mails-inbox] #threadTree [data-pin-mails-duplicate-star] {
+  display: none !important;
+}
+:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout [data-pin-mails-native-star] {
+  position: absolute !important;
+  inset-block-start: 50%;
+  inset-inline-end: 60px;
+  transform: translateY(-50%);
+  display: grid !important;
+  place-items: center !important;
+  inline-size: 24px !important;
+  block-size: 24px !important;
+  min-inline-size: 24px !important;
+  min-block-size: 24px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+:root[uidensity="touch"][pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout [data-pin-mails-native-star] {
+  inset-inline-end: 68px;
+  inline-size: 28px !important;
+  block-size: 28px !important;
+  min-inline-size: 28px !important;
+  min-block-size: 28px !important;
+}
+
+/* 3.2.4 — garde immédiate contre le double contrôle étoile de certaines
+ * variantes ThreadCard. L’attribut posé par le contrôleur reste la source
+ * principale ; :has() couvre la courte fenêtre avant le prochain patch DOM. */
+:root[pin-mails-inbox] #threadTree tr.card-layout:has(.button-star) .tree-button-flag:not(.button-star) {
+  display: none !important;
 }

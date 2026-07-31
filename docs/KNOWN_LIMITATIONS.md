@@ -12,3 +12,8 @@
 
 - La mémoire projet décrit le dépôt mais ne remplace pas une validation graphique réelle ;
   elle est contrôlée automatiquement pour la version et les points d’entrée.
+- La purge immédiate s’appuie sur des écouteurs de cycle de vie enregistrés lorsque l’Experiment a été chargé et doit être validée dans Thunderbird réel. Si l’extension est restée désactivée depuis le démarrage, l’Experiment ne peut pas exécuter lui-même cette purge au moment exact de la suppression. La sentinelle stockée dans la zone locale que Gecko efface nativement force toutefois une purge des résidus avant toute initialisation lors d’une réinstallation normale. Les préférences de développement Firefox/Thunderbird permettant volontairement de conserver le stockage d’extension à la désinstallation peuvent neutraliser ce mécanisme et sont hors configuration utilisateur normale.
+- Le propriétaire du profil local et toute personne disposant de Browser Toolbox contrôlent déjà le processus Thunderbird ; MailPerch ne peut pas créer une frontière d’autorisation contre cet acteur. Il n’existe donc aucun rôle administrateur client à contourner.
+- Les sauvegardes exportées manuellement hors des dossiers gérés par MailPerch ne peuvent ni ne doivent être effacées automatiquement lors de la désinstallation.
+- Une sécurité absolue ne peut pas être garantie ; toute nouvelle version de Thunderbird ou modification de l’API Experiment exige une nouvelle revue et des tests réels.
+- Les actions GitHub sont épinglées à des commits précis et suivies par Dependabot ; une mise à jour doit être relue avant fusion plutôt que suivie automatiquement par un tag mobile.

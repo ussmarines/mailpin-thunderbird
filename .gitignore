@@ -27,3 +27,6 @@ __pycache__/
 Thumbs.db
 .vscode/
 .idea/
+
+CI_LOG_*.txt
+ROUNDTRIP_CI_LOG_*.txt

@@ -14,6 +14,7 @@ EXTENSION = ROOT / "extension"
 DIST = ROOT / "dist"
 FIXED_TIME = (2026, 1, 1, 0, 0, 0)
 SOURCE_EXCLUDES = {".git", ".venv", "node_modules", "__pycache__", ".pytest_cache"}
+SOURCE_EXCLUDED_GLOBS = ("CI_LOG_*.txt", "ROUNDTRIP_CI_LOG_*.txt")
 XPI_EXCLUDED_NAMES = {"AGENTS.md"}
 
 
@@ -25,7 +26,12 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def archive_file(archive: zipfile.ZipFile, source: Path, target: str) -> None:
+def archive_file(archive: zipfile.ZipFile, source: Path, target: str, *, root: Path = ROOT) -> None:
+    if source.is_symlink():
+        raise SystemExit(f"Lien symbolique refusé dans l’archive : {source}")
+    resolved = source.resolve(strict=True)
+    if not resolved.is_relative_to(root.resolve()) or not resolved.is_file():
+        raise SystemExit(f"Source d’archive hors dépôt ou invalide : {source}")
     info = zipfile.ZipInfo(target.replace(os.sep, "/"), FIXED_TIME)
     info.compress_type = zipfile.ZIP_DEFLATED
     info.external_attr = (0o100644 & 0xFFFF) << 16
@@ -37,7 +43,7 @@ def create_xpi(output: Path) -> None:
         raise SystemExit("extension/manifest.json est introuvable")
     with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
         for source in sorted(path for path in EXTENSION.rglob("*") if path.is_file() and path.name not in XPI_EXCLUDED_NAMES):
-            archive_file(archive, source, source.relative_to(EXTENSION).as_posix())
+            archive_file(archive, source, source.relative_to(EXTENSION).as_posix(), root=EXTENSION)
 
 
 def create_source_zip(output: Path) -> None:
@@ -46,9 +52,11 @@ def create_source_zip(output: Path) -> None:
             relative = source.relative_to(ROOT)
             if any(part in SOURCE_EXCLUDES for part in relative.parts):
                 continue
+            if any(relative.match(pattern) for pattern in SOURCE_EXCLUDED_GLOBS):
+                continue
             if relative.parts and relative.parts[0] == "dist" and relative.as_posix() != "dist/.gitkeep":
                 continue
-            archive_file(archive, source, relative.as_posix())
+            archive_file(archive, source, relative.as_posix(), root=ROOT)
 
 
 def main() -> None:

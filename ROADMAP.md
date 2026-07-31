@@ -1,5 +1,14 @@
 # Feuille de route
 
+## 3.2.4 — porte de sécurité et cycle de vie
+
+- valider dans Thunderbird réel la fermeture/purge à la désinstallation et la sentinelle de réinstallation à zéro, y compris après désactivation/réactivation ;
+- confirmer les valeurs recommandées sur un profil neuf : mode guidé, densité normale, automatisations destructives désactivées ;
+- tester les imports malformés, volumineux et contenant des clés dangereuses ;
+- vérifier les sauvegardes dans le dossier interne puis dans un dossier choisi par le sélecteur natif ;
+- maintenir `SECURITY_AUDIT_3.2.4.md`, `docs/SECURITY_BOUNDARY.md` et le test de durcissement dans chaque future version ;
+- exécuter une revue de sécurité indépendante avant toute publication publique.
+
 ## 3.2.x — consolidation en cours
 
 - exécuter les tests browser/XPCShell dans un checkout Thunderbird réel ;

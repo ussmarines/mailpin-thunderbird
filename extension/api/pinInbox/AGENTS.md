@@ -3,6 +3,7 @@
 > Contexte global : lire `PROJECT_MEMORY.md` à la racine avant ce fichier.
 
 Zone la plus risquée du dépôt. Elle a accès aux fonctions internes de Thunderbird.
+Lire aussi `docs/SECURITY_BOUNDARY.md` et `SECURITY_AUDIT_3.2.4.md` avant toute modification.
 
 ## Invariants
 
@@ -13,6 +14,9 @@ Zone la plus risquée du dépôt. Elle a accès aux fonctions internes de Thunde
 - Éviter les variables globales ; conserver l’état sur l’instance `ExtensionAPI`.
 - Toute action destructive doit utiliser les notifications Thunderbird pour confirmer le résultat.
 - Les objets retournés au background doivent être clonables et expurgés.
+- Les arguments des pages doivent être bornés et normalisés au niveau privilégié, même si le schéma les valide déjà.
+- Les chemins locaux ne sont modifiés que par un sélecteur natif ; aucun chemin fourni par le DOM/import.
+- La désinstallation doit fermer le stockage avant purge et ne doit jamais recréer un fichier de récupération.
 
 ## Carte de travail
 

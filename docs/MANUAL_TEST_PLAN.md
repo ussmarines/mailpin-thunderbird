@@ -235,3 +235,54 @@ Consigner version Thunderbird, OS, thème, vue, type de compte et résultat.
 - confirmer que `dist/.gitkeep` n’est pas signalé avec un suffixe `\r` ;
 - lancer `python scripts/check_project_memory.py` ;
 - vérifier que `PROJECT_MEMORY.md` indique la version, le commit de base et les chemins principaux.
+
+
+## Validation ciblée 3.2.4 — sécurité, paramètres et désinstallation
+
+### Installation propre et valeurs recommandées
+
+- créer un profil Thunderbird neuf, installer le XPI et redémarrer complètement ;
+- confirmer : mode de réglages Guidé, espacement Équilibré, densité des cartes Normale, stockage indépendant des étoiles ;
+- confirmer que les règles automatiques, le suivi automatique sans réponse, la synchronisation Agenda bidirectionnelle et la suppression Agenda au désépinglage sont désactivés par défaut ;
+- vérifier qu’aucun compte, calendrier, groupe, règle, affaire ou épingle d’une installation précédente n’est présent.
+
+### Enregistrer et annuler
+
+- modifier une case, une liste, un nombre, un groupe et une règle ;
+- confirmer que le bandeau Enregistrer/Annuler apparaît et que les deux boutons sont activables ;
+- cliquer Annuler et vérifier le retour exact aux valeurs persistées ;
+- refaire les changements, cliquer Enregistrer, fermer l’onglet puis le rouvrir et vérifier la persistance ;
+- double-cliquer rapidement Enregistrer et confirmer qu’une seule écriture est exécutée ;
+- vérifier que le dossier de sauvegarde choisi n’est jamais remplacé par une valeur saisie via le DOM ou un objet JavaScript modifié.
+
+### Imports et entrées non fiables
+
+- importer une sauvegarde valide, puis confirmer que MailPerch passe en mode sûr et désactive les règles/automatismes importés ;
+- refuser un fichier trop volumineux, trop imbriqué, cyclique, avec `__proto__`, `prototype` ou `constructor` ;
+- refuser une enveloppe dont la somme de contrôle a été modifiée ;
+- confirmer qu’aucun chemin de sauvegarde, lien Agenda ou état d’exécution automatique n’est restauré depuis le fichier ;
+- vérifier que le diagnostic exporté ne contient ni adresse de compte brute, ni identifiant de calendrier, ni chemin local, ni corps de message.
+
+### Désinstallation complète
+
+- créer des épingles, groupes, règles, affaires, historique et une sauvegarde interne ;
+- choisir aussi un dossier externe de sauvegarde et produire une sauvegarde MailPerch munie de son checksum local ;
+- fermer les opérations en cours, supprimer MailPerch depuis le gestionnaire de modules et fermer toutes les fenêtres Thunderbird ;
+- vérifier la disparition de la base `pin-mails-v2.sqlite` et de ses fichiers WAL/SHM/journal, du fichier de récupération, du dossier interne `pin-mails-backups` et des préférences `extensions.pinMails.*` ;
+- dans le dossier externe, confirmer que seules les sauvegardes MailPerch vérifiables ont été supprimées et que les fichiers sans rapport sont conservés ;
+- réinstaller le même XPI et confirmer un démarrage à zéro avec la configuration recommandée ;
+- répéter après avoir désactivé l’extension puis redémarré Thunderbird avant sa suppression : si une purge immédiate n’a pas pu s’exécuter, la réinstallation doit quand même supprimer les résidus avant l’ouverture SQLite grâce à la sentinelle native ;
+- effectuer aussi une mise à jour 3.2.3 → 3.2.4 et confirmer que la migration initiale de la sentinelle ne supprime pas les données existantes ;
+- conserver les exports téléchargés manuellement : ils sont hors du stockage géré par l’extension et ne doivent pas être supprimés.
+
+### Frontière de confiance
+
+- confirmer qu’aucun réglage `admin`, `isAdmin`, rôle caché ou jeton maître n’existe dans le DOM, le manifeste, le schéma ou les préférences ;
+- modifier le DOM des paramètres : cela ne doit jamais permettre de définir un chemin de fichier ou d’activer une capacité absente de l’API privilégiée ;
+- documenter séparément les manipulations effectuées avec Browser Toolbox : le propriétaire du profil local est dans la frontière de confiance et contrôle déjà Thunderbird.
+
+### Liste générale
+
+- vérifier chaque message étoilé/non étoilé et épinglé/non épinglé : une seule étoile native visible ;
+- changer de dossier, de thème, de densité Thunderbird et faire défiler plusieurs centaines de lignes ;
+- confirmer que le nettoyage de MailPerch restaure les attributs natifs sans laisser d’icône dupliquée.

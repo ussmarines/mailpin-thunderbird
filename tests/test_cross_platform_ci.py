@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
-"""Ensure npm and Actions use the Python launcher available on every runner."""
+"""Ensure npm and Actions remain cross-platform and supply-chain constrained."""
 from pathlib import Path
 import json
+import re
 
 ROOT = Path(__file__).resolve().parents[1]
 package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
 ci = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
 release = (ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8")
+dependabot = (ROOT / ".github/dependabot.yml").read_text(encoding="utf-8")
+check_repo = (ROOT / "scripts/check_repo.py").read_text(encoding="utf-8")
 
 for name in ("check", "test", "build"):
     command = package["scripts"][name]
@@ -17,13 +20,35 @@ assert "runs-on: windows-latest" in ci
 assert "npm run check && npm test" in ci
 assert "python3 scripts/check_versions.py" not in release
 assert "python scripts/check_versions.py" in release
+
+expected_actions = {
+    "actions/checkout": "de0fac2e4500dabe0009e67214ff5f5447ce83dd",
+    "actions/setup-node": "48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e",
+    "actions/setup-python": "a309ff8b426b58ec0e2a45f0f869d46889d02405",
+    "actions/upload-artifact": "043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+}
 for workflow in (ci, release):
-    assert "actions/checkout@v6" in workflow
-    assert "actions/setup-node@v6" in workflow
-    assert "actions/setup-python@v6" in workflow
-    assert "actions/checkout@v4" not in workflow
-    assert "actions/setup-node@v4" not in workflow
-    assert "actions/setup-python@v5" not in workflow
-assert "actions/upload-artifact@v7" in ci
-assert "actions/upload-artifact@v7" in release
+    for action, sha in expected_actions.items():
+        if action == "actions/upload-artifact" and workflow is ci:
+            assert f"{action}@{sha}" in workflow
+        elif action == "actions/upload-artifact" and workflow is release:
+            assert f"{action}@{sha}" in workflow
+        elif action != "actions/upload-artifact":
+            assert f"{action}@{sha}" in workflow
+    assert not re.search(r"uses:\s+[^\s]+@v\d", workflow), workflow
+    assert "python -m pip install" not in workflow
+    assert "beautifulsoup4" not in workflow
+    assert "tinycss2" not in workflow
+
+assert ci.count("persist-credentials: false") == 2
+assert release.count("persist-credentials: false") == 1
+assert "retention-days: 14" in ci
+assert "retention-days: 30" in release
+assert "include-hidden-files: false" in ci
+assert "include-hidden-files: false" in release
+assert "package-ecosystem: github-actions" in dependabot
+assert "BeautifulSoup" not in check_repo
+assert "tinycss2" not in check_repo
+assert "from html.parser import HTMLParser" in check_repo
+
 print("Cross-platform CI tooling guards: OK")

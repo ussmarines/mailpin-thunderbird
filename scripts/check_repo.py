@@ -5,16 +5,102 @@ from __future__ import annotations
 import json
 import re
 import subprocess
+from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import urlparse
 import xml.etree.ElementTree as ET
 
-from bs4 import BeautifulSoup
-import tinycss2
 
 ROOT = Path(__file__).resolve().parents[1]
 EXT = ROOT / "extension"
 errors: list[str] = []
+
+
+class ResourceHTMLParser(HTMLParser):
+    """Collect IDs and local script/style references using the standard library."""
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.ids: set[str] = set()
+        self.duplicate_ids: set[str] = set()
+        self.resources: list[str] = []
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        values = {name.lower(): value for name, value in attrs}
+        node_id = values.get("id")
+        if node_id:
+            if node_id in self.ids:
+                self.duplicate_ids.add(node_id)
+            self.ids.add(node_id)
+        if tag.lower() == "script" and values.get("src"):
+            self.resources.append(str(values["src"]))
+        elif tag.lower() == "link" and values.get("href"):
+            self.resources.append(str(values["href"]))
+
+
+def validate_css_structure(text: str) -> str | None:
+    """Return a compact error for malformed comments, strings or delimiters."""
+
+    stack: list[tuple[str, int]] = []
+    pairs = {"}": "{", "]": "[", ")": "("}
+    quote: str | None = None
+    quote_line = 0
+    escaped = False
+    in_comment = False
+    comment_line = 0
+    line = 1
+    index = 0
+    while index < len(text):
+        char = text[index]
+        following = text[index + 1] if index + 1 < len(text) else ""
+        if char == "\n":
+            line += 1
+
+        if in_comment:
+            if char == "*" and following == "/":
+                in_comment = False
+                index += 2
+                continue
+            index += 1
+            continue
+
+        if quote:
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == quote:
+                quote = None
+            index += 1
+            continue
+
+        if char == "/" and following == "*":
+            in_comment = True
+            comment_line = line
+            index += 2
+            continue
+        if char in {"'", '"'}:
+            quote = char
+            quote_line = line
+            index += 1
+            continue
+        if char in "{[(":
+            stack.append((char, line))
+        elif char in "}])":
+            expected = pairs[char]
+            if not stack or stack[-1][0] != expected:
+                return f"délimiteur inattendu {char!r} ligne {line}"
+            stack.pop()
+        index += 1
+
+    if in_comment:
+        return f"commentaire non terminé commencé ligne {comment_line}"
+    if quote:
+        return f"chaîne {quote!r} non terminée commencée ligne {quote_line}"
+    if stack:
+        char, opened_line = stack[-1]
+        return f"délimiteur {char!r} non fermé commencé ligne {opened_line}"
+    return None
 
 
 def check(condition: bool, message: str) -> None:
@@ -35,7 +121,7 @@ check(manifest.get("manifest_version") == 3, "manifest_version doit être 3")
 check(manifest.get("permissions") == ["menus"], "permissions WebExtension inattendues")
 check(manifest.get("default_locale") == "fr", "default_locale doit être fr")
 check(manifest.get("browser_specific_settings", {}).get("gecko", {}).get("id") == "pin-mails@MailPerch.local", "ID de développement modifié")
-check(manifest.get("content_security_policy", {}).get("extension_pages") == "script-src 'self'; object-src 'none'", "CSP inattendue")
+check(manifest.get("content_security_policy", {}).get("extension_pages") == "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; connect-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'", "CSP inattendue")
 version = str(manifest.get("version", ""))
 check(bool(re.fullmatch(r"\d+\.\d+\.\d+", version)), "version SemVer invalide")
 
@@ -51,16 +137,16 @@ check(en_locale.get("brandSubtitle", {}).get("message") == "Pin, organize and fo
 check(en_locale.get("brandSlogan", {}).get("message") == "Keep important mail within reach.", "slogan MailPerch incohérent")
 
 required_root = [
-    "AGENTS.md", "PROJECT_MEMORY.md", "BRANDING.md", "README.md", "README.en.md", "LICENSE", "NOTICE.md", "CHANGELOG.md", "AUDIT_REPORT_3.1.0.md", "AUDIT_REPORT_3.1.4.md", "AUDIT_REPORT_3.2.0.md", "HOTFIX_REPORT_3.2.1.md", "HOTFIX_REPORT_3.2.2.md", "HOTFIX_REPORT_3.2.3.md",
-    "CONTRIBUTING.md", "CODE_OF_CONDUCT.md", "SECURITY.md", "PRIVACY.md", "ROADMAP.md", "SUPPORT.md",
+    "AGENTS.md", "PROJECT_MEMORY.md", "BRANDING.md", "README.md", "README.en.md", "LICENSE", "NOTICE.md", "CHANGELOG.md",
+    "CONTRIBUTING.md", "CODE_OF_CONDUCT.md", "SECURITY.md", "SECURITY_AUDIT_3.2.4.md", "PRIVACY.md", "ROADMAP.md", "SUPPORT.md",
     "package.json", ".editorconfig", ".gitattributes", ".gitignore", "extension/AGENTS.md",
     "extension/api/pinInbox/AGENTS.md", "tests/AGENTS.md",
-    "docs/PROJECT_STATE.json", "docs/ARCHITECTURE.md", "docs/CODEX_HANDOFF.md", "docs/DATA_MODEL.md", "docs/DEBUGGING.md",
+    "docs/PROJECT_STATE.json", "docs/ARCHITECTURE.md", "docs/CODEX_HANDOFF.md", "docs/DATA_MODEL.md", "docs/DEBUGGING.md", "docs/SECURITY_BOUNDARY.md",
     "docs/UI_SPEC.md", "docs/THREAT_MODEL.md", "docs/ATN_RELEASE_CHECKLIST.md",
     "docs/MANUAL_TEST_PLAN.md", "docs/SCREENSHOT_FINDINGS.md", "docs/DECISIONS.md",
-    "docs/KNOWN_LIMITATIONS.md", "docs/VIDEO_REVIEW_2026-07-30.md", "scripts/build.py", "scripts/check_repo.py", "scripts/check_versions.py", "scripts/check_project_memory.py", "scripts/deep_audit.py", "scripts/scan_secrets.py",
+    "docs/KNOWN_LIMITATIONS.md", "scripts/build.py", "scripts/check_repo.py", "scripts/check_versions.py", "scripts/check_project_memory.py", "scripts/deep_audit.py", "scripts/scan_secrets.py",
     "release/BUILD_INSTRUCTIONS.md", "release/ATN_REVIEW_NOTES_TEMPLATE.md", "release/manifest-store-template.json",
-    "tests/test_build_reproducible.py", "tests/test_ui_regressions.py", "tests/test_api_schema_contract.py", "tests/test_data_integrity_guards.py", "tests/test_native_card_menu.py", "tests/test_accessibility_localization.py", "tests/test_ux_3_2_features.py", "tests/ux_3_2_model_tests.mjs"
+    "tests/test_build_reproducible.py", "tests/test_security_hardening_3_2_4.py", "tests/test_ui_regressions.py", "tests/test_api_schema_contract.py", "tests/test_data_integrity_guards.py", "tests/test_native_card_menu.py", "tests/test_accessibility_localization.py", "tests/test_ux_3_2_features.py", "tests/ux_3_2_model_tests.mjs"
 ]
 for relative in required_root:
     check((ROOT / relative).is_file(), f"fichier dépôt manquant: {relative}")
@@ -137,28 +223,31 @@ for path in EXT.rglob("*.svg"):
 
 # HTML references and JS ID references.
 for html_path in EXT.rglob("*.html"):
-    soup = BeautifulSoup(html_path.read_text(encoding="utf-8"), "html.parser")
-    ids = {node.get("id") for node in soup.find_all(attrs={"id": True})}
-    for tag, attr in (("script", "src"), ("link", "href")):
-        for node in soup.find_all(tag):
-            value = node.get(attr)
-            if not value or urlparse(value).scheme or value.startswith("#"):
-                continue
-            target = (html_path.parent / value).resolve()
-            check(target.is_file(), f"sous-ressource HTML manquante {html_path.relative_to(ROOT)} -> {value}")
+    parser = ResourceHTMLParser()
+    try:
+        parser.feed(html_path.read_text(encoding="utf-8"))
+        parser.close()
+    except Exception as exc:
+        errors.append(f"HTML invalide {html_path.relative_to(ROOT)}: {exc}")
+    for duplicate_id in sorted(parser.duplicate_ids):
+        errors.append(f"ID HTML dupliqué {duplicate_id} dans {html_path.relative_to(ROOT)}")
+    for value in parser.resources:
+        if urlparse(value).scheme or value.startswith("#"):
+            continue
+        target = (html_path.parent / value).resolve()
+        check(target.is_file(), f"sous-ressource HTML manquante {html_path.relative_to(ROOT)} -> {value}")
     sibling_js = html_path.with_suffix(".js")
     if sibling_js.is_file():
         js = sibling_js.read_text(encoding="utf-8")
         for match in re.finditer(r'\$\(["\']([^"\']+)["\']\)', js):
-            check(match.group(1) in ids, f"ID HTML manquant {match.group(1)} référencé par {sibling_js.relative_to(ROOT)}")
+            check(match.group(1) in parser.ids, f"ID HTML manquant {match.group(1)} référencé par {sibling_js.relative_to(ROOT)}")
 
-# CSS parser and local url() targets.
+# CSS structural validation and local url() targets.
 for css_path in EXT.rglob("*.css"):
     text = css_path.read_text(encoding="utf-8")
-    rules = tinycss2.parse_stylesheet(text, skip_comments=False, skip_whitespace=False)
-    for rule in rules:
-        if getattr(rule, "type", "") == "error":
-            errors.append(f"CSS invalide {css_path.relative_to(ROOT)}: {rule.message}")
+    css_error = validate_css_structure(text)
+    if css_error:
+        errors.append(f"CSS invalide {css_path.relative_to(ROOT)}: {css_error}")
     for raw in re.findall(r"url\(([^)]+)\)", text):
         value = raw.strip().strip('"\'')
         if not value or value.startswith(("data:", "#")) or urlparse(value).scheme:
@@ -192,7 +281,11 @@ store_id = str(store_template.get("browser_specific_settings", {}).get("gecko", 
 check("<ATN_USER>" in store_id, "le modèle de publication doit conserver un identifiant ATN explicitement à remplacer")
 check((ROOT / "dist/.gitkeep").is_file(), "dist/.gitkeep manquant")
 
-# Avoid accidental secret/config files and oversized sources.
+# Avoid symlink-based source exfiltration, accidental secret/config files and oversized sources.
+for candidate in ROOT.rglob("*"):
+    if candidate.is_symlink():
+        errors.append(f"lien symbolique interdit dans le dépôt: {candidate.relative_to(ROOT)}")
+
 for path in ROOT.rglob("*"):
     if not path.is_file() or ".git" in path.parts:
         continue
