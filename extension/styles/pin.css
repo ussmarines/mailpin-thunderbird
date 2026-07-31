@@ -1,4 +1,4 @@
-/* MailPerch — Email Pins & Follow-up 3.1.2 */
+/* MailPerch — Email Pins & Follow-up 3.1.3 */
 
 :root {
   --pin-mails-accent: light-dark(#0f6cbd, #62b0e8);
@@ -1009,7 +1009,7 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
 }
 
 
-/* 3.1.2 — interactions fiables des cartes et punaises. */
+/* 3.1.3 — interactions fiables des cartes, Agenda et punaises. */
 .pin-mails-quick-button.pin-mails-card-pin {
   display: grid;
   place-items: center;
@@ -1111,4 +1111,36 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
     visibility: visible;
     pointer-events: auto;
   }
+}
+
+/* 3.1.3 — choix Agenda et retour d’action dans le viewport. */
+.pin-mails-toast {
+  position: fixed;
+  inset-inline-end: 14px;
+  inset-block-end: 14px;
+  max-inline-size: min(460px, calc(100vw - 28px));
+}
+.pin-mails-calendar-dialog {
+  inline-size: min(540px, calc(100vw - 32px));
+  padding: 0;
+  border: 1px solid var(--pin-mails-border);
+  border-radius: 10px;
+  background: var(--layout-background-0);
+  color: inherit;
+  box-shadow: 0 12px 42px rgb(0 0 0 / .4);
+}
+.pin-mails-calendar-dialog::backdrop { background: rgb(0 0 0 / .45); }
+.pin-mails-calendar-dialog-form { display: grid; gap: 13px; padding: 18px; }
+.pin-mails-calendar-dialog-title { margin: 0; font-size: 1.15rem; }
+.pin-mails-calendar-dialog-help { margin: 0; color: var(--layout-color-2); line-height: 1.4; }
+.pin-mails-calendar-dialog-form label { display: grid; gap: 6px; font-weight: 650; }
+.pin-mails-calendar-dialog-select {
+  inline-size: 100%;
+  min-block-size: 36px;
+  padding: 6px 8px;
+  border: 1px solid var(--pin-mails-border);
+  border-radius: 6px;
+  background: var(--layout-background-1);
+  color: inherit;
+  font: inherit;
 }

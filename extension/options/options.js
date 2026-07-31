@@ -7,6 +7,7 @@ let cases = [];
 let templates = [];
 let dirty = false;
 let statusTimer = null;
+let lastStatusControl = null;
 
 const accountControls = new Map();
 const inboxControls = new Map();
@@ -16,11 +17,152 @@ const BOOLEAN_IDS=[
 ];
 const SELECT_IDS=["pinMode","defaultPinTarget","compatibilityMode","panelScope","sortMode","density","missedReminderPolicy","calendarItemType"];
 const NUMBER_IDS=["cardLines","panelMaxHeight","panelPageSize","completedRetentionDays","undoTimeoutMs","reminderLeadMinutes","cleanupGraceDays","defaultFollowUpDays","ruleErrorDisableThreshold","ruleDefaultMaxPerMinute","backupIntervalHours","backupRetention"];
+
+const CONTROL_HELP = {
+  pinMode: "Le mode indépendant conserve les épingles dans le stockage local MailPerch sans modifier les étoiles Thunderbird.",
+  defaultPinTarget: "Détermine si une nouvelle épingle suit uniquement le message sélectionné ou toute sa conversation.",
+  compatibilityMode: "Automatique adapte l’intégration à votre version de Thunderbird. Le mode réduit désactive les fonctions DOM les plus sensibles.",
+  enableCounterRegressionGuard: "Vérifie que MailPerch ne modifie pas les compteurs natifs de messages lus, non lus ou nouveaux.",
+  enableConcurrentWriteProtection: "Sérialise les écritures locales lorsque plusieurs fenêtres Thunderbird utilisent MailPerch en même temps.",
+  safeMode: "Masque les fonctions avancées susceptibles de dépendre davantage de l’interface interne de Thunderbird.",
+  showQuickActions: "Affiche les boutons Répondre, Attente, Terminer et Modifier sur les cartes épinglées.",
+  enableMultiSelect: "Autorise Ctrl/Cmd, Maj et les actions groupées dans le panneau des épingles.",
+  confirmDelete: "Demande une confirmation avant toute suppression de message déclenchée depuis MailPerch.",
+  enableCalendarIntegration: "Autorise la création locale de tâches et d’événements dans les calendriers Thunderbird compatibles.",
+  enableBidirectionalCalendarSync: "Répercute les échéances et états terminés entre l’épingle et l’élément Agenda lié.",
+  calendarCompleteOnPinComplete: "Marque la tâche Agenda terminée lorsque l’épingle correspondante est terminée.",
+  calendarDeleteOnUnpin: "Supprime l’élément Agenda lié lors du désépinglage. Cette option peut être destructive.",
+  calendarItemType: "Type proposé par défaut. Le calendrier reste sélectionnable au moment de chaque création.",
+  preferredCalendarId: "Calendrier présélectionné. Laissez vide pour choisir le calendrier au moment de créer la tâche ou l’événement.",
+  enableAutomaticBackups: "Crée périodiquement des sauvegardes locales de la configuration et des références MailPerch.",
+  backupDirectory: "Dossier local utilisé pour les sauvegardes automatiques et manuelles.",
+  enableGlobalDashboard: "Active l’onglet global regroupant les épingles de tous les comptes.",
+  enablePerformanceMetrics: "Mesure uniquement les durées de rendu locales, sans télémétrie ni envoi réseau.",
+  shortcut: "Raccourci Thunderbird utilisé pour épingler ou désépingler la sélection courante."
+};
+
+const BUTTON_HELP = {
+  "import-stars": "Copie les étoiles Thunderbird existantes vers les épingles MailPerch. Les messages ne sont ni déplacés ni marqués comme lus.",
+  "simulate-rules": "Analyse les règles sans modifier les messages ni les épingles.",
+  "clear-rule-log": "Efface seulement le journal local des règles, pas les messages ni les règles.",
+  "add-rule": "Ajoute une règle locale désactivable avant son enregistrement.",
+  "add-group": "Ajoute un groupe local pour organiser les cartes épinglées.",
+  "add-case": "Ajoute une affaire locale pouvant regrouper plusieurs messages.",
+  "add-template": "Ajoute un modèle de suivi réutilisable.",
+  "sync-calendar": "Relit et synchronise les liens Agenda existants. Aucun nouvel élément n’est créé sans action explicite.",
+  "choose-backup": "Choisit le dossier local des sauvegardes et enregistre immédiatement ce chemin.",
+  "run-backup": "Crée immédiatement une sauvegarde locale dans le dossier configuré.",
+  "integrity-check": "Vérifie la cohérence SQLite sans supprimer ni réparer automatiquement les données.",
+  "compat-check": "Contrôle la disponibilité des fonctions Thunderbird utilisées par MailPerch.",
+  dashboard: "Ouvre le tableau de bord global dans un nouvel onglet Thunderbird.",
+  undo: "Annule la dernière action MailPerch encore disponible dans l’historique local.",
+  repair: "Tente de retrouver les messages déplacés ou renommés sans modifier les compteurs Thunderbird.",
+  rescan: "Rescanne les références épinglées pour mettre à jour leur état local.",
+  cleanup: "Retire les références définitivement introuvables après le délai de sécurité configuré.",
+  "reset-interface": "Réinitialise uniquement la disposition et les préférences visuelles de l’interface.",
+  diagnostic: "Exporte un rapport technique local expurgé du corps des messages et des pièces jointes.",
+  export: "Télécharge une sauvegarde JSON locale de la configuration MailPerch.",
+  "save-shortcut": "Enregistre uniquement le raccourci Thunderbird indiqué.",
+  "save-all": "Enregistre tous les champs, groupes, règles, affaires et modèles actuellement modifiés.",
+  reset: "Réinitialise les réglages, groupes, affaires, modèles et règles. Les épingles sont conservées."
+};
+
+function genericControlHelp(control) {
+  if (control.type === "checkbox") return "Active ou désactive cette fonction après l’enregistrement des paramètres.";
+  if (control.tagName === "SELECT") return "Choisissez le comportement utilisé par MailPerch, puis enregistrez les paramètres.";
+  if (control.type === "number") return "Définit une limite ou une durée locale appliquée après l’enregistrement.";
+  if (control.tagName === "TEXTAREA") return "Une valeur par ligne. Les données restent stockées localement dans MailPerch.";
+  return "Cette valeur est appliquée après l’enregistrement des paramètres.";
+}
+
+function slugify(value) {
+  return String(value || "section")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
+function setLocalStatus(control, message, type = "") {
+  if (!(control instanceof HTMLElement) || !message) return;
+  const anchor = control.closest(".button-help-wrap, label, .file-button") || control;
+  const section = control.closest("section") || control.closest("footer");
+  if (!section) return;
+  for (const old of section.querySelectorAll(".control-feedback[data-active='true']")) {
+    old.dataset.active = "false";
+  }
+  let feedback = anchor.parentElement?.querySelector(`:scope > .control-feedback[data-for="${control.id || control.name || "control"}"]`);
+  if (!feedback) {
+    feedback = node("small", "control-feedback");
+    feedback.dataset.for = control.id || control.name || "control";
+    anchor.after(feedback);
+  }
+  feedback.textContent = String(message);
+  feedback.className = `control-feedback ${type}`.trim();
+  feedback.dataset.active = "true";
+  feedback.setAttribute("role", type === "error" ? "alert" : "status");
+}
+
+function enhanceSettingsPage() {
+  const nav = $("settings-nav");
+  nav.replaceChildren();
+  const sections = [...document.querySelectorAll("#settings-form > section")];
+  sections.forEach((section, index) => {
+    const heading = section.querySelector("h2");
+    if (!heading) return;
+    section.id ||= `settings-${slugify(heading.textContent)}-${index + 1}`;
+    section.dataset.searchText = section.textContent.toLowerCase();
+    const link = node("a", "settings-nav-link", heading.textContent.trim());
+    link.href = `#${section.id}`;
+    link.dataset.sectionId = section.id;
+    nav.appendChild(link);
+  });
+
+  for (const label of document.querySelectorAll("#settings-form section label")) {
+    const control = label.querySelector("input:not([type='file']), select, textarea");
+    if (!control || label.querySelector(":scope > .control-help")) continue;
+    const help = node("small", "control-help", CONTROL_HELP[control.id] || genericControlHelp(control));
+    const helpId = `help-${control.id || Math.random().toString(36).slice(2)}`;
+    help.id = helpId;
+    control.setAttribute("aria-describedby", [control.getAttribute("aria-describedby"), helpId].filter(Boolean).join(" "));
+    label.appendChild(help);
+  }
+
+  for (const button of document.querySelectorAll("#settings-form section button, #settings-form footer button")) {
+    if (!button.id || button.closest(".save-dock") || button.closest(".button-help-wrap")) continue;
+    const wrapper = node("span", "button-help-wrap");
+    button.before(wrapper);
+    wrapper.appendChild(button);
+    const help = node("small", "button-help", BUTTON_HELP[button.id] || "Exécute cette action localement et affiche son résultat sous ce bouton et dans une notification visible.");
+    wrapper.appendChild(help);
+  }
+
+  const search = $("settings-search");
+  const applySearch = () => {
+    const query = search.value.trim().toLowerCase();
+    let visible = 0;
+    for (const section of sections) {
+      const match = !query || section.textContent.toLowerCase().includes(query);
+      section.hidden = !match;
+      const link = nav.querySelector(`[data-section-id="${section.id}"]`);
+      if (link) link.hidden = !match;
+      if (match) visible++;
+    }
+    $("settings-search-summary").textContent = query
+      ? `${visible} section(s) contenant « ${search.value.trim()} ».`
+      : `${sections.length} sections disponibles.`;
+  };
+  search.addEventListener("input", applySearch);
+  applySearch();
+}
 function setDirty(value = true) {
   dirty = Boolean(value);
   document.body.toggleAttribute("data-dirty", dirty);
   const dock = $("save-dock");
   if (dock) dock.hidden = !dirty;
+  if ($("save-dock-message")) {
+    $("save-dock-message").textContent = dirty
+      ? "Modifications non enregistrées — elles ne seront appliquées qu’après Enregistrer."
+      : "Paramètres enregistrés.";
+  }
 }
 
 function clearStatus() {
@@ -35,9 +177,11 @@ function clearStatus() {
   $("status-message").textContent = "";
 }
 
-function setStatus(message, type = "", {persistent = false} = {}) {
+function setStatus(message, type = "", {persistent = false, control = null} = {}) {
   const host = $("status");
   if (!host) return;
+  const activeControl = control instanceof HTMLElement ? control : lastStatusControl;
+  if (message && activeControl) setLocalStatus(activeControl, message, type);
   if (statusTimer) {
     clearTimeout(statusTimer);
     statusTimer = null;
@@ -73,11 +217,12 @@ async function withBusy(control, message, task) {
   const button = control instanceof HTMLElement ? control : null;
   const wasDisabled = button?.disabled;
   if (button) {
+    lastStatusControl = button;
     button.disabled = true;
     button.dataset.busy = "true";
     button.setAttribute("aria-busy", "true");
   }
-  setStatus(message, "busy", {persistent: true});
+  setStatus(message, "busy", {persistent: true, control: button});
   try {
     return await task();
   } finally {
@@ -237,7 +382,49 @@ function renderRules(){
     host.append(row);
   });
 }
-async function renderCalendars(selected){const el=$("preferredCalendarId");el.replaceChildren();const auto=node("option","","Premier calendrier modifiable");auto.value="";el.append(auto);try{for(const calendar of await messenger.pinInbox.getCalendars()){const option=node("option","",calendar.name);option.value=calendar.id;el.append(option);}}catch(error){console.warn("MailPerch : calendriers indisponibles",error);setStatus("Les calendriers Thunderbird ne sont pas disponibles.","error");}el.value=[...el.options].some(o=>o.value===selected)?selected:"";}
+async function renderCalendars(selected) {
+  const el = $("preferredCalendarId");
+  const info = $("calendar-info");
+  el.replaceChildren();
+  info?.replaceChildren();
+  const ask = node("option", "", "Demander lors de la création");
+  ask.value = "";
+  el.append(ask);
+  try {
+    const calendars = await messenger.pinInbox.getCalendars();
+    for (const calendar of calendars) {
+      const option = node(
+        "option",
+        "",
+        `${calendar.name} — tâches ${calendar.taskCompatible ? "✓" : "✕"} · événements ${calendar.eventCompatible ? "✓" : "✕"}${calendar.reason ? ` · ${calendar.reason}` : ""}`
+      );
+      option.value = calendar.id;
+      option.disabled = !calendar.taskCompatible && !calendar.eventCompatible;
+      el.append(option);
+      if (info) {
+        const card = node("div", `calendar-capability ${calendar.writable ? "writable" : "blocked"}`);
+        const title = node("strong", "", calendar.name);
+        const state = node("span", "calendar-capability-state", calendar.writable ? "Inscriptible" : "Non inscriptible");
+        const details = node(
+          "small",
+          "",
+          `Fournisseur : ${calendar.type || "inconnu"} · Tâches : ${calendar.taskSupported ? "prises en charge" : "non prises en charge"} · Événements : ${calendar.eventSupported ? "pris en charge" : "non pris en charge"}${calendar.reason ? ` · ${calendar.reason}` : ""}`
+        );
+        card.append(title, state, details);
+        info.appendChild(card);
+      }
+    }
+    if (info && !calendars.length) {
+      info.appendChild(node("p", "hint", "Aucun calendrier Thunderbird n’est disponible ou l’intégration Agenda est désactivée."));
+    }
+  } catch (error) {
+    console.warn("MailPerch : calendriers indisponibles", error);
+    setStatus("Les calendriers Thunderbird ne sont pas disponibles.", "error", {control: el});
+    info?.appendChild(node("p", "hint", "La liste des calendriers n’a pas pu être chargée."));
+  }
+  el.value = [...el.options].some(option => option.value === selected && !option.disabled) ? selected : "";
+}
+
 function updateRuntimeSummary(config, backup = null) {
   if (!config) return;
   const stats = config.stats || {};
@@ -440,6 +627,7 @@ function renderBrandVersion() {
 window.addEventListener("DOMContentLoaded", async () => {
   localize();
   renderBrandVersion();
+  enhanceSettingsPage();
 
   const form = $("settings-form");
   form.addEventListener("submit", saveAll);

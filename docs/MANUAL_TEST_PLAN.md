@@ -5,7 +5,7 @@ Consigner version Thunderbird, OS, thème, vue, type de compte et résultat.
 ## Installation et migration
 
 - installation propre ;
-- mise à niveau 3.1.1 → 3.1.2 ;
+- mise à niveau 3.1.2 → 3.1.3 ;
 - redémarrage normal et redémarrage forcé ;
 - sauvegarde puis restauration.
 
@@ -52,6 +52,35 @@ Consigner version Thunderbird, OS, thème, vue, type de compte et résultat.
 - règle simulée puis appliquée ;
 - limite et anti-boucle ;
 - veille, réveil et rappel manqué.
+
+## Validation ciblée 3.1.3
+
+### Cartes épinglées
+
+- clic droit sur auteur, objet, espace vide, bouton d’action et punaise : le menu MailPerch s’ouvre ;
+- bouton « Plus » : même menu, positionné dans le viewport ;
+- exécuter ouvrir, répondre, lu/non lu, archiver, supprimer, groupe, attente, planifier, terminer, rappel et Agenda ;
+- désépingler par la punaise puis par le menu ;
+- vérifier le résultat visible et l’absence de double exécution ;
+- tester `Shift+F10`, touche Menu, Échap et navigation clavier.
+
+### Agenda
+
+- vérifier la liste des calendriers dans les paramètres, le panneau, l’éditeur et le dashboard ;
+- choisir un calendrier local inscriptible, créer une tâche puis un événement ;
+- refaire le test avec un calendrier CalDAV inscriptible ;
+- vérifier qu’un calendrier en lecture seule, désactivé, sans ACL ou incompatible reste expliqué mais non sélectionnable ;
+- modifier l’échéance et le titre d’un élément déjà lié ;
+- provoquer une erreur fournisseur et vérifier que le message indique le calendrier et la cause détectée.
+
+### Paramètres
+
+- utiliser la recherche pour retrouver une option et un bouton ;
+- parcourir chaque section avec la navigation collante ;
+- vérifier une explication sous chaque contrôle et chaque bouton ;
+- modifier une option en bas de page : le feedback local et le toast restent visibles ;
+- vérifier les états « modifications non enregistrées », Enregistrer et Annuler ;
+- lancer une opération de maintenance sans perdre les modifications en cours.
 
 ## Régressions vidéo du 30 juillet 2026
 

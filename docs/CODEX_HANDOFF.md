@@ -2,77 +2,48 @@
 
 ## État exact
 
-Produit : **MailPerch — Email Pins & Follow-up**. Build : **3.1.2**, ID de développement `pin-mails@MailPerch.local`.
+Produit : **MailPerch — Email Pins & Follow-up**. Build locale : **3.1.3**, ID de développement `pin-mails@MailPerch.local`.
 
-Corrections implémentées à partir des captures :
+La branche distante `main` reste en **3.1.2** au commit `cc6ded0f2df62f0cac22612c6969dc1237ca0fd3` tant qu’aucun accord explicite de publication n’est donné. La reconstruction 3.1.3 est effectuée localement depuis cette base propre.
 
-Corrections dérivées de la seconde vidéo du 30 juillet 2026 :
+## Correctifs 3.1.3
 
-- feedback des paramètres fixé au bas de la fenêtre avec états succès/erreur/chargement ;
-- barre persistante pour les modifications non enregistrées ;
-- actions de maintenance sans écrasement des champs en cours de saisie ;
-- menu contextuel renforcé au niveau de `about:3pane` et par `pointerdown` droit ;
-- actions invisibles neutralisées avec `pointer-events: none` ;
-- menu « Plus » toujours visible et gestionnaire d’actions unifié ;
-- couleurs, centrage et survol des punaises restaurés ;
-- feedback des actions du dashboard et du Kanban ;
-- documentation détaillée dans `docs/VIDEO_REVIEW_2026-07-30_2.md`.
+- répartiteur partagé pour le clic droit, le bouton « Plus », les actions rapides et le désépinglage ;
+- aucune dépendance à `CSS.escape` dans la fenêtre privilégiée ;
+- écouteurs capturés sur `about:3pane` et retirés symétriquement au nettoyage ;
+- validation Agenda de la lecture seule, de l’état désactivé, des ACL et des capacités tâches/événements ;
+- choix du calendrier cible dans le panneau, l’éditeur et le dashboard ;
+- erreurs Agenda contextualisées au lieu du seul code `MODIFICATION_FAILED` ;
+- recherche et navigation par sections dans les paramètres ;
+- descriptions visibles sous les contrôles et boutons ;
+- feedback local près de l’action, toast fixe dans le viewport et barre persistante Enregistrer/Annuler.
 
-Corrections supplémentaires dérivées de la vidéo du 30 juillet 2026 :
-
-- schémas explicites pour tous les objets transmis à l’API Experiment ;
-- chargement du dashboard et sauvegarde des paramètres débloqués ;
-- clic droit capturé avant le menu natif de Thunderbird ;
-- état actif séparé de la sélection multiple ;
-- couleurs de compte rétablies pour toutes les punaises ;
-- retours de survol restaurés et hitboxes stabilisées ;
-- centrage optique des SVG corrigé ;
-- dialogues internes pour la création et l’affectation de groupes.
-
-- dashboard ouvert par le background afin que CSS/JS soient chargés comme ressources d’extension ;
-- dashboard entièrement stylé avec états d’erreur et de chargement ;
-- menu contextuel propre aux cartes, ouvert au clic droit, à `Shift+F10` et à la touche Menu ;
-- menu contextuel en position fixe pour éviter le clipping du panneau ;
-- fermeture du menu au défilement, redimensionnement, changement de dossier et perte de focus ;
-- réduction des actions rapides visibles ;
-- icônes explicites dans l’en-tête ;
-- nettoyage des marqueurs drag-and-drop pour supprimer le contour pointillé résiduel ;
-- conservation des compteurs natifs Thunderbird ;
-- rétention des sauvegardes limitée aux fichiers `pin-mails-*.json` ;
-- invalidation du cache de démarrage à la désactivation/mise à jour.
+Le détail de la troisième passe vidéo est consigné dans `docs/VIDEO_REVIEW_2026-07-30_3.md`.
 
 ## Ce qui doit encore être validé dans Thunderbird
 
-1. Clic droit sur une carte : menu visible, focus clavier, toutes les commandes.
-2. Dashboard : CSS sombre, données chargées, boutons et Kanban.
-3. Aucun contour pointillé après un drag annulé, sortie de fenêtre ou changement de dossier.
-4. Deux fenêtres ouvertes : mise à jour des épingles sans écrasement.
-5. Compteurs natifs inchangés après épinglage/désépinglage.
-6. Agenda : création, modification, calendrier en lecture seule et suppression.
-7. Archivage/suppression : traitement seulement après notification Thunderbird.
-8. Mise à niveau depuis 3.0.0 avec conservation de la base.
+1. Clic droit sur auteur, objet, espace vide et punaise de chaque carte.
+2. Bouton « Plus », actions rapides et désépinglage, à la souris et au clavier.
+3. Création d’une tâche et d’un événement dans chacun des calendriers compatibles.
+4. Refus explicite d’un calendrier désactivé, en lecture seule, sans ACL ou sans capacité adaptée.
+5. Choix du calendrier dans le panneau, l’éditeur et le dashboard.
+6. Paramètres en haut et en bas de page : aide, recherche, navigation, état modifié, Enregistrer et Annuler.
+7. Deux fenêtres ouvertes, compteurs natifs inchangés, stockage et migration conservés.
+8. Archivage/suppression uniquement après notification Thunderbird.
 
-## Commandes obligatoires
+## Commande obligatoire
 
 ```bash
 npm run ci
 ```
 
-Pour le test graphique, suivre `docs/MANUAL_TEST_PLAN.md` et consigner : version Thunderbird, système, type de compte, vue Tableau/Cartes, thème et résultat.
+Pour le test graphique, suivre `docs/MANUAL_TEST_PLAN.md` et consigner la version Thunderbird, le système, le type de compte, la vue, le thème et le résultat.
 
-## Priorités si un problème apparaît
+## Invariants
 
-1. perte de données ou modification de compteurs ;
-2. action destructive incorrecte ;
-3. boucle de règle/Agenda ;
-4. erreur ou fuite d’écouteur ;
-5. menu/dashboard/drag ;
-6. cosmétique.
-
-## Identité de marque
-
-Lire `BRANDING.md`. MailPerch est le nom public canonique. Les identifiants internes `pin-mails-*` sont historiques et restent conservés jusqu’à une migration explicitement testée.
-
-## Interdictions
-
-Ne pas introduire de réseau, dépendance CDN, télémétrie, stockage du corps des messages, `innerHTML`, sélection native forcée ou modification des compteurs de dossiers.
+- aucun réseau, CDN, télémétrie ou publicité ;
+- aucun stockage du corps des messages ou des pièces jointes ;
+- aucune modification des compteurs natifs lu/non lu/nouveau ;
+- conservation de l’ID `pin-mails@MailPerch.local`, du stockage SQLite, des migrations et de la sécurité multi-fenêtre ;
+- pas de `innerHTML`, `eval` ou `new Function` ;
+- nettoyage des écouteurs et nœuds à l’arrêt.

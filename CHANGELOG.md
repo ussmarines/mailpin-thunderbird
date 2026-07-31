@@ -1,5 +1,26 @@
 # Journal des modifications
 
+## 3.1.3 — cartes, Agenda et paramètres réparés
+
+### Corrigé
+
+- gestionnaires des actions de cartes déplacés dans une portée partagée afin que le clic droit, le bouton « Plus », les actions rapides et le désépinglage utilisent le même répartiteur ;
+- suppression de la dépendance à `CSS.escape` dans le contexte privilégié Thunderbird ;
+- capture des clics au niveau de `about:3pane`, avec nettoyage symétrique des écouteurs à l’arrêt ;
+- inventaire Agenda enrichi avec lecture seule, désactivation, ACL et capacités tâches/événements ;
+- sélection explicite du calendrier cible dans le panneau, l’éditeur de carte et le dashboard ;
+- erreurs `MODIFICATION_FAILED` transformées en diagnostics lisibles indiquant le calendrier et sa compatibilité ;
+- mise à jour des éléments Agenda liés protégée par les mêmes contrôles d’écriture ;
+- paramètres dotés d’une navigation par section, d’une recherche, d’explications sous chaque contrôle et bouton, et d’un état enregistré/non enregistré explicite ;
+- retours d’action affichés à la fois près du contrôle utilisé et dans un toast fixe toujours visible ;
+- notifications du panneau placées dans le viewport au lieu de dépendre du défilement.
+
+### Validation
+
+- garde de régression dédiée aux actions de cartes, aux capacités Agenda et aux surfaces de sélection ;
+- `npm run ci` requis avant distribution ;
+- validation graphique réelle dans Thunderbird encore requise avant publication.
+
 ## 3.1.2 — interactions et retours d’action
 
 ### Corrigé

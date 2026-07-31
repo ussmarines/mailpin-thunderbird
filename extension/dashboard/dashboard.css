@@ -265,3 +265,20 @@ body[data-loading] #history {
 @media (max-width: 720px) {
   .status { inset-inline: 12px; inset-block-end: 12px; max-inline-size: none; }
 }
+
+/* 3.1.3 — sélection explicite du calendrier Agenda. */
+.calendar-target-control {
+  display: grid;
+  gap: 4px;
+  flex: 1 1 320px;
+  min-inline-size: min(100%, 280px);
+  font-weight: 650;
+}
+.calendar-target-control select { inline-size: 100%; }
+.calendar-target-control small {
+  max-inline-size: 60ch;
+  color: var(--muted);
+  font-size: .78rem;
+  font-weight: 400;
+  line-height: 1.3;
+}

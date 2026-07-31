@@ -15,6 +15,7 @@ let searchTimer = null;
 let statusTimer = null;
 let loadGeneration = 0;
 let loading = false;
+let calendarDescriptors = [];
 
 const $ = id => document.getElementById(id);
 
@@ -380,6 +381,53 @@ function renderTechnical() {
   if (!log.childElementCount) log.append(createEmpty("Aucune règle exécutée récemment."));
 }
 
+async function renderCalendarTarget() {
+  const select = $("calendar-target");
+  const previous = select.value;
+  const [calendars, configuration] = await Promise.all([
+    api.pinInbox.getCalendars(),
+    api.pinInbox.getConfiguration().catch(() => ({settings: {}}))
+  ]);
+  calendarDescriptors = calendars;
+  select.replaceChildren(option("", "Choisir un calendrier…"));
+  for (const calendar of calendars) {
+    const item = option(
+      calendar.id,
+      `${calendar.name} — tâches ${calendar.taskCompatible ? "✓" : "✕"} · événements ${calendar.eventCompatible ? "✓" : "✕"}${calendar.reason ? ` · ${calendar.reason}` : ""}`
+    );
+    item.disabled = !calendar.taskCompatible && !calendar.eventCompatible;
+    item.dataset.taskCompatible = String(calendar.taskCompatible);
+    item.dataset.eventCompatible = String(calendar.eventCompatible);
+    item.dataset.reason = calendar.reason || "";
+    select.appendChild(item);
+  }
+  const preferred = previous || configuration.settings?.preferredCalendarId || "";
+  select.value = [...select.options].some(item => item.value === preferred && !item.disabled) ? preferred : "";
+  updateCalendarTargetHelp();
+}
+
+function updateCalendarTargetHelp() {
+  const select = $("calendar-target");
+  const help = $("calendar-target-help");
+  const calendar = calendarDescriptors.find(item => item.id === select.value);
+  if (!calendar) {
+    help.textContent = "Choisissez le calendrier utilisé par les actions Agenda. Les calendriers incompatibles sont affichés mais désactivés.";
+    return;
+  }
+  help.textContent = `${calendar.name} · tâches ${calendar.taskCompatible ? "autorisées" : "indisponibles"} · événements ${calendar.eventCompatible ? "autorisés" : "indisponibles"}${calendar.reason ? ` · ${calendar.reason}` : ""}.`;
+}
+
+function calendarIdFor(itemType) {
+  const select = $("calendar-target");
+  const calendar = calendarDescriptors.find(item => item.id === select.value);
+  if (!calendar) throw new Error("Choisissez d’abord un calendrier Agenda dans la barre d’outils.");
+  const compatible = itemType === "event" ? calendar.eventCompatible : calendar.taskCompatible;
+  if (!compatible) {
+    throw new Error(`Le calendrier « ${calendar.name} » n’est pas compatible avec ${itemType === "event" ? "les événements" : "les tâches"}${calendar.reason ? ` : ${calendar.reason}` : ""}.`);
+  }
+  return calendar.id;
+}
+
 function setView() {
   const view = $("view").value;
   const visibleId = {
@@ -401,6 +449,7 @@ async function load({announce = true} = {}) {
     if (!api?.pinInbox?.getDashboardData) {
       throw new Error("L’API interne des épingles n’est pas disponible.");
     }
+    await renderCalendarTarget();
     const result = await api.pinInbox.getDashboardData({
       filter: $("filter").value,
       search: $("search").value,
@@ -449,7 +498,7 @@ async function load({announce = true} = {}) {
 
 async function actionFor(key, action) {
   if (action === "snooze") return api.pinInbox.snoozeReminder(key, 3_600_000);
-  if (action === "calendar") return api.pinInbox.createCalendarItem(key, "task", "");
+  if (action === "calendar") return api.pinInbox.createCalendarItem(key, "task", calendarIdFor("task"));
   if (["active", "waiting", "planned"].includes(action)) {
     return api.pinInbox.setWorkflowStatus([key], action, {});
   }
@@ -483,7 +532,7 @@ for (const hostId of ["items", "kanban", "cases"]) {
     setStatus("Application de l’action…", "busy", {persistent: true});
     try {
       if (action === "case-calendar" && actionButton.dataset.caseId) {
-        await api.pinInbox.createCaseCalendarItem(actionButton.dataset.caseId, "task", "");
+        await api.pinInbox.createCaseCalendarItem(actionButton.dataset.caseId, "task", calendarIdFor("task"));
       } else {
         const card = target.closest(".item");
         if (!card) throw new Error("La carte ciblée est introuvable.");
@@ -498,6 +547,8 @@ for (const hostId of ["items", "kanban", "cases"]) {
     }
   });
 }
+
+$("calendar-target").addEventListener("change", updateCalendarTargetHelp);
 
 $("refresh").addEventListener("click", async event => {
   setButtonBusy(event.currentTarget, true);

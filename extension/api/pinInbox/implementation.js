@@ -339,7 +339,8 @@ function normalizeCase(value, fallbackIndex = 0) {
     createdAt: Math.max(0, Number(value.createdAt) || Date.now()),
     updatedAt: Math.max(0, Number(value.updatedAt) || Date.now()),
     calendarId: String(value.calendarId || ""),
-    calendarItemId: String(value.calendarItemId || "")
+    calendarItemId: String(value.calendarItemId || ""),
+    calendarItemType: value.calendarItemType === "event" ? "event" : "task"
   };
 }
 
@@ -3391,19 +3392,44 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
   async _syncReferenceToCalendar(ref) {
-    if(!this._settings.enableCalendarIntegration||!this._settings.enableBidirectionalCalendarSync||!ref?.calendarItemId)return {synced:false};
-    const {calendar,item}=await this._calendarItemForRef(ref);if(!calendar||!item)return {synced:false,missing:true};
-    const cloneItem=item.clone();const due=ref.dueAt||ref.followUpAt||0;
-    if(due){
-      const date=lazy.cal.dtz.jsDateToDateTime(new Date(due));
-      if(ref.calendarItemType==="event"){cloneItem.startDate=date;cloneItem.endDate=lazy.cal.dtz.jsDateToDateTime(new Date(due+3600000));}
-      else cloneItem.dueDate=date;
-    } else if (ref.calendarItemType !== "event") {
-      cloneItem.dueDate=null;
+    if (!this._settings.enableCalendarIntegration || !this._settings.enableBidirectionalCalendarSync || !ref?.calendarItemId) return {synced: false};
+    const {calendar, item} = await this._calendarItemForRef(ref);
+    if (!calendar || !item) return {synced: false, missing: true};
+    const type = ref.calendarItemType === "event" ? "event" : "task";
+    const descriptor = this._calendarDescriptor(calendar);
+    const compatible = type === "event" ? descriptor.eventCompatible : descriptor.taskCompatible;
+    if (!compatible) throw this._calendarOperationError("Calendrier devenu incompatible", descriptor, type);
+    const cloneItem = item.clone();
+    const due = ref.dueAt || ref.followUpAt || 0;
+    if (due) {
+      const date = lazy.cal.dtz.jsDateToDateTime(new Date(due));
+      if (type === "event") {
+        cloneItem.startDate = date;
+        cloneItem.endDate = lazy.cal.dtz.jsDateToDateTime(new Date(due + 3600000));
+      } else {
+        cloneItem.dueDate = date;
+      }
+    } else if (type !== "event") {
+      cloneItem.dueDate = null;
     }
-    if(ref.calendarItemType!=="event"&&this._settings.calendarCompleteOnPinComplete){try{cloneItem.percentComplete=ref.completedAt?100:0;cloneItem.status=ref.completedAt?"COMPLETED":"NEEDS-ACTION";cloneItem.completedDate=ref.completedAt?lazy.cal.dtz.jsDateToDateTime(new Date(ref.completedAt)):null;}catch{}}
-    cloneItem.title=ref.subject||cloneItem.title;cloneItem.setProperty("X-PIN-MAILS-STABLE-KEY",ref.stableKey);
-    const saved=await calendar.modifyItem(cloneItem,item);ref.calendarLastSyncedAt=Date.now();ref.calendarSyncHash=`${ref.dueAt}|${ref.completedAt}|${ref.subject}`;return {synced:true,itemId:saved?.id||item.id};
+    if (type !== "event" && this._settings.calendarCompleteOnPinComplete) {
+      try {
+        cloneItem.percentComplete = ref.completedAt ? 100 : 0;
+        cloneItem.status = ref.completedAt ? "COMPLETED" : "NEEDS-ACTION";
+        cloneItem.completedDate = ref.completedAt ? lazy.cal.dtz.jsDateToDateTime(new Date(ref.completedAt)) : null;
+      } catch {}
+    }
+    cloneItem.title = ref.subject || cloneItem.title;
+    cloneItem.setProperty("X-PIN-MAILS-STABLE-KEY", ref.stableKey);
+    let saved;
+    try {
+      saved = await calendar.modifyItem(cloneItem, item);
+    } catch (error) {
+      throw this._calendarOperationError(error, descriptor, type);
+    }
+    ref.calendarLastSyncedAt = Date.now();
+    ref.calendarSyncHash = `${ref.dueAt}|${ref.completedAt}|${ref.subject}`;
+    return {synced: true, itemId: saved?.id || item.id};
   }
 
   async _syncCalendarLinks(force=false) {
@@ -3419,7 +3445,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     for (const caseItem of this._data.cases || []) {
       if (!caseItem.calendarItemId || !caseItem.calendarId) continue;
       try {
-        const result = await this._createCaseCalendarItem(caseItem.id, "task", caseItem.calendarId, {save:false,refresh:false,createIfMissing:false});
+        const result = await this._createCaseCalendarItem(caseItem.id, caseItem.calendarItemType || "task", caseItem.calendarId, {save:false,refresh:false,createIfMissing:false});
         if (result.updated) casesSynced++;
       } catch (error) {
         missing++;
@@ -3430,28 +3456,160 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     return {synced,missing,casesSynced};
   }
 
+  _calendarCapabilitySupported(calendar, itemType) {
+    const property = itemType === "event"
+      ? "capabilities.events.supported"
+      : "capabilities.tasks.supported";
+    try {
+      const value = calendar.getProperty?.(property);
+      return value !== false && value !== "false" && value !== 0;
+    } catch {
+      return true;
+    }
+  }
+
+  _calendarDescriptor(calendar) {
+    const readOnly = Boolean(calendar?.readOnly);
+    let disabled = false;
+    let aclWritable = !readOnly;
+    try {
+      const disabledValue = calendar?.getProperty?.("disabled");
+      disabled = disabledValue === true || disabledValue === "true" || disabledValue === 1;
+    } catch {}
+    try {
+      if (lazy.cal.acl?.isCalendarWritable) {
+        aclWritable = Boolean(lazy.cal.acl.isCalendarWritable(calendar));
+      }
+    } catch {
+      aclWritable = false;
+    }
+    const taskSupported = this._calendarCapabilitySupported(calendar, "task");
+    const eventSupported = this._calendarCapabilitySupported(calendar, "event");
+    const writable = !readOnly && !disabled && aclWritable;
+    const reasons = [];
+    if (disabled) reasons.push("calendrier désactivé");
+    if (readOnly) reasons.push("lecture seule");
+    if (!readOnly && !aclWritable) reasons.push("droits d’écriture refusés par l’ACL");
+    if (!taskSupported && !eventSupported) reasons.push("ni les tâches ni les événements ne sont pris en charge");
+    return {
+      id: String(calendar?.id || ""),
+      name: String(calendar?.name || calendar?.id || "Calendrier sans nom"),
+      type: String(calendar?.type || ""),
+      readOnly,
+      disabled,
+      aclWritable,
+      writable,
+      taskSupported,
+      eventSupported,
+      taskCompatible: writable && taskSupported,
+      eventCompatible: writable && eventSupported,
+      reason: reasons.join(" · ")
+    };
+  }
+
   _getCalendars() {
     if (!this._settings.enableCalendarIntegration) return [];
     try {
-      return lazy.cal.manager.getCalendars().map(calendar => ({
-        id: calendar.id, name: calendar.name || calendar.id,
-        type: calendar.type || "", readOnly: Boolean(calendar.readOnly),
-        disabled: Boolean(calendar.getProperty?.("disabled"))
-      })).filter(calendar => !calendar.readOnly && !calendar.disabled);
-    } catch (error) { this._recordDiagnostic("warning", "Calendriers indisponibles", error); return []; }
+      return lazy.cal.manager.getCalendars().map(calendar => this._calendarDescriptor(calendar));
+    } catch (error) {
+      this._recordDiagnostic("warning", "Calendriers indisponibles", error);
+      return [];
+    }
+  }
+
+  _selectCalendarForItem(itemType, calendarId = "") {
+    const type = itemType === "event" ? "event" : "task";
+    const calendars = lazy.cal.manager.getCalendars();
+    const descriptors = calendars.map(calendar => this._calendarDescriptor(calendar));
+    const compatible = descriptor => type === "event"
+      ? descriptor.eventCompatible
+      : descriptor.taskCompatible;
+    const wanted = String(calendarId || this._settings.preferredCalendarId || "");
+    if (wanted) {
+      const index = descriptors.findIndex(item => item.id === wanted);
+      if (index < 0) {
+        throw new ExtensionError("Le calendrier sélectionné n’existe plus. Choisissez un autre calendrier.");
+      }
+      const descriptor = descriptors[index];
+      if (!compatible(descriptor)) {
+        const itemLabel = type === "event" ? "événement" : "tâche";
+        const article = type === "event" ? "cet" : "cette";
+        const reason = descriptor.reason || `${itemLabel} non pris en charge`;
+        throw new ExtensionError(`Le calendrier « ${descriptor.name} » ne peut pas recevoir ${article} ${itemLabel} : ${reason}.`);
+      }
+      return {calendar: calendars[index], descriptor};
+    }
+    const index = descriptors.findIndex(compatible);
+    if (index < 0) {
+      const itemLabel = type === "event" ? "événement" : "tâche";
+      throw new ExtensionError(`Aucun calendrier inscriptible compatible avec ce type d’${itemLabel} n’est disponible.`);
+    }
+    return {calendar: calendars[index], descriptor: descriptors[index]};
+  }
+
+  _calendarOperationError(error, descriptor, itemType) {
+    const raw = String(error?.message || error || "MODIFICATION_FAILED");
+    const label = itemType === "event" ? "l’événement" : "la tâche";
+    const state = descriptor?.reason || (descriptor?.writable ? "écriture autorisée selon les vérifications locales" : "état inconnu");
+    return new ExtensionError(
+      `Impossible d’écrire ${label} dans le calendrier « ${descriptor?.name || "inconnu"} ». ` +
+      `État détecté : ${state}. Vérifiez les droits, la lecture seule, la synchronisation et les capacités du fournisseur, ` +
+      `puis choisissez un autre calendrier. Détail Thunderbird : ${raw}`
+    );
   }
 
   async _createCalendarItem(stableKey, itemType = "", calendarId = "") {
-    if(!this._settings.enableCalendarIntegration)throw new ExtensionError("L’intégration Agenda est désactivée.");
-    const ref=this._data.refs[String(stableKey||"")];if(!ref)throw new ExtensionError("Message épinglé introuvable.");
-    if(ref.calendarItemId){const existing=await this._calendarItemForRef(ref);if(existing.item){await this._syncReferenceToCalendar(ref);return {created:false,updated:true,calendarId:ref.calendarId,itemId:ref.calendarItemId,itemType:ref.calendarItemType};}}
-    const calendars=lazy.cal.manager.getCalendars();const wanted=String(calendarId||this._settings.preferredCalendarId||"");const calendar=calendars.find(item=>item.id===wanted)||calendars.find(item=>!item.readOnly&&!item.getProperty?.("disabled"));if(!calendar)throw new ExtensionError("Aucun calendrier modifiable n’est disponible.");
-    const type=itemType==="event"?"event":(itemType==="task"?"task":this._settings.calendarItemType);const hdr=this._resolveReference(ref,true);const start=ref.dueAt||ref.followUpAt||Date.now()+3600000;
-    const description=[ref.note,hdr?`Message : ${hdr.folder.getUriForMsg(hdr)}`:"",`Expéditeur : ${ref.author}`,ref.caseId?`Affaire : ${(this._data.cases||[]).find(item=>item.id===ref.caseId)?.name||ref.caseId}`:""].filter(Boolean).join("\n\n");
-    let item;if(type==="event"){item=new lazy.CalEvent();item.title=ref.subject||"Message épinglé";item.startDate=lazy.cal.dtz.jsDateToDateTime(new Date(start));item.endDate=lazy.cal.dtz.jsDateToDateTime(new Date(start+3600000));}else{item=new lazy.CalTodo();item.title=ref.subject||"Message épinglé";item.entryDate=lazy.cal.dtz.jsDateToDateTime(new Date());item.dueDate=lazy.cal.dtz.jsDateToDateTime(new Date(start));}
-    item.calendar=calendar;item.setProperty("DESCRIPTION",description);item.setProperty("X-PIN-MAILS-STABLE-KEY",ref.stableKey);item.setProperty("X-PIN-MAILS-VERSION","3");
-    const saved=await calendar.addItem(item);ref.calendarId=calendar.id;ref.calendarItemId=saved?.id||item.id||"";ref.calendarItemType=type;ref.calendarLastSyncedAt=Date.now();
-    this._registerCalendarObservers();this._recordActivity("calendar",ref.stableKey,`${type==="event"?"Événement":"Tâche"} créé`);this._saveData("calendar");this._refreshAllStates(true);return {created:true,calendarId:calendar.id,itemId:ref.calendarItemId,itemType:type};
+    if (!this._settings.enableCalendarIntegration) throw new ExtensionError("L’intégration Agenda est désactivée.");
+    const ref = this._data.refs[String(stableKey || "")];
+    if (!ref) throw new ExtensionError("Message épinglé introuvable.");
+    const type = itemType === "event" ? "event" : (itemType === "task" ? "task" : this._settings.calendarItemType);
+    if (ref.calendarItemId) {
+      const existing = await this._calendarItemForRef(ref);
+      if (existing.item) {
+        await this._syncReferenceToCalendar(ref);
+        return {created: false, updated: true, calendarId: ref.calendarId, itemId: ref.calendarItemId, itemType: ref.calendarItemType};
+      }
+    }
+    const {calendar, descriptor} = this._selectCalendarForItem(type, calendarId);
+    const hdr = this._resolveReference(ref, true);
+    const start = ref.dueAt || ref.followUpAt || Date.now() + 3600000;
+    const description = [
+      ref.note,
+      hdr ? `Message : ${hdr.folder.getUriForMsg(hdr)}` : "",
+      `Expéditeur : ${ref.author}`,
+      ref.caseId ? `Affaire : ${(this._data.cases || []).find(item => item.id === ref.caseId)?.name || ref.caseId}` : ""
+    ].filter(Boolean).join("\n\n");
+    let item;
+    if (type === "event") {
+      item = new lazy.CalEvent();
+      item.title = ref.subject || "Message épinglé";
+      item.startDate = lazy.cal.dtz.jsDateToDateTime(new Date(start));
+      item.endDate = lazy.cal.dtz.jsDateToDateTime(new Date(start + 3600000));
+    } else {
+      item = new lazy.CalTodo();
+      item.title = ref.subject || "Message épinglé";
+      item.entryDate = lazy.cal.dtz.jsDateToDateTime(new Date());
+      item.dueDate = lazy.cal.dtz.jsDateToDateTime(new Date(start));
+    }
+    item.calendar = calendar;
+    item.setProperty("DESCRIPTION", description);
+    item.setProperty("X-PIN-MAILS-STABLE-KEY", ref.stableKey);
+    item.setProperty("X-PIN-MAILS-VERSION", "3");
+    let saved;
+    try {
+      saved = await calendar.addItem(item);
+    } catch (error) {
+      throw this._calendarOperationError(error, descriptor, type);
+    }
+    ref.calendarId = calendar.id;
+    ref.calendarItemId = saved?.id || item.id || "";
+    ref.calendarItemType = type;
+    ref.calendarLastSyncedAt = Date.now();
+    this._registerCalendarObservers();
+    this._recordActivity("calendar", ref.stableKey, `${type === "event" ? "Événement" : "Tâche"} créé`);
+    this._saveData("calendar");
+    this._refreshAllStates(true);
+    return {created: true, calendarId: calendar.id, itemId: ref.calendarItemId, itemType: type};
   }
 
 
@@ -3468,10 +3626,18 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   async _createCaseCalendarItem(caseId, itemType = "task", calendarId = "", {save=true,refresh=true,createIfMissing=true} = {}) {
     if(!this._settings.enableCalendarIntegration)throw new ExtensionError("L’intégration Agenda est désactivée.");
     const caseItem=(this._data.cases||[]).find(item=>item.id===String(caseId||""));if(!caseItem)throw new ExtensionError("Affaire introuvable.");
-    const calendars=lazy.cal.manager.getCalendars();const wanted=String(calendarId||this._settings.preferredCalendarId||"");const calendar=calendars.find(item=>item.id===wanted)||calendars.find(item=>!item.readOnly&&!item.getProperty?.("disabled"));if(!calendar)throw new ExtensionError("Aucun calendrier modifiable n’est disponible.");
+    const type = itemType === "event" ? "event" : "task";
+    const calendars = lazy.cal.manager.getCalendars();
     if(caseItem.calendarItemId&&caseItem.calendarId){
       try{
         const existingCalendar=calendars.find(item=>item.id===caseItem.calendarId);
+        if (!existingCalendar) {
+          if (!createIfMissing) return {created:false,updated:false,missing:true,caseId:caseItem.id};
+        } else {
+          const existingDescriptor = this._calendarDescriptor(existingCalendar);
+          const compatible = type === "event" ? existingDescriptor.eventCompatible : existingDescriptor.taskCompatible;
+          if (!compatible) throw this._calendarOperationError("Calendrier lié devenu incompatible", existingDescriptor, type);
+        }
         const existing=await existingCalendar?.getItem(caseItem.calendarItemId);
         if(existing){
           const cloneItem=existing.clone();
@@ -3486,7 +3652,12 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
             cloneItem.dueDate=null;
           }
           try{cloneItem.percentComplete=caseItem.status==="completed"?100:0;cloneItem.status=caseItem.status==="completed"?"COMPLETED":"NEEDS-ACTION";}catch{}
-          await existingCalendar.modifyItem(cloneItem,existing);
+          try {
+            await existingCalendar.modifyItem(cloneItem,existing);
+          } catch (error) {
+            throw this._calendarOperationError(error, this._calendarDescriptor(existingCalendar), type);
+          }
+          caseItem.calendarItemType=type;
           caseItem.updatedAt=Date.now();
           if(save)this._saveData("case-calendar-update");
           if(refresh)this._refreshAllStates(true);
@@ -3498,11 +3669,18 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         if (!createIfMissing) return {created:false,updated:false,missing:true,caseId:caseItem.id};
       }
     }
-    const type=itemType==="event"?"event":"task";const start=caseItem.dueAt||Date.now()+3600000;let item;
+    const {calendar, descriptor} = this._selectCalendarForItem(type, calendarId);
+    const start=caseItem.dueAt||Date.now()+3600000;let item;
     if(type==="event"){item=new lazy.CalEvent();item.title=caseItem.name||"Affaire";item.startDate=lazy.cal.dtz.jsDateToDateTime(new Date(start));item.endDate=lazy.cal.dtz.jsDateToDateTime(new Date(start+3600000));}
     else{item=new lazy.CalTodo();item.title=caseItem.name||"Affaire";item.entryDate=lazy.cal.dtz.jsDateToDateTime(new Date());item.dueDate=lazy.cal.dtz.jsDateToDateTime(new Date(start));}
     item.calendar=calendar;item.setProperty("DESCRIPTION",caseItem.note||"");item.setProperty("X-PIN-MAILS-CASE-ID",caseItem.id);item.setProperty("X-PIN-MAILS-VERSION","3");
-    const saved=await calendar.addItem(item);caseItem.calendarId=calendar.id;caseItem.calendarItemId=saved?.id||item.id||"";caseItem.updatedAt=Date.now();this._registerCalendarObservers();
+    let saved;
+    try {
+      saved = await calendar.addItem(item);
+    } catch (error) {
+      throw this._calendarOperationError(error, descriptor, type);
+    }
+    caseItem.calendarId=calendar.id;caseItem.calendarItemId=saved?.id||item.id||"";caseItem.calendarItemType=type;caseItem.updatedAt=Date.now();this._registerCalendarObservers();
     if(save)this._saveData("case-calendar");
     if(refresh)this._refreshAllStates(true);
     return{created:true,caseId:caseItem.id,calendarId:calendar.id,itemId:caseItem.calendarItemId,itemType:type};
@@ -3633,6 +3811,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     let groupAssignmentDialog = null;
     let onPanelContextMenu = null;
     let onPanelRightPointerDown = null;
+    let onPanelClickCapture = null;
 
     const clearDropVisuals = () => {
       if (!panel) return;
@@ -3860,6 +4039,8 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       field("Suivi récurrent", recurrence);
       const recurrenceInterval = createNode("input", "pin-mails-editor-recurrence-interval"); recurrenceInterval.type = "number"; recurrenceInterval.min = "1"; recurrenceInterval.max = "100"; field("Intervalle de récurrence", recurrenceInterval);
       const lead = createNode("input", "pin-mails-editor-lead"); lead.type = "number"; lead.min = "0"; lead.max = "10080"; field("Rappel anticipé (minutes)", lead);
+      const calendarSelect = createNode("select", "pin-mails-editor-calendar");
+      field("Calendrier Agenda", calendarSelect);
       const completedLabel = createNode("label", "pin-mails-editor-completed-label");
       const completed = createNode("input", "pin-mails-editor-completed"); completed.type = "checkbox";
       completedLabel.append(completed, createNode("span", "", "Marqué comme terminé")); grid.appendChild(completedLabel);
@@ -3884,8 +4065,27 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         about3Pane.setTimeout(() => openEditor(stableKey), 0);
         showToast("Modèle de suivi appliqué.", true);
       });
-      task.addEventListener("click", async () => { await this._createCalendarItem(editor.dataset.stableKey, "task", this._settings.preferredCalendarId); showToast("Tâche créée ou synchronisée dans l’agenda.", false); });
-      eventButton.addEventListener("click", async () => { await this._createCalendarItem(editor.dataset.stableKey, "event", this._settings.preferredCalendarId); showToast("Événement créé dans l’agenda.", false); });
+      const runEditorCalendarAction = async (itemType, button) => {
+        setActionBusy(button, true);
+        try {
+          let calendarId = calendarSelect.value;
+          const ref = this._data.refs[editor.dataset.stableKey];
+          if (!calendarId && !ref?.calendarItemId) {
+            calendarId = await chooseCalendarForType(itemType, ref?.calendarId || this._settings.preferredCalendarId);
+            if (!calendarId) return;
+            calendarSelect.value = calendarId;
+          }
+          await this._createCalendarItem(editor.dataset.stableKey, itemType, calendarId || ref?.calendarId || "");
+          showToast(itemType === "event" ? "Événement créé ou synchronisé dans l’Agenda." : "Tâche créée ou synchronisée dans l’Agenda.", false, "success");
+        } catch (error) {
+          this._recordDiagnostic("error", "Écriture Agenda depuis l’éditeur impossible", error);
+          showToast(`Agenda impossible : ${error?.message || error}`, false, "error");
+        } finally {
+          setActionBusy(button, false);
+        }
+      };
+      task.addEventListener("click", () => { void runEditorCalendarAction("task", task); });
+      eventButton.addEventListener("click", () => { void runEditorCalendarAction("event", eventButton); });
       snooze10.addEventListener("click", () => { this._snoozeReminder(editor.dataset.stableKey, 10 * 60_000); editor.close(); });
       snoozeHour.addEventListener("click", () => { this._snoozeReminder(editor.dataset.stableKey, 60 * 60_000); editor.close(); });
       snoozeTomorrow.addEventListener("click", () => { this._snoozeReminder(editor.dataset.stableKey, DAY_MS); editor.close(); });
@@ -3932,7 +4132,31 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       dialog.querySelector(".pin-mails-editor-recurrence-interval").value = String(ref.recurrenceInterval || 1);
       dialog.querySelector(".pin-mails-editor-lead").value = String(ref.reminderLeadMinutes || 0);
       dialog.querySelector(".pin-mails-editor-completed").checked = Boolean(ref.completedAt);
-      for (const button of dialog.querySelectorAll(".pin-mails-editor-calendar-row [data-calendar-action]")) button.disabled = !this._settings.enableCalendarIntegration;
+      const calendarSelect = dialog.querySelector(".pin-mails-editor-calendar");
+      calendarSelect.replaceChildren();
+      const calendars = this._settings.enableCalendarIntegration ? this._getCalendars() : [];
+      for (const calendar of calendars) {
+        const option = createNode("option", "", `${calendar.name} — tâches ${calendar.taskCompatible ? "✓" : "✕"} · événements ${calendar.eventCompatible ? "✓" : "✕"}${calendar.reason ? ` · ${calendar.reason}` : ""}`);
+        option.value = calendar.id;
+        option.dataset.taskCompatible = String(calendar.taskCompatible);
+        option.dataset.eventCompatible = String(calendar.eventCompatible);
+        option.disabled = !calendar.taskCompatible && !calendar.eventCompatible;
+        calendarSelect.appendChild(option);
+      }
+      const preferredCalendar = [ref.calendarId, this._settings.preferredCalendarId]
+        .find(id => calendars.some(calendar => calendar.id === id && (calendar.taskCompatible || calendar.eventCompatible)));
+      calendarSelect.value = preferredCalendar || calendars.find(calendar => calendar.taskCompatible || calendar.eventCompatible)?.id || "";
+      const updateCalendarButtons = () => {
+        const option = calendarSelect.selectedOptions[0];
+        const enabled = this._settings.enableCalendarIntegration && Boolean(option);
+        const taskButton = dialog.querySelector('[data-calendar-action="true"]');
+        const eventButton = dialog.querySelectorAll('[data-calendar-action="true"]')[1];
+        if (taskButton) taskButton.disabled = !enabled || option?.dataset.taskCompatible !== "true";
+        if (eventButton) eventButton.disabled = !enabled || option?.dataset.eventCompatible !== "true";
+      };
+      calendarSelect.onchange = updateCalendarButtons;
+      calendarSelect.disabled = !this._settings.enableCalendarIntegration || !calendarSelect.options.length;
+      updateCalendarButtons();
       dialog.querySelector(".pin-mails-editor-template").disabled = !this._settings.enableTemplates;
       dialog.showModal(); dialog.querySelector(".pin-mails-editor-note").focus();
     };
@@ -4047,6 +4271,230 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       groupAssignmentDialog.dataset.stableKeys = JSON.stringify(keys);
       groupAssignmentDialog.showModal();
       select.focus();
+    };
+
+    const panelList = () => panel?.querySelector(".pin-mails-panel-list") || null;
+
+    const findCardByStableKey = stableKey => {
+      const key = String(stableKey || "");
+      const list = panelList();
+      if (!list || !key) return null;
+      return [...list.querySelectorAll(".pin-mails-card")]
+        .find(card => card.dataset.stableKey === key) || null;
+    };
+
+    const closeContextMenu = () => {
+      if (!contextMenu) return;
+      contextMenu.hidden = true;
+      contextMenuKey = "";
+    };
+
+    const setActionBusy = (button, busy) => {
+      if (!button) return;
+      button.disabled = Boolean(busy);
+      button.toggleAttribute("data-busy", Boolean(busy));
+      button.setAttribute("aria-busy", String(Boolean(busy)));
+    };
+
+    const calendarCompatible = (calendar, itemType) => itemType === "event"
+      ? calendar.eventCompatible
+      : calendar.taskCompatible;
+
+    const chooseCalendarForType = (itemType, selectedId = "") => {
+      const type = itemType === "event" ? "event" : "task";
+      const calendars = this._getCalendars();
+      const compatible = calendars.filter(calendar => calendarCompatible(calendar, type));
+      if (!compatible.length) {
+        const label = type === "event" ? "événement" : "tâche";
+        throw new ExtensionError(`Aucun calendrier inscriptible compatible avec cet ${label} n’est disponible.`);
+      }
+      return new Promise(resolve => {
+        const dialog = createNode("dialog", "pin-mails-calendar-dialog");
+        const form = createNode("form", "pin-mails-calendar-dialog-form");
+        form.method = "dialog";
+        const title = createNode("h2", "pin-mails-calendar-dialog-title", type === "event" ? "Choisir le calendrier de l’événement" : "Choisir le calendrier de la tâche");
+        const explanation = createNode("p", "pin-mails-calendar-dialog-help", "Les calendriers incompatibles restent visibles pour expliquer pourquoi ils ne peuvent pas être utilisés.");
+        const label = createNode("label", "", "Calendrier cible");
+        const select = createNode("select", "pin-mails-calendar-dialog-select");
+        for (const calendar of calendars) {
+          const supported = calendarCompatible(calendar, type);
+          const suffix = supported ? "compatible" : (calendar.reason || `${type === "event" ? "événements" : "tâches"} non pris en charge`);
+          const option = createNode("option", "", `${calendar.name} — ${suffix}`);
+          option.value = calendar.id;
+          option.disabled = !supported;
+          select.appendChild(option);
+        }
+        const preferred = [selectedId, this._settings.preferredCalendarId]
+          .find(id => compatible.some(calendar => calendar.id === id));
+        select.value = preferred || compatible[0].id;
+        label.appendChild(select);
+        const actions = createNode("div", "pin-mails-editor-actions");
+        const cancel = createNode("button", "secondary", "Annuler");
+        cancel.type = "button";
+        const confirm = createNode("button", "primary", "Continuer");
+        confirm.type = "submit";
+        actions.append(cancel, confirm);
+        form.append(title, explanation, label, actions);
+        dialog.appendChild(form);
+        document.body.appendChild(dialog);
+        let resolved = false;
+        const finish = value => {
+          if (resolved) return;
+          resolved = true;
+          resolve(value);
+          dialog.remove();
+        };
+        cancel.addEventListener("click", () => { dialog.close(); finish(""); });
+        form.addEventListener("submit", event => {
+          event.preventDefault();
+          const value = select.value;
+          dialog.close();
+          finish(value);
+        });
+        dialog.addEventListener("cancel", event => { event.preventDefault(); dialog.close(); finish(""); });
+        dialog.addEventListener("close", () => finish(""), {once: true});
+        dialog.showModal();
+        select.focus();
+      });
+    };
+
+    const prepareContextMenu = key => {
+      const ref = this._data.refs[key];
+      const card = findCardByStableKey(key);
+      const hdr = card?._pinMessageHeader || (ref ? this._resolveReference(ref, false) : null);
+      const item = action => contextMenu?.querySelector(`[data-context-action="${action}"]`);
+      const setLabel = (action, label) => {
+        const button = item(action);
+        if (button) button.textContent = label;
+      };
+      const disable = (action, disabled) => {
+        const button = item(action);
+        if (button) button.disabled = Boolean(disabled);
+      };
+
+      setLabel("toggleRead", hdr && hdr.flags & Ci.nsMsgMessageFlags.Read ? "Marquer comme non lu" : "Marquer comme lu");
+      setLabel("waiting", ref?.workflowStatus === "waiting" ? "Repasser à traiter" : "Mettre en attente");
+      setLabel("planned", ref?.workflowStatus === "planned" ? "Repasser à traiter" : "Planifier");
+      setLabel("complete", ref?.completedAt ? "Rouvrir" : "Marquer comme terminé");
+      setLabel("unpin", hdr ? "Désépingler" : "Retirer la référence introuvable");
+
+      for (const action of ["open", "reply", "toggleRead", "archive", "delete"]) disable(action, !hdr);
+      disable("group", !this._data.groups.length);
+      const calendars = this._settings.enableCalendarIntegration ? this._getCalendars() : [];
+      disable("calendar-task", !calendars.some(calendar => calendar.taskCompatible));
+      disable("calendar-event", !calendars.some(calendar => calendar.eventCompatible));
+    };
+
+    const positionContextMenu = (clientX, clientY) => {
+      if (!contextMenu || !contextMenuKey) return;
+      prepareContextMenu(contextMenuKey);
+      contextMenu.hidden = false;
+      contextMenu.style.left = "0px";
+      contextMenu.style.top = "0px";
+      const menuRect = contextMenu.getBoundingClientRect();
+      const viewportWidth = document.documentElement.clientWidth || about3Pane.innerWidth;
+      const viewportHeight = document.documentElement.clientHeight || about3Pane.innerHeight;
+      const x = Math.max(6, Math.min(clientX, viewportWidth - menuRect.width - 6));
+      const y = Math.max(6, Math.min(clientY, viewportHeight - menuRect.height - 6));
+      contextMenu.style.left = `${x}px`;
+      contextMenu.style.top = `${y}px`;
+      contextMenu.querySelector(".pin-mails-context-item:not([disabled])")?.focus();
+    };
+
+    const openContextMenuForCard = (card, clientX, clientY) => {
+      if (!card || !panel?.contains(card)) return false;
+      selectedPanelKey = card.dataset.stableKey;
+      selectionAnchorKey = card.dataset.stableKey;
+      updatePanelSelection();
+      contextMenuKey = card.dataset.stableKey;
+      positionContextMenu(clientX, clientY);
+      return true;
+    };
+
+    const runCardAction = async (key, action, sourceButton = null) => {
+      const ref = this._data.refs[key];
+      const card = findCardByStableKey(key);
+      const hdr = card?._pinMessageHeader || (ref ? this._resolveReference(ref, false) : null);
+      if (!ref) {
+        showToast("Cette épingle n’existe plus.", false, "error");
+        return;
+      }
+
+      setActionBusy(sourceButton, true);
+      try {
+        if (action === "open") {
+          if (!selectPanelMessage(ref, hdr, card)) showToast("Le message est introuvable.", false, "error");
+          return;
+        }
+        if (action === "unpin") {
+          if (selectedPanelKey === key) selectedPanelKey = null;
+          selectedPanelKeys.delete(key);
+          this._performReferenceAction([key], "unpin");
+          showToast(hdr ? "Message désépinglé." : "Référence introuvable retirée.", true, "success");
+          return;
+        }
+        if (action === "edit") { openEditor(key); return; }
+        if (action === "group") { openGroupAssignmentDialog([key]); return; }
+        if (action === "waiting") {
+          const waiting = ref.workflowStatus !== "waiting";
+          this._setWorkflowStatus([key], waiting ? "waiting" : "active");
+          showToast(waiting ? "Message placé en attente." : "Message replacé à traiter.", true, "success");
+          return;
+        }
+        if (action === "planned") {
+          const planned = ref.workflowStatus !== "planned";
+          this._setWorkflowStatus([key], planned ? "planned" : "active");
+          showToast(planned ? "Message planifié." : "Message replacé à traiter.", true, "success");
+          return;
+        }
+        if (action === "complete") {
+          const completed = !ref.completedAt;
+          this._performReferenceAction([key], completed ? "complete" : "uncomplete");
+          showToast(completed ? "Message marqué comme terminé." : "Message rouvert.", true, "success");
+          return;
+        }
+        if (action === "snooze") {
+          this._snoozeReminder(key, 60 * 60_000);
+          showToast("Rappel reporté d’une heure.", true, "success");
+          return;
+        }
+        if (action === "calendar-task" || action === "calendar-event") {
+          const type = action === "calendar-event" ? "event" : "task";
+          const calendarId = ref.calendarItemId
+            ? ref.calendarId
+            : await chooseCalendarForType(type, ref.calendarId || this._settings.preferredCalendarId);
+          if (!calendarId && !ref.calendarItemId) {
+            showToast("Création Agenda annulée.", false, "info");
+            return;
+          }
+          await this._createCalendarItem(key, type, calendarId);
+          showToast(type === "event" ? "Événement synchronisé dans l’Agenda." : "Tâche synchronisée dans l’Agenda.", false, "success");
+          return;
+        }
+
+        const result = this._performMessageAction(action, hdr ? [hdr] : [], about3Pane);
+        if (!result?.count) {
+          if (!result?.cancelled) showToast("Cette action ne peut pas être exécutée sur ce message.", false, "error");
+          return;
+        }
+        if (action === "reply") showToast("Fenêtre de réponse ouverte.", false, "success");
+      } catch (error) {
+        this._recordDiagnostic("error", `Action de carte impossible : ${action}`, error);
+        showToast(`Action impossible : ${error?.message || error}`, false, "error");
+      } finally {
+        setActionBusy(sourceButton, false);
+      }
+    };
+
+    const dispatchCardAction = (card, action, sourceButton = null) => {
+      if (!card || !action || !panel?.contains(card)) return false;
+      const key = card.dataset.stableKey;
+      if (action === "more") {
+        const rect = sourceButton?.getBoundingClientRect?.() || card.getBoundingClientRect();
+        return openContextMenuForCard(card, rect.right, rect.bottom);
+      }
+      void runCardAction(key, action, sourceButton);
+      return true;
     };
 
     const createPanel = () => {
@@ -4170,7 +4618,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         if (!button) return;
         const action = button.dataset.bulkAction;
         const keys = [...selectedPanelKeys];
-        const headers = keys.map(key => document.querySelector(`.pin-mails-card[data-stable-key="${CSS.escape(key)}"]`)?._pinMessageHeader).filter(Boolean);
+        const headers = keys.map(key => findCardByStableKey(key)?._pinMessageHeader).filter(Boolean);
         if (action === "unpin") {
           this._pushUndo("Désépinglage multiple", this._captureFlags(headers));
           if (this._settings.pinMode === "nativeStar") {
@@ -4192,151 +4640,6 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         }
       });
 
-      const closeContextMenu = () => {
-        if (!contextMenu) return;
-        contextMenu.hidden = true;
-        contextMenuKey = "";
-      };
-
-      const setActionBusy = (button, busy) => {
-        if (!button) return;
-        button.disabled = Boolean(busy);
-        button.toggleAttribute("data-busy", Boolean(busy));
-        button.setAttribute("aria-busy", String(Boolean(busy)));
-      };
-
-      const prepareContextMenu = key => {
-        const ref = this._data.refs[key];
-        const card = list.querySelector(`.pin-mails-card[data-stable-key="${CSS.escape(key)}"]`);
-        const hdr = card?._pinMessageHeader || (ref ? this._resolveReference(ref, false) : null);
-        const item = action => contextMenu.querySelector(`[data-context-action="${action}"]`);
-        const setLabel = (action, label) => {
-          const button = item(action);
-          if (button) button.textContent = label;
-        };
-        const disable = (action, disabled) => {
-          const button = item(action);
-          if (button) button.disabled = Boolean(disabled);
-        };
-
-        setLabel("toggleRead", hdr && hdr.flags & Ci.nsMsgMessageFlags.Read ? "Marquer comme non lu" : "Marquer comme lu");
-        setLabel("waiting", ref?.workflowStatus === "waiting" ? "Repasser à traiter" : "Mettre en attente");
-        setLabel("planned", ref?.workflowStatus === "planned" ? "Repasser à traiter" : "Planifier");
-        setLabel("complete", ref?.completedAt ? "Rouvrir" : "Marquer comme terminé");
-        setLabel("unpin", hdr ? "Désépingler" : "Retirer la référence introuvable");
-
-        for (const action of ["open", "reply", "toggleRead", "archive", "delete"]) {
-          disable(action, !hdr);
-        }
-        disable("group", !this._data.groups.length);
-        disable("calendar-task", !this._settings.enableCalendarIntegration);
-        disable("calendar-event", !this._settings.enableCalendarIntegration);
-      };
-
-      const positionContextMenu = (clientX, clientY) => {
-        if (!contextMenu || !contextMenuKey) return;
-        prepareContextMenu(contextMenuKey);
-        contextMenu.hidden = false;
-        contextMenu.style.left = "0px";
-        contextMenu.style.top = "0px";
-        const menuRect = contextMenu.getBoundingClientRect();
-        const viewportWidth = document.documentElement.clientWidth || about3Pane.innerWidth;
-        const viewportHeight = document.documentElement.clientHeight || about3Pane.innerHeight;
-        const x = Math.max(6, Math.min(clientX, viewportWidth - menuRect.width - 6));
-        const y = Math.max(6, Math.min(clientY, viewportHeight - menuRect.height - 6));
-        contextMenu.style.left = `${x}px`;
-        contextMenu.style.top = `${y}px`;
-        contextMenu.querySelector(".pin-mails-context-item:not([disabled])")?.focus();
-      };
-
-      const openContextMenuForCard = (card, clientX, clientY) => {
-        if (!card || !panel?.contains(card)) return false;
-        selectedPanelKey = card.dataset.stableKey;
-        selectionAnchorKey = card.dataset.stableKey;
-        updatePanelSelection();
-        contextMenuKey = card.dataset.stableKey;
-        positionContextMenu(clientX, clientY);
-        return true;
-      };
-
-      const runCardAction = async (key, action, sourceButton = null) => {
-        const ref = this._data.refs[key];
-        const card = list.querySelector(`.pin-mails-card[data-stable-key="${CSS.escape(key)}"]`);
-        const hdr = card?._pinMessageHeader || (ref ? this._resolveReference(ref, false) : null);
-        if (!ref) {
-          showToast("Cette épingle n’existe plus.", false, "error");
-          return;
-        }
-
-        setActionBusy(sourceButton, true);
-        try {
-          if (action === "open") {
-            if (!selectPanelMessage(ref, hdr, card)) {
-              showToast("Le message est introuvable.", false, "error");
-            }
-            return;
-          }
-          if (action === "unpin") {
-            if (selectedPanelKey === key) selectedPanelKey = null;
-            selectedPanelKeys.delete(key);
-            this._performReferenceAction([key], "unpin");
-            showToast(hdr ? "Message désépinglé." : "Référence introuvable retirée.", true, "success");
-            return;
-          }
-          if (action === "edit") {
-            openEditor(key);
-            return;
-          }
-          if (action === "group") {
-            openGroupAssignmentDialog([key]);
-            return;
-          }
-          if (action === "waiting") {
-            const waiting = ref.workflowStatus !== "waiting";
-            this._setWorkflowStatus([key], waiting ? "waiting" : "active");
-            showToast(waiting ? "Message placé en attente." : "Message replacé à traiter.", true, "success");
-            return;
-          }
-          if (action === "planned") {
-            const planned = ref.workflowStatus !== "planned";
-            this._setWorkflowStatus([key], planned ? "planned" : "active");
-            showToast(planned ? "Message planifié." : "Message replacé à traiter.", true, "success");
-            return;
-          }
-          if (action === "complete") {
-            const completed = !ref.completedAt;
-            this._performReferenceAction([key], completed ? "complete" : "uncomplete");
-            showToast(completed ? "Message marqué comme terminé." : "Message rouvert.", true, "success");
-            return;
-          }
-          if (action === "snooze") {
-            this._snoozeReminder(key, 60 * 60_000);
-            showToast("Rappel reporté d’une heure.", true, "success");
-            return;
-          }
-          if (action === "calendar-task" || action === "calendar-event") {
-            const type = action === "calendar-event" ? "event" : "task";
-            await this._createCalendarItem(key, type, this._settings.preferredCalendarId);
-            showToast(type === "event" ? "Événement synchronisé dans l’Agenda." : "Tâche synchronisée dans l’Agenda.", false, "success");
-            return;
-          }
-
-          const result = this._performMessageAction(action, hdr ? [hdr] : [], about3Pane);
-          if (!result?.count) {
-            if (!result?.cancelled) showToast("Cette action ne peut pas être exécutée sur ce message.", false, "error");
-            return;
-          }
-          if (action === "reply") {
-            showToast("Fenêtre de réponse ouverte.", false, "success");
-          }
-        } catch (error) {
-          this._recordDiagnostic("error", `Action de carte impossible : ${action}`, error);
-          showToast(`Action impossible : ${error?.message || error}`, false, "error");
-        } finally {
-          setActionBusy(sourceButton, false);
-        }
-      };
-
       contextMenu.addEventListener("click", event => {
         const target = elementFromEvent(event);
         const item = target?.closest?.("[data-context-action]");
@@ -4353,7 +4656,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
           event.preventDefault();
           const key = contextMenuKey;
           closeContextMenu();
-          if (key) list.querySelector(`[data-stable-key="${CSS.escape(key)}"]`)?.focus();
+          if (key) findCardByStableKey(key)?.focus();
         } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
           event.preventDefault();
           const delta = event.key === "ArrowDown" ? 1 : -1;
@@ -4366,6 +4669,21 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
           items.at(-1)?.focus();
         }
       });
+
+      if (!onPanelClickCapture) {
+        onPanelClickCapture = event => {
+          if (event.button !== 0) return;
+          const target = elementFromEvent(event);
+          const actionButton = target?.closest?.("[data-card-action]");
+          const card = cardFromEvent(event);
+          if (!actionButton || !card || !panel?.contains(card)) return;
+          event.preventDefault();
+          event.stopPropagation();
+          event.stopImmediatePropagation();
+          dispatchCardAction(card, actionButton.dataset.cardAction, actionButton);
+        };
+        about3Pane.addEventListener("click", onPanelClickCapture, true);
+      }
 
       if (!onPanelContextMenu) {
         onPanelContextMenu = event => {
@@ -4404,17 +4722,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         if (actionButton) {
           event.preventDefault();
           event.stopPropagation();
-          const action = actionButton.dataset.cardAction;
-          if (action === "more") {
-            selectedPanelKey = key;
-            selectionAnchorKey = key;
-            updatePanelSelection();
-            contextMenuKey = key;
-            const rect = actionButton.getBoundingClientRect();
-            positionContextMenu(rect.right, rect.bottom);
-          } else {
-            void runCardAction(key, action, actionButton);
-          }
+          dispatchCardAction(card, actionButton.dataset.cardAction, actionButton);
           return;
         }
         if (this._settings.enableMultiSelect && (event.ctrlKey || event.metaKey)) {
@@ -4449,12 +4757,8 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
           event.preventDefault(); selectPanelMessage(this._data.refs[card.dataset.stableKey], card._pinMessageHeader, card);
         } else if (event.key === "ContextMenu" || (event.shiftKey && event.key === "F10")) {
           event.preventDefault();
-          selectedPanelKey = card.dataset.stableKey;
-          selectionAnchorKey = card.dataset.stableKey;
-          updatePanelSelection();
-          contextMenuKey = card.dataset.stableKey;
           const rect = card.getBoundingClientRect();
-          positionContextMenu(rect.left + Math.min(36, rect.width / 2), rect.top + Math.min(36, rect.height / 2));
+          openContextMenuForCard(card, rect.left + Math.min(36, rect.width / 2), rect.top + Math.min(36, rect.height / 2));
         } else if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "a") {
           event.preventDefault(); for (const item of cards) selectedPanelKeys.add(item.dataset.stableKey); updatePanelSelection();
         }
@@ -4790,6 +5094,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       document.removeEventListener("click", onDocumentClick, true);
       document.removeEventListener("pointerdown", onDocumentPointerDown, true);
       document.removeEventListener("keydown", onDocumentKeyDown, true);
+      if (onPanelClickCapture) about3Pane.removeEventListener("click", onPanelClickCapture, true);
       if (onPanelContextMenu) about3Pane.removeEventListener("contextmenu", onPanelContextMenu, true);
       if (onPanelRightPointerDown) about3Pane.removeEventListener("pointerdown", onPanelRightPointerDown, true);
       document.removeEventListener("select", onSelectionChange, true);
