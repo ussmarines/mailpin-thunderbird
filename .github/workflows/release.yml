@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: Expected MailPerch version (for example 3.2.5)
+        description: Expected MailPerch version (for example 3.2.6)
         required: true
         type: string
       create_draft_release:

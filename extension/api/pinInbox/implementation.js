@@ -4802,7 +4802,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         return;
       }
       if (!button) {
-        button = createNode("button", `${INDEPENDENT_BUTTON_CLASS} button icon-button icon-only`);
+        button = createNode("button", INDEPENDENT_BUTTON_CLASS);
         button.type = "button";
         button.dataset.pinMailsAction = "toggle-row-pin";
         if (row.classList.contains("card-layout")) {
@@ -4815,6 +4815,12 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
           host?.appendChild(button);
         }
       }
+      // Never inherit Thunderbird's generic icon-button classes here. In
+      // Thunderbird 153 those classes can paint their own icon in addition to
+      // MailPerch's masked pin, which makes the control look like a duplicated
+      // star. Existing virtualized rows are normalized on every patch.
+      button.classList.remove("button", "icon-button", "icon-only", "button-star", "tree-button-flag");
+      button.classList.add(INDEPENDENT_BUTTON_CLASS);
       const pinned = this._isPinnedHeader(hdr);
       row.toggleAttribute("data-pin-mails-pinned", pinned);
       row.style.setProperty("--pin-row-account-color", this._getAccountColor(accountKeyForFolder(hdr.folder)));

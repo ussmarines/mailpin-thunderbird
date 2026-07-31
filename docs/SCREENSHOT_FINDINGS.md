@@ -61,3 +61,11 @@ possède une règle CSS.
 - Enregistrer et Annuler deviennent des actions natives du formulaire (`submit`/`reset`) et l’objet retourné par l’API est cloné avant enrichissement ;
 - `deep_audit.py` utilise des flux NUL-délimités binaires pour les chemins Git ;
 - les trois incidents sont inscrits dans `docs/BUG_TRACKER.md` avec statut `À VALIDER` ou `CORRIGÉ`.
+
+
+## Captures du 31 juillet 2026 — bugs rouverts après 3.2.5
+
+- plusieurs symboles apparaissent à droite des cartes malgré le mode indépendant ;
+- la punaise héritait encore de classes d’icône Thunderbird et l’étoile était déplacée par le CSS MailPerch ;
+- la barre Enregistrer/Annuler était visible mais les contrôles restaient hors du formulaire et dépendaient de `form=`, non fiable dans l’onglet Options ;
+- ces constats correspondent à MP-2026-004 et MP-2026-005 dans `docs/BUG_TRACKER.md`.

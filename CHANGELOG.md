@@ -1,5 +1,15 @@
 # Journal des modifications
 
+## 3.2.6 — interaction réelle des paramètres et icônes natives
+
+- retrait des classes génériques Thunderbird du bouton de punaise indépendant afin d’empêcher le dessin d’une icône parasite ;
+- l’étoile native reste dans son conteneur Thunderbird en mode indépendant, sans repositionnement CSS par MailPerch ;
+- barre Enregistrer/Annuler déplacée à l’intérieur du formulaire et reliée directement par des gestionnaires de clic ;
+- conservation des événements `submit`/`reset` comme accès clavier et accessibilité ;
+- retours visibles lorsque les paramètres ne sont pas prêts, inchangés ou déjà en cours de traitement ;
+- réouverture documentée de MP-2026-004 et MP-2026-005 jusqu’à validation Thunderbird réelle ;
+- ajout des gardes de régression `tests/test_regressions_3_2_6.py`.
+
 ## 3.2.5 — étoiles natives, validation des paramètres et suivi des bugs
 
 - correction définitive de la duplication des étoiles dans la liste native : les annotations, déplacements et masquages sont désormais limités au mode `nativeStar` ;

@@ -21,16 +21,12 @@ assert ':root[pin-mails-inbox][pin-mails-native-star] #threadTree [data-pin-mail
 assert ':has(.button-star) .tree-button-flag:not(.button-star)' not in PIN_CSS
 assert ':root[pin-mails-inbox] #threadTree [data-pin-mails-duplicate-star]' not in PIN_CSS
 
-# Save and cancel are native form actions. This preserves keyboard activation
-# and avoids a click-only path outside the form.
-assert 'id="discard-changes" type="reset" form="settings-form"' in OPTIONS_HTML
-assert 'id="save-all-floating" type="submit" form="settings-form"' in OPTIONS_HTML
+# Save and cancel remain reachable through form events, while later builds may
+# add a direct visible-button path for Thunderbird options-tab compatibility.
 assert 'form.addEventListener("submit", saveAll);' in OPTIONS_JS
 assert 'form.addEventListener("reset", discardChanges);' in OPTIONS_JS
-assert '$("save-all-floating").addEventListener("click", saveAll);' not in OPTIONS_JS
 assert 'async function discardChanges(event = null)' in OPTIONS_JS
 assert 'settings: {...saved.settings}' in OPTIONS_JS
-assert 'form.requestSubmit($("save-all-floating"));' in OPTIONS_JS
 
 # Windows subprocesses use NUL-delimited binary streams, so CRLF conversion
 # can never become part of a Git pathname.

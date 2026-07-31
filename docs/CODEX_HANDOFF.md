@@ -5,7 +5,7 @@ court afin d’éviter de dupliquer le contexte.
 
 ## État courant
 
-- version de travail : **3.2.5** ;
+- version de travail : **3.2.6** ;
 - base GitHub : `main` au commit `3e8852d4ffcd05c3235000489452ffef6dc752b0` ;
 - ID : `pin-mails@MailPerch.local` ;
 - schémas : SQLite 5, paramètres 6, données 6 ;
@@ -45,3 +45,7 @@ Puis suivre `docs/MANUAL_TEST_PLAN.md`, particulièrement la section 3.2.4.
 - audit Git Windows converti aux flux NUL-délimités binaires ;
 - registre permanent des bugs ajouté et contrôlé par la CI.
 
+
+## Passe 3.2.6
+
+Priorité absolue : MP-2026-004 et MP-2026-005. Ne pas les déclarer corrigés sur la seule base des tests statiques. Lire `docs/BUG_TRACKER.md`, conserver l’étoile dans le DOM natif en mode indépendant et maintenir un gestionnaire direct sur les boutons visibles des paramètres.

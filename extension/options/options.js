@@ -893,10 +893,26 @@ async function reload({preserveEdits = false} = {}) {
 
 async function saveAll(event = null) {
   event?.preventDefault?.();
-  if (!configurationReady || !dirty || saveInFlight) return;
+  event?.stopPropagation?.();
+  const submitter = event?.submitter instanceof HTMLElement
+    ? event.submitter
+    : event?.currentTarget instanceof HTMLButtonElement
+      ? event.currentTarget
+      : $("save-all-floating");
+  if (!configurationReady) {
+    setStatus("Les paramètres sont encore en cours de chargement.", "error", {control: submitter, persistent: true});
+    return;
+  }
+  if (!dirty) {
+    setStatus("Aucune modification à enregistrer.", "success", {control: submitter});
+    return;
+  }
+  if (saveInFlight) {
+    setStatus("Une opération sur les paramètres est déjà en cours.", "busy", {control: submitter, persistent: true});
+    return;
+  }
   saveInFlight = true;
   syncSaveControls();
-  const submitter = event?.submitter || event?.currentTarget || $("save-all-floating");
   try {
     if (!configuration?.settings) await reload();
     const config = await withBusy(submitter, "Enregistrement des paramètres…", async () => {
@@ -928,10 +944,26 @@ async function saveAll(event = null) {
 
 async function discardChanges(event = null) {
   event?.preventDefault?.();
-  if (!configurationReady || !dirty || saveInFlight) return;
+  event?.stopPropagation?.();
+  const control = event?.submitter instanceof HTMLElement
+    ? event.submitter
+    : event?.currentTarget instanceof HTMLButtonElement
+      ? event.currentTarget
+      : $("discard-changes");
+  if (!configurationReady) {
+    setStatus("Les paramètres sont encore en cours de chargement.", "error", {control, persistent: true});
+    return;
+  }
+  if (!dirty) {
+    setStatus("Aucune modification à annuler.", "success", {control});
+    return;
+  }
+  if (saveInFlight) {
+    setStatus("Une opération sur les paramètres est déjà en cours.", "busy", {control, persistent: true});
+    return;
+  }
   saveInFlight = true;
   syncSaveControls();
-  const control = event?.submitter || event?.currentTarget || $("discard-changes");
   try {
     await withBusy(control, "Restauration des paramètres enregistrés…", () => reload());
     setDirty(false);
@@ -1037,8 +1069,16 @@ window.addEventListener("DOMContentLoaded", async () => {
   setConfigurationReady(false);
 
   const form = $("settings-form");
+  const saveButton = $("save-all-floating");
+  const discardButton = $("discard-changes");
+  // Thunderbird options tabs have historically been inconsistent with
+  // out-of-form submitters. Keep native form events for keyboard/assistive
+  // technology, and bind the visible controls directly as the authoritative
+  // click path. Both routes converge on the same guarded functions.
   form.addEventListener("submit", saveAll);
   form.addEventListener("reset", discardChanges);
+  saveButton.addEventListener("click", saveAll);
+  discardButton.addEventListener("click", discardChanges);
   form.addEventListener("input", event => {
     if (event.target.id === "shortcut" || event.target.id === "import-file") return;
     setDirty();
@@ -1323,7 +1363,11 @@ window.addEventListener("DOMContentLoaded", async () => {
     if (!(event.ctrlKey || event.metaKey) || event.altKey || event.key.toLowerCase() !== "s") return;
     if (!configurationReady || !dirty || saveInFlight) return;
     event.preventDefault();
-    form.requestSubmit($("save-all-floating"));
+    void saveAll({
+      preventDefault() {},
+      stopPropagation() {},
+      currentTarget: saveButton
+    });
   });
 
   window.addEventListener("beforeunload", event => {

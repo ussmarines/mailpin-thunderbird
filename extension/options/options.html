@@ -170,11 +170,10 @@
         </section>
 
         <footer class="form-footer"><div><strong data-i18n="readyToSave">Résumé local</strong><span id="stats"></span></div><span class="hint">Utilisez la barre Enregistrer/Annuler qui apparaît uniquement après une modification.</span></footer>
+        <div id="save-dock" class="save-dock" hidden><span id="save-dock-message" data-i18n="unsavedChanges">Des modifications ne sont pas encore enregistrées.</span><span class="save-dock-actions"><button id="discard-changes" type="button" class="secondary" data-i18n="cancelChanges">Annuler</button><button id="save-all-floating" type="button" class="primary" data-i18n="save">Enregistrer</button></span></div>
       </form>
     </div>
   </main>
-
-  <div id="save-dock" class="save-dock" hidden><span id="save-dock-message" data-i18n="unsavedChanges">Des modifications ne sont pas encore enregistrées.</span><span class="save-dock-actions"><button id="discard-changes" type="reset" form="settings-form" class="secondary" data-i18n="cancelChanges">Annuler</button><button id="save-all-floating" type="submit" form="settings-form" class="primary" data-i18n="save">Enregistrer</button></span></div>
   <aside id="status" class="status-toast" role="status" aria-live="polite" aria-atomic="true" hidden><span class="status-icon" aria-hidden="true"></span><span id="status-message"></span><button id="status-close" class="status-close" type="button" aria-label="Fermer">×</button></aside>
   <noscript>JavaScript doit être activé pour configurer MailPerch.</noscript>
 </body>

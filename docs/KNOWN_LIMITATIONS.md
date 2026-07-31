@@ -21,4 +21,4 @@
 
 ## Validation des correctifs récents
 
-Les incidents 3.2.5 concernant les étoiles et les paramètres sont protégés par des gardes automatisées, mais restent suivis dans `docs/BUG_TRACKER.md` jusqu’à confirmation dans Thunderbird 153. La CI Linux locale ne remplace pas le job Windows réel pour la régression CRLF.
+Les incidents MP-2026-004 et MP-2026-005 ont été rouverts après l’échec de la 3.2.5 dans Thunderbird réel. La 3.2.6 change la frontière responsable, mais ces bugs restent `À VALIDER` dans `docs/BUG_TRACKER.md`. Les tests statiques ne remplacent pas un clic réel dans l’onglet Options ni le rendu des lignes virtualisées.

@@ -1,5 +1,12 @@
 # Feuille de route
 
+## 3.2.6 — seconde correction des interactions réelles
+
+- confirmer dans Thunderbird 153 qu’une seule étoile native, une seule punaise MailPerch et un seul bouton Plus sont visibles par ligne ;
+- confirmer les clics directs Enregistrer et Annuler, puis la persistance après fermeture/réouverture ;
+- maintenir MP-2026-004 et MP-2026-005 en `À VALIDER` jusqu’à confirmation utilisateur ;
+- ne plus déplacer `.button-star` en mode indépendant et ne jamais appliquer les classes génériques Thunderbird à la punaise MailPerch.
+
 ## 3.2.5 — validation des régressions réelles
 
 - confirmer dans Thunderbird 153 qu’une seule étoile native est visible en mode indépendant et en mode `nativeStar` ;

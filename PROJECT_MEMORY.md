@@ -4,7 +4,7 @@
 > Lire ce document avant tout autre fichier. Il donne l’état courant, les invariants,
 > la carte du dépôt et les chemins exacts à ouvrir selon la tâche.
 >
-> Version de travail : **3.2.5**
+> Version de travail : **3.2.6**
 > Base GitHub vérifiée : `main` au commit `5285bb202e509ea6cb5d710eae40fb253c0faa88`
 > Produit : **MailPerch — Email Pins & Follow-up**
 > Extension ID de développement : `pin-mails@MailPerch.local`
@@ -25,6 +25,8 @@ L’extension comporte deux mondes :
 Après cette mémoire, lire `docs/BUG_TRACKER.md` avant toute correction afin de ne pas rouvrir un bug déjà connu ni perdre un défaut non résolu.
 
 La version 3.2.5 conserve le durcissement 3.2.4 et corrige trois régressions observées dans Thunderbird réel : étoile native dupliquée, commandes Enregistrer/Annuler peu fiables et faux positif CRLF de la CI Windows. Elle ajoute aussi `docs/BUG_TRACKER.md`, registre permanent des bugs connus lu par Codex et vérifié par la CI.
+
+La version 3.2.6 rouvre les deux défauts UI non confirmés par la 3.2.5. La punaise indépendante ne porte plus aucune classe d’icône Thunderbird, l’étoile native n’est plus déplacée en mode indépendant, et les boutons visibles Enregistrer/Annuler sont désormais à l’intérieur du formulaire avec des gestionnaires de clic directs. Les entrées MP-2026-004 et MP-2026-005 restent `À VALIDER` jusqu’à confirmation dans Thunderbird 153.
 
 ## 2. Invariants non négociables
 
@@ -53,7 +55,7 @@ La version 3.2.5 conserve le durcissement 3.2.4 et corrige trois régressions ob
 
 | Élément | Valeur |
 |---|---|
-| Version extension/package | `3.2.5` |
+| Version extension/package | `3.2.6` |
 | Thunderbird déclaré | `128.0` à `153.*` |
 | Manifest | MV3 |
 | Permission WebExtension | `menus` uniquement |

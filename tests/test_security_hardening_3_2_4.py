@@ -19,7 +19,7 @@ CHECK_REPO = (ROOT / "scripts/check_repo.py").read_text(encoding="utf-8")
 CI_WORKFLOW = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
 RELEASE_WORKFLOW = (ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8")
 
-assert PACKAGE["version"] == MANIFEST["version"] == "3.2.5"
+assert PACKAGE["version"] == MANIFEST["version"] == "3.2.6"
 assert MANIFEST["permissions"] == ["menus"]
 assert "content_scripts" not in MANIFEST
 assert "externally_connectable" not in MANIFEST

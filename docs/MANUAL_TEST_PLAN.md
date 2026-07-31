@@ -313,3 +313,24 @@ Consigner version Thunderbird, OS, thème, vue, type de compte et résultat.
 - vérifier l’absence de faux chemin `dist/.gitkeep\r` dans les logs.
 
 Après chaque résultat, mettre à jour `docs/BUG_TRACKER.md` : `À VALIDER` vers `CORRIGÉ`, ou rouvrir l’entrée avec les nouvelles preuves.
+
+
+## Validation ciblée 3.2.6 — bugs rouverts
+
+### MP-2026-004 — étoile et punaise
+
+1. Choisir le mode d’épinglage indépendant.
+2. Afficher au moins 100 messages en vue Cartes.
+3. Faire défiler rapidement vers le bas puis vers le haut afin de forcer la réutilisation des lignes.
+4. Vérifier sur chaque ligne : une étoile native Thunderbird, une punaise MailPerch et un bouton `…`, sans symbole supplémentaire.
+5. Épingler/désépingler plusieurs messages et confirmer que l’étoile native ne change pas.
+6. Refaire le test en mode `nativeStar`, où l’étoile est volontairement remplacée par la punaise.
+
+### MP-2026-005 — paramètres
+
+1. Modifier un sélecteur, une case à cocher, un nombre et un champ texte.
+2. Cliquer **Enregistrer** et vérifier le retour « Paramètres enregistrés ».
+3. Fermer puis rouvrir l’onglet Paramètres et confirmer la persistance.
+4. Modifier de nouveau une valeur, cliquer **Annuler** et confirmer le retour immédiat à la valeur enregistrée.
+5. Refaire l’enregistrement avec `Ctrl+S` ou `Cmd+S`.
+6. Ne passer les entrées du registre à `CORRIGÉ` qu’après réussite de ces scénarios.
