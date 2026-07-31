@@ -4678,6 +4678,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     let groupAssignmentDialog = null;
     let onPanelContextMenu = null;
     const cardCache = new Map();
+    const nativeButtonSnapshots = new WeakMap();
     let lastRenderSignature = "";
 
     const clearDropVisuals = () => {
@@ -4757,17 +4758,39 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       button.setAttribute("aria-pressed", String(Boolean(pinned)));
     };
 
+    const snapshotNativeButton = button => {
+      if (!button || nativeButtonSnapshots.has(button)) return;
+      nativeButtonSnapshots.set(button, {
+        parent: button.parentNode,
+        nextSibling: button.nextSibling,
+        attributes: new Map([
+          "title",
+          "aria-label",
+          "aria-pressed",
+          "data-l10n-id"
+        ].map(name => [name, button.hasAttribute(name) ? button.getAttribute(name) : null]))
+      });
+    };
+
     const restoreNativeButton = button => {
       if (!button) return;
+      const snapshot = nativeButtonSnapshots.get(button);
       button.classList.remove(BUTTON_CLASS);
-      button.removeAttribute("title");
-      button.removeAttribute("aria-label");
-      button.removeAttribute("aria-pressed");
-      button.removeAttribute("data-l10n-id");
-      const row = button.closest("tr.card-layout");
-      const originalContainer = row?.querySelector(".thread-card-icon-info");
-      if (originalContainer && button.parentElement !== originalContainer) {
-        originalContainer.appendChild(button);
+      button.removeAttribute("data-pin-mails-native-star");
+      button.removeAttribute("data-pin-mails-duplicate-star");
+      if (snapshot) {
+        for (const [name, value] of snapshot.attributes) {
+          if (value === null) button.removeAttribute(name);
+          else button.setAttribute(name, value);
+        }
+        if (snapshot.parent?.isConnected && button.parentNode !== snapshot.parent) {
+          if (snapshot.nextSibling?.parentNode === snapshot.parent) {
+            snapshot.parent.insertBefore(button, snapshot.nextSibling);
+          } else {
+            snapshot.parent.appendChild(button);
+          }
+        }
+        nativeButtonSnapshots.delete(button);
       }
     };
 
@@ -4803,14 +4826,17 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       if (!(row instanceof about3Pane.HTMLElement) || row.dataset.properties?.includes("dummy")) return;
       const hdr = headerForRow(row);
       const starCandidates = [...new Set(row.querySelectorAll(".button-star, .tree-button-flag"))];
-      const star = starCandidates.find(item => item.classList.contains("button-star")) || starCandidates[0] || null;
-      for (const candidate of starCandidates) {
-        candidate.toggleAttribute("data-pin-mails-duplicate-star", candidate !== star);
-        candidate.toggleAttribute("data-pin-mails-native-star", candidate === star);
-      }
-      if (this._settings.pinMode === "nativeStar" && isEnabled()) {
+      const nativeStarMode = this._settings.pinMode === "nativeStar" && isEnabled();
+
+      if (nativeStarMode) {
+        const star = starCandidates.find(item => item.classList.contains("button-star")) || starCandidates[0] || null;
+        for (const candidate of starCandidates) {
+          candidate.toggleAttribute("data-pin-mails-duplicate-star", candidate !== star);
+          candidate.toggleAttribute("data-pin-mails-native-star", candidate === star);
+        }
         row.querySelector(`.${INDEPENDENT_BUTTON_CLASS}`)?.remove();
         if (star) {
+          snapshotNativeButton(star);
           star.classList.add(BUTTON_CLASS);
           const pinned = this._isPinnedHeader(hdr);
           setButtonLabel(star, pinned);
@@ -4822,7 +4848,10 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
           }
         }
       } else {
-        restoreNativeButton(star);
+        // Independent mode must leave Thunderbird's native star controls entirely
+        // untouched. In particular, remove annotations left on virtualized rows
+        // that previously rendered in native-star mode.
+        for (const candidate of starCandidates) restoreNativeButton(candidate);
         ensureIndependentButton(row, hdr);
       }
     };

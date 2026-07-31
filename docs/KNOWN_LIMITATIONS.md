@@ -17,3 +17,8 @@
 - Les sauvegardes exportées manuellement hors des dossiers gérés par MailPerch ne peuvent ni ne doivent être effacées automatiquement lors de la désinstallation.
 - Une sécurité absolue ne peut pas être garantie ; toute nouvelle version de Thunderbird ou modification de l’API Experiment exige une nouvelle revue et des tests réels.
 - Les actions GitHub sont épinglées à des commits précis et suivies par Dependabot ; une mise à jour doit être relue avant fusion plutôt que suivie automatiquement par un tag mobile.
+
+
+## Validation des correctifs récents
+
+Les incidents 3.2.5 concernant les étoiles et les paramètres sont protégés par des gardes automatisées, mais restent suivis dans `docs/BUG_TRACKER.md` jusqu’à confirmation dans Thunderbird 153. La CI Linux locale ne remplace pas le job Windows réel pour la régression CRLF.

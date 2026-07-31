@@ -286,3 +286,30 @@ Consigner version Thunderbird, OS, thème, vue, type de compte et résultat.
 - vérifier chaque message étoilé/non étoilé et épinglé/non épinglé : une seule étoile native visible ;
 - changer de dossier, de thème, de densité Thunderbird et faire défiler plusieurs centaines de lignes ;
 - confirmer que le nettoyage de MailPerch restaure les attributs natifs sans laisser d’icône dupliquée.
+
+
+## Validation ciblée 3.2.5 — étoiles, paramètres et CI Windows
+
+### Étoiles et punaise
+
+- démarrer avec `Stockage des épingles = Indépendant des étoiles` ;
+- vérifier une seule étoile native, une seule punaise MailPerch et un seul bouton `…` sur au moins vingt lignes virtualisées ;
+- faire défiler rapidement, changer de dossier, revenir et vérifier l’absence de duplication ;
+- passer en mode `nativeStar`, vérifier l’action, puis revenir en mode indépendant ;
+- confirmer que l’étoile retrouve son libellé, son emplacement et son comportement Thunderbird d’origine.
+
+### Paramètres
+
+- modifier successivement une case, un champ numérique, une liste et un groupe ;
+- cliquer Enregistrer et confirmer la disparition de la barre ainsi que la persistance après réouverture ;
+- effectuer d’autres modifications, cliquer Annuler et confirmer le retour exact aux valeurs enregistrées ;
+- répéter l’enregistrement avec `Ctrl+S` sous Windows/Linux ou `Cmd+S` sur macOS ;
+- vérifier qu’un double clic ne lance pas deux écritures et qu’une erreur API reste visible près de l’action.
+
+### CI Windows
+
+- pousser la version sur une branche de test ;
+- confirmer que `Source and model checks (Windows)` passe `scripts/deep_audit.py` ;
+- vérifier l’absence de faux chemin `dist/.gitkeep\r` dans les logs.
+
+Après chaque résultat, mettre à jour `docs/BUG_TRACKER.md` : `À VALIDER` vers `CORRIGÉ`, ou rouvrir l’entrée avec les nouvelles preuves.

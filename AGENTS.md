@@ -5,8 +5,9 @@ Ce dépôt contient une MailExtension Thunderbird Manifest V3 avec une API Exper
 **Ordre de lecture obligatoire pour économiser le contexte :**
 
 1. `PROJECT_MEMORY.md` — état courant, carte complète et procédures ;
-2. le fichier `AGENTS.md` le plus proche de la zone modifiée ;
-3. uniquement les fichiers spécialisés indiqués par la mémoire.
+2. `docs/BUG_TRACKER.md` — bugs ouverts, corrigés et validations réelles restantes ;
+3. le fichier `AGENTS.md` le plus proche de la zone modifiée ;
+4. uniquement les fichiers spécialisés indiqués par la mémoire.
 
 ## But du produit
 
@@ -60,7 +61,7 @@ Le XPI est construit dans `dist/`. Aucun outil de compilation externe n’est re
 3. Modifier la plus petite surface possible.
 4. Lancer `npm run ci`.
 5. Tester manuellement les scénarios de `docs/MANUAL_TEST_PLAN.md`.
-6. Documenter les limites restantes dans `docs/CODEX_HANDOFF.md`.
+6. Mettre à jour `docs/BUG_TRACKER.md`, puis documenter les limites restantes dans `docs/CODEX_HANDOFF.md`.
 
 ## Zones à haut risque
 

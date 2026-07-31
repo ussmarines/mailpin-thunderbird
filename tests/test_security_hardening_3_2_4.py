@@ -19,7 +19,7 @@ CHECK_REPO = (ROOT / "scripts/check_repo.py").read_text(encoding="utf-8")
 CI_WORKFLOW = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
 RELEASE_WORKFLOW = (ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8")
 
-assert PACKAGE["version"] == MANIFEST["version"] == "3.2.4"
+assert PACKAGE["version"] == MANIFEST["version"] == "3.2.5"
 assert MANIFEST["permissions"] == ["menus"]
 assert "content_scripts" not in MANIFEST
 assert "externally_connectable" not in MANIFEST
@@ -195,7 +195,8 @@ assert "this._settings.backupDirectory = currentBackupDirectory" in IMPLEMENTATI
 # The row controller and CSS retain one canonical native star only.
 assert 'data-pin-mails-duplicate-star' in IMPLEMENTATION
 assert '[data-pin-mails-duplicate-star]' in PIN_CSS
-assert ':has(.button-star) .tree-button-flag:not(.button-star)' in PIN_CSS
+assert ':root[pin-mails-inbox][pin-mails-native-star] #threadTree [data-pin-mails-duplicate-star]' in PIN_CSS
+assert ':has(.button-star) .tree-button-flag:not(.button-star)' not in PIN_CSS
 
 # There is deliberately no client-side administrator role or privilege switch.
 for path in [*EXT.rglob("*.js"), *EXT.rglob("*.mjs"), *EXT.rglob("*.html")]:

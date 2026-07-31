@@ -2,10 +2,10 @@
   "format": "mailperch-project-state",
   "version": 1,
   "project": "MailPerch — Email Pins & Follow-up",
-  "extensionVersion": "3.2.4",
+  "extensionVersion": "3.2.5",
   "baseGitHub": {
     "branch": "main",
-    "commit": "3e8852d4ffcd05c3235000489452ffef6dc752b0"
+    "commit": "5285bb202e509ea6cb5d710eae40fb253c0faa88"
   },
   "extensionId": "pin-mails@MailPerch.local",
   "thunderbird": {
@@ -25,7 +25,8 @@
     "options": "extension/options/options.html",
     "dashboard": "extension/dashboard/dashboard.html",
     "projectMemory": "PROJECT_MEMORY.md",
-    "securityBoundary": "docs/SECURITY_BOUNDARY.md"
+    "securityBoundary": "docs/SECURITY_BOUNDARY.md",
+    "bugTracker": "docs/BUG_TRACKER.md"
   },
   "commands": [
     "npm run check",
@@ -69,7 +70,8 @@
     "automatic rules",
     "imports and restores",
     "uninstall lifecycle",
-    "privileged API input validation"
+    "privileged API input validation",
+    "settings save/cancel lifecycle"
   ],
   "security": {
     "uninstallLifecycle": "AddonManager early signal + awaited Gecko Management uninstall purge + core-cleared ExtensionStorage reinstall sentinel",

@@ -18,11 +18,11 @@ options_js = (ROOT / "extension/options/options.js").read_text(encoding="utf-8")
 options_css = (ROOT / "extension/options/options.css").read_text(encoding="utf-8")
 deep_audit = (ROOT / "scripts/deep_audit.py").read_text(encoding="utf-8")
 
-VERSION = "3.2.4"
+VERSION = "3.2.5"
 assert package["version"] == VERSION
 assert manifest["version"] == VERSION
 assert state["extensionVersion"] == VERSION
-assert state["baseGitHub"]["commit"] == "3e8852d4ffcd05c3235000489452ffef6dc752b0"
+assert state["baseGitHub"]["commit"] == "5285bb202e509ea6cb5d710eae40fb253c0faa88"
 assert f"Version de travail : **{VERSION}**" in memory
 
 # Settings spacing must stay scoped to the settings page. Stale attributes are
@@ -98,8 +98,10 @@ assert 'id="save-all-floating"' in options_html
 assert 'class="save-dock-actions"' in options_html
 assert 'class="form-footer"' in options_html
 
-# Windows git output can contain CRLF; never treat it as part of a tracked name.
-assert 'value.strip("\\r\\n")' in deep_audit
+# Windows text-mode pipes can inject CRLF into path input. The audit uses
+# NUL-delimited binary streams instead of stripping corrupted output later.
+assert '["git", "check-ignore", "--no-index", "-z", "--stdin"]' in deep_audit
+assert 'input=b"\\0".join(tracked_names) + b"\\0"' in deep_audit
 assert 'relative != "dist/.gitkeep"' in deep_audit
 
 # The one-scan Codex memory must remain complete and machine-checkable.
@@ -115,4 +117,4 @@ for path in state["entrypoints"].values():
     assert (ROOT / path).is_file(), path
     assert path in memory, path
 
-print("MailPerch 3.2.4 UI polish and project-memory guards: OK")
+print("MailPerch 3.2.5 UI polish and project-memory guards: OK")

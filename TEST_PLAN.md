@@ -12,7 +12,7 @@ Ils couvrent structure, versions, mémoire projet, scan de secrets, permissions/
 
 Les fichiers `tests/browser/` et `tests/xpcshell/` restent des points d’entrée pour un checkout Thunderbird. Aucune compatibilité graphique complète ne doit être affirmée avant leur exécution et la matrice manuelle Windows/Linux.
 
-Le contexte de test, les invariants et les chemins à haut risque sont résumés dans [`PROJECT_MEMORY.md`](PROJECT_MEMORY.md).
+Le contexte de test, les invariants et les chemins à haut risque sont résumés dans [`PROJECT_MEMORY.md`](PROJECT_MEMORY.md). Les bugs reproduits et leur validation sont suivis dans [`docs/BUG_TRACKER.md`](docs/BUG_TRACKER.md).
 
 
 ## Porte de sécurité 3.2.4
@@ -24,3 +24,18 @@ python tests/test_security_hardening_3_2_4.py
 ```
 
 Il ne remplace pas une validation dans Thunderbird. La désinstallation doit être vérifiée manuellement avec un profil de test : fermeture des fenêtres, suppression du module, absence de base/préférences/sauvegardes internes, puis réinstallation avec les valeurs recommandées.
+
+
+## Régressions ciblées 3.2.5
+
+```bash
+python tests/test_regressions_3_2_5.py
+python scripts/check_bug_tracker.py
+```
+
+Dans Thunderbird, vérifier séparément :
+
+1. une seule étoile native et une seule punaise MailPerch en mode indépendant ;
+2. le passage vers `nativeStar`, puis le retour au mode indépendant sans étoile déplacée ni masquée ;
+3. Enregistrer, Annuler, Entrée/Espace et `Ctrl/Cmd+S` dans les paramètres ;
+4. le job Windows GitHub Actions, qui ne doit plus signaler `dist/.gitkeep\r`.

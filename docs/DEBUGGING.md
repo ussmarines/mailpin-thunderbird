@@ -75,3 +75,8 @@ Un échec mentionnant `dist/.gitkeep\r` indique que cette normalisation a régre
 - pour Enregistrer/Annuler, inspecter `configurationReady`, `dirty` et `saveInFlight` plutôt que de forcer les boutons dans le DOM ;
 - pour une désinstallation, utiliser un profil de test, fermer les opérations, supprimer le module puis vérifier les fichiers et préférences décrits dans `docs/MANUAL_TEST_PLAN.md` ;
 - ne jamais tester la purge sur un profil de production sans sauvegarde indépendante.
+
+
+## Registre des bugs
+
+Avant une nouvelle investigation, consulter `docs/BUG_TRACKER.md`. Si le défaut n’y figure pas, ajouter une entrée `OUVERT` avec version Thunderbird, OS, vue, scénario et capture. Ne supprimer aucune entrée corrigée : elle sert de garde contre les régressions.

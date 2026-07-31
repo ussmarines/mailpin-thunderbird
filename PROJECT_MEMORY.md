@@ -4,8 +4,8 @@
 > Lire ce document avant tout autre fichier. Il donne l’état courant, les invariants,
 > la carte du dépôt et les chemins exacts à ouvrir selon la tâche.
 >
-> Version de travail : **3.2.4**
-> Base GitHub vérifiée : `main` au commit `3e8852d4ffcd05c3235000489452ffef6dc752b0`
+> Version de travail : **3.2.5**
+> Base GitHub vérifiée : `main` au commit `5285bb202e509ea6cb5d710eae40fb253c0faa88`
 > Produit : **MailPerch — Email Pins & Follow-up**
 > Extension ID de développement : `pin-mails@MailPerch.local`
 
@@ -22,7 +22,9 @@ L’extension comporte deux mondes :
 2. **Experiment privilégié** : `api/pinInbox/implementation.js`, accès à
    `about:3pane`, SQLite, dossiers, en-têtes de messages et Agenda.
 
-La version 3.2.4 durcit la frontière privilégiée et stabilise l’interface : entrées API bornées, imports rendus inertes (automatismes et confirmations sensibles réinitialisés), diagnostic anonymisé, chemin de sauvegarde réservé au sélecteur natif, purge des données à la désinstallation, sentinelle de réinstallation, Enregistrer/Annuler réparés, étoile native dédupliquée, paramètres réorganisés et CI multiplateforme robuste.
+Après cette mémoire, lire `docs/BUG_TRACKER.md` avant toute correction afin de ne pas rouvrir un bug déjà connu ni perdre un défaut non résolu.
+
+La version 3.2.5 conserve le durcissement 3.2.4 et corrige trois régressions observées dans Thunderbird réel : étoile native dupliquée, commandes Enregistrer/Annuler peu fiables et faux positif CRLF de la CI Windows. Elle ajoute aussi `docs/BUG_TRACKER.md`, registre permanent des bugs connus lu par Codex et vérifié par la CI.
 
 ## 2. Invariants non négociables
 
@@ -51,7 +53,7 @@ La version 3.2.4 durcit la frontière privilégiée et stabilise l’interface :
 
 | Élément | Valeur |
 |---|---|
-| Version extension/package | `3.2.4` |
+| Version extension/package | `3.2.5` |
 | Thunderbird déclaré | `128.0` à `153.*` |
 | Manifest | MV3 |
 | Permission WebExtension | `menus` uniquement |
@@ -130,6 +132,7 @@ La version 3.2.4 durcit la frontière privilégiée et stabilise l’interface :
 | Secrets | `scripts/scan_secrets.py` | CI |
 | CI GitHub | `.github/workflows/ci.yml` | `tests/test_cross_platform_ci.py` |
 | Release candidate | `.github/workflows/release.yml` | `release/` |
+| Bugs connus | `docs/BUG_TRACKER.md` | `scripts/check_bug_tracker.py` |
 
 ## 6. Carte complète des fichiers
 
@@ -140,6 +143,7 @@ La version 3.2.4 durcit la frontière privilégiée et stabilise l’interface :
 - `.gitignore` : caches, builds et artefacts ignorés.
 - `AGENTS.md` : règles rapides pour les agents.
 - `PROJECT_MEMORY.md` : ce document, entrée unique de contexte.
+- `docs/BUG_TRACKER.md` : registre durable des bugs ouverts, corrigés et à valider.
 - `README.md` / `README.en.md` : présentation et installation.
 - `CHANGELOG.md` : historique des versions.
 - `ROADMAP.md` : priorités encore ouvertes.
@@ -200,6 +204,7 @@ La version 3.2.4 durcit la frontière privilégiée et stabilise l’interface :
 - `check_repo.py` : structure, ressources, CSS/HTML/JS.
 - `check_versions.py` : versions cohérentes.
 - `check_project_memory.py` : empêche cette mémoire de devenir obsolète.
+- `check_bug_tracker.py` : valide les identifiants, statuts et champs du registre des bugs.
 - `deep_audit.py` : audit de chaque fichier texte, compatible Windows.
 - `scan_secrets.py` : secrets et identifiants sensibles.
 
@@ -229,6 +234,7 @@ La version 3.2.4 durcit la frontière privilégiée et stabilise l’interface :
 ### `docs/`
 
 - `PROJECT_STATE.json` : état machine-lisible courant.
+- `BUG_TRACKER.md` : source unique des bugs connus et de leur statut.
 - `ARCHITECTURE.md` : architecture détaillée.
 - `CODEX_HANDOFF.md` : relais court vers cette mémoire.
 - `DATA_MODEL.md` : modèle de données.

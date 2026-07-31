@@ -131,23 +131,35 @@ def main() -> None:
         seen_casefold[folded] = relative
 
     if (ROOT / ".git").exists():
-        tracked = run("git", "ls-files", "-z")
+        # Use NUL-delimited binary streams. Text-mode stdin on Windows rewrites
+        # ``\n`` to ``\r\n``; git check-ignore then interprets the carriage
+        # return as part of the path and reports a fake ``dist/.gitkeep\r``.
+        tracked = subprocess.run(
+            ["git", "ls-files", "-z"],
+            cwd=ROOT,
+            capture_output=True,
+            text=False,
+            check=False,
+        )
         if tracked.returncode:
-            fail(f"git ls-files a échoué: {tracked.stderr.strip()}")
+            fail(f"git ls-files a échoué: {tracked.stderr.decode('utf-8', 'replace').strip()}")
         else:
-            tracked_names = {value.strip("\r\n") for value in tracked.stdout.split("\0") if value.strip("\r\n")}
+            tracked_names = sorted({value for value in tracked.stdout.split(b"\0") if value})
             ignored = subprocess.run(
-                ["git", "check-ignore", "--no-index", "--stdin"],
+                ["git", "check-ignore", "--no-index", "-z", "--stdin"],
                 cwd=ROOT,
-                input="\n".join(sorted(tracked_names)) + "\n",
+                input=b"\0".join(tracked_names) + b"\0",
                 capture_output=True,
-                text=True,
+                text=False,
                 check=False,
             )
             if ignored.returncode not in {0, 1}:
-                fail(f"git check-ignore a échoué: {ignored.stderr.strip()}")
-            for relative in (value.strip("\r\n") for value in ignored.stdout.splitlines()):
-                if relative and relative != "dist/.gitkeep":
+                fail(f"git check-ignore a échoué: {ignored.stderr.decode('utf-8', 'replace').strip()}")
+            for raw_relative in ignored.stdout.split(b"\0"):
+                if not raw_relative:
+                    continue
+                relative = raw_relative.decode("utf-8", "replace")
+                if relative != "dist/.gitkeep":
                     fail(f"fichier versionné également ignoré: {relative}")
 
     for path in files:

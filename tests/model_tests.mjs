@@ -107,4 +107,4 @@ assert.equal(scope.PinCalendarHelpers.itemCaseId(item), "case");
 assert.equal(scope.PinCalendarHelpers.itemDueAt(item), 1234);
 assert.equal(scope.PinCalendarHelpers.itemCompleted(item), true);
 
-console.log("Model tests 3.2.4: OK");
+console.log("Model tests 3.2.5: OK");

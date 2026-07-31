@@ -907,13 +907,37 @@ async function saveAll(event = null) {
         cases,
         templates
       });
-      saved.shortcut = await getShortcut();
-      return saved;
+      if (!saved?.settings || typeof saved.settings !== "object") {
+        throw new Error("MailPerch n’a pas confirmé l’enregistrement des paramètres.");
+      }
+      return {
+        ...saved,
+        settings: {...saved.settings},
+        shortcut: await getShortcut()
+      };
     });
     applyConfiguration(config);
     setStatus("Paramètres enregistrés.", "success");
   } catch (error) {
     setStatus(`Erreur : ${error.message || error}`, "error");
+  } finally {
+    saveInFlight = false;
+    syncSaveControls();
+  }
+}
+
+async function discardChanges(event = null) {
+  event?.preventDefault?.();
+  if (!configurationReady || !dirty || saveInFlight) return;
+  saveInFlight = true;
+  syncSaveControls();
+  const control = event?.submitter || event?.currentTarget || $("discard-changes");
+  try {
+    await withBusy(control, "Restauration des paramètres enregistrés…", () => reload());
+    setDirty(false);
+    setStatus("Modifications annulées.", "success", {control});
+  } catch (error) {
+    setStatus(`Annulation impossible : ${error.message || error}`, "error", {control, persistent: true});
   } finally {
     saveInFlight = false;
     syncSaveControls();
@@ -1014,7 +1038,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   const form = $("settings-form");
   form.addEventListener("submit", saveAll);
-  $("save-all-floating").addEventListener("click", saveAll);
+  form.addEventListener("reset", discardChanges);
   form.addEventListener("input", event => {
     if (event.target.id === "shortcut" || event.target.id === "import-file") return;
     setDirty();
@@ -1026,16 +1050,6 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   $("status-close").addEventListener("click", clearStatus);
   $("save-shortcut").addEventListener("click", saveShortcut);
-  $("discard-changes").addEventListener("click", async event => {
-    if (!configurationReady || !dirty) return;
-    try {
-      await withBusy(event.currentTarget, "Restauration des paramètres enregistrés…", () => reload());
-      setDirty(false);
-      setStatus("Modifications annulées.", "success");
-    } catch (error) {
-      setStatus(`Annulation impossible : ${error.message || error}`, "error");
-    }
-  });
 
   $("add-group").addEventListener("click", () => {
     groups.push({
@@ -1303,6 +1317,13 @@ window.addEventListener("DOMContentLoaded", async () => {
       }
     );
     if (result) setDirty(false);
+  });
+
+  window.addEventListener("keydown", event => {
+    if (!(event.ctrlKey || event.metaKey) || event.altKey || event.key.toLowerCase() !== "s") return;
+    if (!configurationReady || !dirty || saveInFlight) return;
+    event.preventDefault();
+    form.requestSubmit($("save-all-floating"));
   });
 
   window.addEventListener("beforeunload", event => {

@@ -10,6 +10,7 @@ ci = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
 release = (ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8")
 dependabot = (ROOT / ".github/dependabot.yml").read_text(encoding="utf-8")
 check_repo = (ROOT / "scripts/check_repo.py").read_text(encoding="utf-8")
+deep_audit = (ROOT / "scripts/deep_audit.py").read_text(encoding="utf-8")
 
 for name in ("check", "test", "build"):
     command = package["scripts"][name]
@@ -50,5 +51,10 @@ assert "package-ecosystem: github-actions" in dependabot
 assert "BeautifulSoup" not in check_repo
 assert "tinycss2" not in check_repo
 assert "from html.parser import HTMLParser" in check_repo
+
+assert '["git", "check-ignore", "--no-index", "-z", "--stdin"]' in deep_audit
+assert 'input=b"\\0".join(tracked_names) + b"\\0"' in deep_audit
+assert 'text=False' in deep_audit
+assert '"\n".join(sorted(tracked_names))' not in deep_audit
 
 print("Cross-platform CI tooling guards: OK")

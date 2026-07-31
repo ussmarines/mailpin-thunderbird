@@ -1,5 +1,13 @@
 # Feuille de route
 
+## 3.2.5 — validation des régressions réelles
+
+- confirmer dans Thunderbird 153 qu’une seule étoile native est visible en mode indépendant et en mode `nativeStar` ;
+- modifier un champ texte, une case, un nombre et une liste, puis valider Enregistrer, Annuler et `Ctrl/Cmd+S` ;
+- confirmer le passage du job Windows après le flux NUL-délimité de `deep_audit.py` ;
+- maintenir `docs/BUG_TRACKER.md` à chaque bug reproduit, même lorsqu’une correction est différée ;
+- intégrer progressivement les validations graphiques au harnais Thunderbird réel.
+
 ## 3.2.4 — porte de sécurité et cycle de vie
 
 - valider dans Thunderbird réel la fermeture/purge à la désinstallation et la sentinelle de réinstallation à zéro, y compris après désactivation/réactivation ;

@@ -20,7 +20,7 @@ checks = {
     "extension/styles/pin.css": [version],
     "PROJECT_MEMORY.md": [f"Version de travail : **{version}**"],
     "docs/PROJECT_STATE.json": [f'"extensionVersion": "{version}"'],
-    f"SECURITY_AUDIT_{version}.md": [version],
+    "docs/BUG_TRACKER.md": [f"Version de travail : **{version}**"],
 }
 for relative, tokens in checks.items():
     text = (ROOT / relative).read_text(encoding="utf-8")

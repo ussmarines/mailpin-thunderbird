@@ -63,3 +63,16 @@ Une sentinelle primitive est en plus enregistrée dans `ExtensionStorage`, effac
 ## 2026-07-31 — chaîne CI immuable et autonome
 
 Les contrôles HTML/CSS reposent sur la bibliothèque standard Python. Les workflows ne téléchargent aucun helper Python, les actions GitHub sont épinglées à des commits immuables, `persist-credentials` est désactivé et Dependabot propose les mises à jour. Cette décision réduit la chaîne d’approvisionnement sans rendre les vérifications dépendantes d’un lockfile externe.
+
+
+## Les étoiles natives restent intactes en mode indépendant
+
+MailPerch ne déplace, ne masque et ne relabellise aucun contrôle étoile lorsque `pinMode = independent`. Les transformations de l’étoile sont autorisées uniquement en mode `nativeStar`, avec instantané et restauration exacte du parent et des attributs natifs.
+
+## Les actions globales des paramètres utilisent le formulaire natif
+
+La barre fixe peut rester hors du formulaire dans le DOM, mais ses boutons ciblent explicitement `settings-form` avec `type=submit` et `type=reset`. Le JavaScript écoute `submit` et `reset`, ce qui garantit clavier, accessibilité et activation standard sans chemin `click` parallèle.
+
+## Le suivi des bugs est permanent
+
+`docs/BUG_TRACKER.md` est la source unique des bugs reproduits. Un correctif graphique reste `À VALIDER` tant qu’il n’a pas été confirmé dans Thunderbird réel. La CI valide la structure du registre sans effacer son historique.

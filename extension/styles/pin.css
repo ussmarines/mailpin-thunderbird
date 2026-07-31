@@ -1,4 +1,4 @@
-/* MailPerch — Email Pins & Follow-up 3.2.4 */
+/* MailPerch — Email Pins & Follow-up 3.2.5 */
 
 :root {
   --pin-mails-accent: light-dark(#0f6cbd, #62b0e8);
@@ -1373,10 +1373,10 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
 /* 3.2.4 — une seule étoile native par ligne. Thunderbird peut exposer deux
  * contrôles de drapeau lors de la réutilisation d'une carte virtualisée ; le
  * contrôleur marque le contrôle canonique et masque seulement le doublon. */
-:root[pin-mails-inbox] #threadTree [data-pin-mails-duplicate-star] {
+:root[pin-mails-inbox][pin-mails-native-star] #threadTree [data-pin-mails-duplicate-star] {
   display: none !important;
 }
-:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout [data-pin-mails-native-star] {
+:root[pin-mails-inbox][pin-mails-native-star] #threadTree[rows="thread-card"] tr.card-layout [data-pin-mails-native-star] {
   position: absolute !important;
   inset-block-start: 50%;
   inset-inline-end: 60px;
@@ -1390,7 +1390,7 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   margin: 0 !important;
   padding: 0 !important;
 }
-:root[uidensity="touch"][pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout [data-pin-mails-native-star] {
+:root[uidensity="touch"][pin-mails-inbox][pin-mails-native-star] #threadTree[rows="thread-card"] tr.card-layout [data-pin-mails-native-star] {
   inset-inline-end: 68px;
   inline-size: 28px !important;
   block-size: 28px !important;
@@ -1398,9 +1398,6 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   min-block-size: 28px !important;
 }
 
-/* 3.2.4 — garde immédiate contre le double contrôle étoile de certaines
- * variantes ThreadCard. L’attribut posé par le contrôleur reste la source
- * principale ; :has() couvre la courte fenêtre avant le prochain patch DOM. */
-:root[pin-mails-inbox] #threadTree tr.card-layout:has(.button-star) .tree-button-flag:not(.button-star) {
-  display: none !important;
-}
+/* En mode indépendant, MailPerch ne masque, ne déplace et ne redessine
+ * jamais les étoiles natives. Le masquage de doublon est strictement limité
+ * au mode où l'étoile native sert elle-même d'épingle MailPerch. */

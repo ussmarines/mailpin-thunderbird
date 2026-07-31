@@ -5,7 +5,7 @@ court afin d’éviter de dupliquer le contexte.
 
 ## État courant
 
-- version de travail : **3.2.4** ;
+- version de travail : **3.2.5** ;
 - base GitHub : `main` au commit `3e8852d4ffcd05c3235000489452ffef6dc752b0` ;
 - ID : `pin-mails@MailPerch.local` ;
 - schémas : SQLite 5, paramètres 6, données 6 ;
@@ -38,3 +38,10 @@ npm run ci
 ```
 
 Puis suivre `docs/MANUAL_TEST_PLAN.md`, particulièrement la section 3.2.4.
+## Passe 3.2.5
+
+- étoiles natives laissées intactes en mode indépendant ;
+- sauvegarde/annulation des paramètres basées sur les événements natifs du formulaire ;
+- audit Git Windows converti aux flux NUL-délimités binaires ;
+- registre permanent des bugs ajouté et contrôlé par la CI.
+

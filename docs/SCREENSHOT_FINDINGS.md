@@ -45,3 +45,19 @@ possède une règle CSS.
 - une réinstallation conservait les données de profil historiques ; le cycle de désinstallation ferme maintenant SQLite avant de purger base, récupération, sauvegardes internes et préférences, et une sentinelle native déclenche une purge avant initialisation si des résidus subsistent ;
 - les valeurs recommandées d’une installation neuve sont Guidé, Équilibré, densité Normale et automatismes sensibles désactivés ;
 - la demande de sécurité a conduit à documenter la frontière réelle : aucune notion d’administrateur client, validation au niveau Experiment, imports non fiables et chemins de fichiers réservés au sélecteur natif.
+
+
+## Captures du 31 juillet 2026 — passe 3.2.5
+
+### Constats
+
+- deux contrôles étoile restent visibles dans certaines lignes en mode indépendant ;
+- la barre Enregistrer/Annuler est visible mais les commandes ne produisent pas le résultat attendu ;
+- le job Windows transmet un retour chariot à `git check-ignore`, qui affiche `dist/.gitkeep\r`.
+
+### Corrections
+
+- les annotations et déplacements de l’étoile sont limités au mode `nativeStar` ; le mode indépendant restaure chaque contrôle natif à partir d’un instantané ;
+- Enregistrer et Annuler deviennent des actions natives du formulaire (`submit`/`reset`) et l’objet retourné par l’API est cloné avant enrichissement ;
+- `deep_audit.py` utilise des flux NUL-délimités binaires pour les chemins Git ;
+- les trois incidents sont inscrits dans `docs/BUG_TRACKER.md` avec statut `À VALIDER` ou `CORRIGÉ`.

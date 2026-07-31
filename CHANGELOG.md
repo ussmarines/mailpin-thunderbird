@@ -1,5 +1,14 @@
 # Journal des modifications
 
+## 3.2.5 — étoiles natives, validation des paramètres et suivi des bugs
+
+- correction définitive de la duplication des étoiles dans la liste native : les annotations, déplacements et masquages sont désormais limités au mode `nativeStar` ;
+- restauration exacte des attributs et du conteneur d’origine du bouton étoile lors d’un changement de mode ou d’un nettoyage de fenêtre ;
+- actions Enregistrer et Annuler reliées au formulaire natif par `submit` et `reset`, avec raccourci `Ctrl/Cmd+S` et confirmation explicite du retour API ;
+- correction de la CI Windows par des flux Git NUL-délimités en mode binaire, empêchant tout faux chemin `dist/.gitkeep\r` ;
+- ajout de `docs/BUG_TRACKER.md`, registre permanent des bugs connus, et de `scripts/check_bug_tracker.py` dans la validation standard ;
+- ajout de gardes de régression 3.2.5 pour les étoiles, les paramètres, le bug tracker et l’audit Git multiplateforme.
+
 ## 3.2.4 — durcissement sécurité, désinstallation propre et fiabilité
 - chaîne CI autonome : suppression des helpers Python téléchargés, actions GitHub épinglées par SHA, checkout sans identifiants persistés et suivi Dependabot ;
 

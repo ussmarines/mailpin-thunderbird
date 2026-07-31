@@ -74,3 +74,17 @@
 - les imports affichent un aperçu et sont restaurés en mode sûr, automatismes désactivés ;
 - les confirmations UX complètent les contrôles privilégiés mais ne constituent jamais la seule barrière de sécurité ;
 - après désinstallation/réinstallation, l’interface doit repartir sur les valeurs recommandées sans données résiduelles.
+
+
+## Étoile native et punaise
+
+- en mode indépendant : conserver l’étoile Thunderbird intacte et ajouter uniquement la punaise MailPerch ;
+- en mode `nativeStar` : transformer un seul contrôle canonique, masquer uniquement ses doublons et restaurer exactement l’état natif en quittant ce mode ;
+- ne jamais positionner un contrôle marqué `data-pin-mails-native-star` si la racine ne porte pas `pin-mails-native-star`.
+
+## Barre Enregistrer/Annuler
+
+- un seul groupe d’actions globales ;
+- boutons associés au formulaire par l’attribut `form` ;
+- Enregistrer = `submit`, Annuler = `reset` intercepté pour recharger les valeurs persistées ;
+- état occupé et erreurs affichés sans bloquer le reste de la lecture.
