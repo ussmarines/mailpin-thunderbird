@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Dashboard DOM contract and 3.2.2 view regression guards."""
+"""Dashboard DOM contract and 3.2.3 view regression guards."""
 from html.parser import HTMLParser
 from pathlib import Path
 import re

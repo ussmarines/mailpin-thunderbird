@@ -5515,7 +5515,6 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       const enabled = isEnabled();
       document.documentElement.toggleAttribute(INBOX_ATTRIBUTE, enabled);
       document.documentElement.setAttribute("pin-mails-density", this._settings.density);
-      document.documentElement.setAttribute("pin-mails-ui-preset", this._settings.uiPreset || "balanced");
       const systemReducedMotion = Boolean(about3Pane.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches);
       const reduceMotion = this._settings.reduceMotion === "always" || (this._settings.reduceMotion === "auto" && systemReducedMotion);
       document.documentElement.setAttribute("pin-mails-animate", String(this._settings.animateChanges && !this._settings.safeMode && !reduceMotion));
@@ -5695,6 +5694,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       document.documentElement.removeAttribute(INBOX_ATTRIBUTE);
       document.documentElement.removeAttribute("pin-mails-native-star");
       document.documentElement.removeAttribute("pin-mails-density");
+      document.documentElement.removeAttribute("pin-mails-ui-preset");
       document.documentElement.removeAttribute("pin-mails-animate");
       document.documentElement.style.removeProperty("--pin-mails-max-height");
       cardCache.clear(); lastRenderSignature = "";

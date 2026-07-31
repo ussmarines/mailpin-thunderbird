@@ -78,3 +78,13 @@ Le diagnostic est désactivable, borné entre 50 et 500 entrées et filtré par 
 - détection des messages sortants et réponses entrantes pour le suivi sans réponse ;
 - observateurs Agenda lorsque la synchronisation bidirectionnelle est activée ;
 - nettoyage systématique des observateurs, popups, timers et nœuds à la fermeture.
+
+## Isolation des préférences visuelles
+
+- `uiPreset` est appliqué uniquement à `options/options.html` via `body[data-ui-preset]`.
+- `density` est appliqué uniquement au panneau d’épingles via `pin-mails-density`.
+- aucune préférence MailPerch ne doit modifier la hauteur virtuelle `ThreadCard` de Thunderbird ;
+- étoile, punaise et menu sont positionnés dans un rail d’actions centré sans changer le modèle de données natif.
+
+La mémoire d’architecture synthétique et la carte des fichiers sont dans
+[`../PROJECT_MEMORY.md`](../PROJECT_MEMORY.md).

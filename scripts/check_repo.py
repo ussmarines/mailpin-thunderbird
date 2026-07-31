@@ -51,14 +51,14 @@ check(en_locale.get("brandSubtitle", {}).get("message") == "Pin, organize and fo
 check(en_locale.get("brandSlogan", {}).get("message") == "Keep important mail within reach.", "slogan MailPerch incohérent")
 
 required_root = [
-    "AGENTS.md", "BRANDING.md", "README.md", "README.en.md", "LICENSE", "NOTICE.md", "CHANGELOG.md", "AUDIT_REPORT_3.1.0.md", "AUDIT_REPORT_3.1.4.md", "AUDIT_REPORT_3.2.0.md", "HOTFIX_REPORT_3.2.1.md", "HOTFIX_REPORT_3.2.2.md",
+    "AGENTS.md", "PROJECT_MEMORY.md", "BRANDING.md", "README.md", "README.en.md", "LICENSE", "NOTICE.md", "CHANGELOG.md", "AUDIT_REPORT_3.1.0.md", "AUDIT_REPORT_3.1.4.md", "AUDIT_REPORT_3.2.0.md", "HOTFIX_REPORT_3.2.1.md", "HOTFIX_REPORT_3.2.2.md", "HOTFIX_REPORT_3.2.3.md",
     "CONTRIBUTING.md", "CODE_OF_CONDUCT.md", "SECURITY.md", "PRIVACY.md", "ROADMAP.md", "SUPPORT.md",
     "package.json", ".editorconfig", ".gitattributes", ".gitignore", "extension/AGENTS.md",
     "extension/api/pinInbox/AGENTS.md", "tests/AGENTS.md",
-    "docs/ARCHITECTURE.md", "docs/CODEX_HANDOFF.md", "docs/DATA_MODEL.md", "docs/DEBUGGING.md",
+    "docs/PROJECT_STATE.json", "docs/ARCHITECTURE.md", "docs/CODEX_HANDOFF.md", "docs/DATA_MODEL.md", "docs/DEBUGGING.md",
     "docs/UI_SPEC.md", "docs/THREAT_MODEL.md", "docs/ATN_RELEASE_CHECKLIST.md",
     "docs/MANUAL_TEST_PLAN.md", "docs/SCREENSHOT_FINDINGS.md", "docs/DECISIONS.md",
-    "docs/KNOWN_LIMITATIONS.md", "docs/VIDEO_REVIEW_2026-07-30.md", "scripts/build.py", "scripts/check_repo.py", "scripts/check_versions.py", "scripts/deep_audit.py", "scripts/scan_secrets.py",
+    "docs/KNOWN_LIMITATIONS.md", "docs/VIDEO_REVIEW_2026-07-30.md", "scripts/build.py", "scripts/check_repo.py", "scripts/check_versions.py", "scripts/check_project_memory.py", "scripts/deep_audit.py", "scripts/scan_secrets.py",
     "release/BUILD_INSTRUCTIONS.md", "release/ATN_REVIEW_NOTES_TEMPLATE.md", "release/manifest-store-template.json",
     "tests/test_build_reproducible.py", "tests/test_ui_regressions.py", "tests/test_api_schema_contract.py", "tests/test_data_integrity_guards.py", "tests/test_native_card_menu.py", "tests/test_accessibility_localization.py", "tests/test_ux_3_2_features.py", "tests/ux_3_2_model_tests.mjs"
 ]

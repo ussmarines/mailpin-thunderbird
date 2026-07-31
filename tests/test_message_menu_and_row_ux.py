@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regression guards for the 3.2.2 message-menu, group and row UX fixes."""
+"""Regression guards for the 3.2.3 message-menu, group and row UX fixes."""
 from pathlib import Path
 import json
 

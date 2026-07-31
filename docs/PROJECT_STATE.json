@@ -1,0 +1,65 @@
+{
+  "format": "mailperch-project-state",
+  "version": 1,
+  "project": "MailPerch — Email Pins & Follow-up",
+  "extensionVersion": "3.2.3",
+  "baseGitHub": {
+    "branch": "main",
+    "commit": "8b3495baca5d89358d703c42add9d773c09517af"
+  },
+  "extensionId": "pin-mails@MailPerch.local",
+  "thunderbird": {
+    "min": "128.0",
+    "max": "153.*"
+  },
+  "schemas": {
+    "sqlite": 5,
+    "settings": 5,
+    "data": 6
+  },
+  "entrypoints": {
+    "manifest": "extension/manifest.json",
+    "background": "extension/background.js",
+    "experimentSchema": "extension/api/pinInbox/schema.json",
+    "experiment": "extension/api/pinInbox/implementation.js",
+    "options": "extension/options/options.html",
+    "dashboard": "extension/dashboard/dashboard.html",
+    "projectMemory": "PROJECT_MEMORY.md"
+  },
+  "commands": [
+    "npm run check",
+    "npm test",
+    "npm run build",
+    "npm run ci"
+  ],
+  "invariants": [
+    "No native unread/new/total counter mutation",
+    "Pinning never changes read state",
+    "No network, telemetry, ads, CDN or remote code",
+    "No message bodies or attachment contents stored",
+    "No eval/new Function/innerHTML/outerHTML",
+    "SQLite writes remain incremental, transactional and serialized",
+    "All injected resources are cleaned up",
+    "No remote publication without explicit approval"
+  ],
+  "ui": {
+    "settingsSpacingAffects": [
+      "extension/options"
+    ],
+    "cardDensityAffects": [
+      "MailPerch pinned cards"
+    ],
+    "mustNotAffect": [
+      "Thunderbird native thread row height",
+      "native message counters"
+    ]
+  },
+  "highRisk": [
+    "_setupAbout3Pane",
+    "PinStructuredStore",
+    "_resolveReference",
+    "calendar observers",
+    "folder observers",
+    "automatic rules"
+  ]
+}

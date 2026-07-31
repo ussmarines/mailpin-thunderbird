@@ -201,3 +201,37 @@ Consigner version Thunderbird, OS, thème, vue, type de compte et résultat.
 
 - vérifier que les jobs Linux et Windows exécutent `npm run check` puis `npm test` ;
 - confirmer l’absence de commande `python3` dans les scripts npm et le workflow de release.
+
+## Validation ciblée 3.2.3
+
+### Liste native Thunderbird
+
+- vérifier que étoile, punaise et bouton « Plus » sont sur un rail horizontal centré ;
+- confirmer des marges supérieures et inférieures identiques autour des trois boutons ;
+- tester messages nouveaux, non lus, étoilés, épinglés, avec pièce jointe et étiquettes ;
+- tester densités Thunderbird Compacte, Normale et Tactile sans décalage de virtualisation.
+
+### Densités MailPerch
+
+- modifier « Espacement des paramètres » : seule la page Options doit changer ;
+- modifier « Densité des cartes » : seul le panneau Épinglés doit changer ;
+- vérifier que les modes Compact, Normal et Confortable conservent auteur, objet, date et actions lisibles ;
+- confirmer que la liste native ne change jamais de hauteur lors de ces modifications.
+
+### Paramètres
+
+- vérifier que chaque case possède son aide sous le libellé, sans chevauchement ;
+- vérifier que les aides des boutons restent dans des colonnes séparées ;
+- créer, déplacer, recolorer et supprimer un groupe ;
+- confirmer qu’un compte ne répète pas deux fois la même adresse ;
+- vérifier les libellés Agenda « Tâches », « Événements », les deux ou indisponible ;
+- vérifier que le toast se ferme depuis son coin supérieur droit ;
+- confirmer qu’un seul bouton Enregistrer persistant apparaît après modification ;
+- tester zoom 125 %, 150 %, 200 % et largeur inférieure à 780 px.
+
+### CI et mémoire
+
+- exécuter les jobs Linux et Windows ;
+- confirmer que `dist/.gitkeep` n’est pas signalé avec un suffixe `\r` ;
+- lancer `python scripts/check_project_memory.py` ;
+- vérifier que `PROJECT_MEMORY.md` indique la version, le commit de base et les chemins principaux.

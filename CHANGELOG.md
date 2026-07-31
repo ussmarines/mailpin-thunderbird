@@ -1,5 +1,21 @@
 # Journal des modifications
 
+## 3.2.3 — mémoire projet et harmonisation UX
+
+- ajout de `PROJECT_MEMORY.md`, point d’entrée unique pour Codex, et de `docs/PROJECT_STATE.json` ;
+- contrôle automatique empêchant la mémoire projet de devenir obsolète ;
+- rail étoile, punaise et menu centré verticalement dans les cartes de messages natives ;
+- séparation stricte entre l’espacement de la page Paramètres et la densité du panneau principal ;
+- densités Compacte, Normale et Confortable rendues lisibles avec des hauteurs minimales sûres ;
+- correction du bouton Fermer des notifications, désormais placé en haut à droite ;
+- ajout des primitives CSS manquantes qui causaient chevauchements, textes concaténés et blocs désorganisés ;
+- réorganisation des toggles, aides de boutons, groupes, comptes, calendriers, sauvegardes et centre de santé ;
+- suppression de la duplication visible nom/adresse des comptes ;
+- libellés Agenda fondés sur les capacités réelles tâches/événements ;
+- suppression du second bouton Enregistrer visible au profit du dock contextuel ;
+- audit Git Windows durci contre les retours chariot dans les chemins suivis ;
+- nouvelle garde de régression pour l’UX 3.2.3 et la mémoire projet.
+
 ## 3.2.2 — alignement des lignes, chargement des paramètres et CI Windows
 
 - rééquilibrage complet de la géométrie des cartes de messages Thunderbird sans dépasser leur hauteur virtuelle native ;

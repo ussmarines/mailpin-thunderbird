@@ -1,4 +1,4 @@
-/* MailPerch — Email Pins & Follow-up 3.2.2 */
+/* MailPerch — Email Pins & Follow-up 3.2.3 */
 
 :root {
   --pin-mails-accent: light-dark(#0f6cbd, #62b0e8);
@@ -14,20 +14,20 @@
   --pin-mails-soft: light-dark(#e8f2fb, color-mix(in srgb, #0f6cbd 22%, transparent));
   --pin-mails-max-height: 360px;
   --pin-mails-card-gap: 4px;
-  --pin-mails-card-padding: 7px 9px 7px 12px;
-  --pin-mails-card-min-height: 52px;
+  --pin-mails-card-padding: 8px 10px 8px 12px;
+  --pin-mails-card-min-height: 56px;
 }
 
 :root[pin-mails-density="compact"] {
-  --pin-mails-card-gap: 2px;
-  --pin-mails-card-padding: 5px 8px 5px 11px;
-  --pin-mails-card-min-height: 42px;
+  --pin-mails-card-gap: 3px;
+  --pin-mails-card-padding: 6px 9px 6px 11px;
+  --pin-mails-card-min-height: 48px;
 }
 
 :root[pin-mails-density="comfortable"] {
   --pin-mails-card-gap: 6px;
-  --pin-mails-card-padding: 10px 11px 10px 14px;
-  --pin-mails-card-min-height: 62px;
+  --pin-mails-card-padding: 11px 12px 11px 14px;
+  --pin-mails-card-min-height: 66px;
 }
 
 /* Le filtre étoilé devient un interrupteur du panneau, sans filtrage.
@@ -1115,16 +1115,6 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   background: light-dark(#fff0ef, #431d1d);
   color: light-dark(#b42318, #ff9ca2);
 }
-:root[pin-mails-ui-preset="compact"] #pin-mails-panel {
-  --pin-mails-card-padding: 5px;
-  font-size: .92em;
-}
-:root[pin-mails-ui-preset="comfortable"] #pin-mails-panel {
-  --pin-mails-card-padding: 11px;
-}
-:root[pin-mails-ui-preset="comfortable"] .pin-mails-card {
-  padding-block: 10px;
-}
 @media (forced-colors: active) {
   .pin-mails-smart-view-select,
   .pin-mails-no-reply-chip { border: 1px solid CanvasText; }
@@ -1154,7 +1144,7 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   outline-offset: 1px;
 }
 
-/* 3.2.2 — géométrie équilibrée des lignes générales Thunderbird.
+/* 3.2.3 — géométrie équilibrée des lignes générales Thunderbird.
  * ThreadCard conserve une hauteur virtuelle native de 46 px : l’amélioration
  * doit donc répartir l’espace intérieur sans agrandir artificiellement une
  * seule sous-ligne, sous peine de pousser l’objet contre la bordure basse. */
@@ -1278,4 +1268,103 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
     border-color: Highlight;
   }
   .pin-mails-group-remove { forced-color-adjust: auto; }
+}
+
+/* 3.2.3 — rail d’actions centré et densités sûres.
+ * Le confort visuel des paramètres ne modifie plus about:3pane. Seule la
+ * densité explicite des cartes MailPerch agit sur le panneau d’épingles. */
+.pin-mails-card {
+  line-height: 1.3;
+}
+.pin-mails-card-top,
+.pin-mails-card-meta {
+  min-block-size: 20px;
+  align-items: center;
+}
+:root[pin-mails-density="compact"] .pin-mails-card {
+  font-size: max(.92em, 12px);
+}
+:root[pin-mails-density="compact"] .pin-mails-subject,
+:root[pin-mails-density="compact"] .pin-mails-author {
+  line-height: 1.25;
+}
+:root[pin-mails-density="comfortable"] .pin-mails-card-top,
+:root[pin-mails-density="comfortable"] .pin-mails-card-meta {
+  min-block-size: 22px;
+}
+
+/* Les boutons natifs « Plus », étoile et punaise forment un rail unique,
+ * centré verticalement sur toute la carte. Ils gardent ainsi la même marge
+ * au-dessus et au-dessous, quelle que soit la longueur de l’objet. */
+:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-column:last-child {
+  position: relative;
+  justify-content: center;
+  gap: 0;
+  padding-block: 4px;
+  padding-inline-end: 86px;
+}
+:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout :is(.thread-card-row, .thread-card-dynamic-row) {
+  position: static;
+  min-block-size: 19px;
+  line-height: 1.2;
+}
+:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-subject-container {
+  min-block-size: 19px;
+  padding-block: 0;
+}
+:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-icon-info {
+  min-block-size: 19px;
+  padding-inline-end: 0;
+}
+:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout :is(
+  .tree-button-more,
+  .button-star,
+  .pin-mails-independent-button
+) {
+  position: absolute !important;
+  inset-block-start: 50%;
+  display: grid !important;
+  place-items: center !important;
+  inline-size: 24px !important;
+  block-size: 24px !important;
+  min-inline-size: 24px !important;
+  min-block-size: 24px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: translateY(-50%);
+}
+:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .tree-button-more {
+  inset-inline-end: 4px;
+}
+:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .pin-mails-independent-button {
+  inset-inline-end: 32px;
+}
+:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .button-star {
+  inset-inline-end: 60px;
+}
+:root[pin-mails-inbox][pin-mails-native-star] #threadTree[rows="thread-card"] tr.card-layout .pin-mails-row-button {
+  inset-inline-end: 32px;
+}
+:root[uidensity="touch"][pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-column:last-child {
+  padding-block: 6px;
+  padding-inline-end: 98px;
+}
+:root[uidensity="touch"][pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout :is(
+  .tree-button-more,
+  .button-star,
+  .pin-mails-independent-button
+) {
+  inline-size: 28px !important;
+  block-size: 28px !important;
+  min-inline-size: 28px !important;
+  min-block-size: 28px !important;
+}
+:root[uidensity="touch"][pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .tree-button-more {
+  inset-inline-end: 4px;
+}
+:root[uidensity="touch"][pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .pin-mails-independent-button {
+  inset-inline-end: 36px;
+}
+:root[uidensity="touch"][pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .button-star {
+  inset-inline-end: 68px;
 }

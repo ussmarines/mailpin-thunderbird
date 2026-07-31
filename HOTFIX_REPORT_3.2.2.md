@@ -18,8 +18,7 @@ Base GitHub : `main` au commit `b8f8a00ff267602b7e7e718af32f11a1e5b1a4b8` (3.2.1
 - centrage de la colonne d’état, des deux lignes, des informations d’icônes et des boutons ;
 - chargement de configuration validé et retenté quatre fois sur une courte fenêtre ;
 - boutons Enregistrer/Annuler désactivés tant que la configuration n’est pas prête ;
-- scripts npm et workflow de release basés sur `python`, multiplateforme après `actions/setup-python` ;
-- actions officielles GitHub mises à niveau vers leurs versions Node 24 afin de supprimer les avertissements visibles dans les runs.
+- scripts npm et workflow de release basés sur `python`, multiplateforme après `actions/setup-python`.
 
 ## Validation
 

@@ -1,5 +1,7 @@
 # AGENTS.md — Tests
 
+> Contexte global : lire `PROJECT_MEMORY.md` à la racine avant ce fichier.
+
 Les tests génériques ne remplacent pas Thunderbird.
 
 - `static_checks.py` : contrat du paquet et motifs interdits.

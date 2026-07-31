@@ -51,3 +51,16 @@ Vérifier :
 2. que toutes les clés envoyées par `options.js` et `dashboard.js` sont listées ;
 3. que `python3 tests/test_api_schema_contract.py` réussit ;
 4. qu’aucun nouveau paramètre objet nu n’est ajouté.
+
+## Diagnostic de mise en page
+
+1. Vérifier `uiPreset` dans les options et `density` dans le panneau : ils ne doivent pas agir sur la même surface.
+2. Inspecter `pin-mails-density` sur `document.documentElement` de `about:3pane`.
+3. L’attribut historique `pin-mails-ui-preset` doit être absent de `about:3pane`.
+4. Vérifier le rail `.tree-button-more`, `.button-star`, `.pin-mails-independent-button`.
+5. Pour les paramètres, exécuter `tests/test_ui_polish_3_2_3.py`.
+
+## CI Windows
+
+`deep_audit.py` normalise `\r` et `\n` dans les sorties `git ls-files` et `git check-ignore`.
+Un échec mentionnant `dist/.gitkeep\r` indique que cette normalisation a régressé.

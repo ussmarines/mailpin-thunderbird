@@ -18,6 +18,9 @@ checks = {
     "CHANGELOG.md": [f"## {version}"],
     "THIRD_PARTY_NOTICES.md": [f"build {version}"],
     "extension/styles/pin.css": [version],
+    "PROJECT_MEMORY.md": [f"Version de travail : **{version}**"],
+    "docs/PROJECT_STATE.json": [f'"extensionVersion": "{version}"'],
+    f"HOTFIX_REPORT_{version}.md": [version],
 }
 for relative, tokens in checks.items():
     text = (ROOT / relative).read_text(encoding="utf-8")

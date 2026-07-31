@@ -51,7 +51,7 @@
           </div>
           <div class="setting-grid three-columns">
             <label class="setting-field"><span data-i18n="settingsExperience">Niveau de réglages</span><select id="settingsExperience"><option value="guided" data-i18n="settingsGuided">Guidé — recommandé</option><option value="advanced" data-i18n="settingsAdvanced">Avancé</option></select></label>
-            <label class="setting-field"><span data-i18n="uiPreset">Confort visuel</span><select id="uiPreset"><option value="compact" data-i18n="uiCompact">Compact</option><option value="balanced" data-i18n="uiBalanced">Équilibré — recommandé</option><option value="comfortable" data-i18n="uiComfortable">Très aéré</option></select></label>
+            <label class="setting-field"><span data-i18n="uiPreset">Espacement des paramètres</span><select id="uiPreset"><option value="compact" data-i18n="uiCompact">Compact</option><option value="balanced" data-i18n="uiBalanced">Équilibré — recommandé</option><option value="comfortable" data-i18n="uiComfortable">Très aéré</option></select></label>
             <label class="setting-field"><span data-i18n="reduceMotion">Animations</span><select id="reduceMotion"><option value="auto" data-i18n="motionAuto">Suivre le système</option><option value="always" data-i18n="motionReduce">Réduire les animations</option><option value="never" data-i18n="motionFull">Animations complètes</option></select></label>
           </div>
           <div class="feature-map">
@@ -169,12 +169,12 @@
           <div class="shortcut-row"><input id="shortcut" type="text" aria-label="Raccourci clavier"><button id="save-shortcut" type="button" class="secondary" data-i18n="saveShortcut">Enregistrer le raccourci</button></div>
         </section>
 
-        <footer class="form-footer"><div><strong data-i18n="readyToSave">Prêt à enregistrer ?</strong><span id="stats"></span></div><button id="save-all" type="submit" class="primary" data-i18n="saveSettings">Enregistrer les paramètres</button></footer>
+        <footer class="form-footer"><div><strong data-i18n="readyToSave">Résumé local</strong><span id="stats"></span></div><span class="hint">Utilisez la barre Enregistrer/Annuler qui apparaît uniquement après une modification.</span></footer>
       </form>
     </div>
   </main>
 
-  <div id="save-dock" class="save-dock" hidden><span id="save-dock-message" data-i18n="unsavedChanges">Des modifications ne sont pas encore enregistrées.</span><button id="discard-changes" type="button" class="secondary" data-i18n="cancelChanges">Annuler</button><button id="save-all-floating" type="submit" form="settings-form" class="primary" data-i18n="save">Enregistrer</button></div>
+  <div id="save-dock" class="save-dock" hidden><span id="save-dock-message" data-i18n="unsavedChanges">Des modifications ne sont pas encore enregistrées.</span><span class="save-dock-actions"><button id="discard-changes" type="button" class="secondary" data-i18n="cancelChanges">Annuler</button><button id="save-all-floating" type="submit" form="settings-form" class="primary" data-i18n="save">Enregistrer</button></span></div>
   <aside id="status" class="status-toast" role="status" aria-live="polite" aria-atomic="true" hidden><span class="status-icon" aria-hidden="true"></span><span id="status-message"></span><button id="status-close" class="status-close" type="button" aria-label="Fermer">×</button></aside>
   <noscript>JavaScript doit être activé pour configurer MailPerch.</noscript>
 </body>

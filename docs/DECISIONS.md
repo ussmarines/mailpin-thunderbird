@@ -27,3 +27,18 @@ Le propriétaire ne souhaite ni vente ni redistribution publique du code. Le pro
 ## D007 — MailPerch comme identité publique
 
 Le nom public canonique est **MailPerch** et le nom complet du store est **MailPerch — Email Pins & Follow-up**. Les anciens noms faisant référence à Outlook sont retirés des surfaces publiques. Les identifiants techniques `pin-mails-*` restent conservés jusqu’à une migration dédiée afin de préserver les données et les mises à niveau.
+
+## 2026-07-31 — séparation des densités
+
+`uiPreset` ne concerne que la page Paramètres. `density` ne concerne que les cartes épinglées.
+Aucun réglage MailPerch ne redimensionne les lignes natives Thunderbird.
+
+## 2026-07-31 — mémoire projet unique
+
+`PROJECT_MEMORY.md` est le point d’entrée obligatoire pour Codex. Les documents spécialisés
+restent la source détaillée, mais ne doivent pas recopier l’intégralité du contexte.
+
+## 2026-07-31 — rail d’actions natif
+
+Dans la vue Cartes Thunderbird, étoile, punaise et menu utilisent un rail centré verticalement.
+La hauteur virtuelle native reste inchangée.

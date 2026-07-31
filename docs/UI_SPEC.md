@@ -21,9 +21,12 @@
 
 ## Liste générale
 
-- la ligne Cartes qui contient la punaise dispose d’une hauteur minimale confortable ;
-- la cible de la punaise mesure 36×36 px, est centrée verticalement et éloignée du bord supérieur ;
-- l’espace réservé ne doit jamais chevaucher l’objet, l’auteur ou les autres boutons Thunderbird.
+- conserver la hauteur virtuelle native de Thunderbird ;
+- placer étoile, punaise et bouton « Plus » sur un rail horizontal centré verticalement ;
+- utiliser des cibles de 24×24 px en densité normale et 28×28 px en densité tactile ;
+- garantir une marge supérieure et inférieure identique ;
+- réserver l’espace du rail sans chevaucher auteur, date, objet, étiquettes ou pièces jointes ;
+- les réglages `uiPreset` et `density` ne modifient jamais la géométrie native.
 
 ## Cartes
 
@@ -48,9 +51,11 @@
 - barre latérale groupée : Essentiel, Suivi, Organisation, Intégrations, Maintenance et Accès rapide ;
 - recherche filtrant sections et navigation ;
 - section active signalée par `aria-current` ;
-- modes Guidé/Avancé et Compact/Équilibré/Très aéré ;
-- aide sous chaque contrôle et bouton ;
-- dock Enregistrer/Annuler et toast fixe mais non invasif.
+- modes Guidé/Avancé et espacement Compact/Équilibré/Très aéré limité à cette page ;
+- aide sous chaque contrôle et bouton, sans placer aide et libellé côte à côte ;
+- un seul dock Enregistrer/Annuler, visible uniquement lorsqu’une modification existe ;
+- toast fixe non invasif, avec fermeture en haut à droite ;
+- comptes, groupes et calendriers présentés sans duplication ni jargon technique inutile.
 
 ## Dashboard
 

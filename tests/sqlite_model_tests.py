@@ -114,7 +114,7 @@ def main() -> None:
         connection.execute("PRAGMA wal_checkpoint(PASSIVE)")
         connection.close()
 
-    print("SQLite model tests 3.2.2: OK")
+    print("SQLite model tests 3.2.3: OK")
 
 
 if __name__ == "__main__":

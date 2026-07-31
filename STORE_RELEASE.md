@@ -12,7 +12,7 @@ Voir `BRANDING.md` pour les règles de nommage et les identifiants techniques co
 
 ## État
 
-La build 3.2.2 reste une Release Candidate de développement et n’est pas déclarée prête pour Add-ons for Thunderbird.
+La build 3.2.3 reste une Release Candidate de développement et n’est pas déclarée prête pour Add-ons for Thunderbird.
 
 Avant publication :
 

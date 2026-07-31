@@ -1,6 +1,12 @@
 # AGENTS.md — MailPerch
 
-Ce dépôt contient une MailExtension Thunderbird Manifest V3 avec une API Experiment privilégiée. Lire ce fichier avant toute modification.
+Ce dépôt contient une MailExtension Thunderbird Manifest V3 avec une API Experiment privilégiée.
+
+**Ordre de lecture obligatoire pour économiser le contexte :**
+
+1. `PROJECT_MEMORY.md` — état courant, carte complète et procédures ;
+2. le fichier `AGENTS.md` le plus proche de la zone modifiée ;
+3. uniquement les fichiers spécialisés indiqués par la mémoire.
 
 ## But du produit
 
@@ -20,6 +26,8 @@ Afficher des messages épinglés dans un panneau distinct au-dessus de la liste 
 10. Toute écoute, minuterie, feuille de style, menu et nœud injecté doit être nettoyé dans `onShutdown`/`cleanup`.
 
 ## Carte rapide
+
+La carte exhaustive est dans `PROJECT_MEMORY.md`. Cette liste ne conserve que les points d’entrée.
 
 - `extension/manifest.json` : manifeste installable.
 - `extension/background.js` : API WebExtension publique, menus, commandes, ouverture du dashboard.

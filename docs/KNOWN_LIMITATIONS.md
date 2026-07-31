@@ -9,3 +9,6 @@
 - Les actions supprimer/archiver, les dossiers virtuels et la synchronisation Agenda doivent être validés sur chaque fournisseur utilisé.
 - Le fichier principal de l’Experiment reste l’orchestrateur privilégié. Les logiques pures et stables sont séparées dans `modules/`, mais le découpage de l’intégration DOM doit rester progressif.
 - L’identifiant, le nom et la licence doivent être validés avant une publication ATN.
+
+- La mémoire projet décrit le dépôt mais ne remplace pas une validation graphique réelle ;
+  elle est contrôlée automatiquement pour la version et les points d’entrée.

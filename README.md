@@ -7,7 +7,7 @@
 
 MailPerch est une extension Thunderbird qui ajoute un panneau d’épingles au-dessus de la liste native des messages, avec suivi local, rappels, groupes, affaires, Kanban, règles et intégration Agenda.
 
-> **État : build de développement 3.2.2.** Les contrôles statiques, les tests de modèle et les gardes de régression sont exécutés automatiquement. Une validation graphique complète dans Thunderbird reste obligatoire avant publication.
+> **État : build de développement 3.2.3.** Les contrôles statiques, les tests de modèle et les gardes de régression sont exécutés automatiquement. Une validation graphique complète dans Thunderbird reste obligatoire avant publication.
 
 ## Fonctions principales
 
@@ -31,9 +31,13 @@ MailPerch est une extension Thunderbird qui ajoute un panneau d’épingles au-d
 
 1. Construire avec `npm run build`, ou utiliser le XPI fourni séparément.
 2. Dans Thunderbird : **Extensions et thèmes → roue dentée → Installer un module depuis un fichier**.
-3. Sélectionner `dist/MailPerch_v3.2.2.xpi`.
+3. Sélectionner `dist/MailPerch_v3.2.3.xpi`.
 4. Redémarrer complètement Thunderbird.
 5. Utiliser un profil de test et des messages sans importance pour les opérations de suppression, archivage et règles.
+
+## Mémoire projet pour Codex
+
+Lire [`PROJECT_MEMORY.md`](PROJECT_MEMORY.md) pour obtenir en un seul passage l’état courant, la carte complète des fichiers, les invariants et les procédures de modification.
 
 ## Développement
 

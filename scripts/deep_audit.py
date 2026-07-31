@@ -135,7 +135,7 @@ def main() -> None:
         if tracked.returncode:
             fail(f"git ls-files a échoué: {tracked.stderr.strip()}")
         else:
-            tracked_names = {value for value in tracked.stdout.split("\0") if value}
+            tracked_names = {value.strip("\r\n") for value in tracked.stdout.split("\0") if value.strip("\r\n")}
             ignored = subprocess.run(
                 ["git", "check-ignore", "--no-index", "--stdin"],
                 cwd=ROOT,
@@ -146,8 +146,8 @@ def main() -> None:
             )
             if ignored.returncode not in {0, 1}:
                 fail(f"git check-ignore a échoué: {ignored.stderr.strip()}")
-            for relative in ignored.stdout.splitlines():
-                if relative != "dist/.gitkeep":
+            for relative in (value.strip("\r\n") for value in ignored.stdout.splitlines()):
+                if relative and relative != "dist/.gitkeep":
                     fail(f"fichier versionné également ignoré: {relative}")
 
     for path in files:

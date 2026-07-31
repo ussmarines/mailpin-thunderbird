@@ -31,7 +31,7 @@ function setConfigurationReady(ready) {
   document.documentElement.toggleAttribute("data-configuration-ready", Boolean(ready));
   const form = $("settings-form");
   form?.setAttribute("aria-busy", String(!ready));
-  for (const id of ["save-all", "discard-changes"]) {
+  for (const id of ["save-all-floating", "discard-changes"]) {
     const control = $(id);
     if (control) control.disabled = !ready;
   }
@@ -103,13 +103,13 @@ const BUTTON_HELP = {
   diagnostic: "Exporte un rapport technique local expurgé du corps des messages et des pièces jointes.",
   export: "Télécharge une sauvegarde JSON locale de la configuration MailPerch.",
   "save-shortcut": "Enregistre uniquement le raccourci Thunderbird indiqué.",
-  "save-all": "Enregistre tous les champs, groupes, règles, affaires et modèles actuellement modifiés.",
+  "save-all-floating": "Enregistre tous les champs, groupes, règles, affaires et modèles actuellement modifiés.",
   reset: "Réinitialise les réglages, groupes, affaires, modèles et règles. Les épingles sont conservées."
 };
 
 Object.assign(CONTROL_HELP, {
   settingsExperience: "Le mode Guidé masque les réglages avancés. Le mode Avancé affiche tous les réglages sans modifier leur valeur.",
-  uiPreset: "Ajuste uniquement l’espacement de cette page et des interfaces MailPerch.",
+  uiPreset: "Ajuste uniquement l’espacement de la page des paramètres. Cette option ne modifie jamais la liste des messages ni le panneau principal.",
   reduceMotion: "Réduit les animations pour plus de confort, sans désactiver les retours d’action.",
   panelVirtualizationThreshold: "Au-delà de ce nombre d’épingles, MailPerch limite le rendu initial afin de préserver la fluidité.",
   enableSmartViews: "Ajoute les vues Aujourd’hui, En retard, Sans réponse, Sans échéance et autres vues calculées localement.",
@@ -407,13 +407,67 @@ function moveButtons(list, index, render) {
   return [up, down];
 }
 
-function renderGroups(){const host=$("groups-list");host.replaceChildren();if(!groups.length)host.append(node("p","hint","Aucun groupe personnalisé."));groups.forEach((group,index)=>{const row=node("article","group-row");row.style.setProperty("--group-color",group.color);const name=document.createElement("input");name.value=group.name;name.maxLength=80;const color=document.createElement("input");color.type="color";color.value=group.color;name.addEventListener("input",()=>group.name=name.value.slice(0,80));color.addEventListener("input",()=>{group.color=color.value;row.style.setProperty("--group-color",color.value);});const[up,down]=moveButtons(groups,index,()=>{renderGroups();renderRules();renderTemplates();});row.append(node("span","group-drag","⋮⋮"),name,color,up,down,removeButton(()=>{groups.splice(index,1);renderGroups();renderRules();renderTemplates();}));host.append(row);});renderWaitingGroups();}
+function renderGroups() {
+  const host = $("groups-list");
+  host.replaceChildren();
+  if (!groups.length) host.append(node("p", "hint", "Aucun groupe personnalisé."));
+  groups.forEach((group, index) => {
+    const row = node("article", "group-row group-editor-row");
+    row.style.setProperty("--group-color", group.color);
+
+    const drag = node("span", "group-drag", "⋮⋮");
+    drag.setAttribute("aria-hidden", "true");
+    drag.title = "Ordre du groupe";
+
+    const nameField = node("label", "entity-field");
+    nameField.append(node("span", "", "Nom du groupe"));
+    const name = document.createElement("input");
+    name.value = group.name;
+    name.maxLength = 80;
+    name.setAttribute("aria-label", "Nom du groupe");
+    nameField.append(name);
+
+    const colorField = node("label", "entity-field");
+    colorField.append(node("span", "", "Couleur"));
+    const color = document.createElement("input");
+    color.type = "color";
+    color.value = group.color;
+    color.setAttribute("aria-label", `Couleur du groupe ${group.name || index + 1}`);
+    colorField.append(color);
+
+    name.addEventListener("input", () => {
+      group.name = name.value.slice(0, 80);
+      color.setAttribute("aria-label", `Couleur du groupe ${group.name || index + 1}`);
+    });
+    color.addEventListener("input", () => {
+      group.color = color.value;
+      row.style.setProperty("--group-color", color.value);
+    });
+
+    const [up, down] = moveButtons(groups, index, () => {
+      renderGroups();
+      renderRules();
+      renderTemplates();
+    });
+    const actions = node("div", "entity-actions");
+    actions.append(up, down, removeButton(() => {
+      groups.splice(index, 1);
+      renderGroups();
+      renderRules();
+      renderTemplates();
+    }));
+
+    row.append(drag, nameField, colorField, actions);
+    host.append(row);
+  });
+  renderWaitingGroups();
+}
 function renderWaitingGroups(selected=configuration?.settings?.waitingGroupId||""){const el=$("waitingGroupId");el.replaceChildren();const none=node("option","","Aucun");none.value="";el.append(none);for(const group of groups){const option=node("option","",group.name);option.value=group.id;el.append(option);}el.value=groups.some(g=>g.id===selected)?selected:"";}
 function renderCases(){
   const host=$("cases-list");host.replaceChildren();
   if(!cases.length)host.append(node("p","hint","Aucune affaire."));
   cases.forEach((item,index)=>{
-    const row=node("article","group-row");row.style.setProperty("--group-color",item.color);
+    const row=node("article","group-row case-editor-row");row.style.setProperty("--group-color",item.color);
     const name=document.createElement("input");name.value=item.name;name.maxLength=120;
     const color=document.createElement("input");color.type="color";color.value=item.color;
     const status=select([["active","À traiter"],["waiting","En attente"],["planned","Planifié"],["completed","Terminé"]],item.status||"active","Statut");
@@ -482,10 +536,13 @@ function renderAccounts(accounts) {
     card.style.setProperty("--account-color", account.color);
     const header = node("div", "account-header");
     const title = node("div", "account-title");
-    title.append(
-      node("div", "account-name", account.name),
-      node("div", "account-email", account.email || account.key)
-    );
+    const primaryLabel = String(account.name || account.email || "Compte Thunderbird").trim();
+    const secondaryLabel = String(account.email || "").trim();
+    title.append(node("div", "account-name", primaryLabel));
+    if (secondaryLabel && secondaryLabel.localeCompare(primaryLabel, undefined, {sensitivity: "accent"}) !== 0) {
+      title.append(node("div", "account-email", secondaryLabel));
+    }
+    title.title = `Identifiant technique : ${account.key}`;
     const color = document.createElement("input");
     color.type = "color";
     color.value = account.color;
@@ -573,13 +630,27 @@ async function renderCalendars(selected) {
       option.disabled = !calendar.taskCompatible && !calendar.eventCompatible;
       el.append(option);
       if (info) {
-        const card = node("div", `calendar-capability ${calendar.writable ? "writable" : "blocked"}`);
+        const taskCompatible = Boolean(calendar.taskCompatible);
+        const eventCompatible = Boolean(calendar.eventCompatible);
+        const capabilityClass = !calendar.writable || (!taskCompatible && !eventCompatible)
+          ? "blocked"
+          : taskCompatible && eventCompatible
+            ? "writable"
+            : taskCompatible ? "tasks-only" : "events-only";
+        const stateLabel = capabilityClass === "writable"
+          ? "Tâches et événements"
+          : capabilityClass === "tasks-only"
+            ? "Tâches uniquement"
+            : capabilityClass === "events-only"
+              ? "Événements uniquement"
+              : "Indisponible en écriture";
+        const card = node("div", `calendar-capability ${capabilityClass}`);
         const title = node("strong", "", calendar.name);
-        const state = node("span", "calendar-capability-state", calendar.writable ? "Inscriptible" : "Non inscriptible");
+        const state = node("span", "calendar-capability-state", stateLabel);
         const details = node(
           "small",
           "",
-          `Fournisseur : ${calendar.type || "inconnu"} · Tâches : ${calendar.taskSupported ? "prises en charge" : "non prises en charge"} · Événements : ${calendar.eventSupported ? "pris en charge" : "non pris en charge"}${calendar.reason ? ` · ${calendar.reason}` : ""}`
+          `Fournisseur : ${calendar.type || "inconnu"} · Tâches : ${taskCompatible ? "compatibles" : "non compatibles"} · Événements : ${eventCompatible ? "compatibles" : "non compatibles"}${calendar.reason ? ` · ${calendar.reason}` : ""}`
         );
         card.append(title, state, details);
         info.appendChild(card);
@@ -814,7 +885,7 @@ async function reload({preserveEdits = false} = {}) {
 
 async function saveAll(event) {
   event.preventDefault();
-  const submitter = event.submitter || $("save-all");
+  const submitter = event.submitter || $("save-all-floating");
   try {
     if (!configuration?.settings) await reload();
     const config = await withBusy(submitter, "Enregistrement des paramètres…", async () => {

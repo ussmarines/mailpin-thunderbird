@@ -1,0 +1,39 @@
+
+> mailperch-thunderbird@3.2.3 ci
+> npm run check && npm test && npm run build
+
+
+> mailperch-thunderbird@3.2.3 check
+> python scripts/check_repo.py && python scripts/check_versions.py && python scripts/check_project_memory.py && python scripts/deep_audit.py && python scripts/scan_secrets.py
+
+Repository checks 3.2.3: OK
+Version declarations 3.2.3: OK
+Project memory 3.2.3: OK
+Deep audit: 116 fichiers source, 19413 lignes, aucune anomalie structurelle
+Secret scan: OK
+
+> mailperch-thunderbird@3.2.3 test
+> python tests/static_checks.py && python tests/test_api_schema_contract.py && python tests/test_folder_counter_guard.py && python tests/test_ui_regressions.py && python tests/test_options_controls.py && python tests/test_calendar_and_card_actions.py && python tests/test_native_card_menu.py && python tests/test_data_integrity_guards.py && python tests/test_accessibility_localization.py && python tests/test_ux_3_2_features.py && python tests/test_dashboard_dom_contract.py && python tests/test_message_menu_and_row_ux.py && python tests/test_cross_platform_ci.py && python tests/test_ui_polish_3_2_3.py && node tests/ux_3_2_model_tests.mjs && python tests/test_build_reproducible.py && node tests/model_tests.mjs && python tests/sqlite_model_tests.py
+
+Static checks 3.2.3: OK
+Experiment API schema contract: OK
+Folder counter guard checks: OK
+UI regression guards: OK
+Options control and feedback guards: OK
+Calendar and card action regression guards: OK
+Native pinned-card menu regression guards: OK
+Data integrity and lifecycle guards: OK
+Accessibility/localization guards: OK (330 UI strings, 362 localized messages)
+MailPerch 3.2 feature guards: OK
+Dashboard DOM contract: 36 referenced ids, OK
+Message menu, group removal and row readability guards: OK
+Cross-platform CI tooling guards: OK
+MailPerch 3.2.3 UI polish and project-memory guards: OK
+MailPerch 3.2 model tests: OK
+Reproducible XPI/source builds: OK
+Model tests 3.2.3: OK
+SQLite model tests 3.2.3: OK
+
+> mailperch-thunderbird@3.2.3 build
+> python scripts/build.py --source
+

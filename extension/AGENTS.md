@@ -1,5 +1,7 @@
 # AGENTS.md — Runtime WebExtension
 
+> Contexte global : lire `PROJECT_MEMORY.md` à la racine avant ce fichier.
+
 Ce dossier est exactement le contenu placé à la racine du XPI.
 
 ## Règles

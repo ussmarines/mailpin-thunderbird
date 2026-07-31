@@ -1,5 +1,7 @@
 # AGENTS.md — API Experiment privilégiée
 
+> Contexte global : lire `PROJECT_MEMORY.md` à la racine avant ce fichier.
+
 Zone la plus risquée du dépôt. Elle a accès aux fonctions internes de Thunderbird.
 
 ## Invariants
