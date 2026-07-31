@@ -1,4 +1,4 @@
-/* MailPerch — Email Pins & Follow-up 3.2.1 */
+/* MailPerch — Email Pins & Follow-up 3.2.2 */
 
 :root {
   --pin-mails-accent: light-dark(#0f6cbd, #62b0e8);
@@ -1154,36 +1154,73 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   outline-offset: 1px;
 }
 
-/* 3.2.1 — lignes générales plus aérées et nouveaux messages repérables immédiatement. */
-:root[pin-mails-inbox] #threadTree tr.card-layout .card-container {
+/* 3.2.2 — géométrie équilibrée des lignes générales Thunderbird.
+ * ThreadCard conserve une hauteur virtuelle native de 46 px : l’amélioration
+ * doit donc répartir l’espace intérieur sans agrandir artificiellement une
+ * seule sous-ligne, sous peine de pousser l’objet contre la bordure basse. */
+:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .card-container {
   min-block-size: 46px;
   box-sizing: border-box;
+  align-items: stretch;
 }
-:root[pin-mails-inbox] #threadTree tr.card-layout .thread-card-column {
-  padding-block-start: 4px;
-  padding-block-end: 6px;
+:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-column:first-child {
+  justify-content: center;
+  align-items: center;
+  padding-block: 0;
 }
-:root[pin-mails-inbox] #threadTree tr.card-layout .thread-card-dynamic-row {
-  padding-block-end: 3px;
+:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-column:last-child {
+  justify-content: center;
+  gap: 1px;
+  padding-block-start: 3px;
+  padding-block-end: 5px;
 }
-#threadTree tr.card-layout .thread-card-row:has(.pin-mails-independent-button) {
-  min-block-size: 42px;
-  padding-block: 4px 5px;
+:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout :is(.thread-card-row, .thread-card-dynamic-row) {
+  min-block-size: 17px;
+  line-height: 1.25;
   align-items: center;
 }
-#threadTree tr.card-layout .pin-mails-independent-button {
-  inline-size: 36px !important;
-  block-size: 36px !important;
-  min-inline-size: 36px !important;
-  min-block-size: 36px !important;
-  margin-block: 4px !important;
-  align-self: center;
+:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-dynamic-row {
+  padding-block-end: 1px;
 }
-#threadTree tr.card-layout .pin-mails-independent-button::before {
-  inline-size: 24px;
-  block-size: 24px;
-  -webkit-mask-size: 24px 24px;
-  mask-size: 24px 24px;
+:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-subject-container {
+  display: flex;
+  align-items: center;
+  min-block-size: 17px;
+  padding-block-end: 1px;
+}
+:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout :is(.sender, .date, .subject) {
+  line-height: 1.25;
+}
+:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-icon-info {
+  align-self: center;
+  min-block-size: 24px;
+}
+/* La punaise reste une cible nette sans imposer 42 px à la première ligne. */
+#threadTree[rows="thread-card"] tr.card-layout .pin-mails-independent-button {
+  inline-size: 24px !important;
+  block-size: 24px !important;
+  min-inline-size: 24px !important;
+  min-block-size: 24px !important;
+  margin: 0 !important;
+  align-self: center;
+  flex: 0 0 24px;
+}
+#threadTree[rows="thread-card"] tr.card-layout .pin-mails-independent-button::before {
+  inline-size: 18px;
+  block-size: 18px;
+  -webkit-mask-size: 18px 18px;
+  mask-size: 18px 18px;
+}
+:root[uidensity="touch"][pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-column:last-child {
+  gap: 2px;
+  padding-block: 5px 7px;
+}
+:root[uidensity="touch"][pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .pin-mails-independent-button {
+  inline-size: 28px !important;
+  block-size: 28px !important;
+  min-inline-size: 28px !important;
+  min-block-size: 28px !important;
+  flex-basis: 28px;
 }
 :root[pin-mails-inbox] #threadTree tr.card-layout[data-properties~="unread"] .card-container {
   border-inline-start: 3px solid color-mix(in srgb, var(--pin-mails-accent) 78%, CanvasText);

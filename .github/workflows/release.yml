@@ -20,11 +20,12 @@ jobs:
   release-candidate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 22
-      - uses: actions/setup-python@v5
+          package-manager-cache: false
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
       - name: Install review helpers
@@ -34,11 +35,11 @@ jobs:
         run: |
           ACTUAL="$(node -p "require('./package.json').version")"
           test "$ACTUAL" = "${{ inputs.version }}" || { echo "Expected ${{ inputs.version }}, found $ACTUAL"; exit 1; }
-          python3 scripts/check_versions.py
+          python scripts/check_versions.py
       - name: Run complete verification
         run: npm run ci
       - name: Upload release candidate
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: MailPerch-${{ inputs.version }}-release-candidate
           if-no-files-found: error

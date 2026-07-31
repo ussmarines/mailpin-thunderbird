@@ -39,5 +39,5 @@ assert 'actionButton("diagnostic-export"' in dash_js
 assert 'actionButton("diagnostic-clear"' in dash_js
 assert "downloadJson" in dash_js
 assert "pin-mails-health-indicator" in pin_css
-assert "min-block-size: 46px" in pin_css and "inline-size: 36px" in pin_css
+assert "min-block-size: 46px" in pin_css and "inline-size: 24px !important" in pin_css
 print("MailPerch 3.2 feature guards: OK")

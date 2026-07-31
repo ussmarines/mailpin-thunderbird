@@ -179,3 +179,25 @@ Consigner version Thunderbird, OS, thème, vue, type de compte et résultat.
 - vérifier aussi « Retirer du groupe » dans le menu natif de la carte ;
 - contrôler l’espacement des lignes et de l’aperçu en vue Cartes ;
 - recevoir un message neuf et vérifier sa bordure, son fond, sa typographie et son icône agrandie en thèmes clair, sombre et contraste élevé.
+
+## Validation ciblée 3.2.2
+
+### Géométrie de la liste générale
+
+- tester la vue Cartes avec les densités Compacte, Normale et Tactile ;
+- vérifier que l’expéditeur, la date, l’objet, l’indicateur nouveau/non lu, la punaise et le menu sont centrés dans leur zone ;
+- confirmer qu’une marge visible reste présente sous l’objet et qu’aucun texte ne touche la bordure ;
+- vérifier les dossiers de 10, 100 et plusieurs milliers de messages afin d’écarter tout décalage de virtualisation ;
+- tester les messages avec pièce jointe, étiquette, étoile, conversation et texte très long.
+
+### Paramètres
+
+- ouvrir la page puis changer immédiatement le niveau de réglages avant la fin du chargement ;
+- vérifier qu’aucune erreur `configuration is null` n’apparaît ;
+- confirmer que Enregistrer et Annuler restent désactivés pendant le chargement puis deviennent disponibles ;
+- simuler une indisponibilité temporaire de l’API et vérifier le message de chargement lisible.
+
+### CI multiplateforme
+
+- vérifier que les jobs Linux et Windows exécutent `npm run check` puis `npm test` ;
+- confirmer l’absence de commande `python3` dans les scripts npm et le workflow de release.

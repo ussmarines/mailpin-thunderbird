@@ -1,5 +1,17 @@
 # Journal des modifications
 
+## 3.2.2 — alignement des lignes, chargement des paramètres et CI Windows
+
+- rééquilibrage complet de la géométrie des cartes de messages Thunderbird sans dépasser leur hauteur virtuelle native ;
+- suppression de la hauteur forcée de 42 px sur la première sous-ligne, qui repoussait l’objet contre la bordure basse ;
+- centrage vertical de l’indicateur lu/non lu, de l’expéditeur, de la date, de l’objet, des icônes et de la punaise MailPerch ;
+- taille de la punaise adaptée à la vue Cartes afin de préserver une cible claire sans déformer la ligne ;
+- chargement des paramètres rendu tolérant aux réponses transitoirement nulles, avec tentatives courtes et état de formulaire explicite ;
+- enregistrement et sélection du dossier protégés lorsque la configuration n’est pas encore disponible ;
+- scripts npm rendus multiplateformes avec la commande `python`, disponible via `actions/setup-python` sous Linux et Windows ;
+- actions GitHub migrées vers les runtimes Node 24 (`checkout@v6`, `setup-node@v6`, `setup-python@v6`, `upload-artifact@v7`) pour supprimer les avertissements de dépréciation ;
+- nouvelles gardes de régression pour la géométrie des lignes, la configuration différée et l’outillage CI multiplateforme.
+
 ## 3.2.1 — tableau de bord, menus et lisibilité de la liste
 
 - correction du crash du tableau de bord causé par la correspondance erronée entre la vue `list` et la section DOM `items` ;

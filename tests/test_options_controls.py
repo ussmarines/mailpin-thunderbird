@@ -43,4 +43,17 @@ for required in (
 ):
     assert required in HTML or required in JS, required
 
+for required_guard in (
+    "fetchConfigurationWithRetry",
+    "requireConfiguration",
+    "setConfigurationReady(false)",
+    "setConfigurationReady(true)",
+    "currentSettings({settingsExperience",
+    "if (!configuration?.settings) await reload()",
+):
+    assert required_guard in JS, required_guard
+
+assert "configuration.settings.preferredCalendarId" not in JS
+assert "{...configuration.settings" not in JS
+
 print("Options control and feedback guards: OK")

@@ -14,6 +14,43 @@ let entitySequence = 0;
 const accountControls = new Map();
 const inboxControls = new Map();
 const $ = id => document.getElementById(id);
+const wait = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
+
+function currentSettings(overrides = {}) {
+  return {...(configuration?.settings || {}), ...overrides};
+}
+
+function requireConfiguration() {
+  if (!configuration?.settings || typeof configuration.settings !== "object") {
+    throw new Error("Les paramètres MailPerch sont encore en cours de chargement. Réessayez dans un instant.");
+  }
+  return configuration;
+}
+
+function setConfigurationReady(ready) {
+  document.documentElement.toggleAttribute("data-configuration-ready", Boolean(ready));
+  const form = $("settings-form");
+  form?.setAttribute("aria-busy", String(!ready));
+  for (const id of ["save-all", "discard-changes"]) {
+    const control = $(id);
+    if (control) control.disabled = !ready;
+  }
+}
+
+async function fetchConfigurationWithRetry(attempts = 4) {
+  let lastError = null;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      const value = await messenger.pinInbox.getConfiguration();
+      if (value?.settings && typeof value.settings === "object") return value;
+      lastError = new Error("La configuration reçue est vide.");
+    } catch (error) {
+      lastError = error;
+    }
+    if (attempt < attempts) await wait(100 * attempt);
+  }
+  throw lastError || new Error("La configuration MailPerch est indisponible.");
+}
 const BOOLEAN_IDS=[
   "allowPinOutsideInbox","enableConversationPins","safeMode","showSmartSections","hideCompleted","autoRemoveCompleted","groupByAccount","groupByCustomGroup","showSearch","showCounters","rememberCollapsed","showAccountColor","showAttachments","showTags","showPriority","smartDates","showFolder","showNotes","showDeadlines","showGroups","showQuickActions","enableDragFromInbox","enableMultiSelect","enableBulkActions","confirmBulkDestructiveActions","enableUndo","confirmDelete","animateChanges","enableReminders","enableAdvancedReminders","enableAutomaticRules","enableRuleSimulation","autoUnpinOnArchive","autoCompleteOnArchive","autoUnpinOnDelete","autoUnpinOnRead","autoUnpinOnReply","keepPinOnMove","moveToWaitingOnReply","enableCalendarIntegration","enableBidirectionalCalendarSync","calendarCompleteOnPinComplete","calendarDeleteOnUnpin","enableGlobalDashboard","enablePerformanceMetrics","autoCleanup","enableWaitingWorkflow","reopenOnConversationReply","enableRecurringFollowUps","enableHistory","enableCases","enableKanban","enableTemplates","enableAutomaticBackups","backupBeforeMigration","backupIncludeHistory","enableConcurrentWriteProtection","enableCounterRegressionGuard","enableAutomaticNoReplyTracking","noReplyCancelOnIncomingReply","enableSmartViews","enableHealthCenter","enableHealthNotifications","enableDiagnostics"
 ];
@@ -394,7 +431,7 @@ function renderCases(){
           return messenger.pinInbox.createCaseCalendarItem(
             item.id,
             "task",
-            configuration.settings.preferredCalendarId || ""
+            currentSettings().preferredCalendarId || ""
           );
         });
         item.calendarItemId = result.itemId || item.calendarItemId || "";
@@ -700,8 +737,11 @@ function updateRuntimeSummary(config, backup = null) {
 }
 
 function applyConfiguration(config) {
-  configuration = config;
-  const settings = config.settings;
+  if (!config?.settings || typeof config.settings !== "object") {
+    throw new Error("La configuration MailPerch est incomplète.");
+  }
+  configuration = {...config, settings: {...config.settings}};
+  const settings = configuration.settings;
   for (const id of SELECT_IDS) if ($(id)) $(id).value = settings[id];
   for (const id of NUMBER_IDS) if ($(id)) $(id).value = String(settings[id] ?? 0);
   for (const id of BOOLEAN_IDS) if ($(id)) $(id).checked = Boolean(settings[id]);
@@ -724,6 +764,7 @@ function applyConfiguration(config) {
   updateRuntimeSummary(config);
   renderProviderMatrix(config.providerMatrix);
   setDirty(false);
+  setConfigurationReady(true);
 }
 
 function collectSettings() {
@@ -731,7 +772,7 @@ function collectSettings() {
   const inboxEnabled = {};
   for (const [key, input] of accountControls) accountColors[key] = input.value;
   for (const [uri, input] of inboxControls) inboxEnabled[uri] = input.checked;
-  const result = {...configuration.settings, accountColors, inboxEnabled};
+  const result = {...requireConfiguration().settings, accountColors, inboxEnabled};
   for (const id of SELECT_IDS) result[id] = $(id).value;
   for (const id of NUMBER_IDS) result[id] = Number($(id).value);
   for (const id of BOOLEAN_IDS) result[id] = $(id).checked;
@@ -746,7 +787,7 @@ function collectSettings() {
 
 async function reload({preserveEdits = false} = {}) {
   const [config, shortcut, backup, health] = await Promise.all([
-    messenger.pinInbox.getConfiguration(),
+    fetchConfigurationWithRetry(),
     getShortcut(),
     messenger.pinInbox.getBackupStatus().catch(() => null),
     messenger.pinInbox.getHealthReport().catch(() => null)
@@ -775,6 +816,7 @@ async function saveAll(event) {
   event.preventDefault();
   const submitter = event.submitter || $("save-all");
   try {
+    if (!configuration?.settings) await reload();
     const config = await withBusy(submitter, "Enregistrement des paramètres…", async () => {
       const saved = await messenger.pinInbox.setConfiguration({
         settings: collectSettings(),
@@ -883,6 +925,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   localize();
   renderBrandVersion();
   enhanceSettingsPage();
+  setConfigurationReady(false);
 
   const form = $("settings-form");
   form.addEventListener("submit", saveAll);
@@ -984,9 +1027,9 @@ window.addEventListener("DOMContentLoaded", async () => {
     }));
   };
 
-  $("settingsExperience").addEventListener("change", () => applyUxPreferences({...configuration.settings, settingsExperience: $("settingsExperience").value}));
-  $("uiPreset").addEventListener("change", () => applyUxPreferences({...configuration.settings, uiPreset: $("uiPreset").value}));
-  $("reduceMotion").addEventListener("change", () => applyUxPreferences({...configuration.settings, reduceMotion: $("reduceMotion").value}));
+  $("settingsExperience").addEventListener("change", () => applyUxPreferences(currentSettings({settingsExperience: $("settingsExperience").value})));
+  $("uiPreset").addEventListener("change", () => applyUxPreferences(currentSettings({uiPreset: $("uiPreset").value})));
+  $("reduceMotion").addEventListener("change", () => applyUxPreferences(currentSettings({reduceMotion: $("reduceMotion").value})));
 
   $("provider-check").addEventListener("click", async event => {
     const matrix = await run(
@@ -1101,7 +1144,8 @@ window.addEventListener("DOMContentLoaded", async () => {
         return;
       }
       $("backupDirectory").value = result.path;
-      configuration.settings.backupDirectory = result.path;
+      if (!configuration?.settings) await reload();
+      requireConfiguration().settings.backupDirectory = result.path;
       const backup = await messenger.pinInbox.getBackupStatus().catch(() => null);
       updateRuntimeSummary(configuration, backup);
       setStatus("Dossier de sauvegarde enregistré.", "success");
@@ -1179,6 +1223,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     await withBusy(null, "Chargement des paramètres…", () => reload());
     clearStatus();
   } catch (error) {
+    setConfigurationReady(false);
     setStatus(`Chargement impossible : ${error.message || error}`, "error", {persistent: true});
   }
 });

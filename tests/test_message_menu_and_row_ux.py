@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regression guards for the 3.2.1 message-menu, group and row UX fixes."""
+"""Regression guards for the 3.2.2 message-menu, group and row UX fixes."""
 from pathlib import Path
 import json
 
@@ -33,7 +33,17 @@ assert 'data-properties~="unread"' in css
 assert 'data-properties~="new"' in css
 assert 'min-block-size: 46px' in css
 assert '--read-status-size: 20px' in css
-assert 'padding-block-end: 6px' in css
+assert 'padding-block-end: 5px' in css
+
+# The 46 px native virtual row is distributed between both text lines. A large
+# minimum height on the sender row would push the subject against the bottom.
+assert 'thread-card-column:first-child' in css
+assert 'thread-card-column:last-child' in css
+assert 'thread-card-subject-container' in css
+assert 'line-height: 1.25' in css
+assert 'min-block-size: 42px' not in css
+assert 'inline-size: 24px !important' in css
+assert 'block-size: 24px !important' in css
 
 for locale in ['fr', 'en']:
     data = json.loads((ROOT / f"extension/_locales/{locale}/messages.json").read_text(encoding="utf-8"))
