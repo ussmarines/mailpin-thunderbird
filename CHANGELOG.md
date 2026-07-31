@@ -1,5 +1,21 @@
 # Journal des modifications
 
+## 3.1.4 — audit complet, intégrité et fiabilité
+
+- correction du sens de comparaison des priorités Thunderbird ;
+- résolution des messages renforcée pour ne plus contourner l’empreinte d’identité en cas de Message-ID dupliqué ;
+- normalisation des imports durcie contre les clés héritées et les identifiants réservés ;
+- déduplication et limitation cohérentes des groupes, règles, affaires, modèles, historiques et journaux ;
+- correction de l’installation tardive de l’écouteur de défilement du panneau ;
+- sérialisation des écritures de récupération rendue cohérente ;
+- calcul des récurrences anciennes optimisé et protégé contre les résultats passés ;
+- suppression des collisions d’identifiants lors de créations rapides ;
+- correction des courses de chargement dans le tableau de bord et la liste Agenda des paramètres ;
+- réinitialisation des couleurs de compte correctement marquée comme modification ;
+- menus WebExtension réinitialisés proprement au redémarrage du contexte ;
+- ajout d’un audit profond de tous les fichiers source et de nouvelles gardes de régression ;
+- suppression de constantes et imports inutilisés.
+
 ## 3.1.3 — cartes, Agenda et paramètres réparés
 
 ### Corrigé

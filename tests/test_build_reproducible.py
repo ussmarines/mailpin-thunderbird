@@ -30,8 +30,9 @@ with tempfile.TemporaryDirectory() as directory:
         assert "AGENTS.md" in names
         assert "extension/manifest.json" in names
         assert "release/BUILD_INSTRUCTIONS.md" in names
+        assert "dist/.gitkeep" in names
         assert not any(name.startswith(".git/") for name in names)
-        assert not any(name.startswith("dist/") for name in names)
+        assert not any(name.startswith("dist/") and name != "dist/.gitkeep" for name in names)
         assert not any("__pycache__" in name or name.endswith(".pyc") for name in names)
         assert not any(name.lower().endswith((".xpi", ".sqlite", ".sqlite-wal", ".sqlite-shm")) for name in names)
 

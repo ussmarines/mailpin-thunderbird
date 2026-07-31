@@ -15,12 +15,12 @@
     const upsert = [];
     const remove = [];
     for (const [key, value] of Object.entries(next || {})) {
-      if (!(key in previous) || stableStringify(previous[key]) !== stableStringify(value)) {
+      if (!Object.prototype.hasOwnProperty.call(previous, key) || stableStringify(previous[key]) !== stableStringify(value)) {
         upsert.push([key, value]);
       }
     }
     for (const key of Object.keys(previous || {})) {
-      if (!(key in next)) {
+      if (!Object.prototype.hasOwnProperty.call(next, key)) {
         remove.push(key);
       }
     }

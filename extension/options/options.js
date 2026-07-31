@@ -8,6 +8,8 @@ let templates = [];
 let dirty = false;
 let statusTimer = null;
 let lastStatusControl = null;
+let calendarRenderGeneration = 0;
+let entitySequence = 0;
 
 const accountControls = new Map();
 const inboxControls = new Map();
@@ -180,7 +182,8 @@ function clearStatus() {
 function setStatus(message, type = "", {persistent = false, control = null} = {}) {
   const host = $("status");
   if (!host) return;
-  const activeControl = control instanceof HTMLElement ? control : lastStatusControl;
+  const requestedControl = control instanceof HTMLElement ? control : lastStatusControl;
+  const activeControl = requestedControl?.isConnected ? requestedControl : null;
   if (message && activeControl) setLocalStatus(activeControl, message, type);
   if (statusTimer) {
     clearTimeout(statusTimer);
@@ -203,6 +206,16 @@ function node(tag, className, value) {
 
 function lines(value) {
   return String(value || "").split(/\r?\n/).map(v => v.trim()).filter(Boolean);
+}
+
+function uniqueEntityId(prefix, items) {
+  const existing = new Set((items || []).map(item => String(item?.id || "")));
+  let candidate;
+  do {
+    entitySequence += 1;
+    candidate = `${prefix}-${Date.now().toString(36)}-${entitySequence.toString(36)}`;
+  } while (existing.has(candidate));
+  return candidate;
 }
 
 async function getShortcut() {
@@ -344,7 +357,48 @@ function renderTemplates(){
     host.append(row);
   });
 }
-function renderAccounts(accounts){const host=$("accounts-list");host.replaceChildren();accountControls.clear();inboxControls.clear();for(const account of accounts){const card=node("article","account-card");card.style.setProperty("--account-color",account.color);const header=node("div","account-header"),title=node("div","account-title");title.append(node("div","account-name",account.name),node("div","account-email",account.email||account.key));const color=document.createElement("input");color.type="color";color.value=account.color;color.addEventListener("input",()=>card.style.setProperty("--account-color",color.value));accountControls.set(account.key,color);const reset=node("button","secondary","Défaut");reset.type="button";reset.addEventListener("click",()=>{color.value=account.defaultColor;card.style.setProperty("--account-color",account.defaultColor);});header.append(title,color,reset);card.append(header);const inboxes=node("div","inbox-list");for(const inbox of account.inboxes){const label=document.createElement("label"),input=document.createElement("input");input.type="checkbox";input.checked=inbox.enabled;label.append(input,document.createTextNode(`Panneau dans « ${inbox.name} »`));inboxes.append(label);inboxControls.set(inbox.uri,input);}card.append(inboxes);host.append(card);}}
+function renderAccounts(accounts) {
+  const host = $("accounts-list");
+  host.replaceChildren();
+  accountControls.clear();
+  inboxControls.clear();
+  for (const account of accounts) {
+    const card = node("article", "account-card");
+    card.style.setProperty("--account-color", account.color);
+    const header = node("div", "account-header");
+    const title = node("div", "account-title");
+    title.append(
+      node("div", "account-name", account.name),
+      node("div", "account-email", account.email || account.key)
+    );
+    const color = document.createElement("input");
+    color.type = "color";
+    color.value = account.color;
+    color.addEventListener("input", () => card.style.setProperty("--account-color", color.value));
+    accountControls.set(account.key, color);
+    const reset = node("button", "secondary", "Défaut");
+    reset.type = "button";
+    reset.addEventListener("click", () => {
+      color.value = account.defaultColor;
+      card.style.setProperty("--account-color", account.defaultColor);
+      setDirty();
+    });
+    header.append(title, color, reset);
+    card.append(header);
+    const inboxes = node("div", "inbox-list");
+    for (const inbox of account.inboxes) {
+      const label = document.createElement("label");
+      const input = document.createElement("input");
+      input.type = "checkbox";
+      input.checked = inbox.enabled;
+      label.append(input, document.createTextNode(`Panneau dans « ${inbox.name} »`));
+      inboxes.append(label);
+      inboxControls.set(inbox.uri, input);
+    }
+    card.append(inboxes);
+    host.append(card);
+  }
+}
 function renderRules(){
   const host=$("rules-list");host.replaceChildren();
   if(!rules.length)host.append(node("p","hint","Aucune règle personnalisée."));
@@ -383,6 +437,7 @@ function renderRules(){
   });
 }
 async function renderCalendars(selected) {
+  const generation = ++calendarRenderGeneration;
   const el = $("preferredCalendarId");
   const info = $("calendar-info");
   el.replaceChildren();
@@ -392,6 +447,7 @@ async function renderCalendars(selected) {
   el.append(ask);
   try {
     const calendars = await messenger.pinInbox.getCalendars();
+    if (generation !== calendarRenderGeneration) return;
     for (const calendar of calendars) {
       const option = node(
         "option",
@@ -418,6 +474,7 @@ async function renderCalendars(selected) {
       info.appendChild(node("p", "hint", "Aucun calendrier Thunderbird n’est disponible ou l’intégration Agenda est désactivée."));
     }
   } catch (error) {
+    if (generation !== calendarRenderGeneration) return;
     console.warn("MailPerch : calendriers indisponibles", error);
     setStatus("Les calendriers Thunderbird ne sont pas disponibles.", "error", {control: el});
     info?.appendChild(node("p", "hint", "La liste des calendriers n’a pas pu être chargée."));
@@ -468,7 +525,7 @@ function applyConfiguration(config) {
   renderRules();
   renderAccounts(config.accounts || []);
   renderWaitingGroups(settings.waitingGroupId);
-  renderCalendars(settings.preferredCalendarId);
+  void renderCalendars(settings.preferredCalendarId);
   updateRuntimeSummary(config);
   setDirty(false);
 }
@@ -649,7 +706,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   $("add-group").addEventListener("click", () => {
     groups.push({
-      id: `group-${Date.now().toString(36)}`,
+      id: uniqueEntityId("group", groups),
       name: "Nouveau groupe",
       color: "#6264a7"
     });
@@ -661,7 +718,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   $("add-case").addEventListener("click", () => {
     cases.push({
-      id: `case-${Date.now().toString(36)}`,
+      id: uniqueEntityId("case", cases),
       name: "Nouvelle affaire",
       color: "#0f6cbd",
       status: "active",
@@ -676,7 +733,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   $("add-template").addEventListener("click", () => {
     templates.push({
-      id: `template-${Date.now().toString(36)}`,
+      id: uniqueEntityId("template", templates),
       name: "Nouveau modèle",
       priorityLevel: "normal",
       workflowStatus: "active",
@@ -689,7 +746,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   $("add-rule").addEventListener("click", () => {
     rules.push({
-      id: `rule-${Date.now().toString(36)}`,
+      id: uniqueEntityId("rule", rules),
       name: "Nouvelle règle",
       enabled: true,
       priority: (rules.length + 1) * 100,

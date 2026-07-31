@@ -5,7 +5,7 @@ Consigner version Thunderbird, OS, thème, vue, type de compte et résultat.
 ## Installation et migration
 
 - installation propre ;
-- mise à niveau 3.1.2 → 3.1.3 ;
+- mise à niveau 3.1.3 → 3.1.4 ;
 - redémarrage normal et redémarrage forcé ;
 - sauvegarde puis restauration.
 
@@ -53,7 +53,7 @@ Consigner version Thunderbird, OS, thème, vue, type de compte et résultat.
 - limite et anti-boucle ;
 - veille, réveil et rappel manqué.
 
-## Validation ciblée 3.1.3
+## Validation ciblée 3.1.4
 
 ### Cartes épinglées
 

@@ -44,7 +44,6 @@ const DATA_CHANGED_TOPIC = "pin-mails-data-changed";
 const DEFAULT_BACKUP_FOLDER = "pin-mails-backups";
 const RECOVERY_FILENAME = "pin-mails-recovery.json";
 const MAX_RECOVERY_PREF_BYTES = 256 * 1024;
-const BACKUP_FORMAT_VERSION = 3;
 const RULE_LOOP_GUARD_MS = 5000;
 const CALENDAR_SYNC_INTERVAL_MS = 5 * 60 * 1000;
 const BACKUP_CHECK_INTERVAL_MS = 60 * 60 * 1000;
@@ -53,14 +52,12 @@ const BUTTON_CLASS = "pin-mails-row-button";
 const INDEPENDENT_BUTTON_CLASS = "pin-mails-independent-button";
 const PANEL_TOGGLE_ID = "pin-mails-qfb-toggle";
 const EDITOR_ID = "pin-mails-editor";
-const GROUP_EDITOR_ID = "pin-mails-group-editor";
 const TOAST_ID = "pin-mails-toast";
 const PANEL_ID = "pin-mails-panel";
 const ALL_HEADER_ID = "pin-mails-all-header";
 const REFRESH_DELAY_MS = 160;
 const READY_RETRIES = 50;
 const READY_RETRY_DELAY_MS = 100;
-const NONE_INDEX = 0xffffffff;
 const DAY_MS = 86_400_000;
 const COLOR_RE = /^#[0-9a-f]{6}$/i;
 const GROUP_ID_RE = /^[a-z0-9_-]{1,48}$/i;
@@ -221,10 +218,62 @@ function normalizeBoolean(value, fallback) {
   return typeof value === "boolean" ? value : fallback;
 }
 
-function normalizeRecord(value) {
-  return value && typeof value === "object" && !Array.isArray(value)
-    ? {...value}
-    : {};
+const UNSAFE_RECORD_KEYS = new Set(["__proto__", "prototype", "constructor"]);
+
+function isSafeRecordKey(value, maxLength = 4096) {
+  return typeof value === "string" && value.length > 0 && value.length <= maxLength &&
+    !UNSAFE_RECORD_KEYS.has(value);
+}
+
+function hasOwn(record, key) {
+  return Object.prototype.hasOwnProperty.call(record, key);
+}
+
+function boundedText(value, maxLength) {
+  return String(value ?? "").slice(0, maxLength);
+}
+
+function normalizeRecord(value, {maxKeyLength = 4096} = {}) {
+  const result = {};
+  if (!value || typeof value !== "object" || Array.isArray(value)) return result;
+  for (const [key, item] of Object.entries(value)) {
+    if (isSafeRecordKey(key, maxKeyLength)) result[key] = item;
+  }
+  return result;
+}
+
+function uniqueStrings(values, predicate = () => true) {
+  const result = [];
+  const seen = new Set();
+  for (const value of Array.isArray(values) ? values : []) {
+    const text = String(value);
+    if (!seen.has(text) && predicate(text)) {
+      seen.add(text);
+      result.push(text);
+    }
+  }
+  return result;
+}
+
+function uniqueById(values, limit) {
+  const result = [];
+  const seen = new Set();
+  for (const item of values) {
+    if (!item?.id || seen.has(item.id)) continue;
+    seen.add(item.id);
+    result.push(item);
+    if (result.length >= limit) break;
+  }
+  return result;
+}
+
+function uniqueEntityId(prefix, values) {
+  const existing = new Set((values || []).map(item => String(item?.id || "")));
+  let candidate;
+  do {
+    candidate = `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+  } while (existing.has(candidate));
+  return candidate;
 }
 
 function normalizeSettings(value) {
@@ -284,23 +333,23 @@ function normalizeSettings(value) {
   }
 
   settings.accountColors = {};
-  for (const [key, color] of Object.entries(normalizeRecord(source.accountColors))) {
-    if (typeof key === "string" && COLOR_RE.test(String(color))) {
-      settings.accountColors[key] = String(color).toLowerCase();
-    }
+  for (const [key, color] of Object.entries(normalizeRecord(source.accountColors, {maxKeyLength: 256}))) {
+    if (COLOR_RE.test(String(color))) settings.accountColors[key] = String(color).toLowerCase();
   }
   settings.inboxEnabled = {};
-  for (const [uri, enabled] of Object.entries(normalizeRecord(source.inboxEnabled))) {
-    if (typeof uri === "string" && typeof enabled === "boolean") {
-      settings.inboxEnabled[uri] = enabled;
-    }
+  for (const [uri, enabled] of Object.entries(normalizeRecord(source.inboxEnabled, {maxKeyLength: 4096}))) {
+    if (typeof enabled === "boolean") settings.inboxEnabled[uri] = enabled;
   }
-  settings.autoPinSenders = Array.isArray(source.autoPinSenders)
-    ? source.autoPinSenders.map(value => String(value).trim().toLowerCase()).filter(Boolean).slice(0, 200)
-    : [];
-  settings.autoPinTags = Array.isArray(source.autoPinTags)
-    ? source.autoPinTags.map(value => String(value).trim()).filter(Boolean).slice(0, 100)
-    : [];
+  settings.autoPinSenders = uniqueStrings(
+    Array.isArray(source.autoPinSenders)
+      ? source.autoPinSenders.map(value => boundedText(value, 320).trim().toLowerCase()).filter(Boolean)
+      : []
+  ).slice(0, 200);
+  settings.autoPinTags = uniqueStrings(
+    Array.isArray(source.autoPinTags)
+      ? source.autoPinTags.map(value => boundedText(value, 128).trim()).filter(Boolean)
+      : []
+  ).slice(0, 100);
   settings.waitingGroupId = GROUP_ID_RE.test(String(source.waitingGroupId || "")) ? String(source.waitingGroupId) : "";
   settings.preferredCalendarId = String(source.preferredCalendarId || "").slice(0, 256);
   settings.backupDirectory = String(source.backupDirectory || "").slice(0, 2048);
@@ -317,7 +366,7 @@ function normalizeGroup(value, fallbackIndex = 0) {
   }
   let id = String(value.id || `group-${fallbackIndex + 1}`).trim().toLowerCase();
   id = id.replace(/[^a-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 48);
-  if (!GROUP_ID_RE.test(id)) {
+  if (!GROUP_ID_RE.test(id) || !isSafeRecordKey(id, 48)) {
     return null;
   }
   const name = String(value.name || "Groupe").trim().slice(0, 80) || "Groupe";
@@ -328,18 +377,18 @@ function normalizeGroup(value, fallbackIndex = 0) {
 function normalizeCase(value, fallbackIndex = 0) {
   if (!value || typeof value !== "object") return null;
   const id = String(value.id || `case-${fallbackIndex + 1}`).replace(/[^a-z0-9_-]/gi, "-").slice(0, 64);
-  if (!id) return null;
+  if (!id || !isSafeRecordKey(id, 64)) return null;
   return {
     id,
-    name: String(value.name || `Affaire ${fallbackIndex + 1}`).slice(0, 120),
+    name: boundedText(value.name || `Affaire ${fallbackIndex + 1}`, 120),
     color: COLOR_RE.test(String(value.color || "")) ? String(value.color).toLowerCase() : "#0f6cbd",
-    note: String(value.note || "").slice(0, 4000),
+    note: boundedText(value.note, 4000),
     dueAt: Math.max(0, Number(value.dueAt) || 0),
     status: ["active", "waiting", "planned", "completed"].includes(value.status) ? value.status : "active",
     createdAt: Math.max(0, Number(value.createdAt) || Date.now()),
     updatedAt: Math.max(0, Number(value.updatedAt) || Date.now()),
-    calendarId: String(value.calendarId || ""),
-    calendarItemId: String(value.calendarItemId || ""),
+    calendarId: boundedText(value.calendarId, 512),
+    calendarItemId: boundedText(value.calendarItemId, 1024),
     calendarItemType: value.calendarItemType === "event" ? "event" : "task"
   };
 }
@@ -347,7 +396,7 @@ function normalizeCase(value, fallbackIndex = 0) {
 function normalizeTemplate(value, fallbackIndex = 0) {
   if (!value || typeof value !== "object") return null;
   const id = String(value.id || `template-${fallbackIndex + 1}`).replace(/[^a-z0-9_-]/gi, "-").slice(0, 64);
-  if (!id) return null;
+  if (!id || !isSafeRecordKey(id, 64)) return null;
   return {
     id,
     name: String(value.name || `Modèle ${fallbackIndex + 1}`).slice(0, 120),
@@ -367,8 +416,10 @@ function normalizeTemplate(value, fallbackIndex = 0) {
 
 function normalizeHistory(value) {
   if (!value || typeof value !== "object") return null;
+  const id = boundedText(value.id || `history-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, 100);
+  if (!isSafeRecordKey(id, 100)) return null;
   return {
-    id: String(value.id || `history-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`).slice(0, 100),
+    id,
     stableKey: String(value.stableKey || "").slice(0, 1024),
     subject: String(value.subject || "").slice(0, 1000),
     author: String(value.author || "").slice(0, 1000),
@@ -384,26 +435,44 @@ function normalizeHistory(value) {
   };
 }
 
+function normalizeRuleLog(value, fallbackIndex = 0) {
+  if (!value || typeof value !== "object") return null;
+  const fallbackId = `rule-log-${fallbackIndex + 1}`;
+  const id = boundedText(value.id || fallbackId, 100);
+  if (!isSafeRecordKey(id, 100)) return null;
+  return {
+    id,
+    time: Math.max(0, Number(value.time) || Date.now()),
+    ruleId: boundedText(value.ruleId, 64),
+    ruleName: boundedText(value.ruleName, 100),
+    trigger: boundedText(value.trigger, 40),
+    result: boundedText(value.result, 40),
+    details: boundedText(value.details, 1000),
+    stableKey: boundedText(value.stableKey, 4096),
+    subject: boundedText(value.subject, 300)
+  };
+}
+
 function normalizeReference(key, value) {
-  if (!value || typeof value !== "object") {
-    return null;
-  }
+  if (!value || typeof value !== "object") return null;
+  const stableKey = boundedText(value.stableKey || key, 4096);
+  if (!isSafeRecordKey(stableKey, 4096)) return null;
   const groupId = String(value.groupId || "");
   return {
-    stableKey: String(value.stableKey || key),
-    headerMessageId: String(value.headerMessageId || ""),
-    accountKey: String(value.accountKey || "unknown"),
-    sourceInboxURI: String(value.sourceInboxURI || ""),
-    lastFolderURI: String(value.lastFolderURI || ""),
+    stableKey,
+    headerMessageId: boundedText(value.headerMessageId, 2048),
+    accountKey: boundedText(value.accountKey || "unknown", 256),
+    sourceInboxURI: boundedText(value.sourceInboxURI, 4096),
+    lastFolderURI: boundedText(value.lastFolderURI, 4096),
     lastMessageKey: Number.isInteger(value.lastMessageKey) ? value.lastMessageKey : Number(value.lastMessageKey) || 0,
     pinnedAt: Number(value.pinnedAt) || Date.now(),
     lastSeen: Number(value.lastSeen) || Date.now(),
     missingSince: Number(value.missingSince) || 0,
-    subject: String(value.subject || ""),
-    author: String(value.author || ""),
+    subject: boundedText(value.subject, 1000),
+    author: boundedText(value.author, 1000),
     date: Number(value.date) || 0,
-    accountName: String(value.accountName || ""),
-    folderName: String(value.folderName || ""),
+    accountName: boundedText(value.accountName, 500),
+    folderName: boundedText(value.folderName, 500),
     note: String(value.note || "").slice(0, MAX_NOTE_LENGTH),
     dueAt: Math.max(0, Number(value.dueAt) || 0),
     reminderAt: Math.max(0, Number(value.reminderAt) || 0),
@@ -411,20 +480,20 @@ function normalizeReference(key, value) {
     priorityLevel: ["normal", "high", "urgent"].includes(value.priorityLevel) ? value.priorityLevel : "normal",
     groupId: GROUP_ID_RE.test(groupId) ? groupId : "",
     trackingMode: value.trackingMode === "conversation" ? "conversation" : "message",
-    conversationKey: String(value.conversationKey || ""),
-    identityFingerprint: String(value.identityFingerprint || ""),
+    conversationKey: boundedText(value.conversationKey, 4096),
+    identityFingerprint: boundedText(value.identityFingerprint, 4096),
     completedAt: Math.max(0, Number(value.completedAt) || 0),
     snoozeUntil: Math.max(0, Number(value.snoozeUntil) || 0),
     repeatRule: ["", "daily", "weekdays", "weekly", "monthly"].includes(value.repeatRule) ? value.repeatRule : "",
     reminderLeadMinutes: clampNumber(value.reminderLeadMinutes, 0, 10080, 0),
-    calendarId: String(value.calendarId || ""),
-    calendarItemId: String(value.calendarItemId || ""),
+    calendarId: boundedText(value.calendarId, 512),
+    calendarItemId: boundedText(value.calendarItemId, 1024),
     calendarItemType: value.calendarItemType === "event" ? "event" : "task",
     conversationCount: Math.max(0, Number(value.conversationCount) || 0),
     conversationUnread: Math.max(0, Number(value.conversationUnread) || 0),
     nativeStarImported: Boolean(value.nativeStarImported),
-    rootMessageId: String(value.rootMessageId || ""),
-    gmThreadId: String(value.gmThreadId || ""),
+    rootMessageId: boundedText(value.rootMessageId, 2048),
+    gmThreadId: boundedText(value.gmThreadId, 256),
     threadId: Math.max(0, Number(value.threadId) || 0),
     workflowStatus: ["active", "waiting", "planned", "completed"].includes(value.workflowStatus) ? value.workflowStatus : (value.completedAt ? "completed" : "active"),
     waitingSince: Math.max(0, Number(value.waitingSince) || 0),
@@ -437,7 +506,7 @@ function normalizeReference(key, value) {
     recurrenceRule: ["", "daily", "weekdays", "weekly", "monthly", "quarterly", "yearly"].includes(value.recurrenceRule) ? value.recurrenceRule : "",
     recurrenceInterval: clampNumber(value.recurrenceInterval, 1, 100, 1),
     calendarLastSyncedAt: Math.max(0, Number(value.calendarLastSyncedAt) || 0),
-    calendarSyncHash: String(value.calendarSyncHash || ""),
+    calendarSyncHash: boundedText(value.calendarSyncHash, 256),
     createdFromRuleId: String(value.createdFromRuleId || "").slice(0, 64),
     updatedAt: Math.max(0, Number(value.updatedAt) || Date.now())
   };
@@ -448,61 +517,62 @@ function normalizeData(value) {
   const data = clone(DEFAULT_DATA);
   for (const [key, ref] of Object.entries(normalizeRecord(source.refs))) {
     const normalized = normalizeReference(key, ref);
-    if (normalized) {
+    if (normalized && !hasOwn(data.refs, normalized.stableKey)) {
       data.refs[normalized.stableKey] = normalized;
     }
   }
-  data.manualOrder = Array.isArray(source.manualOrder)
-    ? source.manualOrder.map(String).filter(key => key in data.refs)
-    : [];
+  data.manualOrder = uniqueStrings(source.manualOrder, key => hasOwn(data.refs, key));
   for (const key of Object.keys(data.refs)) {
-    if (!data.manualOrder.includes(key)) {
-      data.manualOrder.push(key);
-    }
+    if (!data.manualOrder.includes(key)) data.manualOrder.push(key);
   }
-  const seenGroups = new Set();
-  data.groups = [];
-  for (const [index, item] of (Array.isArray(source.groups) ? source.groups : []).entries()) {
-    const group = normalizeGroup(item, index);
-    if (group && !seenGroups.has(group.id)) {
-      seenGroups.add(group.id);
-      data.groups.push(group);
-    }
-  }
-  data.groupOrder = Array.isArray(source.groupOrder)
-    ? source.groupOrder.map(String).filter(id => seenGroups.has(id))
-    : data.groups.map(group => group.id);
+
+  const normalizedGroups = (Array.isArray(source.groups) ? source.groups : [])
+    .map((item, index) => normalizeGroup(item, index)).filter(Boolean);
+  data.groups = uniqueById(normalizedGroups, MAX_GROUPS);
+  const groupIds = new Set(data.groups.map(group => group.id));
+  data.groupOrder = uniqueStrings(source.groupOrder, id => groupIds.has(id));
   for (const group of data.groups) {
-    if (!data.groupOrder.includes(group.id)) {
-      data.groupOrder.push(group.id);
-    }
+    if (!data.groupOrder.includes(group.id)) data.groupOrder.push(group.id);
   }
-  data.collapsedByInbox = normalizeRecord(source.collapsedByInbox);
-  data.panelVisibleByInbox = normalizeRecord(source.panelVisibleByInbox);
-  data.rules = [];
-  for (const [index, item] of (Array.isArray(source.rules) ? source.rules : []).slice(0, MAX_RULES).entries()) {
-    const rule = normalizeRule(item, index);
-    if (rule && !data.rules.some(existing => existing.id === rule.id)) data.rules.push(rule);
-  }
-  data.cases = (Array.isArray(source.cases) ? source.cases : []).slice(0, MAX_CASES).map(normalizeCase).filter(Boolean);
-  data.caseOrder = Array.isArray(source.caseOrder) ? source.caseOrder.map(String).filter(id => data.cases.some(item => item.id === id)) : data.cases.map(item => item.id);
-  for (const item of data.cases) if (!data.caseOrder.includes(item.id)) data.caseOrder.push(item.id);
-  data.templates = (Array.isArray(source.templates) ? source.templates : []).slice(0, MAX_TEMPLATES).map(normalizeTemplate).filter(Boolean);
+
+  data.collapsedByInbox = normalizeRecord(source.collapsedByInbox, {maxKeyLength: 4096});
+  data.panelVisibleByInbox = normalizeRecord(source.panelVisibleByInbox, {maxKeyLength: 4096});
+
+  const normalizedRules = (Array.isArray(source.rules) ? source.rules : [])
+    .map((item, index) => normalizeRule(item, index)).filter(Boolean);
+  data.rules = uniqueById(normalizedRules, MAX_RULES);
+  const normalizedCases = (Array.isArray(source.cases) ? source.cases : [])
+    .map((item, index) => normalizeCase(item, index)).filter(Boolean);
+  data.cases = uniqueById(normalizedCases, MAX_CASES);
   const caseIds = new Set(data.cases.map(item => item.id));
+  data.caseOrder = uniqueStrings(source.caseOrder, id => caseIds.has(id));
+  for (const item of data.cases) {
+    if (!data.caseOrder.includes(item.id)) data.caseOrder.push(item.id);
+  }
+
+  const normalizedTemplates = (Array.isArray(source.templates) ? source.templates : [])
+    .map((item, index) => normalizeTemplate(item, index)).filter(Boolean);
+  data.templates = uniqueById(normalizedTemplates, MAX_TEMPLATES);
   const templateIds = new Set(data.templates.map(item => item.id));
+
   for (const ref of Object.values(data.refs)) {
-    if (ref.groupId && !seenGroups.has(ref.groupId)) ref.groupId = "";
+    if (ref.groupId && !groupIds.has(ref.groupId)) ref.groupId = "";
     if (ref.caseId && !caseIds.has(ref.caseId)) ref.caseId = "";
     if (ref.templateId && !templateIds.has(ref.templateId)) ref.templateId = "";
   }
-  data.history = (Array.isArray(source.history) ? source.history : []).map(normalizeHistory).filter(Boolean).slice(-MAX_HISTORY);
-  data.ruleLog = (Array.isArray(source.ruleLog) ? source.ruleLog : []).filter(item => item && typeof item === "object").slice(-MAX_RULE_LOG);
+
+  const normalizedHistory = (Array.isArray(source.history) ? source.history : [])
+    .map(normalizeHistory).filter(Boolean);
+  data.history = uniqueById(normalizedHistory.slice(-MAX_HISTORY), MAX_HISTORY);
+  const normalizedRuleLog = (Array.isArray(source.ruleLog) ? source.ruleLog : [])
+    .map((item, index) => normalizeRuleLog(item, index)).filter(Boolean);
+  data.ruleLog = uniqueById(normalizedRuleLog.slice(-MAX_RULE_LOG), MAX_RULE_LOG);
   data.activity = (Array.isArray(source.activity) ? source.activity : [])
     .map(normalizeActivity).filter(Boolean).slice(-MAX_ACTIVITY);
   data.dashboard = {
     filter: ["active", "all", "overdue", "today", "week", "completed", "unread", "waiting", "planned"].includes(source.dashboard?.filter)
       ? source.dashboard.filter : "active",
-    search: String(source.dashboard?.search || "").slice(0, 500),
+    search: boundedText(source.dashboard?.search, 500),
     view: ["list", "kanban", "cases", "history"].includes(source.dashboard?.view) ? source.dashboard.view : "list"
   };
   data.migration = {
@@ -654,7 +724,7 @@ function hasAttachment(hdr) {
 
 function isHighPriority(hdr) {
   try {
-    return Number(hdr.priority) <= Number(Ci.nsMsgPriority.high);
+    return Number(hdr.priority) >= Number(Ci.nsMsgPriority.high);
   } catch {
     try {
       const priority = String(hdr.getStringProperty("priority") || "").toLowerCase();
@@ -679,7 +749,6 @@ function findHeaderInFolder(folder, ref) {
     if (ref.headerMessageId) {
       const found = database?.getMsgHdrForMessageID(ref.headerMessageId);
       if (found && (!ref.identityFingerprint || messageIdentityFingerprint(found) === ref.identityFingerprint)) return found;
-      if (found && ref.headerMessageId) return found;
     }
     if (ref.lastMessageKey && database?.containsKey(ref.lastMessageKey)) {
       const found = database.getMsgHdrForKey(ref.lastMessageKey);
@@ -692,7 +761,7 @@ function findHeaderInFolder(folder, ref) {
     while (messages.hasMoreElements() && inspected++ < 20000) {
       const hdr = messages.getNext().QueryInterface(Ci.nsIMsgDBHdr);
       if (ref.identityFingerprint && messageIdentityFingerprint(hdr) === ref.identityFingerprint) return hdr;
-      if (ref.headerMessageId && String(hdr.messageId || "") === ref.headerMessageId) return hdr;
+      if (!ref.identityFingerprint && ref.headerMessageId && String(hdr.messageId || "") === ref.headerMessageId) return hdr;
     }
   } catch {
     // Database can be unavailable while a remote folder is loading.
@@ -753,6 +822,7 @@ function messageIdentityFingerprint(hdr) {
 function normalizeRule(value, index = 0) {
   if (!value || typeof value !== "object") return null;
   const id = String(value.id || `rule-${index + 1}`).replace(/[^a-z0-9_-]/gi, "-").slice(0, 64) || `rule-${index + 1}`;
+  if (!isSafeRecordKey(id, 64)) return null;
   const trigger = ["messageAdded", "read", "archive", "reply", "move", "delete", "complete", "calendar"].includes(value.trigger) ? value.trigger : "messageAdded";
   const action = ["pin", "unpin", "complete", "group", "keep", "status", "template", "case"].includes(value.action) ? value.action : "pin";
   return {
@@ -1056,7 +1126,9 @@ class PinStructuredStore {
   scheduleSave(data, undo, reason = "update") {
     const snapshot = {data: clone(data), undo: clone(undo || [])};
     if (!this.available || !this.connection) {
-      this.writeChain = this.writeChain.catch(() => {}).then(() => this.writeEmergencyRecovery(snapshot.data, snapshot.undo, `storage-unavailable-${reason}`));
+      this.writeChain = this.writeChain.catch(() => {}).then(async () => {
+        await this.writeEmergencyRecovery(snapshot.data, snapshot.undo, `storage-unavailable-${reason}`);
+      });
       return;
     }
     this.pendingSnapshot = {snapshot, reason};
@@ -1566,10 +1638,6 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       this._undoStack = Array.isArray(loaded.undo) ? loaded.undo.slice(-MAX_UNDO) : this._undoStack;
       this._refreshAllStates(true);
     } catch (error) { this._recordDiagnostic("warning", "Rechargement multi-fenêtres impossible", error); }
-  }
-
-  _t(key, fallback = "") {
-    try { return this._context?.extension?.localeData?.localizeMessage(key) || fallback || key; } catch { return fallback || key; }
   }
 
   async _migrateFromLegacy(rawSettings, rawData) {
@@ -2086,9 +2154,11 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   _createCase(details = {}) {
     if (!this._settings.enableCases) throw new ExtensionError("Les affaires sont désactivées.");
     if ((this._data.cases || []).length >= MAX_CASES) throw new ExtensionError("Nombre maximal d’affaires atteint.");
-    const item = normalizeCase({...details,id:details.id || `case-${Date.now().toString(36)}`}, (this._data.cases || []).length);
+    const values = this._data.cases || [];
+    const item = normalizeCase({...details, id: details.id || uniqueEntityId("case", values)}, values.length);
     if (!item) throw new ExtensionError("Affaire invalide.");
-    this._data.cases.push(item); this._data.caseOrder.push(item.id); this._saveData("case-create");
+    if (values.some(existing => existing.id === item.id)) throw new ExtensionError("Une affaire utilise déjà cet identifiant.");
+    values.push(item); this._data.caseOrder.push(item.id); this._saveData("case-create");
     return clone(item);
   }
 
@@ -2114,9 +2184,11 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   _createTemplate(details = {}) {
     if (!this._settings.enableTemplates) throw new ExtensionError("Les modèles sont désactivés.");
     if ((this._data.templates || []).length >= MAX_TEMPLATES) throw new ExtensionError("Nombre maximal de modèles atteint.");
-    const item=normalizeTemplate({...details,id:details.id||`template-${Date.now().toString(36)}`},(this._data.templates||[]).length);
+    const values = this._data.templates || [];
+    const item=normalizeTemplate({...details,id:details.id||uniqueEntityId("template",values)},values.length);
     if(!item) throw new ExtensionError("Modèle invalide.");
-    this._data.templates.push(item);this._saveData("template-create");return clone(item);
+    if(values.some(existing=>existing.id===item.id)) throw new ExtensionError("Un modèle utilise déjà cet identifiant.");
+    values.push(item);this._saveData("template-create");return clone(item);
   }
 
   _updateTemplate(templateId, details = {}) {
@@ -2346,8 +2418,8 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     if (this._settings.pinMode === "nativeStar") {
       return Boolean(hdr.flags & Ci.nsMsgMessageFlags.Marked);
     }
-    return (messageStableKey(hdr) in this._data.refs) ||
-      (this._settings.enableConversationPins && conversationStableKey(hdr) in this._data.refs);
+    return hasOwn(this._data.refs, messageStableKey(hdr)) ||
+      (this._settings.enableConversationPins && hasOwn(this._data.refs, conversationStableKey(hdr)));
   }
 
   _captureFlags(headers, includeStar = this._settings.pinMode === "nativeStar") {
@@ -2378,7 +2450,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         this._removeReferenceByKey(trackingMode === "conversation" ? conversationStableKey(hdr) : messageStableKey(hdr));
         // If the row is active only because its whole conversation is pinned,
         // clicking its visible pin must actually clear that state.
-        if (trackingMode === "conversation" || conversationStableKey(hdr) in this._data.refs) this._removeReferenceByKey(conversationStableKey(hdr));
+        if (trackingMode === "conversation" || hasOwn(this._data.refs, conversationStableKey(hdr))) this._removeReferenceByKey(conversationStableKey(hdr));
       }
       if (this._settings.pinMode === "nativeStar") {
         const list = byFolder.get(hdr.folder) || [];
@@ -2427,7 +2499,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         const key = messageStableKey(hdr);
         const flagged = Boolean(hdr.flags & Ci.nsMsgMessageFlags.Marked);
         if (flagged) {
-          const existed = key in this._data.refs;
+          const existed = hasOwn(this._data.refs, key);
           this._ensureReference(hdr, folder.URI);
           changed ||= !existed;
         } else if (this._data.refs[key]?.sourceInboxURI === folder.URI) {
@@ -2557,8 +2629,8 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       const keys = [];
       for (const hdr of headers) {
         const conversationKey = conversationStableKey(hdr);
-        const key = conversationKey in this._data.refs ? conversationKey : messageStableKey(hdr);
-        if (key in this._data.refs && !keys.includes(key)) keys.push(key);
+        const key = hasOwn(this._data.refs, conversationKey) ? conversationKey : messageStableKey(hdr);
+        if (hasOwn(this._data.refs, key) && !keys.includes(key)) keys.push(key);
       }
       return this._performReferenceAction(keys, action, {});
     }
@@ -3220,7 +3292,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     const headers = pane ? this._getSelectedHeaders(pane) : [];
     if (!headers.length || !this._settings.enableConversationPins) return {count: 0};
     const unique = [...new Map(headers.map(h => [conversationStableKey(h), h])).values()];
-    const allPinned = unique.every(h => conversationStableKey(h) in this._data.refs);
+    const allPinned = unique.every(h => hasOwn(this._data.refs, conversationStableKey(h)));
     const state = typeof forceState === "boolean" ? forceState : !allPinned;
     this._setHeadersPinned(unique, state, pane.gFolder?.URI || "", state ? "Épinglage de conversation" : "Désépinglage de conversation", "conversation");
     for (const hdr of unique) { const ref = this._data.refs[conversationStableKey(hdr)]; if (ref) this._updateConversationReference(ref, hdr); }
@@ -4617,7 +4689,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       conversationButton.addEventListener("click", () => {
         const headers = this._getSelectedHeaders(about3Pane); if (!headers.length) return;
         const unique = [...new Map(headers.map(h => [conversationStableKey(h), h])).values()];
-        const state = !unique.every(h => conversationStableKey(h) in this._data.refs);
+        const state = !unique.every(h => hasOwn(this._data.refs, conversationStableKey(h)));
         this._setHeadersPinned(unique, state, currentFolderURI(), state ? "Épinglage de conversation" : "Désépinglage de conversation", "conversation");
         for (const hdr of unique) { const ref = this._data.refs[conversationStableKey(hdr)]; if (ref) this._updateConversationReference(ref, hdr); }
         this._saveData("conversation");
@@ -5162,13 +5234,16 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     document.addEventListener("select", onSelectionChange, true);
     about3Pane.addEventListener("blur", onWindowBlur, true);
     about3Pane.addEventListener("resize", onViewportChange);
-    panel?.querySelector(".pin-mails-panel-list")?.addEventListener("scroll", onViewportChange, {passive: true});
     threadTree.addEventListener("rowcountchange", onRowCountChange);
     threadTree.addEventListener("dragstart", onThreadDragStart);
     threadTree.addEventListener("dragend", onThreadDragEnd);
     about3Pane.addEventListener("unload", cleanup, {once: true});
     this._ensureMainMenuWindow(about3Pane.top);
-    ensurePanelToggle(); createPanel(); updateFolderMode(); scheduleRefresh(true);
+    ensurePanelToggle();
+    createPanel();
+    panel?.querySelector(".pin-mails-panel-list")?.addEventListener("scroll", onViewportChange, {passive: true});
+    updateFolderMode();
+    scheduleRefresh(true);
   }
 
   _formatTimestamp(about3Pane, timestamp) {

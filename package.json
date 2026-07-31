@@ -1,11 +1,11 @@
 {
   "name": "mailperch-thunderbird",
-  "version": "3.1.3",
+  "version": "3.1.4",
   "private": true,
   "description": "Build, test, and release tooling for MailPerch, a Thunderbird email pinning and follow-up extension.",
   "scripts": {
-    "check": "python3 scripts/check_repo.py && python3 scripts/scan_secrets.py",
-    "test": "python3 tests/static_checks.py && python3 tests/test_api_schema_contract.py && python3 tests/test_folder_counter_guard.py && python3 tests/test_ui_regressions.py && python3 tests/test_options_controls.py && python3 tests/test_calendar_and_card_actions.py && python3 tests/test_build_reproducible.py && node tests/model_tests.mjs && python3 tests/sqlite_model_tests.py",
+    "check": "python3 scripts/check_repo.py && python3 scripts/deep_audit.py && python3 scripts/scan_secrets.py",
+    "test": "python3 tests/static_checks.py && python3 tests/test_api_schema_contract.py && python3 tests/test_folder_counter_guard.py && python3 tests/test_ui_regressions.py && python3 tests/test_options_controls.py && python3 tests/test_calendar_and_card_actions.py && python3 tests/test_data_integrity_guards.py && python3 tests/test_build_reproducible.py && node tests/model_tests.mjs && python3 tests/sqlite_model_tests.py",
     "build": "python3 scripts/build.py --source",
     "ci": "npm run check && npm test && npm run build"
   },

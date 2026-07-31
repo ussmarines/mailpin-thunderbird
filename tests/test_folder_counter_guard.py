@@ -1,5 +1,5 @@
 from __future__ import annotations
-import pathlib, re
+import pathlib
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 impl = (ROOT / "extension/api/pinInbox/implementation.js").read_text(encoding="utf-8")
 css = (ROOT / "extension/styles/pin.css").read_text(encoding="utf-8")

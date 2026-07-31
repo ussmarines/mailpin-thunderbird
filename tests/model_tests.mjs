@@ -48,6 +48,20 @@ const diff = scope.PinStorageHelpers.mapDiff({a:{x:1}, b:{x:2}}, {a:{x:1}, b:{x:
 assert.deepEqual(JSON.parse(JSON.stringify(diff.upsert)), [["b",{x:3}],["c",{x:4}]]);
 assert.deepEqual(JSON.parse(JSON.stringify(diff.remove)), []);
 assert.deepEqual(JSON.parse(JSON.stringify(scope.PinStorageHelpers.mapDiff({a:1},{b:2}).remove)), ["a"]);
+
+const inheritedPrevious = Object.create({inherited: {x: 1}});
+const inheritedDiff = scope.PinStorageHelpers.mapDiff(inheritedPrevious, {inherited: {x: 1}});
+assert.deepEqual(
+  JSON.parse(JSON.stringify(inheritedDiff.upsert)),
+  [["inherited", {x: 1}]],
+  "Inherited properties must never be treated as stored records"
+);
+const inheritedNext = Object.create({kept: 1});
+assert.deepEqual(
+  JSON.parse(JSON.stringify(scope.PinStorageHelpers.mapDiff({kept: 1}, inheritedNext).remove)),
+  ["kept"],
+  "Inherited properties in the next map must not suppress removals"
+);
 const envelope = scope.PinStorageHelpers.backupEnvelope({refs:{a:{x:1}}}, [], {schemaVersion:5});
 assert.equal(scope.PinStorageHelpers.verifyBackupEnvelope(envelope), true);
 envelope.data.refs.a.x = 2;
@@ -60,6 +74,23 @@ assert.equal(new Date(scope.PinWorkflow.nextOccurrence(new Date("2026-01-31T10:0
 const oldDaily = new Date("2026-07-01T10:00:00Z").getTime();
 const futureDaily = scope.PinWorkflow.nextFutureOccurrence(oldDaily,"daily",1,new Date("2026-07-30T10:00:00Z").getTime());
 assert.equal(futureDaily > new Date("2026-07-30T10:00:00Z").getTime(), true, "Recurring work must advance beyond now");
+
+const veryOldDaily = new Date("2010-01-01T10:00:00Z").getTime();
+const currentDaily = new Date("2026-07-30T10:00:00Z").getTime();
+assert.equal(
+  scope.PinWorkflow.nextFutureOccurrence(veryOldDaily, "daily", 1, currentDaily) > currentDaily,
+  true,
+  "Fixed recurrences must jump beyond now even after more than 1000 occurrences"
+);
+const protectedArchive = scope.PinWorkflow.archiveRecord(
+  {stableKey: "original", subject: "Subject", pinnedAt: 1},
+  "completed",
+  {id: "forged", stableKey: "forged", action: "forged", custom: "preserved"}
+);
+assert.notEqual(protectedArchive.id, "forged");
+assert.equal(protectedArchive.stableKey, "original");
+assert.equal(protectedArchive.action, "completed");
+assert.equal(protectedArchive.custom, "preserved");
 
 const rules = [
   {id:"b", enabled:true, priority:200, accountKey:"", folderURI:"", senderContains:"", subjectContains:"facture", tagKey:""},
@@ -76,4 +107,4 @@ assert.equal(scope.PinCalendarHelpers.itemCaseId(item), "case");
 assert.equal(scope.PinCalendarHelpers.itemDueAt(item), 1234);
 assert.equal(scope.PinCalendarHelpers.itemCompleted(item), true);
 
-console.log("Model tests 3.1.3: OK");
+console.log("Model tests 3.1.4: OK");

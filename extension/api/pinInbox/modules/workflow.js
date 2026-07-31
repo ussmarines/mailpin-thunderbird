@@ -35,12 +35,22 @@
   }
 
   function nextFutureOccurrence(base, rule, interval = 1, now = Date.now()) {
-    let next = nextOccurrence(base, rule, interval);
-    let guard = 0;
-    while (next && next <= now && guard++ < 1000) {
-      next = nextOccurrence(next, rule, interval);
+    const safeBase = Number(base) || Date.now();
+    const count = Math.max(1, Math.min(100, Number(interval) || 1));
+    let next = nextOccurrence(safeBase, rule, count);
+    if (!next || next > now) return next;
+
+    const fixedStep = rule === "daily" ? DAY * count : rule === "weekly" ? DAY * 7 * count : 0;
+    if (fixedStep) {
+      const jumps = Math.floor((now - safeBase) / fixedStep) + 1;
+      return safeBase + jumps * fixedStep;
     }
-    return next;
+
+    let guard = 0;
+    while (next && next <= now && guard++ < 10000) {
+      next = nextOccurrence(next, rule, count);
+    }
+    return next > now ? next : 0;
   }
 
   function statusForReference(ref) {
@@ -57,6 +67,7 @@
   function archiveRecord(ref, action, extra = {}) {
     const completedAt = Number(ref.completedAt || Date.now());
     return {
+      ...extra,
       id: `history-${completedAt}-${Math.random().toString(36).slice(2, 9)}`,
       stableKey: String(ref.stableKey || ""),
       subject: String(ref.subject || ""),
@@ -70,8 +81,7 @@
       durationMs: Math.max(0, completedAt - Number(ref.pinnedAt || completedAt)),
       waitingSince: Number(ref.waitingSince || 0),
       followUpCount: Math.max(0, Number(ref.followUpCount || 0)),
-      action: String(action || "completed"),
-      ...extra
+      action: String(action || "completed")
     };
   }
 

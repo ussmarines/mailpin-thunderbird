@@ -2,11 +2,11 @@
 
 ## État exact
 
-Produit : **MailPerch — Email Pins & Follow-up**. Build locale : **3.1.3**, ID de développement `pin-mails@MailPerch.local`.
+Produit : **MailPerch — Email Pins & Follow-up**. Build locale : **3.1.4**, ID de développement `pin-mails@MailPerch.local`.
 
-La branche distante `main` reste en **3.1.2** au commit `cc6ded0f2df62f0cac22612c6969dc1237ca0fd3` tant qu’aucun accord explicite de publication n’est donné. La reconstruction 3.1.3 est effectuée localement depuis cette base propre.
+La branche distante `main` est en **3.1.3** au commit `bd562373a3dab54958102e2186611ebbe0e0623d`. L’audit 3.1.4 est effectué localement depuis cette base propre et n’est pas publié automatiquement.
 
-## Correctifs 3.1.3
+## Audit et correctifs 3.1.4
 
 - répartiteur partagé pour le clic droit, le bouton « Plus », les actions rapides et le désépinglage ;
 - aucune dépendance à `CSS.escape` dans la fenêtre privilégiée ;

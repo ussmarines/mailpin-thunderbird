@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 EXTENSION = ROOT / "extension"
 DIST = ROOT / "dist"
 FIXED_TIME = (2026, 1, 1, 0, 0, 0)
-SOURCE_EXCLUDES = {".git", ".venv", "node_modules", "dist", "__pycache__", ".pytest_cache"}
+SOURCE_EXCLUDES = {".git", ".venv", "node_modules", "__pycache__", ".pytest_cache"}
 XPI_EXCLUDED_NAMES = {"AGENTS.md"}
 
 
@@ -45,6 +45,8 @@ def create_source_zip(output: Path) -> None:
         for source in sorted(path for path in ROOT.rglob("*") if path.is_file()):
             relative = source.relative_to(ROOT)
             if any(part in SOURCE_EXCLUDES for part in relative.parts):
+                continue
+            if relative.parts and relative.parts[0] == "dist" and relative.as_posix() != "dist/.gitkeep":
                 continue
             archive_file(archive, source, relative.as_posix())
 

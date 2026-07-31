@@ -204,7 +204,12 @@ messenger.tabs.onCreated.addListener(tab => {
 });
 messenger.tabs.onActivated.addListener(info => setupTab(info.tabId));
 
-createMenus();
+async function initializeMenus() {
+  await messenger.menus.removeAll();
+  createMenus();
+}
+
+initializeMenus().catch(error => logError("initialisation des menus impossible", error));
 messenger.mailTabs.query({})
   .then(tabs => Promise.all(tabs.map(tab => setupTab(tab.id ?? tab.tabId))))
   .catch(error => logError("initialisation des onglets impossible", error));

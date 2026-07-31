@@ -53,7 +53,9 @@ function clearKanbanDropState() {
 }
 
 function setLoading(value) {
-  loading = Boolean(value);
+  const next = Boolean(value);
+  if (next === loading) return;
+  loading = next;
   document.body.toggleAttribute("data-loading", loading);
   for (const control of document.querySelectorAll("button, select, input")) {
     if (control.id === "retry") continue;
@@ -260,7 +262,7 @@ function renderKanban() {
     });
     list.addEventListener("dragover", event => {
       event.preventDefault();
-      event.dataTransfer.dropEffect = "move";
+      if (event.dataTransfer) event.dataTransfer.dropEffect = "move";
     });
     list.addEventListener("dragleave", event => {
       if (!list.contains(event.relatedTarget)) delete list.dataset.dropActive;
@@ -268,7 +270,7 @@ function renderKanban() {
     list.addEventListener("drop", async event => {
       event.preventDefault();
       clearKanbanDropState();
-      const key = event.dataTransfer.getData("text/x-pin-mails-key");
+      const key = event.dataTransfer?.getData("text/x-pin-mails-key") || "";
       if (!key) return;
       setStatus("Déplacement de la carte…", "busy", {persistent: true});
       try {
@@ -283,6 +285,7 @@ function renderKanban() {
       const card = createCard(item, {checkbox: false, compact: true});
       card.draggable = true;
       card.addEventListener("dragstart", event => {
+        if (!event.dataTransfer) return;
         event.dataTransfer.setData("text/x-pin-mails-key", item.stableKey);
         event.dataTransfer.effectAllowed = "move";
       });
@@ -381,13 +384,14 @@ function renderTechnical() {
   if (!log.childElementCount) log.append(createEmpty("Aucune règle exécutée récemment."));
 }
 
-async function renderCalendarTarget() {
+async function renderCalendarTarget(generation) {
   const select = $("calendar-target");
   const previous = select.value;
   const [calendars, configuration] = await Promise.all([
     api.pinInbox.getCalendars(),
     api.pinInbox.getConfiguration().catch(() => ({settings: {}}))
   ]);
+  if (generation !== loadGeneration) return false;
   calendarDescriptors = calendars;
   select.replaceChildren(option("", "Choisir un calendrier…"));
   for (const calendar of calendars) {
@@ -404,6 +408,7 @@ async function renderCalendarTarget() {
   const preferred = previous || configuration.settings?.preferredCalendarId || "";
   select.value = [...select.options].some(item => item.value === preferred && !item.disabled) ? preferred : "";
   updateCalendarTargetHelp();
+  return true;
 }
 
 function updateCalendarTargetHelp() {
@@ -449,7 +454,7 @@ async function load({announce = true} = {}) {
     if (!api?.pinInbox?.getDashboardData) {
       throw new Error("L’API interne des épingles n’est pas disponible.");
     }
-    await renderCalendarTarget();
+    if (!await renderCalendarTarget(generation)) return;
     const result = await api.pinInbox.getDashboardData({
       filter: $("filter").value,
       search: $("search").value,
@@ -486,6 +491,7 @@ async function load({announce = true} = {}) {
     setView();
     if (announce) setStatus(`${current.items.length} élément(s) affiché(s).`, "success");
   } catch (error) {
+    if (generation !== loadGeneration) return;
     console.error("MailPerch : chargement du tableau de bord impossible", error);
     $("fatal-error-message").textContent = String(error?.message || error);
     $("fatal-error").hidden = false;
