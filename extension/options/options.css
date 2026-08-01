@@ -117,6 +117,9 @@ h1 { margin-bottom: .25rem; font-size: clamp(1.65rem, 3vw, 2.25rem); line-height
   text-align: center;
 }
 .settings-loading strong { color: var(--text); font-size: 1.15rem; }
+.settings-error { border-color: color-mix(in srgb, var(--danger) 55%, var(--border)); }
+.settings-error-diagnostic { max-width: 100%; overflow-wrap: anywhere; padding: .45rem .6rem; border-radius: var(--radius-sm); background: var(--surface-2); color: var(--text); font: .82rem/1.4 ui-monospace, SFMono-Regular, Consolas, monospace; }
+.settings-error-actions { justify-content: center; }
 .settings-sidebar { position: sticky; top: 1rem; max-height: calc(100vh - 2rem); overflow: auto; padding: var(--space-3); border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
 .settings-search input { background: var(--surface-2); }
 .settings-nav { display: grid; gap: .2rem; margin: var(--space-3) 0; }

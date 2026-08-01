@@ -49,6 +49,15 @@
         <strong data-i18n="loadingSettingsTitle">Chargement des recommandations</strong>
         <span data-i18n="loadingSettingsHelp">MailPerch vérifie les réglages locaux avant d’afficher les contrôles.</span>
       </div>
+      <section id="settings-error" class="settings-loading settings-error" role="alert" aria-live="assertive" hidden>
+        <strong data-i18n="settingsLoadErrorTitle">Impossible de charger les paramètres</strong>
+        <span data-i18n="settingsLoadErrorHelp">Les réglages MailPerch n’ont pas pu être préparés. Aucune modification n’a été appliquée.</span>
+        <code id="settings-error-diagnostic" class="settings-error-diagnostic">options:init:not-started</code>
+        <div class="button-row settings-error-actions">
+          <button id="retry-settings-load" type="button" class="primary" data-i18n="retrySettingsLoad">Réessayer</button>
+          <button id="copy-settings-diagnostic" type="button" class="secondary" data-i18n="copySettingsDiagnostic">Copier le diagnostic</button>
+        </div>
+      </section>
       <form id="settings-form" class="settings-content" aria-busy="true" hidden>
         <section class="settings-section feature-access-guide" data-nav-icon="⌂" data-nav-group="Essentiel">
           <div class="section-header">

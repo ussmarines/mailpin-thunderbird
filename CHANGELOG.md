@@ -1,5 +1,12 @@
 # Journal des modifications
 
+## 3.2.9 — initialisation des paramètres bornée et récupérable
+
+- contrôleur d’initialisation explicite : les paramètres atteignent toujours le formulaire prêt ou un panneau d’erreur avec Réessayer ;
+- délais maximums et diagnostic expurgé pour l’API de configuration, les raccourcis, la santé, les sauvegardes et l’Agenda ;
+- chargement Agenda déplacé après l’affichage des paramètres principaux : une absence de compte ou de calendrier conserve une liste vide valide ;
+- test Playwright des vrais actifs couvrant une promesse de configuration bloquée, le panneau terminal, Réessayer et un calendrier bloqué.
+
 ## 3.2.8 — recommandations partagées, sauvegarde exhaustive et rail structurel
 
 - source unique gelée pour les recommandations, les types et la migration des réglages, consommée par l'Experiment et la page Options ;

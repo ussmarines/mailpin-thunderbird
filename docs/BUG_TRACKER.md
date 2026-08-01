@@ -5,7 +5,7 @@
 > fichier après `PROJECT_MEMORY.md`.
 
 Dernière mise à jour : **2026-08-01**
-Version de travail : **3.2.8**
+Version de travail : **3.2.9**
 
 ## Règles de suivi
 
@@ -31,6 +31,8 @@ Les défauts MP-2026-004 et MP-2026-005 ont été rouverts après validation ré
 de la build 3.2.5. MP-2026-007 décrit le rendu désactivé d'une configuration
 neuve ou incomplète. La build 3.2.8 corrige leurs frontières communes ; ils
 restent en statut `À VALIDER` tant que Thunderbird 153 ne les confirme pas.
+MP-2026-008 couvre le chargeur Options qui ne quittait pas son état initial ;
+sa correction 3.2.9 attend aussi une observation dans Thunderbird réel.
 
 ## Bugs corrigés ou en validation
 
@@ -43,6 +45,7 @@ restent en statut `À VALIDER` tant que Thunderbird 153 ne les confirme pas.
 | MP-2026-005 | 3.2.4 | La barre « Modifications non enregistrées » n'apparaît plus ou les actions Enregistrer/Annuler ne suivent pas le brouillon réel. | La collecte, le rendu et la comparaison dépendaient de listes parallèles non vérifiées ; une valeur absente ou une exception dans `currentDraftSnapshot` interrompait `syncDirtyState` sans état d'erreur actionnable, et le baseline Agenda était reconstruit dans une continuation asynchrone. | `extension/options/options.js`, `extension/options/options.html`, `extension/options/options.css` | `tests/options_dom_flow.playwright.js`, `tests/test_options_controls.py`, `tests/test_regressions_3_2_8.py` | À VALIDER | 3.2.8 | Tester modifier → Enregistrer → rouvrir, modifier → Annuler et retour manuel, puis redémarrer Thunderbird ; la barre doit suivre chaque famille de contrôle. |
 | MP-2026-006 | 3.2.2 | La CI Windows signale `dist/.gitkeep\r` comme fichier suivi et ignoré. | Le flux texte vers `git check-ignore --stdin` était converti en CRLF sous Windows. | `scripts/deep_audit.py` | `tests/test_regressions_3_2_5.py`, `tests/test_cross_platform_ci.py` | CORRIGÉ | 3.2.5 | La CI Windows doit confirmer après push. |
 | MP-2026-007 | 3.2.7 | Sur une installation neuve ou une configuration vide/partielle, les fonctions recommandées semblent toutes désactivées. | Options acceptait tout objet `settings`, puis rendait les booléens absents avec `Boolean(undefined)`, alors que les recommandations et la normalisation vivaient seulement dans l'Experiment ; aucune source partagée ne garantissait le rendu d'une réponse partielle. | `extension/api/pinInbox/modules/settings.js`, `extension/api/pinInbox/implementation.js`, `extension/options/options.js` | `tests/settings_defaults.mjs`, `tests/options_dom_flow.playwright.js`, `tests/test_options_controls.py` | À VALIDER | 3.2.8 | Dans un profil Thunderbird jetable neuf, ouvrir Options avant toute écriture : recommandations actives sans flash désactivé ; vérifier aussi une mise à jour conservant un `false` explicite. |
+| MP-2026-008 | 3.2.8 | La page Paramètres reste sur « Chargement des recommandations » sans contrôle ni erreur. | `fetchConfigurationWithRetry()` et `renderCalendars()` attendaient des promesses API sans délai ; `applyConfiguration()` attendait l’Agenda avant de définir `configurationReady`, tandis que le `catch` initial remettait seulement le formulaire à faux et conservait le chargeur. | `extension/options/options.js`, `extension/options/options.html`, `extension/options/options.css` | `tests/options_dom_flow.playwright.js`, `tests/test_regressions_3_2_9.py` | À VALIDER | 3.2.9 | Profil Thunderbird jetable sans compte ni calendrier : ouvrir Options, vérifier le formulaire ou l’erreur visible, puis Réessayer, Enregistrer/Annuler et persistance après redémarrage. |
 
 ## Modèle pour une nouvelle entrée
 

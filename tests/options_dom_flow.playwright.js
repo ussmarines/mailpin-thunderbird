@@ -35,6 +35,10 @@ async page => {
       catch { return {gets: 0, setAttempts: 0, writes: 0, failSave: false}; }
     };
     const writeMeta = value => localStorage.setItem(META_KEY, JSON.stringify(value));
+    const initializationMode = () => sessionStorage.getItem("mailperch-options-initialization-mode") || "normal";
+    globalThis.__mailperchSetInitializationMode = mode => {
+      sessionStorage.setItem("mailperch-options-initialization-mode", String(mode));
+    };
     const configuration = () => ({
       ...clone(readPersisted()),
       accounts: clone(accounts),
@@ -58,6 +62,8 @@ async page => {
               const meta = readMeta();
               meta.gets += 1;
               writeMeta(meta);
+              if (initializationMode() === "configuration-never") return new Promise(() => {});
+              if (initializationMode() === "configuration-reject") throw new Error("échec de configuration synthétique");
               return configuration();
             };
           }
@@ -80,6 +86,7 @@ async page => {
             };
           }
           if (name === "getCalendars") {
+            if (initializationMode() === "calendar-never") return () => new Promise(() => {});
             return async () => [{
               id: "calendar-test",
               name: "Agenda synthétique",
@@ -99,7 +106,7 @@ async page => {
         update: async () => {}
       },
       runtime: {
-        getManifest: () => ({version: "3.2.8"}),
+        getManifest: () => ({version: "3.2.9"}),
         getURL: path => path
       },
       i18n: {
@@ -325,6 +332,32 @@ async page => {
   await waitReady();
   assert(await page.locator("#showSearch").isChecked(), "An invalid boolean must fall back to the recommendation");
   assert(await page.locator("#pinMode").inputValue() === "independent", "An invalid enum must be normalized");
+
+  // The actual page must leave the loader after an API promise never settles,
+  // then allow a user-driven retry without reconstructing the document.
+  await page.evaluate(() => globalThis.__mailperchSetInitializationMode("configuration-never"));
+  await page.reload();
+  await page.waitForFunction(() => {
+    const loading = document.querySelector("#settings-loading");
+    const error = document.querySelector("#settings-error");
+    const form = document.querySelector("#settings-form");
+    return loading?.hidden && !error?.hidden && form?.hidden &&
+      document.body.dataset.initializationState === "error";
+  }, null, {timeout: 35_000});
+  assert(await page.locator("#settings-error-diagnostic").textContent() === "options:init:timeout:configuration",
+    "A non-settling configuration promise must produce a non-sensitive timeout diagnostic");
+
+  await page.evaluate(() => globalThis.__mailperchSetInitializationMode("normal"));
+  await page.locator("#retry-settings-load").click();
+  await waitReady();
+  assert(await page.locator("#settings-error").isHidden(), "Retry must return the same document to the ready state");
+
+  await page.evaluate(() => globalThis.__mailperchSetInitializationMode("calendar-never"));
+  await page.reload();
+  await waitReady();
+  assert(!(await page.locator("#settings-loading").isVisible()),
+    "A non-settling optional calendar request must not hold the primary form");
+  await page.evaluate(() => globalThis.__mailperchSetInitializationMode("normal"));
 
   return {
     controlsExercised: controls.length,

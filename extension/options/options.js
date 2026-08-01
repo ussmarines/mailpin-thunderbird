@@ -14,11 +14,82 @@ let statusTimer = null;
 let lastStatusControl = null;
 let calendarRenderGeneration = 0;
 let entitySequence = 0;
+let initializationGeneration = 0;
+let initializationInFlight = false;
+let lastInitializationDiagnostic = "options:init:not-started";
 
 const accountControls = new Map();
 const inboxControls = new Map();
 const $ = id => document.getElementById(id);
 const wait = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
+const INITIALIZATION_TIMEOUTS = Object.freeze({
+  configuration: 10_000,
+  shortcut: 5_000,
+  calendar: 7_000,
+  auxiliary: 7_000
+});
+const SETTINGS_REGISTRY_AVAILABLE = Boolean(
+  globalThis.PinSettings?.DEFAULTS &&
+  typeof globalThis.PinSettings.normalize === "function" &&
+  typeof globalThis.PinSettings.describe === "function"
+);
+
+class OptionsInitializationTimeout extends Error {
+  constructor(operation, timeoutMs) {
+    super(`${operation} n’a pas répondu après ${timeoutMs} ms.`);
+    this.name = "OptionsInitializationTimeout";
+    this.operation = operation;
+    this.timeoutMs = timeoutMs;
+  }
+}
+
+function withTimeout(operation, timeoutMs, operationName) {
+  let timer = null;
+  const task = Promise.resolve().then(operation);
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(() => reject(new OptionsInitializationTimeout(operationName, timeoutMs)), timeoutMs);
+  });
+  return Promise.race([task, timeout]).finally(() => {
+    if (timer) clearTimeout(timer);
+  });
+}
+
+function pinInboxMethod(name) {
+  const method = globalThis.messenger?.pinInbox?.[name];
+  if (typeof method !== "function") {
+    throw new Error(`L’API MailPerch « ${name} » n’est pas disponible.`);
+  }
+  return method.bind(globalThis.messenger.pinInbox);
+}
+
+function initializationDiagnostic(error) {
+  if (error instanceof OptionsInitializationTimeout) {
+    return `options:init:timeout:${error.operation}`;
+  }
+  const name = String(error?.name || "Error").replace(/[^a-z0-9_-]/gi, "").slice(0, 48) || "Error";
+  return `options:init:error:${name}`;
+}
+
+function setInitializationState(state, error = null) {
+  configurationReady = state === "ready";
+  document.body.dataset.initializationState = state;
+  document.body.toggleAttribute("data-configuration-ready", configurationReady);
+  const form = $("settings-form");
+  const loading = $("settings-loading");
+  const failure = $("settings-error");
+  if (form) {
+    form.hidden = !configurationReady;
+    form.setAttribute("aria-busy", String(!configurationReady));
+  }
+  if (loading) loading.hidden = state !== "loading";
+  if (failure) failure.hidden = state !== "error";
+  if (state === "error") {
+    lastInitializationDiagnostic = initializationDiagnostic(error);
+    const diagnostic = $("settings-error-diagnostic");
+    if (diagnostic) diagnostic.textContent = lastInitializationDiagnostic;
+  }
+  syncSaveControls();
+}
 
 function currentSettings(overrides = {}) {
   return {...(configuration?.settings || {}), ...overrides};
@@ -32,23 +103,18 @@ function requireConfiguration() {
 }
 
 function setConfigurationReady(ready) {
-  configurationReady = Boolean(ready);
-  document.body.toggleAttribute("data-configuration-ready", configurationReady);
-  const form = $("settings-form");
-  const loading = $("settings-loading");
-  if (form) {
-    form.hidden = !configurationReady;
-    form.setAttribute("aria-busy", String(!configurationReady));
-  }
-  if (loading) loading.hidden = configurationReady;
-  syncSaveControls();
+  setInitializationState(ready ? "ready" : "loading");
 }
 
-async function fetchConfigurationWithRetry(attempts = 4) {
+async function fetchConfigurationWithRetry(attempts = 3) {
   let lastError = null;
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     try {
-      const value = await messenger.pinInbox.getConfiguration();
+      const value = await withTimeout(
+        () => pinInboxMethod("getConfiguration")(),
+        INITIALIZATION_TIMEOUTS.configuration,
+        "configuration"
+      );
       if (value?.settings && typeof value.settings === "object") return value;
       lastError = new Error("La configuration reçue est vide.");
     } catch (error) {
@@ -57,10 +123,6 @@ async function fetchConfigurationWithRetry(attempts = 4) {
     if (attempt < attempts) await wait(100 * attempt);
   }
   throw lastError || new Error("La configuration MailPerch est indisponible.");
-}
-
-if (!globalThis.PinSettings?.DEFAULTS) {
-  throw new Error("Le registre de recommandations MailPerch n'est pas chargé.");
 }
 
 const CONTROL_CODECS = Object.freeze({
@@ -111,7 +173,7 @@ function cloneSettingValue(value) {
 function settingControl(id, type, options = {}) {
   const key = options.key || id;
   const codec = CONTROL_CODECS[type];
-  if (!codec || !Object.prototype.hasOwnProperty.call(PinSettings.DEFAULTS, key)) {
+  if (!codec || (SETTINGS_REGISTRY_AVAILABLE && !Object.prototype.hasOwnProperty.call(PinSettings.DEFAULTS, key))) {
     throw new Error(`Contrôle de réglage invalide : ${id}`);
   }
   return Object.freeze({
@@ -119,7 +181,7 @@ function settingControl(id, type, options = {}) {
     key,
     type,
     valueType: CONTROL_VALUE_TYPES[type],
-    defaultValue: cloneSettingValue(PinSettings.DEFAULTS[key]),
+    defaultValue: SETTINGS_REGISTRY_AVAILABLE ? cloneSettingValue(PinSettings.DEFAULTS[key]) : undefined,
     read: codec.read,
     write: codec.write,
     normalize: value => PinSettings.normalize({...PinSettings.DEFAULTS, [key]: value})[key],
@@ -181,6 +243,9 @@ const NON_SETTING_CONTROL_IDS = Object.freeze(new Set([
 ]));
 
 function validateSettingsControlRegistry() {
+  if (!SETTINGS_REGISTRY_AVAILABLE) {
+    throw new Error("Le registre de recommandations MailPerch n’est pas chargé.");
+  }
   const schema = new Map(PinSettings.describe().map(entry => [entry.key, entry]));
   for (const [key, entry] of SETTINGS_CONTROL_REGISTRY) {
     const declaration = schema.get(key);
@@ -560,7 +625,12 @@ function uniqueEntityId(prefix, items) {
 
 async function getShortcut() {
   try {
-    return (await messenger.commands.getAll()).find(c => c.name === "toggle-pin-selected")?.shortcut || "";
+    const commands = await withTimeout(
+      () => globalThis.messenger?.commands?.getAll?.() || Promise.reject(new Error("Les raccourcis MailPerch sont indisponibles.")),
+      INITIALIZATION_TIMEOUTS.shortcut,
+      "shortcut"
+    );
+    return commands.find(c => c.name === "toggle-pin-selected")?.shortcut || "";
   } catch {
     return "Alt+P";
   }
@@ -853,7 +923,12 @@ async function renderCalendars(selected) {
   ask.value = "";
   el.append(ask);
   try {
-    const calendars = await messenger.pinInbox.getCalendars();
+    const calendars = await withTimeout(
+      () => pinInboxMethod("getCalendars")(),
+      INITIALIZATION_TIMEOUTS.calendar,
+      "calendars"
+    );
+    if (!Array.isArray(calendars)) throw new Error("La liste des calendriers est invalide.");
     if (generation !== calendarRenderGeneration) return;
     for (const calendar of calendars) {
       const option = node(
@@ -896,9 +971,15 @@ async function renderCalendars(selected) {
     }
   } catch (error) {
     if (generation !== calendarRenderGeneration) return;
-    console.warn("MailPerch : calendriers indisponibles", error);
+    console.warn("MailPerch : calendriers indisponibles", initializationDiagnostic(error));
     setStatus("Les calendriers Thunderbird ne sont pas disponibles.", "error", {control: el});
-    info?.appendChild(node("p", "hint", "La liste des calendriers n’a pas pu être chargée."));
+    info?.appendChild(node(
+      "p",
+      "hint",
+      error instanceof OptionsInitializationTimeout
+        ? "La liste des calendriers n’a pas répondu. Réessayez avec « Synchroniser maintenant » lorsque l’Agenda est disponible."
+        : "La liste des calendriers n’a pas pu être chargée."
+    ));
   }
   el.value = [...el.options].some(option => option.value === selected && !option.disabled) ? selected : "";
 }
@@ -1081,13 +1162,15 @@ async function applyConfiguration(config) {
   renderRules();
   renderAccounts(config.accounts || []);
   renderWaitingGroups(settings.waitingGroupId);
-  await renderCalendars(settings.preferredCalendarId);
   applyUxPreferences(settings);
   updateRuntimeSummary(config);
   renderProviderMatrix(config.providerMatrix);
   setConfigurationReady(true);
   rememberPersistedDraft();
   setDirty(false);
+  // Calendar discovery is useful but cannot keep primary settings hidden.
+  // The selector starts with the valid “ask” choice and fills in afterwards.
+  void renderCalendars(settings.preferredCalendarId);
 }
 
 function readFiniteControlNumber(id, fallback) {
@@ -1113,13 +1196,21 @@ function collectSettings() {
   return PinSettings.normalize(result);
 }
 
-async function reload({preserveEdits = false} = {}) {
-  const [config, shortcut, backup, health] = await Promise.all([
-    fetchConfigurationWithRetry(),
-    getShortcut(),
-    messenger.pinInbox.getBackupStatus().catch(() => null),
-    messenger.pinInbox.getHealthReport().catch(() => null)
+async function refreshOptionalConfiguration(config) {
+  const configurationAtStart = configuration;
+  const [backup, health] = await Promise.all([
+    withTimeout(() => pinInboxMethod("getBackupStatus")(), INITIALIZATION_TIMEOUTS.auxiliary, "backup-status").catch(() => null),
+    withTimeout(() => pinInboxMethod("getHealthReport")(), INITIALIZATION_TIMEOUTS.auxiliary, "health-report").catch(() => null)
   ]);
+  if (!configurationReady || configuration !== configurationAtStart) return;
+  updateRuntimeSummary(configurationAtStart || config, backup);
+  renderHealth(health);
+  renderProviderMatrix(config.providerMatrix || health?.providerMatrix);
+}
+
+async function reload({preserveEdits = false} = {}) {
+  const config = await fetchConfigurationWithRetry();
+  const shortcut = await getShortcut();
   config.shortcut = shortcut;
   if (preserveEdits && configuration) {
     configuration = {
@@ -1130,14 +1221,57 @@ async function reload({preserveEdits = false} = {}) {
       performance: config.performance,
       providerMatrix: config.providerMatrix
     };
-    updateRuntimeSummary(config, backup);
+    updateRuntimeSummary(config);
   } else {
     await applyConfiguration(config);
-    updateRuntimeSummary(config, backup);
   }
-  renderHealth(health);
-  renderProviderMatrix(config.providerMatrix || health?.providerMatrix);
+  void refreshOptionalConfiguration(config);
   return config;
+}
+
+async function copyInitializationDiagnostic() {
+  const diagnostic = lastInitializationDiagnostic;
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(diagnostic);
+    } else {
+      const source = $("settings-error-diagnostic");
+      const selection = window.getSelection();
+      const range = document.createRange();
+      range.selectNodeContents(source);
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+      if (!document.execCommand("copy")) throw new Error("Copie indisponible.");
+      selection?.removeAllRanges();
+    }
+    setStatus("Diagnostic technique copié.", "success");
+  } catch {
+    setStatus("Copie du diagnostic impossible. Vous pouvez sélectionner le code affiché.", "error", {persistent: true});
+  }
+}
+
+async function initializeOptions({preserveEdits = false} = {}) {
+  if (initializationInFlight) return;
+  const generation = ++initializationGeneration;
+  initializationInFlight = true;
+  setInitializationState("loading");
+  clearStatus();
+  try {
+    await reload({preserveEdits});
+    if (generation !== initializationGeneration) return;
+    clearStatus();
+  } catch (error) {
+    if (generation !== initializationGeneration) return;
+    console.error("MailPerch : initialisation des paramètres impossible", initializationDiagnostic(error));
+    setInitializationState("error", error);
+  } finally {
+    if (generation === initializationGeneration) {
+      initializationInFlight = false;
+      if (document.body.dataset.initializationState === "loading") {
+        setInitializationState("error", new Error("Initialisation interrompue."));
+      }
+    }
+  }
 }
 
 function persistenceSnapshot(config) {
@@ -1347,16 +1481,22 @@ function renderBrandVersion() {
 }
 
 window.addEventListener("DOMContentLoaded", async () => {
-  installCriticalSettingsActions();
-  localize();
-  renderBrandVersion();
-  setConfigurationReady(false);
-
+  $("retry-settings-load").addEventListener("click", () => {
+    void initializeOptions();
+  });
+  $("copy-settings-diagnostic").addEventListener("click", () => {
+    void copyInitializationDiagnostic();
+  });
   try {
+    installCriticalSettingsActions();
+    localize();
+    renderBrandVersion();
+    setConfigurationReady(false);
     validateSettingsControlRegistry();
     enhanceSettingsPage();
   } catch (error) {
-    setStatus(`Erreur : ${error.message || error}`, "error", {persistent: true});
+    console.error("MailPerch : préparation des paramètres impossible", initializationDiagnostic(error));
+    setInitializationState("error", error);
     return;
   }
 
@@ -1668,16 +1808,8 @@ window.addEventListener("DOMContentLoaded", async () => {
   // cached document must not display an old draft after returning to it.
   window.addEventListener("pageshow", event => {
     if (!event.persisted) return;
-    void reload().catch(error => {
-      setStatus(`Rechargement impossible : ${error.message || error}`, "error", {persistent: true});
-    });
+    void initializeOptions({preserveEdits: true});
   });
 
-  try {
-    await withBusy(null, "Chargement des paramètres…", () => reload());
-    clearStatus();
-  } catch (error) {
-    setConfigurationReady(false);
-    setStatus(`Chargement impossible : ${error.message || error}`, "error", {persistent: true});
-  }
+  await initializeOptions();
 });

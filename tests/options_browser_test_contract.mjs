@@ -18,7 +18,10 @@ for (const required of [
   "A failed save must keep an actionable draft",
   "An explicit false from an older version must be preserved",
   "A missing key must receive its recommendation",
-  "A missing settings object must display safe recommendations as active"
+  "A missing settings object must display safe recommendations as active",
+  "configuration-never",
+  "options:init:timeout:configuration",
+  "#retry-settings-load"
 ]) {
   assert.ok(scenario.includes(required), `Missing real-browser assertion: ${required}`);
 }
@@ -27,5 +30,6 @@ assert.ok(scenario.includes("page.reload()"), "Persistence must be tested after 
 assert.ok(scenario.includes("#discard-changes"), "Cancel must be exercised through the visible control");
 assert.ok(!scenario.includes("class Element"), "The browser scenario must not use a synthetic DOM harness");
 assert.ok(html.includes("../api/pinInbox/modules/settings.js"), "Options must load the shared settings registry");
+assert.ok(html.includes('id="settings-error"'), "Options must expose a terminal initialization error panel");
 
 console.log("Real-browser options test contract: OK");

@@ -1090,5 +1090,17 @@
   },
   "loadingSettingsHelp": {
     "message": "MailPerch vérifie les réglages locaux avant d’afficher les contrôles."
+  },
+  "settingsLoadErrorTitle": {
+    "message": "Impossible de charger les paramètres"
+  },
+  "settingsLoadErrorHelp": {
+    "message": "Les réglages MailPerch n’ont pas pu être préparés. Aucune modification n’a été appliquée."
+  },
+  "retrySettingsLoad": {
+    "message": "Réessayer"
+  },
+  "copySettingsDiagnostic": {
+    "message": "Copier le diagnostic"
   }
 }

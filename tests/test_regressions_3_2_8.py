@@ -43,6 +43,10 @@ assert "persistenceSnapshot(saved) !== persistenceSnapshot(persisted)" in OPTION
 assert "await messenger.pinInbox.getConfiguration();" in OPTIONS
 assert 'save?.addEventListener("click", saveAll);' in OPTIONS
 assert 'discard?.addEventListener("click", discardChanges);' in OPTIONS
+assert "OptionsInitializationTimeout" in OPTIONS
+assert "setInitializationState(\"error\", error);" in OPTIONS
+assert "void renderCalendars(settings.preferredCalendarId);" in OPTIONS
+assert 'id="settings-error"' in (ROOT / "extension/options/options.html").read_text(encoding="utf-8")
 
 for bug_id in ("MP-2026-004", "MP-2026-005", "MP-2026-007"):
     row = next(line for line in TRACKER.splitlines() if line.startswith(f"| {bug_id} |"))

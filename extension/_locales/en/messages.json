@@ -1090,5 +1090,17 @@
   },
   "loadingSettingsHelp": {
     "message": "MailPerch checks local settings before showing the controls."
+  },
+  "settingsLoadErrorTitle": {
+    "message": "Could not load settings"
+  },
+  "settingsLoadErrorHelp": {
+    "message": "MailPerch settings could not be prepared. No changes were applied."
+  },
+  "retrySettingsLoad": {
+    "message": "Try again"
+  },
+  "copySettingsDiagnostic": {
+    "message": "Copy diagnostic"
   }
 }

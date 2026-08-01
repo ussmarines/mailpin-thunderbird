@@ -37,6 +37,9 @@ for button in parser.buttons:
 for required in (
     "status-toast",
     "settings-loading",
+    "settings-error",
+    "retry-settings-load",
+    "copy-settings-diagnostic",
     "save-dock",
     "withBusy",
     "preserveEdits",
@@ -47,6 +50,11 @@ for required in (
 
 for required_guard in (
     "fetchConfigurationWithRetry",
+    "withTimeout",
+    "OptionsInitializationTimeout",
+    "setInitializationState",
+    "initializeOptions",
+    "refreshOptionalConfiguration",
     "requireConfiguration",
     "setConfigurationReady(false)",
     "setConfigurationReady(true)",
@@ -64,6 +72,7 @@ for required_guard in (
     "function syncDirtyState()",
     "const saveDisabled = !configurationReady || saveInFlight || !dirty || Boolean(draftStateError);",
     "await applyConfiguration(config);",
+    "void renderCalendars(settings.preferredCalendarId);",
 ):
     assert required_guard in JS, required_guard
 

@@ -1,5 +1,12 @@
 # Feuille de route
 
+## 3.2.9 — validation Thunderbird de l’initialisation récupérable
+
+- ouvrir Options dans un profil vierge sans compte ni calendrier et confirmer que le chargeur disparaît ;
+- vérifier le formulaire, les recommandations, Enregistrer, Annuler et la persistance après redémarrage ;
+- provoquer une indisponibilité de l’Experiment et confirmer le panneau d’erreur, le diagnostic expurgé et Réessayer ;
+- conserver MP-2026-008 en `À VALIDER` jusqu’à cette observation réelle.
+
 ## 3.2.8 — validation Thunderbird des corrections structurelles
 
 - confirmer dans un profil Thunderbird 153 jetable que les recommandations sont visibles dès la première ouverture des paramètres ;

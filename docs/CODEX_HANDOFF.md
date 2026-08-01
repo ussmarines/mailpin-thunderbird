@@ -5,7 +5,7 @@ court afin d’éviter de dupliquer le contexte.
 
 ## État courant
 
-- version de travail : **3.2.8** ;
+- version de travail : **3.2.9** ;
 - base GitHub : `main` au commit `0f8c50cbafef8e6bc8779c13c2169b0392b6300c` ;
 - ID : `pin-mails@MailPerch.local` ;
 - schémas : SQLite 5, paramètres 6, données 6 ;
@@ -58,3 +58,11 @@ Priorité absolue : MP-2026-004 et MP-2026-005. Ne pas les déclarer corrigés s
 - le rail d'actions repose sur la structure réelle de ThreadCard 153 et ne doit pas être remplacé par un offset de capture ;
 - le lancement Thunderbird temporaire a réussi, mais WebDriver BiDi n'a exposé aucun contexte d'onglet ;
 - MP-2026-004, MP-2026-005 et MP-2026-007 restent `À VALIDER`.
+
+## Passe 3.2.9
+
+- l’initialisation Options est terminale : formulaire prêt ou panneau d’erreur avec Réessayer ;
+- toute attente API de configuration est bornée, et Agenda/santé/sauvegarde sont secondaires ;
+- les diagnostics d’initialisation ne contiennent que des codes techniques expurgés ;
+- Playwright local a validé le timeout, le panneau terminal et Réessayer sur les vrais actifs ; Thunderbird 153.0.1 a chargé l’XPI dans un profil vierge sans compte, mais son onglet Options n’était pas automatisable ;
+- la validation graphique réelle dans Thunderbird reste obligatoire.

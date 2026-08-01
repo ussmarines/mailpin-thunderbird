@@ -4,7 +4,7 @@
 > Lire ce document avant tout autre fichier. Il donne l’état courant, les invariants,
 > la carte du dépôt et les chemins exacts à ouvrir selon la tâche.
 >
-> Version de travail : **3.2.8**
+> Version de travail : **3.2.9**
 > Base de travail vérifiée : `main` au commit `0f8c50cbafef8e6bc8779c13c2169b0392b6300c`
 > Produit : **MailPerch — Email Pins & Follow-up**
 > Extension ID de développement : `pin-mails@MailPerch.local`
@@ -36,6 +36,11 @@ les erreurs et la reconstruction de page. Dans les cartes Thunderbird 153,
 lieu de rester dans la rangée basse native. MP-2026-004, MP-2026-005 et
 MP-2026-007 restent `À VALIDER` jusqu'à observation dans Thunderbird.
 
+La version 3.2.9 borne l’initialisation de la page Paramètres : configuration,
+raccourcis et composants secondaires ont un délai maximal ; l’Agenda, la santé et
+les sauvegardes se chargent après le formulaire. Toute erreur atteint un panneau
+terminal avec Réessayer et un diagnostic expurgé, jamais un chargement permanent.
+
 ## 2. Invariants non négociables
 
 1. Ne jamais modifier les compteurs natifs de nouveaux messages, non-lus ou totaux.
@@ -63,7 +68,7 @@ MP-2026-007 restent `À VALIDER` jusqu'à observation dans Thunderbird.
 
 | Élément | Valeur |
 |---|---|
-| Version extension/package | `3.2.8` |
+| Version extension/package | `3.2.9` |
 | Thunderbird déclaré | `128.0` à `153.*` |
 | Manifest | MV3 |
 | Permission WebExtension | `menus` uniquement |
