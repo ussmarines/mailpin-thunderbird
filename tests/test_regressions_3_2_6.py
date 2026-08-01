@@ -29,11 +29,12 @@ form_start = OPTIONS_HTML.index('<form id="settings-form"')
 form_end = OPTIONS_HTML.index('</form>', form_start)
 dock_pos = OPTIONS_HTML.index('id="save-dock"')
 assert form_start < dock_pos < form_end
-assert 'id="discard-changes" type="button"' in OPTIONS_HTML
-assert 'id="save-all-floating" type="button"' in OPTIONS_HTML
+assert 'id="discard-changes" type="reset"' in OPTIONS_HTML
+assert 'id="save-all-floating" type="submit"' in OPTIONS_HTML
 assert 'form="settings-form"' not in OPTIONS_HTML[OPTIONS_HTML.index('id="save-dock"'):form_end]
-assert 'document.addEventListener("click", event => {' in OPTIONS_JS
-assert '#save-all-floating, #discard-changes' in OPTIONS_JS
+assert 'save?.addEventListener("click", saveAll);' in OPTIONS_JS
+assert 'discard?.addEventListener("click", discardChanges);' in OPTIONS_JS
+assert 'document.addEventListener("click", event => {' not in OPTIONS_JS
 assert 'form.addEventListener("submit", saveAll);' in OPTIONS_JS
 assert 'event?.stopPropagation?.();' in OPTIONS_JS
 assert 'form.requestSubmit($("save-all-floating"));' not in OPTIONS_JS

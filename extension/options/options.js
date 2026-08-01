@@ -1070,17 +1070,19 @@ function localize() {
 
 function installCriticalSettingsActions() {
   const form = $("settings-form");
+  const save = $("save-all-floating");
+  const discard = $("discard-changes");
   if (!form || form.dataset.criticalActionsBound === "true") return;
   form.dataset.criticalActionsBound = "true";
   form.noValidate = true;
   form.addEventListener("submit", saveAll);
   form.addEventListener("reset", discardChanges);
-  document.addEventListener("click", event => {
-    const button = event.target?.closest?.("#save-all-floating, #discard-changes");
-    if (!button) return;
-    if (button.id === "save-all-floating") void saveAll(event);
-    else void discardChanges(event);
-  }, true);
+  // Thunderbird options tabs can host the document in an embedding browser.
+  // Keep the form semantics for keyboard and assistive technology, but bind
+  // the actual visible controls as well: delegation on the outer document is
+  // not a reliable activation path in that embedding.
+  save?.addEventListener("click", saveAll);
+  discard?.addEventListener("click", discardChanges);
 }
 
 function renderBrandVersion() {

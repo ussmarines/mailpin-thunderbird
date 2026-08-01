@@ -5,7 +5,7 @@
 > la carte du dépôt et les chemins exacts à ouvrir selon la tâche.
 >
 > Version de travail : **3.2.7**
-> Base GitHub vérifiée : `main` au commit `5285bb202e509ea6cb5d710eae40fb253c0faa88`
+> Base de travail vérifiée : `main` au commit `c6140ee12a7b9ad70cf3c41d8fea0256dc36862b`
 > Produit : **MailPerch — Email Pins & Follow-up**
 > Extension ID de développement : `pin-mails@MailPerch.local`
 

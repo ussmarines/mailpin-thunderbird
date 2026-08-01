@@ -37,20 +37,19 @@ for selector in (
 ):
     assert selector not in pin_css, selector
 
-# Native message action rail: equal vertical spacing, stable 24 px targets,
-# touch-safe 28 px targets, and enough trailing room for the two MailPerch-controlled actions. The native star stays in Thunderbird's own icon area.
+# Native message actions: the independent pin shares Thunderbird's native icon
+# flex container with the star, with stable 24 px and touch-safe 28 px targets.
 for token in (
-    "inset-block-start: 50%",
-    "transform: translateY(-50%)",
     "inline-size: 24px !important",
     "block-size: 24px !important",
     "inline-size: 28px !important",
     "block-size: 28px !important",
-    "padding-inline-end: 58px",
+    ".thread-card-icon-info",
 ):
     assert token in pin_css, token
-for selector in (".tree-button-more", ".pin-mails-independent-button"):
-    assert selector in pin_css, selector
+assert ".thread-card-icon-info .button-star" not in pin_css
+assert ".thread-card-icon-info .pin-mails-independent-button" not in pin_css
+assert "padding-inline-end: 58px" not in pin_css
 
 # Pinned cards must remain readable in every density.
 for minimum in ("--pin-mails-card-min-height: 48px", "--pin-mails-card-min-height: 56px", "--pin-mails-card-min-height: 66px"):

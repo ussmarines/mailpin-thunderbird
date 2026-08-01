@@ -1293,15 +1293,12 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   min-block-size: 22px;
 }
 
-/* Le bouton « Plus » et la punaise MailPerch forment un rail centré.
- * L’étoile reste dans le conteneur natif de Thunderbird en mode indépendant :
- * la déplacer produisait un second dessin lors de la virtualisation des lignes. */
+/* 3.2.7 — la punaise indépendante reste dans le flux de .thread-card-icon-info, juste
+ * avant l'étoile Thunderbird. Les deux contrôles partagent donc le même
+ * conteneur flex natif et le même centrage vertical, y compris au recyclage
+ * des cartes. Le menu « Plus » conserve sa position native dans l'en-tête. */
 :root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-column:last-child {
-  position: relative;
-  justify-content: center;
-  gap: 0;
   padding-block: 4px;
-  padding-inline-end: 58px;
 }
 :root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout :is(.thread-card-row, .thread-card-dynamic-row) {
   position: static;
@@ -1316,12 +1313,7 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   min-block-size: 19px;
   padding-inline-end: 0;
 }
-:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout :is(
-  .tree-button-more,
-  .pin-mails-independent-button
-) {
-  position: absolute !important;
-  inset-block-start: 50%;
+:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .pin-mails-independent-button {
   display: grid !important;
   place-items: center !important;
   inline-size: 24px !important;
@@ -1330,35 +1322,15 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   min-block-size: 24px !important;
   margin: 0 !important;
   padding: 0 !important;
-  transform: translateY(-50%);
-}
-:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .tree-button-more {
-  inset-inline-end: 4px;
-}
-:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .pin-mails-independent-button {
-  inset-inline-end: 32px;
-}
-:root[pin-mails-inbox][pin-mails-native-star] #threadTree[rows="thread-card"] tr.card-layout .pin-mails-row-button {
-  inset-inline-end: 32px;
 }
 :root[uidensity="touch"][pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-column:last-child {
   padding-block: 6px;
-  padding-inline-end: 66px;
 }
-:root[uidensity="touch"][pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout :is(
-  .tree-button-more,
-  .pin-mails-independent-button
-) {
+:root[uidensity="touch"][pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .pin-mails-independent-button {
   inline-size: 28px !important;
   block-size: 28px !important;
   min-inline-size: 28px !important;
   min-block-size: 28px !important;
-}
-:root[uidensity="touch"][pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .tree-button-more {
-  inset-inline-end: 4px;
-}
-:root[uidensity="touch"][pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .pin-mails-independent-button {
-  inset-inline-end: 36px;
 }
 
 
@@ -1393,40 +1365,3 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
 /* En mode indépendant, MailPerch ne masque, ne déplace et ne redessine
  * jamais les étoiles natives. Le masquage de doublon est strictement limité
  * au mode où l'étoile native sert elle-même d'épingle MailPerch. */
-
-/* 3.2.7 — rail d’actions des cartes Thunderbird.
- * L’étoile reste dans son conteneur natif, mais est positionnée visuellement
- * avec la punaise et le menu sur l’axe vertical de la carte. */
-:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-column:last-child {
-  padding-inline-end: 88px;
-}
-:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-icon-info .button-star {
-  position: absolute !important;
-  inset-block-start: 50%;
-  inset-inline-end: 60px;
-  display: grid !important;
-  place-items: center !important;
-  inline-size: 24px !important;
-  block-size: 24px !important;
-  min-inline-size: 24px !important;
-  min-block-size: 24px !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  transform: translateY(-50%);
-}
-:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-icon-info .pin-mails-independent-button {
-  position: absolute !important;
-  inset-block-start: 50%;
-  inset-inline-end: 32px;
-  transform: translateY(-50%);
-}
-:root[uidensity="touch"][pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-column:last-child {
-  padding-inline-end: 100px;
-}
-:root[uidensity="touch"][pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-icon-info .button-star {
-  inset-inline-end: 68px;
-  inline-size: 28px !important;
-  block-size: 28px !important;
-  min-inline-size: 28px !important;
-  min-block-size: 28px !important;
-}
