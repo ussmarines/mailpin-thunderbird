@@ -4,8 +4,8 @@
 > Lire ce document avant tout autre fichier. Il donne l’état courant, les invariants,
 > la carte du dépôt et les chemins exacts à ouvrir selon la tâche.
 >
-> Version de travail : **3.2.7**
-> Base de travail vérifiée : `main` au commit `c6140ee12a7b9ad70cf3c41d8fea0256dc36862b`
+> Version de travail : **3.2.8**
+> Base de travail vérifiée : `main` au commit `0f8c50cbafef8e6bc8779c13c2169b0392b6300c`
 > Produit : **MailPerch — Email Pins & Follow-up**
 > Extension ID de développement : `pin-mails@MailPerch.local`
 
@@ -26,7 +26,15 @@ Après cette mémoire, lire `docs/BUG_TRACKER.md` avant toute correction afin de
 
 La version 3.2.5 conserve le durcissement 3.2.4 et corrige trois régressions observées dans Thunderbird réel : étoile native dupliquée, commandes Enregistrer/Annuler peu fiables et faux positif CRLF de la CI Windows. Elle ajoute aussi `docs/BUG_TRACKER.md`, registre permanent des bugs connus lu par Codex et vérifié par la CI.
 
-La version 3.2.7 rouvre les deux défauts UI non confirmés par la 3.2.5. La punaise indépendante ne porte plus aucune classe d’icône Thunderbird, l’étoile native n’est plus déplacée en mode indépendant, et les boutons visibles Enregistrer/Annuler sont désormais à l’intérieur du formulaire avec des gestionnaires de clic directs. Le brouillon des paramètres est comparé à un instantané persistant afin d’éviter un état dirty fantôme, tandis que le rail d’icônes des cartes impose un conteneur flex de 24 px avec une marge basse structurelle. Les entrées MP-2026-004 et MP-2026-005 restent `À VALIDER` jusqu’à confirmation dans Thunderbird 153.
+La version 3.2.8 remplace les listes parallèles de paramètres par une source de
+vérité partagée et un registre de contrôles vérifié au démarrage. Les configurations
+absentes, partielles, anciennes ou invalides sont normalisées avant tout rendu ;
+les choix `false` explicites restent respectés. Un test Playwright charge les vrais
+HTML/JS/CSS et exerce 98 contrôles, Enregistrer, Annuler, les événements pointeur,
+les erreurs et la reconstruction de page. Dans les cartes Thunderbird 153,
+`.thread-card-icon-info` devient un rail de grille couvrant toutes les lignes au
+lieu de rester dans la rangée basse native. MP-2026-004, MP-2026-005 et
+MP-2026-007 restent `À VALIDER` jusqu'à observation dans Thunderbird.
 
 ## 2. Invariants non négociables
 
@@ -55,7 +63,7 @@ La version 3.2.7 rouvre les deux défauts UI non confirmés par la 3.2.5. La pun
 
 | Élément | Valeur |
 |---|---|
-| Version extension/package | `3.2.7` |
+| Version extension/package | `3.2.8` |
 | Thunderbird déclaré | `128.0` à `153.*` |
 | Manifest | MV3 |
 | Permission WebExtension | `menus` uniquement |
@@ -109,6 +117,7 @@ La version 3.2.7 rouvre les deux défauts UI non confirmés par la 3.2.5. La pun
 | Manifeste, permissions, compatibilité | `extension/manifest.json` | `release/manifest-store-template.json` |
 | Menus Thunderbird et commandes | `extension/background.js` | locales FR/EN |
 | API publique | `extension/api/pinInbox/schema.json` | contrat `tests/test_api_schema_contract.py` |
+| Recommandations/réglages | `extension/api/pinInbox/modules/settings.js` | registre Options + `tests/settings_defaults.mjs` |
 | Cycle de vie privilégié | `extension/api/pinInbox/implementation.js` | `extension/api/pinInbox/AGENTS.md` |
 | Identité/résolution message | `modules/identity.js` | tests modèle |
 | Stockage/checksum/diff | `modules/storage.js` | tests SQLite |
@@ -196,6 +205,7 @@ La version 3.2.7 rouvre les deux défauts UI non confirmés par la 3.2.5. La pun
 - `modules/performance.js` : signatures et métriques locales.
 - `modules/providers.js` : fournisseurs et calendriers.
 - `modules/rules.js` : règles et anti-boucle.
+- `modules/settings.js` : recommandations, types et migration partagés par l'Experiment et Options.
 - `modules/smart.js` : vues intelligentes.
 - `modules/storage.js` : diff/checksum/sauvegardes.
 - `modules/workflow.js` : statuts/récurrences.
@@ -217,6 +227,9 @@ La version 3.2.7 rouvre les deux défauts UI non confirmés par la 3.2.5. La pun
 - `test_folder_counter_guard.py` : compteurs Thunderbird.
 - `test_ui_regressions.py` : régressions UI historiques.
 - `test_options_controls.py` : paramètres/feedback.
+- `settings_defaults.mjs` : recommandations et migrations absentes/partielles/invalides.
+- `options_dom_flow.playwright.js` : vrais contrôles et événements de la page Options.
+- `thread_card_geometry.playwright.js` : géométrie et hit-tests du DOM ThreadCard 153.
 - `test_calendar_and_card_actions.py` : Agenda et cartes.
 - `test_native_card_menu.py` : menu XUL natif.
 - `test_data_integrity_guards.py` : imports/migrations/concurrence.
@@ -243,6 +256,7 @@ La version 3.2.7 rouvre les deux défauts UI non confirmés par la 3.2.5. La pun
 - `DEBUGGING.md` : diagnostic et collecte.
 - `DECISIONS.md` : décisions durables.
 - `KNOWN_LIMITATIONS.md` : limites honnêtes.
+- `FUNCTIONAL_AUDIT_3.2.8.md` : matrice de preuves fonctionnelles de la version courante.
 - `MANUAL_TEST_PLAN.md` : matrice manuelle.
 - `SCREENSHOT_FINDINGS.md` : constats visuels.
 - `UI_SPEC.md` : règles UX/UI.
@@ -273,7 +287,7 @@ Principes :
 - le dock Enregistrer/Annuler est l’unique action persistante ;
 - les comptes n’affichent pas deux fois la même adresse ;
 - les calendriers indiquent « Tâches », « Événements », les deux ou indisponible ;
-- les boutons étoile/punaise/plus d’une ligne native forment un rail centré.
+- l'étoile et la punaise partagent le rail structurel issu de la zone d'informations ; le bouton Plus reste dans l'en-tête natif sans recouvrement.
 
 ## 8. Données et confidentialité
 

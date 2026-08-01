@@ -1084,5 +1084,11 @@
   },
   "removeFromGroup": {
     "message": "Retirer du groupe"
+  },
+  "loadingSettingsTitle": {
+    "message": "Chargement des recommandations"
+  },
+  "loadingSettingsHelp": {
+    "message": "MailPerch vérifie les réglages locaux avant d’afficher les contrôles."
   }
 }

@@ -42,6 +42,6 @@ assert 'form.requestSubmit($("save-all-floating"));' not in OPTIONS_JS
 # Reopened bugs stay visible until real Thunderbird validation.
 for bug_id in ("MP-2026-004", "MP-2026-005"):
     row = next(line for line in TRACKER.splitlines() if line.startswith(f"| {bug_id} |"))
-    assert "| À VALIDER | 3.2.7 |" in row
+    assert "| À VALIDER | 3.2.8 |" in row
 
-print("MailPerch 3.2.6/3.2.7 real-interaction regression guards: OK")
+print("MailPerch 3.2.6/3.2.8 real-interaction regression guards: OK")

@@ -1144,10 +1144,10 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   outline-offset: 1px;
 }
 
-/* 3.2.4 — géométrie équilibrée des lignes générales Thunderbird.
- * ThreadCard conserve une hauteur virtuelle native de 46 px : l’amélioration
- * doit donc répartir l’espace intérieur sans agrandir artificiellement une
- * seule sous-ligne, sous peine de pousser l’objet contre la bordure basse. */
+/* 3.2.8 — rail structurel des actions dans le DOM ThreadCard de Thunderbird
+ * 153. Le conteneur natif comporte une ligne expéditeur, une ligne objet puis
+ * une ligne informations/actions. `display: contents` expose ces enfants à la
+ * grille de la colonne et le rail d’actions couvre toutes les lignes. */
 :root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .card-container {
   min-block-size: 46px;
   box-sizing: border-box;
@@ -1159,39 +1159,67 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   padding-block: 0;
 }
 :root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-column:last-child {
-  justify-content: center;
-  gap: 1px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  column-gap: var(--thread-card-content-gap, 4px);
+  row-gap: 1px;
+  align-items: center;
   padding-block-start: 3px;
   padding-block-end: 5px;
 }
-:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout :is(.thread-card-row, .thread-card-dynamic-row) {
-  min-block-size: 17px;
-  line-height: 1.25;
-  align-items: center;
+:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-row {
+  grid-column: 1 / 3;
+  grid-row: 1;
+  min-inline-size: 0;
 }
 :root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-dynamic-row {
-  padding-block-end: 1px;
+  display: contents;
+}
+:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-button {
+  grid-column: 1;
+  grid-row: 3;
 }
 :root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-subject-container {
+  grid-column: 1 / 3;
+  grid-row: 2;
+}
+:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .pin-mails-card-action-rail {
+  grid-column: 3;
+  grid-row: 1 / 4;
   display: flex;
   align-items: center;
-  min-block-size: 17px;
-  padding-block-end: 1px;
-}
-:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout :is(.sender, .date, .subject) {
-  line-height: 1.25;
-}
-:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-icon-info {
   align-self: center;
   min-block-size: 24px;
+  margin-block: 0;
+  padding-inline-end: 0;
 }
-/* La punaise reste une cible nette sans imposer 42 px à la première ligne. */
+:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .pin-mails-card-action-rail > * {
+  align-self: center;
+}
+:root[pin-mails-inbox] #threadTree[rows="thread-card"].cards-row-compact tr.card-layout .thread-card-column:last-child {
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+}
+:root[pin-mails-inbox] #threadTree[rows="thread-card"].cards-row-compact tr.card-layout .thread-card-button {
+  grid-column: 1;
+  grid-row: 2;
+}
+:root[pin-mails-inbox] #threadTree[rows="thread-card"].cards-row-compact tr.card-layout .thread-card-subject-container {
+  grid-column: 2;
+  grid-row: 2;
+}
+:root[pin-mails-inbox] #threadTree[rows="thread-card"].cards-row-compact tr.card-layout .pin-mails-card-action-rail {
+  grid-row: 1 / 3;
+}
 #threadTree[rows="thread-card"] tr.card-layout .pin-mails-independent-button {
+  display: grid !important;
+  place-items: center !important;
   inline-size: 24px !important;
   block-size: 24px !important;
   min-inline-size: 24px !important;
   min-block-size: 24px !important;
   margin: 0 !important;
+  padding: 0 !important;
   align-self: center;
   flex: 0 0 24px;
 }
@@ -1202,7 +1230,7 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   mask-size: 18px 18px;
 }
 :root[uidensity="touch"][pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-column:last-child {
-  gap: 2px;
+  row-gap: 2px;
   padding-block: 5px 7px;
 }
 :root[uidensity="touch"][pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .pin-mails-independent-button {
@@ -1293,70 +1321,17 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   min-block-size: 22px;
 }
 
-/* 3.2.7 — la punaise indépendante reste dans le flux de .thread-card-icon-info, juste
- * avant l'étoile Thunderbird. Les deux contrôles partagent donc le même
- * conteneur flex natif et le même centrage vertical, y compris au recyclage
- * des cartes. Le menu « Plus » conserve sa position native dans l'en-tête. */
-:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-column:last-child {
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding-block: 8px;
-}
-:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout :is(.thread-card-row, .thread-card-dynamic-row) {
-  position: static;
-  min-block-size: 19px;
-  line-height: 1.2;
-}
-:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-subject-container {
-  min-block-size: 19px;
-  padding-block: 0;
-}
-:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-icon-info {
-  display: flex !important;
-  align-items: center !important;
-  align-self: center;
-  min-block-size: 24px !important;
-  block-size: 24px;
-  margin-block: 0 !important;
-  padding-inline-end: 0;
-}
-:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-icon-info > * {
-  align-self: center;
-}
-:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .pin-mails-independent-button {
-  display: grid !important;
-  place-items: center !important;
-  inline-size: 24px !important;
-  block-size: 24px !important;
-  min-inline-size: 24px !important;
-  min-block-size: 24px !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-:root[uidensity="touch"][pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-column:last-child {
-  padding-block: 6px;
-}
-:root[uidensity="touch"][pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .pin-mails-independent-button {
-  inline-size: 28px !important;
-  block-size: 28px !important;
-  min-inline-size: 28px !important;
-  min-block-size: 28px !important;
-}
-
-
-/* 3.2.4 — une seule étoile native par ligne. Thunderbird peut exposer deux
+/* 3.2.8 — une seule étoile native par ligne. Thunderbird peut exposer deux
  * contrôles de drapeau lors de la réutilisation d'une carte virtualisée ; le
- * contrôleur marque le contrôle canonique et masque seulement le doublon. */
+ * contrôle canonique reste dans le rail structurel et seul le doublon est
+ * masqué. */
 :root[pin-mails-inbox][pin-mails-native-star] #threadTree [data-pin-mails-duplicate-star] {
   display: none !important;
 }
 :root[pin-mails-inbox][pin-mails-native-star] #threadTree[rows="thread-card"] tr.card-layout [data-pin-mails-native-star] {
-  position: absolute !important;
-  inset-block-start: 50%;
-  inset-inline-end: 60px;
-  transform: translateY(-50%);
+  position: relative !important;
+  inset: auto !important;
+  transform: none !important;
   display: grid !important;
   place-items: center !important;
   inline-size: 24px !important;
@@ -1367,7 +1342,6 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   padding: 0 !important;
 }
 :root[uidensity="touch"][pin-mails-inbox][pin-mails-native-star] #threadTree[rows="thread-card"] tr.card-layout [data-pin-mails-native-star] {
-  inset-inline-end: 68px;
   inline-size: 28px !important;
   block-size: 28px !important;
   min-inline-size: 28px !important;

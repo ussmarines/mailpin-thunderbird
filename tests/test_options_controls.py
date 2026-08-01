@@ -13,13 +13,14 @@ class ControlParser(HTMLParser):
     def __init__(self) -> None:
         super().__init__()
         self.buttons: list[dict[str, str]] = []
+        self.settings_controls: list[dict[str, str]] = []
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
-        if tag != "button":
-            return
         values = {key: value or "" for key, value in attrs}
-        if values.get("id"):
+        if tag == "button" and values.get("id"):
             self.buttons.append(values)
+        if tag in {"input", "select", "textarea"} and values.get("id"):
+            self.settings_controls.append(values)
 
 
 parser = ControlParser()
@@ -35,8 +36,8 @@ for button in parser.buttons:
 
 for required in (
     "status-toast",
+    "settings-loading",
     "save-dock",
-    "setDirty",
     "withBusy",
     "preserveEdits",
     "beforeunload",
@@ -49,14 +50,35 @@ for required_guard in (
     "requireConfiguration",
     "setConfigurationReady(false)",
     "setConfigurationReady(true)",
-    "currentSettings({settingsExperience",
+    "SETTINGS_CONTROL_DEFINITIONS",
+    "SETTINGS_CONTROL_REGISTRY",
+    "CONTROL_VALUE_TYPES",
+    "validateSettingsControlRegistry",
+    "PinSettings.normalize",
+    "dataset.settingKey",
+    "dataset.settingType",
+    "dataset.settingMigration",
     "if (!configuration?.settings) await reload()",
     "function currentDraftSnapshot()",
     "function rememberPersistedDraft()",
     "function syncDirtyState()",
-    "const disabled = !configurationReady || saveInFlight || !dirty;",
+    "const saveDisabled = !configurationReady || saveInFlight || !dirty || Boolean(draftStateError);",
+    "await applyConfiguration(config);",
 ):
     assert required_guard in JS, required_guard
+
+non_setting_controls = {"clear-stars-after-import", "import-file", "shortcut"}
+for control in parser.settings_controls:
+    control_id = control["id"]
+    if control_id in non_setting_controls:
+        continue
+    assert f'"{control_id}"' in JS, f"Unregistered settings control: {control_id}"
+
+assert '<script src="../api/pinInbox/modules/settings.js" defer></script>' in HTML
+assert HTML.index('../api/pinInbox/modules/settings.js') < HTML.index('options.js')
+assert 'id="settings-form"' in HTML and 'aria-busy="true" hidden' in HTML
+assert 'id="save-all-floating" type="submit"' in HTML
+assert 'id="discard-changes" type="reset"' in HTML
 
 assert ".save-dock {" in CSS
 assert ".save-dock { pointer-events: none" not in CSS
@@ -64,5 +86,6 @@ assert "pointer-events: none" not in CSS[CSS.index(".save-dock {"):CSS.index("@m
 
 assert "configuration.settings.preferredCalendarId" not in JS
 assert "{...configuration.settings" not in JS
+assert "Object.assign(configuration.settings" not in JS
 
-print("Options control and feedback guards: OK")
+print(f"Options registry and feedback guards ({len(parser.settings_controls)} static controls): OK")

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title data-i18n="optionsTitle">Paramètres de MailPerch</title>
   <link rel="stylesheet" href="options.css">
+  <script src="../api/pinInbox/modules/settings.js" defer></script>
   <script src="options.js" defer></script>
 </head>
 <body>
@@ -44,7 +45,11 @@
         </div>
       </aside>
 
-      <form id="settings-form" class="settings-content">
+      <div id="settings-loading" class="settings-loading" role="status" aria-live="polite">
+        <strong data-i18n="loadingSettingsTitle">Chargement des recommandations</strong>
+        <span data-i18n="loadingSettingsHelp">MailPerch vérifie les réglages locaux avant d’afficher les contrôles.</span>
+      </div>
+      <form id="settings-form" class="settings-content" aria-busy="true" hidden>
         <section class="settings-section feature-access-guide" data-nav-icon="⌂" data-nav-group="Essentiel">
           <div class="section-header">
             <div><p class="eyebrow" data-i18n="sectionStartEyebrow">Démarrage</p><h2 id="feature-access-title" data-i18n="sectionStart">Bien démarrer</h2><p data-i18n="sectionStartIntro">Choisissez une expérience simple ou avancée, puis laissez MailPerch adapter la densité et les animations.</p></div>
@@ -170,7 +175,7 @@
         </section>
 
         <footer class="form-footer"><div><strong data-i18n="readyToSave">Résumé local</strong><span id="stats"></span></div><span class="hint">Utilisez la barre Enregistrer/Annuler qui apparaît uniquement après une modification.</span></footer>
-        <div id="save-dock" class="save-dock" hidden><span id="save-dock-message" data-i18n="unsavedChanges">Des modifications ne sont pas encore enregistrées.</span><span class="save-dock-actions"><button id="discard-changes" type="reset" class="secondary" data-i18n="cancelChanges">Annuler</button><button id="save-all-floating" type="submit" class="primary" data-i18n="save">Enregistrer</button></span></div>
+        <div id="save-dock" class="save-dock" aria-hidden="true" hidden><span id="save-dock-message" data-i18n="unsavedChanges">Des modifications ne sont pas encore enregistrées.</span><span class="save-dock-actions"><button id="discard-changes" type="reset" class="secondary" aria-disabled="true" disabled data-i18n="cancelChanges">Annuler</button><button id="save-all-floating" type="submit" class="primary" aria-disabled="true" disabled data-i18n="save">Enregistrer</button></span></div>
       </form>
     </div>
   </main>

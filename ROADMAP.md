@@ -1,5 +1,13 @@
 # Feuille de route
 
+## 3.2.8 — validation Thunderbird des corrections structurelles
+
+- confirmer dans un profil Thunderbird 153 jetable que les recommandations sont visibles dès la première ouverture des paramètres ;
+- confirmer les 98 contrôles, Enregistrer, Annuler, réouverture et redémarrage avec l'API Experiment réelle ;
+- mesurer le rail sur une liste de messages synthétiques virtualisée et comparer aux seuils automatisés ;
+- conserver MP-2026-004, MP-2026-005 et MP-2026-007 en `À VALIDER` jusqu'à ces observations ;
+- intégrer à terme le scénario Playwright à un harnais Thunderbird qui expose ses contextes d'onglets.
+
 ## 3.2.7 — seconde correction des interactions réelles
 
 - confirmer dans Thunderbird 153 qu’une seule étoile native, une seule punaise MailPerch et un seul bouton Plus sont visibles par ligne ;

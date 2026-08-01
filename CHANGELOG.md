@@ -1,5 +1,17 @@
 # Journal des modifications
 
+## 3.2.8 — recommandations partagées, sauvegarde exhaustive et rail structurel
+
+- source unique gelée pour les recommandations, les types et la migration des réglages, consommée par l'Experiment et la page Options ;
+- conservation des choix `false` explicites et complétion des configurations absentes, partielles, anciennes ou invalides avant tout rendu ;
+- formulaire masqué derrière un état de chargement jusqu'à la normalisation, évitant un affichage transitoire entièrement désactivé ;
+- registre exhaustif des contrôles avec lecteurs, écrivains, normalisation, dépendances et participation au brouillon/sauvegarde ;
+- instantané canonique indépendant, erreurs de comparaison visibles, sauvegarde comparée à la réponse puis à une relecture API ;
+- test Playwright des vrais HTML/JS/CSS : 98 contrôles, pointeur, Enregistrer, Annuler, erreur, configurations anciennes et reconstruction ;
+- rail d'actions aligné par grille sur toutes les rangées du DOM ThreadCard Thunderbird 153, sans offset absolu ni déplacement du texte/de la date ;
+- test géométrique normal/compact/tactile/zoom 125 %/étoile native avec hit-tests et marge basse minimale ;
+- audit fonctionnel et procédure Browser Toolbox consignés dans `docs/FUNCTIONAL_AUDIT_3.2.8.md` et `docs/MANUAL_TEST_PLAN.md`.
+
 ## 3.2.7 — rail natif et sauvegarde vérifiée de bout en bout
 
 - alignement de l’étoile native, de la punaise MailPerch et du menu sur un rail vertical commun sans déplacer l’étoile dans le DOM ;

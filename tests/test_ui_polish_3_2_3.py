@@ -18,11 +18,11 @@ options_js = (ROOT / "extension/options/options.js").read_text(encoding="utf-8")
 options_css = (ROOT / "extension/options/options.css").read_text(encoding="utf-8")
 deep_audit = (ROOT / "scripts/deep_audit.py").read_text(encoding="utf-8")
 
-VERSION = "3.2.7"
+VERSION = "3.2.8"
 assert package["version"] == VERSION
 assert manifest["version"] == VERSION
 assert state["extensionVersion"] == VERSION
-assert state["baseGitHub"]["commit"] == "5285bb202e509ea6cb5d710eae40fb253c0faa88"
+assert state["baseGitHub"]["commit"] == "0f8c50cbafef8e6bc8779c13c2169b0392b6300c"
 assert f"Version de travail : **{VERSION}**" in memory
 
 # Settings spacing must stay scoped to the settings page. Stale attributes are
@@ -37,14 +37,14 @@ for selector in (
 ):
     assert selector not in pin_css, selector
 
-# Native message actions: the independent pin shares Thunderbird's native icon
-# flex container with the star, with stable 24 px and touch-safe 28 px targets.
+# Native message actions: the independent pin and star share the structural
+# action rail promoted from Thunderbird's icon-info node, with stable targets.
 for token in (
     "inline-size: 24px !important",
     "block-size: 24px !important",
     "inline-size: 28px !important",
     "block-size: 28px !important",
-    ".thread-card-icon-info",
+    ".pin-mails-card-action-rail",
 ):
     assert token in pin_css, token
 assert ".thread-card-icon-info .button-star" not in pin_css
@@ -116,4 +116,4 @@ for path in state["entrypoints"].values():
     assert (ROOT / path).is_file(), path
     assert path in memory, path
 
-print("MailPerch 3.2.7 UI polish and project-memory guards: OK")
+print("MailPerch 3.2.8 UI polish and project-memory guards: OK")

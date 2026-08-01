@@ -9,6 +9,7 @@ let cases = [];
 let templates = [];
 let dirty = false;
 let persistedDraftSnapshot = "";
+let draftStateError = null;
 let statusTimer = null;
 let lastStatusControl = null;
 let calendarRenderGeneration = 0;
@@ -34,7 +35,12 @@ function setConfigurationReady(ready) {
   configurationReady = Boolean(ready);
   document.body.toggleAttribute("data-configuration-ready", configurationReady);
   const form = $("settings-form");
-  if (form) form.setAttribute("aria-busy", String(!configurationReady));
+  const loading = $("settings-loading");
+  if (form) {
+    form.hidden = !configurationReady;
+    form.setAttribute("aria-busy", String(!configurationReady));
+  }
+  if (loading) loading.hidden = configurationReady;
   syncSaveControls();
 }
 
@@ -52,11 +58,154 @@ async function fetchConfigurationWithRetry(attempts = 4) {
   }
   throw lastError || new Error("La configuration MailPerch est indisponible.");
 }
-const BOOLEAN_IDS=[
-  "allowPinOutsideInbox","enableConversationPins","safeMode","showSmartSections","hideCompleted","autoRemoveCompleted","groupByAccount","groupByCustomGroup","showSearch","showCounters","rememberCollapsed","showAccountColor","showAttachments","showTags","showPriority","smartDates","showFolder","showNotes","showDeadlines","showGroups","showQuickActions","enableDragFromInbox","enableMultiSelect","enableBulkActions","confirmBulkDestructiveActions","enableUndo","confirmDelete","animateChanges","enableReminders","enableAdvancedReminders","enableAutomaticRules","enableRuleSimulation","autoUnpinOnArchive","autoCompleteOnArchive","autoUnpinOnDelete","autoUnpinOnRead","autoUnpinOnReply","keepPinOnMove","moveToWaitingOnReply","enableCalendarIntegration","enableBidirectionalCalendarSync","calendarCompleteOnPinComplete","calendarDeleteOnUnpin","enableGlobalDashboard","enablePerformanceMetrics","autoCleanup","enableWaitingWorkflow","reopenOnConversationReply","enableRecurringFollowUps","enableHistory","enableCases","enableKanban","enableTemplates","enableAutomaticBackups","backupBeforeMigration","backupIncludeHistory","enableConcurrentWriteProtection","enableCounterRegressionGuard","enableAutomaticNoReplyTracking","noReplyCancelOnIncomingReply","enableSmartViews","enableHealthCenter","enableHealthNotifications","enableDiagnostics"
-];
-const SELECT_IDS=["pinMode","defaultPinTarget","compatibilityMode","panelScope","sortMode","density","missedReminderPolicy","calendarItemType","settingsExperience","uiPreset","reduceMotion","defaultSmartView","diagnosticLevel"];
-const NUMBER_IDS=["cardLines","panelMaxHeight","panelPageSize","panelVirtualizationThreshold","completedRetentionDays","undoTimeoutMs","reminderLeadMinutes","cleanupGraceDays","defaultFollowUpDays","noReplyDefaultDays","ruleErrorDisableThreshold","ruleDefaultMaxPerMinute","backupIntervalHours","backupRetention","diagnosticMaxEntries"];
+
+if (!globalThis.PinSettings?.DEFAULTS) {
+  throw new Error("Le registre de recommandations MailPerch n'est pas chargé.");
+}
+
+const CONTROL_CODECS = Object.freeze({
+  boolean: Object.freeze({
+    read: control => Boolean(control.checked),
+    write: (control, value) => { control.checked = Boolean(value); }
+  }),
+  string: Object.freeze({
+    read: control => String(control.value || ""),
+    write: (control, value) => { control.value = String(value ?? ""); }
+  }),
+  number: Object.freeze({
+    read: (control, context) => readFiniteControlNumber(context.entry.id, context.settings[context.entry.key]),
+    write: (control, value) => { control.value = String(value ?? 0); }
+  }),
+  lines: Object.freeze({
+    read: control => lines(control.value),
+    write: (control, value) => { control.value = (Array.isArray(value) ? value : []).join("\n"); }
+  }),
+  preserved: Object.freeze({
+    read: (_control, context) => context.settings[context.entry.key],
+    write: (control, value) => { control.value = String(value ?? ""); }
+  }),
+  accountColors: Object.freeze({
+    read: () => Object.fromEntries([...accountControls].map(([key, input]) => [key, input.value])),
+    write: () => {}
+  }),
+  inboxEnabled: Object.freeze({
+    read: () => Object.fromEntries([...inboxControls].map(([uri, input]) => [uri, input.checked])),
+    write: () => {}
+  })
+});
+
+const CONTROL_VALUE_TYPES = Object.freeze({
+  boolean: "boolean",
+  string: "string",
+  number: "number",
+  lines: "array",
+  preserved: "string",
+  accountColors: "record",
+  inboxEnabled: "record"
+});
+
+function cloneSettingValue(value) {
+  return value && typeof value === "object" ? JSON.parse(JSON.stringify(value)) : value;
+}
+
+function settingControl(id, type, options = {}) {
+  const key = options.key || id;
+  const codec = CONTROL_CODECS[type];
+  if (!codec || !Object.prototype.hasOwnProperty.call(PinSettings.DEFAULTS, key)) {
+    throw new Error(`Contrôle de réglage invalide : ${id}`);
+  }
+  return Object.freeze({
+    id,
+    key,
+    type,
+    valueType: CONTROL_VALUE_TYPES[type],
+    defaultValue: cloneSettingValue(PinSettings.DEFAULTS[key]),
+    read: codec.read,
+    write: codec.write,
+    normalize: value => PinSettings.normalize({...PinSettings.DEFAULTS, [key]: value})[key],
+    includeInDirty: options.includeInDirty !== false,
+    includeInSave: options.includeInSave !== false,
+    dependency: options.dependency || "",
+    dynamic: Boolean(options.dynamic)
+  });
+}
+
+const SETTINGS_CONTROL_DEFINITIONS = Object.freeze([
+  ...[
+    "allowPinOutsideInbox", "enableConversationPins", "safeMode", "showSmartSections",
+    "hideCompleted", "autoRemoveCompleted", "groupByAccount", "groupByCustomGroup",
+    "showSearch", "showCounters", "rememberCollapsed", "showAccountColor",
+    "showAttachments", "showTags", "showPriority", "smartDates", "showFolder",
+    "showNotes", "showDeadlines", "showGroups", "showQuickActions",
+    "enableDragFromInbox", "enableMultiSelect", "enableBulkActions",
+    "confirmBulkDestructiveActions", "enableUndo", "confirmDelete", "animateChanges",
+    "enableReminders", "enableAdvancedReminders", "enableAutomaticRules",
+    "enableRuleSimulation", "autoUnpinOnArchive", "autoCompleteOnArchive",
+    "autoUnpinOnDelete", "autoUnpinOnRead", "autoUnpinOnReply", "keepPinOnMove",
+    "moveToWaitingOnReply", "enableCalendarIntegration", "enableBidirectionalCalendarSync",
+    "calendarCompleteOnPinComplete", "calendarDeleteOnUnpin", "enableGlobalDashboard",
+    "enablePerformanceMetrics", "autoCleanup", "enableWaitingWorkflow",
+    "reopenOnConversationReply", "enableRecurringFollowUps", "enableHistory",
+    "enableCases", "enableKanban", "enableTemplates", "enableAutomaticBackups",
+    "backupBeforeMigration", "backupIncludeHistory", "enableConcurrentWriteProtection",
+    "enableCounterRegressionGuard", "enableAutomaticNoReplyTracking",
+    "noReplyCancelOnIncomingReply", "enableSmartViews", "enableHealthCenter",
+    "enableHealthNotifications", "enableDiagnostics"
+  ].map(id => settingControl(id, "boolean")),
+  ...[
+    "pinMode", "defaultPinTarget", "compatibilityMode", "panelScope", "sortMode",
+    "density", "missedReminderPolicy", "calendarItemType", "settingsExperience",
+    "uiPreset", "reduceMotion", "defaultSmartView", "diagnosticLevel",
+    "waitingGroupId", "preferredCalendarId"
+  ].map(id => settingControl(id, "string")),
+  ...[
+    "cardLines", "panelMaxHeight", "panelPageSize", "panelVirtualizationThreshold",
+    "completedRetentionDays", "undoTimeoutMs", "reminderLeadMinutes",
+    "cleanupGraceDays", "defaultFollowUpDays", "noReplyDefaultDays",
+    "ruleErrorDisableThreshold", "ruleDefaultMaxPerMinute", "backupIntervalHours",
+    "backupRetention", "diagnosticMaxEntries"
+  ].map(id => settingControl(id, "number")),
+  settingControl("autoPinSenders", "lines"),
+  settingControl("autoPinTags", "lines"),
+  settingControl("backupDirectory", "preserved", {includeInDirty: false, dependency: "choose-backup"}),
+  settingControl("accounts-list", "accountColors", {key: "accountColors", dynamic: true}),
+  settingControl("accounts-list", "inboxEnabled", {key: "inboxEnabled", dynamic: true})
+]);
+
+const SETTINGS_CONTROL_REGISTRY = new Map(
+  SETTINGS_CONTROL_DEFINITIONS.map(entry => [entry.key, entry])
+);
+const NON_UI_SETTING_KEYS = Object.freeze(new Set(["schemaVersion", "showFolderBadge"]));
+const NON_SETTING_CONTROL_IDS = Object.freeze(new Set([
+  "clear-stars-after-import", "import-file", "shortcut"
+]));
+
+function validateSettingsControlRegistry() {
+  const schema = new Map(PinSettings.describe().map(entry => [entry.key, entry]));
+  for (const [key, entry] of SETTINGS_CONTROL_REGISTRY) {
+    const declaration = schema.get(key);
+    if (!declaration || declaration.migration !== PinSettings.MIGRATION_STRATEGY) {
+      throw new Error(`Stratégie de migration absente pour ${key}.`);
+    }
+    if (declaration.type !== entry.valueType) {
+      throw new Error(`Type de réglage divergent pour ${key}.`);
+    }
+    if (stableSnapshot(entry.defaultValue) !== stableSnapshot(declaration.defaultValue)) {
+      throw new Error(`Valeur recommandée divergente pour ${key}.`);
+    }
+    if (!$(entry.id)) throw new Error(`Contrôle déclaré introuvable : ${entry.id}.`);
+  }
+  for (const key of schema.keys()) {
+    if (!SETTINGS_CONTROL_REGISTRY.has(key) && !NON_UI_SETTING_KEYS.has(key)) {
+      throw new Error(`Réglage sans contrôle ni exclusion explicite : ${key}.`);
+    }
+  }
+  for (const control of document.querySelectorAll("#settings-form input[id], #settings-form select[id], #settings-form textarea[id]")) {
+    if (NON_SETTING_CONTROL_IDS.has(control.id)) continue;
+    const registered = SETTINGS_CONTROL_DEFINITIONS.some(entry => entry.id === control.id && !entry.dynamic);
+    if (!registered) throw new Error(`Contrôle configurable non enregistré : ${control.id}.`);
+  }
+}
 
 
 const CONTROL_HELP = {
@@ -274,23 +423,49 @@ function enhanceSettingsPage() {
 function syncSaveControls() {
   const save = $("save-all-floating");
   const discard = $("discard-changes");
-  const disabled = !configurationReady || saveInFlight || !dirty;
-  if (save) save.disabled = disabled;
-  if (discard) discard.disabled = disabled;
+  const saveDisabled = !configurationReady || saveInFlight || !dirty || Boolean(draftStateError);
+  const discardDisabled = !configurationReady || saveInFlight || !dirty;
+  if (save) {
+    save.disabled = saveDisabled;
+    save.setAttribute("aria-disabled", String(saveDisabled));
+  }
+  if (discard) {
+    discard.disabled = discardDisabled;
+    discard.setAttribute("aria-disabled", String(discardDisabled));
+  }
+}
+
+function canonicalDraftValue(value) {
+  if (value === undefined) throw new Error("Le brouillon contient une valeur indéfinie.");
+  if (typeof value === "number" && !Number.isFinite(value)) {
+    throw new Error("Le brouillon contient un nombre invalide.");
+  }
+  if (Array.isArray(value)) return value.map(canonicalDraftValue);
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.keys(value).sort().map(key => [key, canonicalDraftValue(value[key])])
+    );
+  }
+  return value;
 }
 
 function stableSnapshot(value) {
-  if (Array.isArray(value)) return `[${value.map(stableSnapshot).join(",")}]`;
-  if (value && typeof value === "object") {
-    return `{${Object.keys(value).sort().map(key => `${JSON.stringify(key)}:${stableSnapshot(value[key])}`).join(",")}}`;
-  }
-  return JSON.stringify(value);
+  return JSON.stringify(canonicalDraftValue(value));
+}
+
+function comparableDraftSettings(settings) {
+  return Object.fromEntries(
+    SETTINGS_CONTROL_DEFINITIONS
+      .filter(entry => entry.includeInDirty)
+      .map(entry => [entry.key, cloneSettingValue(settings[entry.key])])
+  );
 }
 
 function currentDraftSnapshot() {
   if (!configurationReady || !configuration?.settings) return "";
+  const settings = collectSettings();
   return stableSnapshot({
-    settings: collectSettings(),
+    settings: comparableDraftSettings(settings),
     groups,
     rules,
     cases,
@@ -300,13 +475,17 @@ function currentDraftSnapshot() {
 
 function rememberPersistedDraft() {
   persistedDraftSnapshot = currentDraftSnapshot();
+  draftStateError = null;
 }
 
 function setDirty(value = false) {
   dirty = Boolean(value);
   document.body.toggleAttribute("data-dirty", dirty);
   const dock = $("save-dock");
-  if (dock) dock.hidden = !dirty;
+  if (dock) {
+    dock.hidden = !dirty;
+    dock.setAttribute("aria-hidden", String(!dirty));
+  }
   syncSaveControls();
   if ($("save-dock-message")) {
     $("save-dock-message").textContent = dirty
@@ -317,7 +496,15 @@ function setDirty(value = false) {
 
 function syncDirtyState() {
   if (!configurationReady) return;
-  setDirty(currentDraftSnapshot() !== persistedDraftSnapshot);
+  try {
+    const snapshot = currentDraftSnapshot();
+    draftStateError = null;
+    setDirty(snapshot !== persistedDraftSnapshot);
+  } catch (error) {
+    draftStateError = error;
+    setDirty(true);
+    setStatus(`Impossible d’évaluer les modifications : ${error.message || error}`, "error", {persistent: true});
+  }
 }
 
 function clearStatus() {
@@ -584,6 +771,11 @@ function renderAccounts(accounts) {
     const color = document.createElement("input");
     color.type = "color";
     color.value = account.color;
+    color.dataset.settingKey = "accountColors";
+    color.dataset.settingType = SETTINGS_CONTROL_REGISTRY.get("accountColors").valueType;
+    color.dataset.settingDirty = "true";
+    color.dataset.settingSave = "true";
+    color.dataset.settingMigration = PinSettings.MIGRATION_STRATEGY;
     color.addEventListener("input", () => card.style.setProperty("--account-color", color.value));
     accountControls.set(account.key, color);
     const reset = node("button", "secondary", "Défaut");
@@ -601,6 +793,11 @@ function renderAccounts(accounts) {
       const input = document.createElement("input");
       input.type = "checkbox";
       input.checked = inbox.enabled;
+      input.dataset.settingKey = "inboxEnabled";
+      input.dataset.settingType = SETTINGS_CONTROL_REGISTRY.get("inboxEnabled").valueType;
+      input.dataset.settingDirty = "true";
+      input.dataset.settingSave = "true";
+      input.dataset.settingMigration = PinSettings.MIGRATION_STRATEGY;
       label.append(input, document.createTextNode(`Panneau dans « ${inbox.name} »`));
       inboxes.append(label);
       inboxControls.set(inbox.uri, input);
@@ -845,18 +1042,34 @@ function updateRuntimeSummary(config, backup = null) {
   if (config.providerMatrix) renderProviderMatrix(config.providerMatrix);
 }
 
-function applyConfiguration(config) {
+async function applyConfiguration(config) {
   if (!config?.settings || typeof config.settings !== "object") {
     throw new Error("La configuration MailPerch est incomplète.");
   }
-  configuration = {...config, settings: {...config.settings}};
-  const settings = configuration.settings;
-  for (const id of SELECT_IDS) if ($(id)) $(id).value = settings[id];
-  for (const id of NUMBER_IDS) if ($(id)) $(id).value = String(settings[id] ?? 0);
-  for (const id of BOOLEAN_IDS) if ($(id)) $(id).checked = Boolean(settings[id]);
-  $("autoPinSenders").value = (settings.autoPinSenders || []).join("\n");
-  $("autoPinTags").value = (settings.autoPinTags || []).join("\n");
-  $("backupDirectory").value = settings.backupDirectory || "";
+  const recommendedSettings = PinSettings.normalize(
+    config.recommendedSettings && typeof config.recommendedSettings === "object"
+      ? config.recommendedSettings
+      : PinSettings.defaults()
+  );
+  const settings = PinSettings.normalize(config.settings);
+  configuration = {
+    ...config,
+    settings,
+    recommendedSettings,
+    settingsSchema: Array.isArray(config.settingsSchema) ? config.settingsSchema : PinSettings.describe()
+  };
+  for (const entry of SETTINGS_CONTROL_DEFINITIONS) {
+    if (entry.dynamic) continue;
+    const control = $(entry.id);
+    if (!control) throw new Error(`Contrôle de réglage introuvable : ${entry.id}`);
+    entry.write(control, settings[entry.key], {entry, settings});
+    control.dataset.settingKey = entry.key;
+    control.dataset.settingType = entry.valueType;
+    control.dataset.settingDirty = String(entry.includeInDirty);
+    control.dataset.settingSave = String(entry.includeInSave);
+    control.dataset.settingMigration = PinSettings.MIGRATION_STRATEGY;
+    if (entry.dependency) control.dataset.settingDependency = entry.dependency;
+  }
   $("shortcut").value = config.shortcut || "Alt+P";
   groups = (config.groups || []).map(item => ({...item}));
   rules = (config.rules || []).map(item => ({...item}));
@@ -868,11 +1081,7 @@ function applyConfiguration(config) {
   renderRules();
   renderAccounts(config.accounts || []);
   renderWaitingGroups(settings.waitingGroupId);
-  void renderCalendars(settings.preferredCalendarId).then(() => {
-    // The calendar selector is populated asynchronously. Refresh the baseline
-    // only when the user has not started editing while it was loading.
-    if (!dirty && configuration?.settings === settings) rememberPersistedDraft();
-  });
+  await renderCalendars(settings.preferredCalendarId);
   applyUxPreferences(settings);
   updateRuntimeSummary(config);
   renderProviderMatrix(config.providerMatrix);
@@ -892,21 +1101,16 @@ function readFiniteControlNumber(id, fallback) {
 }
 
 function collectSettings() {
-  const accountColors = {};
-  const inboxEnabled = {};
-  for (const [key, input] of accountControls) accountColors[key] = input.value;
-  for (const [uri, input] of inboxControls) inboxEnabled[uri] = input.checked;
-  const result = {...requireConfiguration().settings, accountColors, inboxEnabled};
-  for (const id of SELECT_IDS) result[id] = $(id).value;
-  for (const id of NUMBER_IDS) result[id] = readFiniteControlNumber(id, result[id]);
-  for (const id of BOOLEAN_IDS) result[id] = $(id).checked;
-  result.showFolderBadge = false;
-  result.waitingGroupId = $("waitingGroupId").value;
-  result.preferredCalendarId = $("preferredCalendarId").value;
-  result.backupDirectory = requireConfiguration().settings.backupDirectory || "";
-  result.autoPinSenders = lines($("autoPinSenders").value);
-  result.autoPinTags = lines($("autoPinTags").value);
-  return result;
+  const settings = requireConfiguration().settings;
+  const result = {...settings};
+  for (const entry of SETTINGS_CONTROL_DEFINITIONS) {
+    if (!entry.includeInSave) continue;
+    const control = entry.dynamic ? $(entry.id) : $(entry.id);
+    if (!control) throw new Error(`Contrôle de réglage introuvable : ${entry.id}`);
+    const rawValue = entry.read(control, {entry, settings});
+    result[entry.key] = entry.normalize(rawValue);
+  }
+  return PinSettings.normalize(result);
 }
 
 async function reload({preserveEdits = false} = {}) {
@@ -928,12 +1132,22 @@ async function reload({preserveEdits = false} = {}) {
     };
     updateRuntimeSummary(config, backup);
   } else {
-    applyConfiguration(config);
+    await applyConfiguration(config);
     updateRuntimeSummary(config, backup);
   }
   renderHealth(health);
   renderProviderMatrix(config.providerMatrix || health?.providerMatrix);
   return config;
+}
+
+function persistenceSnapshot(config) {
+  return stableSnapshot({
+    settings: PinSettings.normalize(config?.settings),
+    groups: Array.isArray(config?.groups) ? config.groups : [],
+    rules: Array.isArray(config?.rules) ? config.rules : [],
+    cases: Array.isArray(config?.cases) ? config.cases : [],
+    templates: Array.isArray(config?.templates) ? config.templates : []
+  });
 }
 
 async function saveAll(event = null) {
@@ -968,6 +1182,10 @@ async function saveAll(event = null) {
       if (!saved?.settings || typeof saved.settings !== "object") {
         throw new Error("MailPerch n’a pas confirmé l’enregistrement des paramètres.");
       }
+      if (stableSnapshot(PinSettings.normalize(requested.settings)) !==
+          stableSnapshot(PinSettings.normalize(saved.settings))) {
+        throw new Error("Les réglages confirmés diffèrent du brouillon demandé.");
+      }
       // Read back through the public API. This verifies the complete path from
       // the form to the privileged preference/SQLite stores before showing a
       // success message.
@@ -975,13 +1193,16 @@ async function saveAll(event = null) {
       if (!persisted?.settings || typeof persisted.settings !== "object") {
         throw new Error("La relecture des paramètres enregistrés a échoué.");
       }
+      if (persistenceSnapshot(saved) !== persistenceSnapshot(persisted)) {
+        throw new Error("La configuration relue diffère de la configuration enregistrée.");
+      }
       return {
         ...persisted,
         settings: {...persisted.settings},
         shortcut: await getShortcut()
       };
     });
-    applyConfiguration(config);
+    await applyConfiguration(config);
     setStatus("Paramètres enregistrés.", "success");
   } catch (error) {
     setStatus(`Erreur : ${error.message || error}`, "error");
@@ -1129,8 +1350,15 @@ window.addEventListener("DOMContentLoaded", async () => {
   installCriticalSettingsActions();
   localize();
   renderBrandVersion();
-  enhanceSettingsPage();
   setConfigurationReady(false);
+
+  try {
+    validateSettingsControlRegistry();
+    enhanceSettingsPage();
+  } catch (error) {
+    setStatus(`Erreur : ${error.message || error}`, "error", {persistent: true});
+    return;
+  }
 
   const form = $("settings-form");
   const saveButton = $("save-all-floating");

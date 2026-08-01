@@ -40,9 +40,20 @@ Dans Thunderbird, vérifier séparément :
 3. Enregistrer, Annuler, Entrée/Espace et `Ctrl/Cmd+S` dans les paramètres ;
 4. le job Windows GitHub Actions, qui ne doit plus signaler `dist/.gitkeep\r`.
 
-## Régressions ciblées 3.2.7
+## Régressions ciblées 3.2.8
 
-1. Défilement rapide de 200 messages : une étoile native, une punaise MailPerch et un bouton Plus par carte.
-2. Modifier un sélecteur, cliquer Enregistrer, fermer puis rouvrir les paramètres et vérifier la valeur.
-3. Modifier une case, cliquer Annuler et vérifier le retour immédiat à la valeur enregistrée.
-4. Refaire les scénarios au clavier avec Ctrl/Cmd+S.
+Automatisé localement avec un serveur HTTP limité à l'interface locale et le CLI
+Playwright (laisser le serveur ouvert dans un premier terminal) :
+
+```bash
+python -m http.server 8765 --bind 127.0.0.1
+playwright-cli -s=mailperch-regression open http://127.0.0.1:8765
+playwright-cli -s=mailperch-regression run-code --filename tests/options_dom_flow.playwright.js
+playwright-cli -s=mailperch-regression run-code --filename tests/thread_card_geometry.playwright.js
+playwright-cli -s=mailperch-regression close
+```
+
+Ces scénarios chargent les vrais HTML/JS/CSS et une API synthétique sans données
+personnelles. Ils ne remplacent pas la validation Thunderbird : défilement rapide
+de 200 messages, comptes/dossiers, réouverture, redémarrage et clics natifs doivent
+être exécutés selon `docs/MANUAL_TEST_PLAN.md`.

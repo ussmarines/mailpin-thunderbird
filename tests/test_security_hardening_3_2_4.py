@@ -8,6 +8,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 EXT = ROOT / "extension"
 IMPLEMENTATION = (EXT / "api/pinInbox/implementation.js").read_text(encoding="utf-8")
+SETTINGS = (EXT / "api/pinInbox/modules/settings.js").read_text(encoding="utf-8")
 OPTIONS = (EXT / "options/options.js").read_text(encoding="utf-8")
 PIN_CSS = (EXT / "styles/pin.css").read_text(encoding="utf-8")
 SCANNER = (ROOT / "scripts/scan_secrets.py").read_text(encoding="utf-8")
@@ -19,7 +20,7 @@ CHECK_REPO = (ROOT / "scripts/check_repo.py").read_text(encoding="utf-8")
 CI_WORKFLOW = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
 RELEASE_WORKFLOW = (ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8")
 
-assert PACKAGE["version"] == MANIFEST["version"] == "3.2.7"
+assert PACKAGE["version"] == MANIFEST["version"] == "3.2.8"
 assert MANIFEST["permissions"] == ["menus"]
 assert "content_scripts" not in MANIFEST
 assert "externally_connectable" not in MANIFEST
@@ -133,7 +134,7 @@ for token in (
     "confirmDelete: true",
     "confirmBulkDestructiveActions: true",
 ):
-    assert token in IMPLEMENTATION, token
+    assert token in SETTINGS, token
 
 # Experiments cannot use static uninstall manifest events. MailPerch instead
 # listens to Gecko's awaited core Management lifecycle and uses AddonManager
@@ -189,7 +190,8 @@ assert "let configurationReady = false;" in OPTIONS
 assert "let saveInFlight = false;" in OPTIONS
 assert "if (!configurationReady || !dirty || saveInFlight) return;" in OPTIONS
 assert "saveInFlight = false;" in OPTIONS
-assert "backupDirectory = requireConfiguration().settings.backupDirectory" in OPTIONS
+assert 'settingControl("backupDirectory", "preserved", {includeInDirty: false' in OPTIONS
+assert "requireConfiguration().settings.backupDirectory = result.path" in OPTIONS
 assert "this._settings.backupDirectory = currentBackupDirectory" in IMPLEMENTATION
 
 # The row controller and CSS retain one canonical native star only.

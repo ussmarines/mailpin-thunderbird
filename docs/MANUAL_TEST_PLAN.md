@@ -334,3 +334,86 @@ Après chaque résultat, mettre à jour `docs/BUG_TRACKER.md` : `À VALIDER` ver
 4. Modifier de nouveau une valeur, cliquer **Annuler** et confirmer le retour immédiat à la valeur enregistrée.
 5. Refaire l’enregistrement avec `Ctrl+S` ou `Cmd+S`.
 6. Ne passer les entrées du registre à `CORRIGÉ` qu’après réussite de ces scénarios.
+
+## Validation ciblée 3.2.8 — recommandations, dock et géométrie
+
+Utiliser exclusivement un profil jetable et des messages synthétiques. Commencer
+sans préférence `extensions.pinMails.settings`, puis répéter avec une mise à jour
+contenant au moins une clé explicitement à `false`.
+
+### Recommandations et sauvegarde
+
+1. Ouvrir Options et confirmer qu'un état « Chargement des recommandations » est
+   remplacé directement par le formulaire normalisé, sans flash de cases toutes
+   décochées.
+2. Vérifier au minimum `showSearch`, `showQuickActions`, Agenda, dashboard,
+   sauvegardes, santé et diagnostic actifs ; règles automatiques, nettoyage
+   automatique et suppressions Agenda restent désactivés par recommandation.
+3. Modifier une case, un nombre, une liste, un texte, une couleur de compte, une
+   boîte, un groupe, une règle et un modèle. À chaque fois, vérifier que le dock
+   apparaît immédiatement dans le viewport.
+4. Au centre des boutons Enregistrer et Annuler, un clic doit être reçu ; vérifier
+   aussi Tab + Entrée/Espace et `Ctrl/Cmd+S`.
+5. Enregistrer, fermer l'onglet, le rouvrir, redémarrer Thunderbird puis vérifier
+   les valeurs. Modifier ensuite plusieurs sections et Annuler : aucune valeur du
+   brouillon ne doit subsister.
+6. Revenir manuellement à chaque valeur initiale : le dock doit disparaître sans
+   écriture. Provoquer si possible une erreur d'écriture dans un profil de test :
+   le dock et le brouillon doivent rester, sans notification de réussite.
+
+Dans la console du document Options sélectionné dans Browser Toolbox, ce diagnostic
+ne révèle que des identifiants de contrôles et des états d'interface :
+
+```js
+(() => {
+  const dock = document.querySelector("#save-dock");
+  const save = document.querySelector("#save-all-floating");
+  const cancel = document.querySelector("#discard-changes");
+  const rect = element => {
+    const box = element.getBoundingClientRect();
+    return {top: box.top, bottom: box.bottom, width: box.width, height: box.height};
+  };
+  console.table({
+    body: {ready: document.body.hasAttribute("data-configuration-ready"), dirty: document.body.hasAttribute("data-dirty")},
+    dock: {hidden: dock.hidden, ariaHidden: dock.getAttribute("aria-hidden"), display: getComputedStyle(dock).display, visibility: getComputedStyle(dock).visibility, pointerEvents: getComputedStyle(dock).pointerEvents, ...rect(dock)},
+    save: {disabled: save.disabled, ariaDisabled: save.getAttribute("aria-disabled"), hit: document.elementFromPoint(rect(save).width ? save.getBoundingClientRect().left + save.getBoundingClientRect().width / 2 : 0, save.getBoundingClientRect().top + save.getBoundingClientRect().height / 2)?.id},
+    cancel: {disabled: cancel.disabled, ariaDisabled: cancel.getAttribute("aria-disabled")}
+  });
+  console.table([...document.querySelectorAll("#settings-form [data-setting-key]")].map(control => ({id: control.id || "dynamique", key: control.dataset.settingKey, type: control.dataset.settingType, dirty: control.dataset.settingDirty, save: control.dataset.settingSave, migration: control.dataset.settingMigration})));
+})();
+```
+
+### Cartes Thunderbird 153
+
+Tester vue normale/compacte, densité tactile, thème sombre et mise à l'échelle
+Windows 100/125 %. Inclure premier/dernier message, lu/non lu, pièce jointe,
+étoilé/non étoilé, sélectionné, survolé, épinglé/désépinglé et défilement rapide.
+
+Dans la Browser Toolbox, relever uniquement classes et géométrie :
+
+```js
+(() => {
+  const pane = Services.wm.getMostRecentWindow("mail:3pane")?.document?.getElementById("tabmail")?.currentAbout3Pane;
+  const rect = element => {
+    const box = element.getBoundingClientRect();
+    return {top: box.top, bottom: box.bottom, left: box.left, right: box.right, width: box.width, height: box.height, centerY: box.top + box.height / 2};
+  };
+  const rows = [...pane.document.querySelectorAll('#threadTree[rows="thread-card"] tr.card-layout')];
+  console.table(rows.slice(0, 30).map((row, index) => {
+    const card = row.querySelector(".card-container");
+    const rail = row.querySelector(".pin-mails-card-action-rail");
+    const pin = row.querySelector(".pin-mails-independent-button, [data-pin-mails-native-star]");
+    const star = row.querySelector(".button-star");
+    const menu = row.querySelector(".tree-button-more");
+    const attachment = row.querySelector(".attachment-icon");
+    if (!card || !rail || !pin || !star || !menu) return {index, incomplete: true};
+    const cardBox = rect(card), pinBox = rect(pin), starBox = rect(star);
+    return {index, classes: row.className, properties: row.getAttribute("data-properties") || "", cardHeight: cardBox.height, pinCenterY: pinBox.centerY - cardBox.top, starCenterY: starBox.centerY - cardBox.top, centerDelta: Math.abs(pinBox.centerY - starBox.centerY), pinBottomGap: cardBox.bottom - pinBox.bottom, starBottomGap: cardBox.bottom - starBox.bottom, rail: JSON.stringify(rect(rail)), menu: JSON.stringify(rect(menu)), attachment: attachment ? JSON.stringify(rect(attachment)) : "none", pinHit: pane.document.elementFromPoint(pinBox.left + pinBox.width / 2, pinBox.centerY)?.className, starHit: pane.document.elementFromPoint(starBox.left + starBox.width / 2, starBox.centerY)?.className};
+  }));
+})();
+```
+
+Attendu : `centerDelta ≤ 1`, cibles entièrement dans la carte, espace inférieur
+`≥ 8` quand la hauteur le permet, aucun recouvrement avec le menu ou la pièce
+jointe, et une cible correcte pour `pinHit`/`starHit`. Joindre les résultats à
+MP-2026-004/005/007 avant de modifier leur statut.

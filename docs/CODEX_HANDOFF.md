@@ -5,8 +5,8 @@ court afin d’éviter de dupliquer le contexte.
 
 ## État courant
 
-- version de travail : **3.2.7** ;
-- base GitHub : `main` au commit `3e8852d4ffcd05c3235000489452ffef6dc752b0` ;
+- version de travail : **3.2.8** ;
+- base GitHub : `main` au commit `0f8c50cbafef8e6bc8779c13c2169b0392b6300c` ;
 - ID : `pin-mails@MailPerch.local` ;
 - schémas : SQLite 5, paramètres 6, données 6 ;
 - aucune publication distante automatique.
@@ -49,3 +49,12 @@ Puis suivre `docs/MANUAL_TEST_PLAN.md`, particulièrement la section 3.2.4.
 ## Passe 3.2.7
 
 Priorité absolue : MP-2026-004 et MP-2026-005. Ne pas les déclarer corrigés sur la seule base des tests statiques. Lire `docs/BUG_TRACKER.md`, conserver l’étoile dans le DOM natif en mode indépendant et maintenir un gestionnaire direct sur les boutons visibles des paramètres.
+
+## Passe 3.2.8
+
+- `modules/settings.js` est la source unique des recommandations et migrations ;
+- le registre Options doit rester exhaustif et son validateur doit échouer visiblement si le DOM et le schéma divergent ;
+- les tests Playwright chargent les vrais actifs mais utilisent une API synthétique locale ; ils ne constituent pas une validation de l'onglet Thunderbird ;
+- le rail d'actions repose sur la structure réelle de ThreadCard 153 et ne doit pas être remplacé par un offset de capture ;
+- le lancement Thunderbird temporaire a réussi, mais WebDriver BiDi n'a exposé aucun contexte d'onglet ;
+- MP-2026-004, MP-2026-005 et MP-2026-007 restent `À VALIDER`.

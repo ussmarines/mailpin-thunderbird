@@ -10,7 +10,7 @@ manifest = json.loads((EXT / "manifest.json").read_text(encoding="utf-8"))
 version = manifest["version"]
 
 assert manifest["manifest_version"] == 3
-assert version == "3.2.7"
+assert version == "3.2.8"
 assert manifest["permissions"] == ["menus"]
 assert manifest["browser_specific_settings"]["gecko"]["id"] == "pin-mails@MailPerch.local"
 assert manifest["browser_specific_settings"]["gecko"]["strict_min_version"] == "128.0"

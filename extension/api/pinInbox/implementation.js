@@ -25,7 +25,7 @@ ChromeUtils.defineESModuleGetters(lazy, {
 
 const PIN_MODULES = {};
 const MODULE_PATHS = [
-  "identity.js", "storage.js", "workflow.js", "rules.js", "calendar.js",
+  "settings.js", "identity.js", "storage.js", "workflow.js", "rules.js", "calendar.js",
   "smart.js", "bulk.js", "diagnostics.js", "providers.js", "health.js",
   "migrations.js", "performance.js", "localization.js"
 ];
@@ -64,6 +64,7 @@ const BACKUP_CHECK_INTERVAL_MS = 60 * 60 * 1000;
 const INBOX_ATTRIBUTE = "pin-mails-inbox";
 const BUTTON_CLASS = "pin-mails-row-button";
 const INDEPENDENT_BUTTON_CLASS = "pin-mails-independent-button";
+const CARD_ACTION_RAIL_CLASS = "pin-mails-card-action-rail";
 const PANEL_TOGGLE_ID = "pin-mails-qfb-toggle";
 const EDITOR_ID = "pin-mails-editor";
 const TOAST_ID = "pin-mails-toast";
@@ -294,109 +295,7 @@ const DEFAULT_COLORS = [
   "#ca5010"
 ];
 
-const DEFAULT_SETTINGS = Object.freeze({
-  schemaVersion: 6,
-  pinMode: "independent",
-  panelScope: "currentInbox",
-  sortMode: "manual",
-  density: "normal",
-  cardLines: 3,
-  panelMaxHeight: 420,
-  panelPageSize: 100,
-  panelVirtualizationThreshold: 180,
-  uiPreset: "balanced",
-  settingsExperience: "guided",
-  reduceMotion: "auto",
-  groupByAccount: true,
-  groupByCustomGroup: false,
-  showAccountColor: true,
-  showAttachments: true,
-  showTags: true,
-  showPriority: true,
-  smartDates: true,
-  showFolder: true,
-  showSearch: true,
-  showQuickActions: true,
-  showNotes: true,
-  showDeadlines: true,
-  showGroups: true,
-  showCounters: true,
-  showFolderBadge: false,
-  rememberCollapsed: true,
-  allowPinOutsideInbox: true,
-  showSmartSections: true,
-  hideCompleted: true,
-  completedRetentionDays: 30,
-  autoRemoveCompleted: false,
-  enableConversationPins: true,
-  defaultPinTarget: "message",
-  enableAdvancedReminders: true,
-  reminderLeadMinutes: 0,
-  missedReminderPolicy: "notify",
-  enableAutomaticRules: false,
-  autoUnpinOnArchive: false,
-  autoCompleteOnArchive: false,
-  autoUnpinOnDelete: true,
-  autoUnpinOnRead: false,
-  autoUnpinOnReply: false,
-  moveToWaitingOnReply: false,
-  waitingGroupId: "",
-  keepPinOnMove: true,
-  autoPinSenders: [],
-  autoPinTags: [],
-  enableCalendarIntegration: true,
-  preferredCalendarId: "",
-  calendarItemType: "task",
-  enableGlobalDashboard: true,
-  enableSmartViews: true,
-  defaultSmartView: "today",
-  enableBulkActions: true,
-  confirmBulkDestructiveActions: true,
-  enableHealthCenter: true,
-  enableHealthNotifications: true,
-  enableDiagnostics: true,
-  diagnosticLevel: "warning",
-  diagnosticMaxEntries: 500,
-  compatibilityMode: "auto",
-  enablePerformanceMetrics: true,
-  enableBidirectionalCalendarSync: false,
-  calendarDeleteOnUnpin: false,
-  calendarCompleteOnPinComplete: false,
-  enableWaitingWorkflow: false,
-  enableAutomaticNoReplyTracking: false,
-  noReplyDefaultDays: 5,
-  noReplyCancelOnIncomingReply: true,
-  defaultFollowUpDays: 3,
-  reopenOnConversationReply: false,
-  enableCases: true,
-  enableKanban: true,
-  enableRecurringFollowUps: false,
-  enableTemplates: true,
-  enableHistory: true,
-  enableAutomaticBackups: true,
-  backupIntervalHours: 24,
-  backupRetention: 10,
-  backupDirectory: "",
-  backupBeforeMigration: true,
-  backupIncludeHistory: true,
-  enableRuleSimulation: true,
-  ruleErrorDisableThreshold: 5,
-  ruleDefaultMaxPerMinute: 60,
-  enableConcurrentWriteProtection: true,
-  enableCounterRegressionGuard: true,
-  autoCleanup: false,
-  cleanupGraceDays: 7,
-  animateChanges: true,
-  enableUndo: true,
-  undoTimeoutMs: 9000,
-  enableDragFromInbox: true,
-  enableMultiSelect: true,
-  enableReminders: true,
-  confirmDelete: true,
-  safeMode: false,
-  accountColors: {},
-  inboxEnabled: {}
-});
+let DEFAULT_SETTINGS = null;
 
 const DEFAULT_DATA = Object.freeze({
   schemaVersion: 6,
@@ -579,103 +478,10 @@ function uniqueEntityId(prefix, values) {
 }
 
 function normalizeSettings(value) {
-  const source = value && typeof value === "object" ? value : {};
-  const settings = clone(DEFAULT_SETTINGS);
-  const scopes = new Set(["currentInbox", "currentAccount", "global"]);
-  const sorts = new Set(["manual", "pinnedAt", "messageDate", "sender", "account", "deadline", "priority"]);
-  const densities = new Set(["compact", "normal", "comfortable"]);
-  const pinModes = new Set(["independent", "nativeStar"]);
-  const pinTargets = new Set(["message", "conversation"]);
-  const missedPolicies = new Set(["notify", "nextStart", "ignore"]);
-  const calendarTypes = new Set(["task", "event"]);
-  const compatibilityModes = new Set(["auto", "full", "reduced"]);
-  const uiPresets = new Set(["compact", "balanced", "comfortable"]);
-  const settingsExperiences = new Set(["guided", "advanced"]);
-  const reduceMotionModes = new Set(["auto", "always", "never"]);
-  const diagnosticLevels = new Set(["debug", "info", "warning", "error"]);
-  const smartViews = new Set(["all", "today", "overdue", "week", "waiting", "noReply", "noDue", "unread", "missing", "calendarError", "recentCompleted"]);
-
-  settings.pinMode = pinModes.has(source.pinMode) ? source.pinMode : settings.pinMode;
-  settings.defaultPinTarget = pinTargets.has(source.defaultPinTarget) ? source.defaultPinTarget : settings.defaultPinTarget;
-  settings.missedReminderPolicy = missedPolicies.has(source.missedReminderPolicy) ? source.missedReminderPolicy : settings.missedReminderPolicy;
-  settings.calendarItemType = calendarTypes.has(source.calendarItemType) ? source.calendarItemType : settings.calendarItemType;
-  settings.compatibilityMode = compatibilityModes.has(source.compatibilityMode) ? source.compatibilityMode : settings.compatibilityMode;
-  settings.uiPreset = uiPresets.has(source.uiPreset) ? source.uiPreset : settings.uiPreset;
-  settings.settingsExperience = settingsExperiences.has(source.settingsExperience) ? source.settingsExperience : settings.settingsExperience;
-  settings.reduceMotion = reduceMotionModes.has(source.reduceMotion) ? source.reduceMotion : settings.reduceMotion;
-  settings.diagnosticLevel = diagnosticLevels.has(source.diagnosticLevel) ? source.diagnosticLevel : settings.diagnosticLevel;
-  settings.defaultSmartView = smartViews.has(source.defaultSmartView) ? source.defaultSmartView : settings.defaultSmartView;
-  settings.panelScope = scopes.has(source.panelScope) ? source.panelScope : settings.panelScope;
-  settings.sortMode = sorts.has(source.sortMode) ? source.sortMode : settings.sortMode;
-  settings.density = densities.has(source.density) ? source.density : settings.density;
-  settings.cardLines = [2, 3].includes(Number(source.cardLines)) ? Number(source.cardLines) : settings.cardLines;
-  settings.panelMaxHeight = clampNumber(source.panelMaxHeight, 160, 900, settings.panelMaxHeight);
-  settings.panelPageSize = clampNumber(source.panelPageSize, 20, 500, settings.panelPageSize);
-  settings.panelVirtualizationThreshold = clampNumber(source.panelVirtualizationThreshold, 40, 2000, settings.panelVirtualizationThreshold);
-  settings.diagnosticMaxEntries = clampNumber(source.diagnosticMaxEntries, 50, MAX_DIAGNOSTIC_EVENTS, settings.diagnosticMaxEntries);
-  settings.noReplyDefaultDays = clampNumber(source.noReplyDefaultDays, 1, 365, settings.noReplyDefaultDays);
-  settings.cleanupGraceDays = clampNumber(source.cleanupGraceDays, 0, 90, settings.cleanupGraceDays);
-  settings.undoTimeoutMs = clampNumber(source.undoTimeoutMs, 3000, 20000, settings.undoTimeoutMs);
-  settings.completedRetentionDays = clampNumber(source.completedRetentionDays, 0, 3650, settings.completedRetentionDays);
-  settings.reminderLeadMinutes = clampNumber(source.reminderLeadMinutes, 0, 10080, settings.reminderLeadMinutes);
-  settings.defaultFollowUpDays = clampNumber(source.defaultFollowUpDays, 0, 365, settings.defaultFollowUpDays);
-  settings.backupIntervalHours = clampNumber(source.backupIntervalHours, 1, 24 * 365, settings.backupIntervalHours);
-  settings.backupRetention = clampNumber(source.backupRetention, 1, 100, settings.backupRetention);
-  settings.ruleErrorDisableThreshold = clampNumber(source.ruleErrorDisableThreshold, 1, 100, settings.ruleErrorDisableThreshold);
-  settings.ruleDefaultMaxPerMinute = clampNumber(source.ruleDefaultMaxPerMinute, 1, 1000, settings.ruleDefaultMaxPerMinute);
-
-  for (const key of [
-    "groupByAccount", "groupByCustomGroup", "showAccountColor", "showAttachments",
-    "showTags", "showPriority", "smartDates", "showFolder", "showSearch",
-    "showQuickActions", "showNotes", "showDeadlines", "showGroups", "showCounters",
-    "showFolderBadge", "rememberCollapsed", "autoCleanup", "animateChanges",
-    "enableUndo", "enableDragFromInbox", "enableMultiSelect", "enableReminders",
-    "confirmDelete", "safeMode", "allowPinOutsideInbox", "showSmartSections",
-    "hideCompleted", "autoRemoveCompleted", "enableConversationPins",
-    "enableAdvancedReminders", "enableAutomaticRules", "autoUnpinOnArchive",
-    "autoCompleteOnArchive", "autoUnpinOnDelete", "autoUnpinOnRead",
-    "autoUnpinOnReply", "moveToWaitingOnReply", "keepPinOnMove",
-    "enableCalendarIntegration", "enableGlobalDashboard", "enablePerformanceMetrics",
-    "enableBidirectionalCalendarSync", "calendarDeleteOnUnpin",
-    "calendarCompleteOnPinComplete", "enableWaitingWorkflow",
-    "reopenOnConversationReply", "enableCases", "enableKanban",
-    "enableRecurringFollowUps", "enableTemplates", "enableHistory",
-    "enableAutomaticBackups", "backupBeforeMigration", "backupIncludeHistory",
-    "enableRuleSimulation", "enableConcurrentWriteProtection",
-    "enableCounterRegressionGuard", "enableAutomaticNoReplyTracking",
-    "noReplyCancelOnIncomingReply", "enableSmartViews", "enableBulkActions",
-    "confirmBulkDestructiveActions", "enableHealthCenter", "enableHealthNotifications",
-    "enableDiagnostics"
-  ]) {
-    settings[key] = normalizeBoolean(source[key], settings[key]);
+  if (!PIN_MODULES.PinSettings) {
+    throw new Error("Le module de recommandations MailPerch n'est pas chargé.");
   }
-
-  settings.accountColors = {};
-  for (const [key, color] of Object.entries(normalizeRecord(source.accountColors, {maxKeyLength: 256}))) {
-    if (COLOR_RE.test(String(color))) settings.accountColors[key] = String(color).toLowerCase();
-  }
-  settings.inboxEnabled = {};
-  for (const [uri, enabled] of Object.entries(normalizeRecord(source.inboxEnabled, {maxKeyLength: 4096}))) {
-    if (typeof enabled === "boolean") settings.inboxEnabled[uri] = enabled;
-  }
-  settings.autoPinSenders = uniqueStrings(
-    Array.isArray(source.autoPinSenders)
-      ? source.autoPinSenders.map(value => boundedText(value, 320).trim().toLowerCase()).filter(Boolean)
-      : []
-  ).slice(0, 200);
-  settings.autoPinTags = uniqueStrings(
-    Array.isArray(source.autoPinTags)
-      ? source.autoPinTags.map(value => boundedText(value, 128).trim()).filter(Boolean)
-      : []
-  ).slice(0, 100);
-  settings.waitingGroupId = GROUP_ID_RE.test(String(source.waitingGroupId || "")) ? String(source.waitingGroupId) : "";
-  settings.preferredCalendarId = String(source.preferredCalendarId || "").slice(0, 256);
-  settings.backupDirectory = String(source.backupDirectory || "").slice(0, 2048);
-  // This legacy option is intentionally forced off. Pin counts must never be
-  // presented as Thunderbird unread/new-message counters in the folder tree.
-  settings.showFolderBadge = false;
-  settings.schemaVersion = 6;
-  return settings;
+  return PIN_MODULES.PinSettings.normalize(value);
 }
 
 function hardenImportedConfiguration(settingsValue, dataValue, currentBackupDirectory = "") {
@@ -1870,6 +1676,10 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       for (const name of MODULE_PATHS) {
         Services.scriptloader.loadSubScript(context.extension.rootURI.resolve(`api/pinInbox/modules/${name}`), PIN_MODULES, "UTF-8");
       }
+      if (!PIN_MODULES.PinSettings?.DEFAULTS) {
+        throw new Error("Le registre de recommandations MailPerch est indisponible.");
+      }
+      DEFAULT_SETTINGS = PIN_MODULES.PinSettings.DEFAULTS;
       this._modulesLoaded = true;
     }
     if (!this._readyPromise) {
@@ -2342,6 +2152,8 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     const broken = Object.values(this._data.refs).filter(ref => ref.missingSince).length;
     return {
       settings: clone(this._settings),
+      recommendedSettings: PIN_MODULES.PinSettings.defaults(),
+      settingsSchema: PIN_MODULES.PinSettings.describe(),
       groups: clone(this._data.groups),
       cases: clone(this._data.cases || []),
       templates: clone(this._data.templates || []),
@@ -4809,9 +4621,9 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         button.type = "button";
         button.dataset.pinMailsAction = "toggle-row-pin";
         if (row.classList.contains("card-layout")) {
-          // Keep MailPerch's pin beside Thunderbird's native star in the
-          // official icon-info container. The star stays in its native DOM
-          // position; no cloning or reparenting is required.
+          // Keep every card action in Thunderbird's official icon-info
+          // container. CSS turns this container into a rail spanning the
+          // native sender, subject and information rows.
           const iconInfo = row.querySelector(".thread-card-icon-info");
           const nativeStar = iconInfo?.querySelector(".button-star, .tree-button-flag");
           iconInfo?.insertBefore(button, nativeStar || null);
@@ -4837,6 +4649,10 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     const patchRow = row => {
       if (!(row instanceof about3Pane.HTMLElement) || row.dataset.properties?.includes("dummy")) return;
       const hdr = headerForRow(row);
+      const cardActionRail = row.classList.contains("card-layout")
+        ? row.querySelector(".thread-card-icon-info")
+        : null;
+      cardActionRail?.classList.add(CARD_ACTION_RAIL_CLASS);
       const starCandidates = [...new Set(row.querySelectorAll(".button-star, .tree-button-flag"))];
       const nativeStarMode = this._settings.pinMode === "nativeStar" && isEnabled();
 
@@ -4853,11 +4669,6 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
           const pinned = this._isPinnedHeader(hdr);
           setButtonLabel(star, pinned);
           row.style.setProperty("--pin-row-account-color", this._getAccountColor(accountKeyForFolder(hdr?.folder || about3Pane.gFolder)));
-          if (row.classList.contains("card-layout")) {
-            const headerRow = row.querySelector(".thread-card-row");
-            const more = headerRow?.querySelector(".tree-button-more");
-            if (headerRow && star.parentElement !== headerRow) headerRow.insertBefore(star, more || null);
-          }
         }
       } else {
         // Independent mode must leave Thunderbird's native star controls entirely
@@ -6172,6 +5983,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       panel?.remove(); allHeader?.remove(); panelToggle?.remove(); editor?.remove(); contextMenu?.remove(); ownedPopupSet?.remove(); groupDialog?.remove(); groupAssignmentDialog?.remove(); for (const badge of document.querySelectorAll(".pin-mails-folder-badge")) badge.remove();
       for (const button of document.querySelectorAll(`.${INDEPENDENT_BUTTON_CLASS}`)) button.remove();
       for (const button of document.querySelectorAll(`.${BUTTON_CLASS}`)) restoreNativeButton(button);
+      for (const rail of document.querySelectorAll(`.${CARD_ACTION_RAIL_CLASS}`)) rail.classList.remove(CARD_ACTION_RAIL_CLASS);
       for (const star of document.querySelectorAll("[data-pin-mails-native-star], [data-pin-mails-duplicate-star]")) {
         star.removeAttribute("data-pin-mails-native-star");
         star.removeAttribute("data-pin-mails-duplicate-star");
