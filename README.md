@@ -46,7 +46,8 @@ npm run build   # XPI reproductible + archive source
 npm run ci      # ensemble des contrôles
 ```
 
-Le contenu de `extension/` est placé à la racine du XPI. Le dossier `dist/` n’est pas versionné.
+Le contenu suivi de `extension/` est placé à la racine du XPI ; les fichiers
+locaux ignorés ne sont jamais empaquetés. Le dossier `dist/` n’est pas versionné.
 
 ## Structure
 
