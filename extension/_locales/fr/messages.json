@@ -1165,4 +1165,10 @@
   "dynamicSimulationSummary": {"message": "$1 correspondance(s) sur $2 message(s)."},
   "dynamicSimulationBusy": {"message": "Simulation des règles…"},
   "dynamicSimulationNoMatch": {"message": "Aucune correspondance."}
+  ,"supportTitle": {"message": "Soutenir MailPerch"}
+  ,"supportIntro": {"message": "Vous appréciez MailPerch ? Vous pouvez contribuer à la poursuite de son développement en faisant un don."}
+  ,"supportPayPal": {"message": "Soutenir le projet via PayPal"}
+  ,"supportAuthor": {"message": "Profil GitHub de l’auteur (lien externe)"}
+  ,"supportRepository": {"message": "Dépôt GitHub du projet (lien externe)"}
+  ,"supportOpenFailed": {"message": "Impossible d’ouvrir ce lien externe. Réessayez plus tard."}
 }

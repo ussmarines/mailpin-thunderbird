@@ -154,6 +154,12 @@ h1 { margin-bottom: .25rem; font-size: clamp(1.65rem, 3vw, 2.25rem); line-height
 .feature-map { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); margin-top: var(--space-4); }
 .feature-map > div { display: grid; gap: .25rem; padding: var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-2); }
 .feature-map span { color: var(--muted); }
+.support-panel { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-4); align-items: center; margin-top: var(--space-4); padding: var(--space-4); border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-2); }
+.support-panel h3 { margin-bottom: .2rem; font-size: 1rem; }
+.support-panel p { max-width: 62ch; margin: 0; color: var(--muted); }
+.support-links { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .55rem; }
+.support-links a { display: inline-flex; align-items: center; justify-content: center; min-height: var(--control-height); padding: .65rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font-weight: 650; text-decoration: none; }
+.support-links a.primary { border-color: var(--accent); }
 
 .advanced-group { margin-top: var(--space-4); border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-2); overflow: clip; }
 .advanced-group summary { cursor: pointer; padding: var(--space-3) var(--space-4); font-weight: 750; }
@@ -256,6 +262,8 @@ body[data-reduce-motion="always"] *, body[data-reduce-motion="always"] *::before
   .page-header { align-items: stretch; flex-direction: column; }
   .header-actions button { width: 100%; }
   .quick-overview, .setting-grid.two-columns, .setting-grid.three-columns, .toggle-grid, .feature-map { grid-template-columns: 1fr; }
+  .support-panel { grid-template-columns: 1fr; }
+  .support-links { justify-content: flex-start; }
   .group-row, .provider-row { grid-template-columns: 1fr; }
   .save-dock { border-radius: var(--radius); align-items: stretch; flex-direction: column; }
   .save-dock-actions button { flex: 1; }

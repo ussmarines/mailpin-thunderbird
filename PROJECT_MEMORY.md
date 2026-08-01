@@ -4,7 +4,7 @@
 > Lire ce document avant tout autre fichier. Il donne l’état courant, les invariants,
 > la carte du dépôt et les chemins exacts à ouvrir selon la tâche.
 >
-> Version de travail : **3.2.11**
+> Version de travail : **3.2.12**
 > Base de travail vérifiée : `main` au commit `3ffd5b88d03230d3b2d6792da18534d897fdd06c`
 > Produit : **MailPerch — Email Pins & Follow-up**
 > Extension ID de développement : `pin-mails@MailPerch.local`
@@ -82,7 +82,7 @@ applique les mêmes validations et ne crée plus une échéance artificielle.
 
 | Élément | Valeur |
 |---|---|
-| Version extension/package | `3.2.11` |
+| Version extension/package | `3.2.12` |
 | Thunderbird déclaré | `128.0` à `153.*` |
 | Manifest | MV3 |
 | Permission WebExtension | `menus` uniquement |

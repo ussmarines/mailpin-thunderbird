@@ -5,7 +5,7 @@
 > fichier après `PROJECT_MEMORY.md`.
 
 Dernière mise à jour : **2026-08-01**
-Version de travail : **3.2.11**
+Version de travail : **3.2.12**
 
 ## Règles de suivi
 

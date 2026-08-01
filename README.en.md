@@ -1,38 +1,44 @@
 # MailPerch
 
-**MailPerch — Email Pins & Follow-up**
+MailPerch is a local-first Thunderbird extension for pinning, organizing, and following up on important email without replacing the native message list.
 
-> **Pin, organize and follow up on your emails in Thunderbird.**
-> *Keep important mail within reach.*
-
-MailPerch is a Thunderbird extension that adds a separate pinned-message panel above the native message list, plus local workflows, reminders, groups, cases, Kanban, rules and Calendar integration.
-
-> **Status: development build 3.2.11.** Static checks, model tests and regression guards run automatically. A complete real-Thunderbird GUI validation is still required before release.
+> **Status: development build 3.2.12.** Compatible with Thunderbird 128 through 153. Complete manual UI and Calendar validation is still required before publication.
 
 ## Main features
 
-- pins independent from Thunderbird stars;
-- a separate panel that does not hide the native message list;
-- account colours, groups, notes, priorities and deadlines;
-- active, waiting, planned and completed workflows;
-- conversations, reminders and recurring follow-ups;
-- cases, Kanban, smart views and bulk actions;
-- automatic local no-reply follow-up tracking;
+- a separate pinned-message panel above the native message list;
+- local follow-ups, deadlines, reminders, groups, cases, and templates;
 - local rules with simulation and loop protection;
-- Thunderbird Calendar tasks and events with a compatibility matrix;
-- protected migrations, previewed restores and local SQLite storage;
-- a health center and an exportable redacted diagnostic log;
-- a native context menu on the whole pinned card;
-- guided, searchable settings with contextual help and unobtrusive feedback;
-- incremental rendering and progressive loading for large pin collections.
+- Calendar tasks and events based on compatible calendars;
+- dashboard, smart views, and a redacted local diagnostic.
 
-## Test installation
+## Installation
 
-Build with `npm run build`, then install `dist/MailPerch_v3.2.11.xpi` from Thunderbird’s Add-ons Manager. Restart Thunderbird completely and use a test profile for destructive actions.
+1. Build the extension with `npm run build`.
+2. In Thunderbird, open **Add-ons and Themes**, then **Install Add-on From File**.
+3. Select `dist/MailPerch_v3.2.12.xpi`.
+4. Restart Thunderbird and begin with a test profile.
 
-## Development
+MailPerch is not yet announced as available through Thunderbird Add-ons.
 
-Requires Python 3.11+ and Node.js 20+. There are no npm dependencies.
+## Quick start
+
+1. Open MailPerch settings.
+2. Keep the recommended settings or adjust the display and follow-up options.
+3. Pin a message from the list, context menu, or configured shortcut.
+4. Use the panel or dashboard to organize follow-ups.
+
+## Privacy and local operation
+
+MailPerch makes no network calls, sends no telemetry, and loads no remote content. Tracking data stays in the Thunderbird profile; message bodies and attachment contents are not copied to its local database. See [PRIVACY.md](PRIVACY.md).
+
+## Permissions and Experiment API
+
+The extension contains a privileged Experiment API to integrate its panel with Thunderbird and access the required local features. This entails Thunderbird’s full-access warning and depends on internal Thunderbird interfaces. See [SECURITY.md](SECURITY.md), the [threat model](docs/THREAT_MODEL.md), and [known limitations](docs/KNOWN_LIMITATIONS.md).
+
+## Development and tests
+
+Requirements: Python 3.11+ and Node.js 20+. No npm dependencies are required.
 
 ```bash
 npm run check
@@ -41,12 +47,28 @@ npm run build
 npm run ci
 ```
 
-The contents of `extension/` are packaged at the XPI root. See `AGENTS.md` and `docs/CODEX_HANDOFF.md` before changing privileged code.
+Manual validation is described in [docs/MANUAL_TEST_PLAN.md](docs/MANUAL_TEST_PLAN.md). Contributors should also read [AGENTS.md](AGENTS.md) and [docs/CODEX_HANDOFF.md](docs/CODEX_HANDOFF.md).
 
-## Privacy and security
+## Documentation and issues
 
-The add-on contains no network calls or telemetry. Structured pin metadata is stored locally. It uses a privileged Thunderbird Experiment API, which grants full access and depends on internal Thunderbird interfaces. See `PRIVACY.md`, `SECURITY.md` and `docs/THREAT_MODEL.md`.
+- [Architecture](docs/ARCHITECTURE.md)
+- [Bug tracker](docs/BUG_TRACKER.md)
+- [Debugging guide](docs/DEBUGGING.md)
+- [Report an issue](https://github.com/ussmarines/mailperch-thunderbird/issues)
+
+## Author and official links
+
+- [ussmarines](https://github.com/ussmarines)
+- [MailPerch repository](https://github.com/ussmarines/mailperch-thunderbird)
+
+## Support MailPerch
+
+Enjoying MailPerch? You can support its continued development with a donation.
+
+[**Support the project via PayPal**](https://paypal.me/ussmarinesdot)
+
+Donations are optional and do not unlock any features.
 
 ## License
 
-This repository is source-available, not open source. Commercial use and public redistribution are prohibited except with the copyright holder’s written permission. See `LICENSE`.
+This repository is provided under a restrictive source-available, non-commercial license with no right to public redistribution. See [LICENSE](LICENSE).

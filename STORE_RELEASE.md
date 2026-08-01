@@ -7,12 +7,15 @@
 - **Sous-titre FR :** Épinglez, organisez et suivez vos e-mails dans Thunderbird.
 - **Subtitle EN:** Pin, organize and follow up on your emails in Thunderbird.
 - **Slogan :** Keep important mail within reach.
+- **Auteur public :** [ussmarines](https://github.com/ussmarines)
+- **Projet :** https://github.com/ussmarines/mailperch-thunderbird
+- **Soutien facultatif :** https://paypal.me/ussmarinesdot
 
 Voir `BRANDING.md` pour les règles de nommage et les identifiants techniques conservés.
 
 ## État
 
-La build 3.2.10 reste une Release Candidate de développement et n’est pas déclarée prête pour Add-ons for Thunderbird.
+La build 3.2.12 reste une Release Candidate de développement et n’est pas déclarée prête pour Add-ons for Thunderbird.
 
 Avant publication :
 

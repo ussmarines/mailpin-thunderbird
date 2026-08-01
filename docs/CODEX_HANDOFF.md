@@ -5,7 +5,7 @@ court afin d’éviter de dupliquer le contexte.
 
 ## État courant
 
-- version de travail : **3.2.11** ;
+- version de travail : **3.2.12** ;
 - base GitHub : `main` au commit `3ffd5b88d03230d3b2d6792da18534d897fdd06c` ;
 - ID : `pin-mails@MailPerch.local` ;
 - schémas : SQLite 5, paramètres 6, données 6 ;

@@ -1,5 +1,11 @@
 # Journal des modifications
 
+## 3.2.12 — identité du projet et soutien facultatif
+
+- métadonnées manifest et package complétées pour `ussmarines`, le dépôt officiel et le soutien PayPal facultatif ;
+- section discrète de soutien ajoutée aux paramètres, avec liens externes ouverts uniquement après un clic ;
+- README français et anglais refondus autour de l’installation, du fonctionnement local, des limites de validation et des liens officiels.
+
 ## 3.2.11 — réglages explicites et création Agenda validée
 
 - les cartes de réglage exposent désormais leur état réel : fond actif uniquement lorsque la case est cochée, focus/survol distincts et badge « Recommandé » pour une recommandation désactivée ;

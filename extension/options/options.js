@@ -1535,6 +1535,23 @@ function localize() {
   }
 }
 
+async function openExternalSupportLink(event) {
+  event.preventDefault();
+  const link = event.currentTarget;
+  try {
+    await messenger.tabs.create({url: link.href});
+  } catch (error) {
+    console.warn("MailPerch : ouverture du lien de soutien impossible", error?.name || "Error");
+    setStatus(msg("supportOpenFailed"), "error", {control: link, persistent: true});
+  }
+}
+
+function installSupportLinks() {
+  for (const link of document.querySelectorAll("[data-support-link]")) {
+    link.addEventListener("click", openExternalSupportLink);
+  }
+}
+
 
 function installCriticalSettingsActions() {
   const form = $("settings-form");
@@ -1568,6 +1585,7 @@ async function startOptions() {
   try {
     installCriticalSettingsActions();
     localize();
+    installSupportLinks();
     renderBrandVersion();
     setConfigurationReady(false);
     validateSettingsControlRegistry();

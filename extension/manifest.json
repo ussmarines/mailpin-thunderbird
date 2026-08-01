@@ -3,8 +3,13 @@
   "name": "__MSG_extensionName__",
   "short_name": "__MSG_extensionShortName__",
   "description": "__MSG_extensionDescription__",
-  "version": "3.2.11",
+  "version": "3.2.12",
   "author": "ussmarines",
+  "developer": {
+    "name": "ussmarines",
+    "url": "https://github.com/ussmarines"
+  },
+  "homepage_url": "https://github.com/ussmarines/mailperch-thunderbird",
   "browser_specific_settings": {
     "gecko": {
       "id": "pin-mails@MailPerch.local",

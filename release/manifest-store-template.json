@@ -8,5 +8,9 @@
     }
   },
   "homepage_url": "https://github.com/ussmarines/mailperch-thunderbird",
+  "developer": {
+    "name": "ussmarines",
+    "url": "https://github.com/ussmarines"
+  },
   "support_url": "https://github.com/ussmarines/mailperch-thunderbird/issues"
 }

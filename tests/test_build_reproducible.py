@@ -44,7 +44,7 @@ with tempfile.TemporaryDirectory() as directory:
         relative_references = re.findall(r'(?:src|href)="([^"]+)"', html)
         relative_references += re.findall(r'(?:import|loadClassicScript)\("([^"]+)"\)', bootstrap)
         for reference in relative_references:
-            if reference.startswith(("#", "data:")):
+            if reference.startswith(("#", "data:", "//")) or re.match(r"^[a-z][a-z0-9+.-]*:", reference, re.I):
                 continue
             target = posixpath.normpath(posixpath.join("options", reference))
             assert target in names, f"Missing packaged Options dependency: {reference}"

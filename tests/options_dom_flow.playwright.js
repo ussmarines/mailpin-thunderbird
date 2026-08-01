@@ -26,6 +26,8 @@ async page => {
       templates: []
     };
     globalThis.__mailperchCalendarCreates = [];
+    globalThis.__mailperchExternalUrls = [];
+    globalThis.__mailperchFailExternalOpen = false;
     const readPersisted = () => {
       try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || clone(initial); }
       catch { return clone(initial); }
@@ -138,7 +140,11 @@ async page => {
           ? englishDynamicMessages[key] || `English ${key}`
           : `Français ${key}`)
       },
-      tabs: {create: async () => ({})}
+      tabs: {create: async ({url}) => {
+        globalThis.__mailperchExternalUrls.push(url);
+        if (globalThis.__mailperchFailExternalOpen) throw new Error("synthetic external-open failure");
+        return {};
+      }}
     };
     if (initializationMode() === "api-delayed") {
       setTimeout(() => { globalThis.messenger.pinInbox = pinInbox; }, 150);
@@ -243,6 +249,19 @@ async page => {
 
   let state = await dockState();
   assert(!state.dirty && state.hidden && state.ariaHidden === "true", "The initial draft must be clean");
+
+  // Support links are inert until clicked, then use the controlled tab mock
+  // rather than navigating to PayPal or GitHub during the test.
+  assert((await page.evaluate(() => globalThis.__mailperchExternalUrls.length)) === 0,
+    "Support links must not open automatically");
+  await page.locator("#support-paypal").click();
+  assert((await page.evaluate(() => globalThis.__mailperchExternalUrls.at(-1))) === "https://paypal.me/ussmarinesdot",
+    "The PayPal support link must open only after an explicit click");
+  await page.evaluate(() => { globalThis.__mailperchFailExternalOpen = true; });
+  await page.locator("#support-author").click();
+  assert((await page.locator("#status-message").textContent()).includes("supportOpenFailed"),
+    "A controlled external-open failure must leave an accessible localized error");
+  await page.evaluate(() => { globalThis.__mailperchFailExternalOpen = false; });
 
   // A setting card has one visual source of truth: the native checkbox. The
   // label click and keyboard activation must keep the draft and card in sync.

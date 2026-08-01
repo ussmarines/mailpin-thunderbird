@@ -1165,4 +1165,10 @@
   "dynamicSimulationSummary": {"message": "$1 match(es) across $2 message(s)."},
   "dynamicSimulationBusy": {"message": "Simulating rules…"},
   "dynamicSimulationNoMatch": {"message": "No matches."}
+  ,"supportTitle": {"message": "Support MailPerch"}
+  ,"supportIntro": {"message": "Enjoying MailPerch? You can support its continued development with a donation."}
+  ,"supportPayPal": {"message": "Support the project via PayPal"}
+  ,"supportAuthor": {"message": "Author’s GitHub profile (external link)"}
+  ,"supportRepository": {"message": "Project GitHub repository (external link)"}
+  ,"supportOpenFailed": {"message": "Could not open this external link. Please try again later."}
 }

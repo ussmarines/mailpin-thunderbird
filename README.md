@@ -1,74 +1,74 @@
 # MailPerch
 
-**MailPerch — Email Pins & Follow-up**
+MailPerch est une extension Thunderbird locale pour épingler, organiser et suivre les e-mails importants sans remplacer la liste native des messages.
 
-> **Épinglez, organisez et suivez vos e-mails dans Thunderbird.**
-> *Gardez vos messages importants à portée de main.*
-
-MailPerch est une extension Thunderbird qui ajoute un panneau d’épingles au-dessus de la liste native des messages, avec suivi local, rappels, groupes, affaires, Kanban, règles et intégration Agenda.
-
-> **État : build de développement 3.2.11.** Les contrôles statiques, les tests de modèle et les gardes de régression sont exécutés automatiquement. Une validation graphique complète dans Thunderbird reste obligatoire avant publication.
+> **État : build de développement 3.2.12.** Compatible avec Thunderbird 128 à 153. La validation manuelle complète de l’interface et de l’Agenda reste nécessaire avant toute publication.
 
 ## Fonctions principales
 
-- épingles indépendantes des étoiles Thunderbird ;
-- panneau distinct sans masquer la liste native ;
-- couleurs personnalisables par compte, groupes, notes et priorités ;
-- suivi « À traiter / En attente / Planifié / Terminé » ;
-- conversations, échéances, rappels et récurrences ;
-- affaires, tableau Kanban, vues intelligentes et actions groupées ;
-- suivi automatique des conversations sans réponse ;
-- règles locales avec simulation et protections anti-boucle ;
-- tâches et événements Agenda avec matrice de compatibilité ;
-- sauvegardes prévisualisées, migrations protégées et stockage SQLite local ;
-- centre de santé et diagnostic local expurgé exportable ;
-- menu contextuel natif sur toute la surface des cartes épinglées ;
-- tableau de bord global adapté aux thèmes clair, sombre et contraste élevé ;
-- paramètres guidés, recherche, aides contextuelles et retours d’action non invasifs ;
-- rendu différentiel et chargement progressif pour les grands volumes.
+- panneau d’épingles distinct au-dessus de la liste native ;
+- suivis, échéances, rappels, groupes, affaires et modèles locaux ;
+- règles locales avec simulation et protections contre les boucles ;
+- tâches et événements Agenda selon les calendriers compatibles ;
+- tableau de bord, vues intelligentes et diagnostic local expurgé.
 
-## Installation de test
+## Installation
 
-1. Construire avec `npm run build`, ou utiliser le XPI fourni séparément.
-2. Dans Thunderbird : **Extensions et thèmes → roue dentée → Installer un module depuis un fichier**.
-3. Sélectionner `dist/MailPerch_v3.2.11.xpi`.
-4. Redémarrer complètement Thunderbird.
-5. Utiliser un profil de test et des messages sans importance pour les opérations de suppression, archivage et règles.
+1. Construisez l’extension avec `npm run build`.
+2. Dans Thunderbird, ouvrez **Extensions et thèmes**, puis **Installer un module depuis un fichier**.
+3. Sélectionnez `dist/MailPerch_v3.2.12.xpi`.
+4. Redémarrez Thunderbird et utilisez d’abord un profil de test.
 
-## Développement
+MailPerch n’est pas encore annoncé comme disponible sur Thunderbird Add-ons.
 
-Prérequis : Python 3.11+ et Node.js 20+. Le projet n’a aucune dépendance npm.
+## Prise en main
+
+1. Ouvrez les paramètres MailPerch.
+2. Conservez les réglages recommandés ou adaptez l’affichage et les suivis.
+3. Épinglez un message depuis la liste, le menu contextuel ou le raccourci configuré.
+4. Utilisez le panneau ou le tableau de bord pour organiser les suivis.
+
+## Confidentialité et fonctionnement local
+
+MailPerch n’effectue aucun appel réseau, télémétrie ou chargement de contenu distant. Les données de suivi restent dans le profil Thunderbird ; le corps des messages et le contenu des pièces jointes ne sont pas copiés dans sa base locale. Consultez [PRIVACY.md](PRIVACY.md).
+
+## Permissions et API Experiment
+
+L’extension contient une API Experiment privilégiée pour intégrer le panneau à Thunderbird et accéder aux fonctions locales nécessaires. Cette API implique l’avertissement d’accès complet de Thunderbird et dépend de ses interfaces internes. Consultez [SECURITY.md](SECURITY.md), le [modèle de menace](docs/THREAT_MODEL.md) et les [limites connues](docs/KNOWN_LIMITATIONS.md).
+
+## Développement et tests
+
+Prérequis : Python 3.11+ et Node.js 20+. Aucune dépendance npm n’est requise.
 
 ```bash
-npm run check   # structure, sécurité, syntaxe et ressources
-npm test        # tests de modèle et gardes anti-régression
-npm run build   # XPI reproductible + archive source
-npm run ci      # ensemble des contrôles
+npm run check
+npm test
+npm run build
+npm run ci
 ```
 
-Le contenu suivi de `extension/` est placé à la racine du XPI ; les fichiers
-locaux ignorés ne sont jamais empaquetés. Le dossier `dist/` n’est pas versionné.
+Les procédures de validation manuelle sont décrites dans [docs/MANUAL_TEST_PLAN.md](docs/MANUAL_TEST_PLAN.md). Les contributeurs doivent également lire [AGENTS.md](AGENTS.md) et [docs/CODEX_HANDOFF.md](docs/CODEX_HANDOFF.md).
 
-## Structure
+## Documentation et problèmes
 
-```text
-extension/       code installable Thunderbird
-docs/            architecture, sécurité, tests et décisions
-scripts/         contrôle, secrets et build reproductible
-tests/           tests statiques, modèles, accessibilité, données et UX 3.2
-release/         modèle de manifeste pour la future publication
-.github/         CI et modèles de contribution
-AGENTS.md        consignes compactes pour Codex et les contributeurs
-```
+- [Architecture](docs/ARCHITECTURE.md)
+- [Registre des bugs](docs/BUG_TRACKER.md)
+- [Guide de débogage](docs/DEBUGGING.md)
+- [Signaler un problème](https://github.com/ussmarines/mailperch-thunderbird/issues)
 
-## Confidentialité
+## Auteur et liens officiels
 
-Aucun appel réseau n’est présent. Les métadonnées nécessaires aux épingles sont stockées localement. Le corps des messages et le contenu des pièces jointes ne sont pas copiés dans la base de l’extension. Voir [PRIVACY.md](PRIVACY.md).
+- [ussmarines](https://github.com/ussmarines)
+- [Dépôt MailPerch](https://github.com/ussmarines/mailperch-thunderbird)
 
-## Sécurité
+## Soutenir MailPerch
 
-L’extension utilise une API Experiment pour accéder à des éléments internes de Thunderbird. Cela implique un avertissement d’accès complet à l’installation et une dépendance aux versions internes de Thunderbird. Voir [SECURITY.md](SECURITY.md), [docs/THREAT_MODEL.md](docs/THREAT_MODEL.md) et [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md).
+Vous appréciez MailPerch ? Vous pouvez contribuer à la poursuite de son développement en faisant un don.
+
+[**Soutenir le projet via PayPal**](https://paypal.me/ussmarinesdot)
+
+Les dons sont facultatifs et ne débloquent aucune fonctionnalité.
 
 ## Licence
 
-Ce dépôt n’est pas open source. Le code est fourni sous une licence source-disponible restrictive, non commerciale et sans droit de redistribution publique. Voir [LICENSE](LICENSE). Une validation juridique professionnelle est recommandée avant publication publique.
+Ce dépôt est fourni sous une licence source-disponible restrictive, non commerciale et sans droit de redistribution publique. Consultez [LICENSE](LICENSE).
