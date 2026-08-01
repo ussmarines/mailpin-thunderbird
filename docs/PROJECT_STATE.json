@@ -2,10 +2,10 @@
   "format": "mailperch-project-state",
   "version": 1,
   "project": "MailPerch — Email Pins & Follow-up",
-  "extensionVersion": "3.2.9",
+  "extensionVersion": "3.2.10",
   "baseGitHub": {
     "branch": "main",
-    "commit": "0f8c50cbafef8e6bc8779c13c2169b0392b6300c"
+    "commit": "3ffd5b88d03230d3b2d6792da18534d897fdd06c"
   },
   "extensionId": "pin-mails@MailPerch.local",
   "thunderbird": {

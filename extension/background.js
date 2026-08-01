@@ -3,7 +3,6 @@
 const MENU_IDS = Object.freeze({
   toggle: "pin-mails-toggle-selection",
   conversation: "pin-mails-toggle-conversation",
-  displayed: "pin-mails-toggle-displayed",
   dashboard: "pin-mails-dashboard",
   options: "pin-mails-options",
   undo: "pin-mails-undo"
@@ -92,11 +91,6 @@ function createMenus() {
     contexts: ["message_list"]
   });
   messenger.menus.create({
-    id: MENU_IDS.displayed,
-    title: translate("menuDisplayed", "Épingler ou désépingler ce message"),
-    contexts: ["message_display"]
-  });
-  messenger.menus.create({
     id: MENU_IDS.dashboard,
     title: translate("menuDashboard", "Tableau de bord MailPerch"),
     contexts: ["tools_menu"]
@@ -153,8 +147,6 @@ messenger.menus.onClicked.addListener(async (info, tab) => {
         return await toggleSelected(tab.id);
       case MENU_IDS.conversation:
         return await toggleConversation(tab.id);
-      case MENU_IDS.displayed:
-        return await toggleDisplayed(tab.id);
       default:
         return undefined;
     }

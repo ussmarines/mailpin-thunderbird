@@ -10,7 +10,7 @@ manifest = json.loads((EXT / "manifest.json").read_text(encoding="utf-8"))
 version = manifest["version"]
 
 assert manifest["manifest_version"] == 3
-assert version == "3.2.9"
+assert version == "3.2.10"
 assert manifest["permissions"] == ["menus"]
 assert manifest["browser_specific_settings"]["gecko"]["id"] == "pin-mails@MailPerch.local"
 assert manifest["browser_specific_settings"]["gecko"]["strict_min_version"] == "128.0"
@@ -59,7 +59,7 @@ required_runtime = [
     "api/pinInbox/modules/identity.js", "api/pinInbox/modules/storage.js",
     "api/pinInbox/modules/workflow.js", "api/pinInbox/modules/rules.js",
     "api/pinInbox/modules/calendar.js", "options/options.html", "options/options.css",
-    "options/options.js", "dashboard/dashboard.html", "dashboard/dashboard.css",
+    "options/options-bootstrap.js", "options/options.js", "dashboard/dashboard.html", "dashboard/dashboard.css",
     "dashboard/dashboard.js", "styles/pin.css", "icons/pin.svg",
     "icons/pin-regular.svg", "icons/pin-filled.svg", "icons/conversation.svg",
     "icons/dashboard.svg", "icons/add.svg", "_locales/fr/messages.json",

@@ -2,7 +2,10 @@ from __future__ import annotations
 
 import hashlib
 import importlib.util
+import json
 from pathlib import Path
+import posixpath
+import re
 import tempfile
 import zipfile
 
@@ -19,7 +22,32 @@ with tempfile.TemporaryDirectory() as directory:
     module.create_xpi(second)
     assert hashlib.sha256(first.read_bytes()).digest() == hashlib.sha256(second.read_bytes()).digest()
     with zipfile.ZipFile(first) as archive:
-        assert not any(name.endswith("AGENTS.md") for name in archive.namelist())
+        names = set(archive.namelist())
+        assert not any(name.endswith("AGENTS.md") for name in names)
+        assert sum(name == "manifest.json" for name in names) == 1
+        assert sum(name == "options/options.html" for name in names) == 1
+        for required in (
+            "options/options.html",
+            "options/options.css",
+            "options/options-bootstrap.js",
+            "options/options.js",
+            "api/pinInbox/modules/settings.js",
+        ):
+            assert required in names, required
+
+        manifest = json.loads(archive.read("manifest.json"))
+        assert manifest["options_ui"]["page"] == "options/options.html"
+        html = archive.read("options/options.html").decode("utf-8")
+        bootstrap = archive.read("options/options-bootstrap.js").decode("utf-8")
+        assert '<script src="options-bootstrap.js" defer></script>' in html
+        assert '<script src="options.js"' not in html
+        relative_references = re.findall(r'(?:src|href)="([^"]+)"', html)
+        relative_references += re.findall(r'(?:import|loadClassicScript)\("([^"]+)"\)', bootstrap)
+        for reference in relative_references:
+            if reference.startswith(("#", "data:")):
+                continue
+            target = posixpath.normpath(posixpath.join("options", reference))
+            assert target in names, f"Missing packaged Options dependency: {reference}"
     source_first = Path(directory) / "source-first.zip"
     source_second = Path(directory) / "source-second.zip"
     module.create_source_zip(source_first)

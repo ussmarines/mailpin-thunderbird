@@ -1,5 +1,15 @@
 # Journal des modifications
 
+## 3.2.10 — amorçage Options prouvé dans Thunderbird
+
+- correction de la cause réelle du chargeur permanent : la localisation du libellé de restauration supprimait l’`input#import-file`, puis `options.js` échouait avant `initializeOptions()` ;
+- ajout d’un bootstrap autonome chargé avant les dépendances, avec capture des erreurs globales et promesses rejetées, watchdog terminal, étapes expurgées et Réessayer sans écouteurs dupliqués ;
+- chargement contrôlé de `settings.js`, import dynamique du module principal et attente bornée de l’espace de noms Experiment avant `getConfiguration()` ;
+- matrice Playwright étendue aux scripts absents, import rejeté, exception top-level, API absente/retardée/rejetée/bloquée, normalisation, Agenda et succès complet avec localisation non vide ;
+- inspection directe du XPI pour vérifier la page Options, toutes ses dépendances relatives et l’unicité du manifeste ;
+- retrait du contexte de menu obsolète `message_display`, refusé par Thunderbird 153, tandis que l’action native de message affiché reste disponible ;
+- validation dans Thunderbird 153.0.1 avec profil temporaire sans compte : recommandations, dock, Enregistrer, Annuler, réouverture et persistance après redémarrage.
+
 ## 3.2.9 — initialisation des paramètres bornée et récupérable
 
 - contrôleur d’initialisation explicite : les paramètres atteignent toujours le formulaire prêt ou un panneau d’erreur avec Réessayer ;

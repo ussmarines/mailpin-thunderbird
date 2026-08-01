@@ -21,6 +21,24 @@ Vérifier :
 3. `pinInbox.onDashboardRequested` est reçu par le background ;
 4. aucune ouverture directe via `contentTab` depuis l’Experiment.
 
+## Paramètres bloqués au chargement
+
+La page Options charge d’abord `options-bootstrap.js`. Celui-ci doit rendre un
+formulaire prêt ou un panneau d’erreur terminal et conserve une trace expurgée
+dans `window.MailPerchOptionsStartup.trace`.
+
+1. Rechercher la première erreur `options-bootstrap.js` ou `options.js` dans la
+   console du navigateur, avant les erreurs secondaires.
+2. Vérifier les étapes `html:loaded`, `bootstrap:loaded`, `settings:*`, `main:*`,
+   `dom:ready`, `options:init:*`, `api:*` et `ui:ready`.
+3. Une étape absente désigne la frontière qui n’a pas terminé ; aucune donnée de
+   courrier, chemin local ou contenu importé ne doit apparaître dans la trace.
+4. Utiliser **Réessayer** pour reconstruire une seule initialisation. Si le module
+   principal n’a jamais été évalué, le bootstrap recharge la page.
+5. Pour reproduire une erreur de paquet, inspecter directement le XPI et confirmer
+   qu’il contient une seule page Options, `options-bootstrap.js`, `options.js`,
+   `options.css` et `api/pinInbox/modules/settings.js`.
+
 ## Clic droit
 
 - inspecter `#pin-mails-card-context-menu`, qui doit être un `menupopup` dans le `popupset` de la fenêtre `about:3pane` ;

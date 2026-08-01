@@ -16,6 +16,10 @@ assert 'conversationMenuTitle(state)' in bg
 assert 'menuPinMessages' in bg and 'menuUnpinMessages' in bg
 assert 'menuPinConversation' in bg and 'menuUnpinConversation' in bg
 assert 'conversationCount' in impl and 'allConversationsPinned' in impl
+# Thunderbird 153 removed the historical message_display menu context. The
+# dedicated messageDisplayAction remains the supported displayed-message path.
+assert 'contexts: ["message_display"]' not in bg
+assert 'messenger.messageDisplayAction?.onClicked.addListener' in bg
 
 # The historical privileged message-menu injection must not coexist with messenger.menus.
 for forbidden in ['_menuWindows', '_ensureMainMenuWindow', '_updateMainMenuWindow', 'pin-mails-message-command']:

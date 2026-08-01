@@ -1,5 +1,11 @@
 # Feuille de route
 
+## 3.2.10 — validation réelle de la page Options
+
+- recommandations, dock, Enregistrer, Annuler, réouverture et redémarrage validés dans Thunderbird 153.0.1 avec un profil jetable ;
+- MP-2026-005, MP-2026-007 et MP-2026-008 corrigés et conservés comme régressions automatisées ;
+- MP-2026-004 reste à valider sur une vraie liste de messages contenant les variantes de cartes requises.
+
 ## 3.2.9 — validation Thunderbird de l’initialisation récupérable
 
 - ouvrir Options dans un profil vierge sans compte ni calendrier et confirmer que le chargeur disparaît ;

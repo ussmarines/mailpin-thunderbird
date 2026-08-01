@@ -6,6 +6,7 @@ import fs from "node:fs";
 
 const scenario = fs.readFileSync(new URL("./options_dom_flow.playwright.js", import.meta.url), "utf8");
 const html = fs.readFileSync(new URL("../extension/options/options.html", import.meta.url), "utf8");
+const bootstrap = fs.readFileSync(new URL("../extension/options/options-bootstrap.js", import.meta.url), "utf8");
 
 for (const required of [
   "page.goto(optionsUrl)",
@@ -20,6 +21,14 @@ for (const required of [
   "A missing key must receive its recommendation",
   "A missing settings object must display safe recommendations as active",
   "configuration-never",
+  "configuration-reject",
+  "normalization-throw",
+  "api-absent",
+  "api-delayed",
+  "main-absent",
+  "import-rejected",
+  "top-level-exception",
+  "settings-absent",
   "options:init:timeout:configuration",
   "#retry-settings-load"
 ]) {
@@ -29,7 +38,8 @@ for (const required of [
 assert.ok(scenario.includes("page.reload()"), "Persistence must be tested after page reconstruction");
 assert.ok(scenario.includes("#discard-changes"), "Cancel must be exercised through the visible control");
 assert.ok(!scenario.includes("class Element"), "The browser scenario must not use a synthetic DOM harness");
-assert.ok(html.includes("../api/pinInbox/modules/settings.js"), "Options must load the shared settings registry");
+assert.ok(bootstrap.includes("../api/pinInbox/modules/settings.js"), "Bootstrap must load the shared settings registry");
+assert.ok(html.includes("options-bootstrap.js"), "Options must load the standalone startup bootstrap");
 assert.ok(html.includes('id="settings-error"'), "Options must expose a terminal initialization error panel");
 
 console.log("Real-browser options test contract: OK");

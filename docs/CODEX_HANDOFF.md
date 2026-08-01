@@ -5,8 +5,8 @@ court afin d’éviter de dupliquer le contexte.
 
 ## État courant
 
-- version de travail : **3.2.9** ;
-- base GitHub : `main` au commit `0f8c50cbafef8e6bc8779c13c2169b0392b6300c` ;
+- version de travail : **3.2.10** ;
+- base GitHub : `main` au commit `3ffd5b88d03230d3b2d6792da18534d897fdd06c` ;
 - ID : `pin-mails@MailPerch.local` ;
 - schémas : SQLite 5, paramètres 6, données 6 ;
 - aucune publication distante automatique.
@@ -66,3 +66,16 @@ Priorité absolue : MP-2026-004 et MP-2026-005. Ne pas les déclarer corrigés s
 - les diagnostics d’initialisation ne contiennent que des codes techniques expurgés ;
 - Playwright local a validé le timeout, le panneau terminal et Réessayer sur les vrais actifs ; Thunderbird 153.0.1 a chargé l’XPI dans un profil vierge sans compte, mais son onglet Options n’était pas automatisable ;
 - la validation graphique réelle dans Thunderbird reste obligatoire.
+
+## Passe 3.2.10
+
+- le XPI 3.2.9 a été reproduit dans Thunderbird 153.0.1 : `localize()` supprimait
+  `input#import-file`, puis `options.js:1773:4` échouait avant l’initialisation ;
+- `options-bootstrap.js` garantit une trace expurgée et un état terminal même si
+  les réglages, le module principal ou l’API Experiment manquent ou se bloquent ;
+- la localisation ne peut plus remplacer un élément qui contient des contrôles ;
+- la matrice Playwright couvre les actifs réels, les échecs pré-module et API,
+  les 98 contrôles, une sauvegarde unique et Réessayer sans écouteur dupliqué ;
+- Thunderbird 153.0.1, profil jetable sans compte, a validé recommandations,
+  Enregistrer, Annuler, réouverture et persistance après redémarrage ;
+- MP-2026-004 reste à valider dans une vraie liste de messages.

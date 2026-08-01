@@ -4,8 +4,8 @@
 > Lire ce document avant tout autre fichier. Il donne l’état courant, les invariants,
 > la carte du dépôt et les chemins exacts à ouvrir selon la tâche.
 >
-> Version de travail : **3.2.9**
-> Base de travail vérifiée : `main` au commit `0f8c50cbafef8e6bc8779c13c2169b0392b6300c`
+> Version de travail : **3.2.10**
+> Base de travail vérifiée : `main` au commit `3ffd5b88d03230d3b2d6792da18534d897fdd06c`
 > Produit : **MailPerch — Email Pins & Follow-up**
 > Extension ID de développement : `pin-mails@MailPerch.local`
 
@@ -41,6 +41,14 @@ raccourcis et composants secondaires ont un délai maximal ; l’Agenda, la sant
 les sauvegardes se chargent après le formulaire. Toute erreur atteint un panneau
 terminal avec Réessayer et un diagnostic expurgé, jamais un chargement permanent.
 
+La version 3.2.10 corrige la cause observée dans Thunderbird 153 : la traduction
+du libellé de restauration supprimait son champ fichier enfant, puis le script
+échouait avant d’entrer dans l’initialisation 3.2.9. Un bootstrap minimal précède
+désormais les dépendances, journalise des étapes expurgées, capture les erreurs
+globales et garantit un état terminal même si un script ou l’API manque. Dans un
+profil jetable sans compte, Thunderbird 153.0.1 a validé les recommandations, le
+dock Enregistrer/Annuler, la réouverture et la persistance après redémarrage.
+
 ## 2. Invariants non négociables
 
 1. Ne jamais modifier les compteurs natifs de nouveaux messages, non-lus ou totaux.
@@ -68,7 +76,7 @@ terminal avec Réessayer et un diagnostic expurgé, jamais un chargement permane
 
 | Élément | Valeur |
 |---|---|
-| Version extension/package | `3.2.9` |
+| Version extension/package | `3.2.10` |
 | Thunderbird déclaré | `128.0` à `153.*` |
 | Manifest | MV3 |
 | Permission WebExtension | `menus` uniquement |
@@ -137,7 +145,8 @@ terminal avec Réessayer et un diagnostic expurgé, jamais un chargement permane
 | Fournisseurs | `modules/providers.js` | matrice comptes/calendriers |
 | Vues intelligentes | `modules/smart.js` | panneau/dashboard |
 | Style panneau et liste native | `extension/styles/pin.css` | `docs/UI_SPEC.md` |
-| Paramètres HTML | `extension/options/options.html` | `options.js`, `options.css` |
+| Bootstrap paramètres | `extension/options/options-bootstrap.js` | capture terminale + chargement des dépendances |
+| Paramètres HTML | `extension/options/options.html` | `options-bootstrap.js`, `options.js`, `options.css` |
 | Paramètres logique | `extension/options/options.js` | schema API |
 | Paramètres style | `extension/options/options.css` | captures UX |
 | Dashboard | `extension/dashboard/*` | contrat DOM |
@@ -188,6 +197,7 @@ terminal avec Réessayer et un diagnostic expurgé, jamais un chargement permane
 - `_locales/fr/messages.json` et `_locales/en/messages.json` : toutes les chaînes.
 - `icons/*.svg` : icônes locales.
 - `styles/pin.css` : styles injectés dans Thunderbird.
+- `options/options-bootstrap.js` : garde terminale précoce et chargement contrôlé.
 - `options/options.html` : structure de la page paramètres.
 - `options/options.js` : chargement, rendu, sauvegarde et outils.
 - `options/options.css` : design responsive et accessible.

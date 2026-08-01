@@ -1,6 +1,6 @@
 # Limites connues
 
-- La build n’a pas été exécutée dans une session Thunderbird graphique par l’environnement qui l’a produite.
+- La page Options 3.2.10 a été exécutée dans Thunderbird 153.0.1 avec un profil jetable sans compte ; les cartes `about:3pane` n’ont pas pu être validées sans jeu de messages.
 - Les gardes automatiques valident les contrats, la syntaxe, les modèles, les données et le build, mais ne remplacent pas un clic réel dans `about:3pane`.
 - Les tests XPCShell/Mochitest fournis nécessitent un checkout de développement Thunderbird et ne sont pas exécutés par la CI générique.
 - Une API Experiment déclenche un avertissement d’accès complet et peut casser lors d’une évolution interne de Thunderbird.
@@ -21,4 +21,4 @@
 
 ## Validation des correctifs récents
 
-Les incidents MP-2026-004 et MP-2026-005 ont été rouverts après l’échec de la 3.2.5 dans Thunderbird réel ; MP-2026-007 couvre les recommandations absentes ou partielles, et MP-2026-008 le cycle de chargement Options. La 3.2.9 borne désormais les attentes et affiche une erreur récupérable, mais ces bugs restent `À VALIDER` dans `docs/BUG_TRACKER.md`. Une API Thunderbird simulée ne remplace pas un clic dans l’onglet Options ni le rendu d’une liste virtualisée Thunderbird.
+MP-2026-005, MP-2026-007 et MP-2026-008 ont été validés dans l’onglet Options de Thunderbird 153.0.1 avec un profil jetable. MP-2026-004 reste `À VALIDER` dans une liste de messages réelle : les mesures Playwright ne remplacent pas le rendu d’une liste virtualisée Thunderbird.

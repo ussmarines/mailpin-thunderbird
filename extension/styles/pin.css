@@ -1144,7 +1144,7 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   outline-offset: 1px;
 }
 
-/* 3.2.8 / 3.2.9 — rail structurel des actions dans le DOM ThreadCard de Thunderbird
+/* 3.2.8 / 3.2.9 / 3.2.10 — rail structurel des actions dans le DOM ThreadCard de Thunderbird
  * 153. Le conteneur natif comporte une ligne expéditeur, une ligne objet puis
  * une ligne informations/actions. `display: contents` expose ces enfants à la
  * grille de la colonne et le rail d’actions couvre toutes les lignes. */

@@ -39,9 +39,11 @@ assert 'form.addEventListener("submit", saveAll);' in OPTIONS_JS
 assert 'event?.stopPropagation?.();' in OPTIONS_JS
 assert 'form.requestSubmit($("save-all-floating"));' not in OPTIONS_JS
 
-# Reopened bugs stay visible until real Thunderbird validation.
-for bug_id in ("MP-2026-004", "MP-2026-005"):
-    row = next(line for line in TRACKER.splitlines() if line.startswith(f"| {bug_id} |"))
-    assert "| À VALIDER | 3.2.8 |" in row
+# The card rail still needs a populated Thunderbird list; Options save/cancel
+# has now completed its real Thunderbird validation.
+card_row = next(line for line in TRACKER.splitlines() if line.startswith("| MP-2026-004 |"))
+options_row = next(line for line in TRACKER.splitlines() if line.startswith("| MP-2026-005 |"))
+assert "| À VALIDER | 3.2.8 |" in card_row
+assert "| CORRIGÉ | 3.2.10 |" in options_row
 
 print("MailPerch 3.2.6/3.2.8 real-interaction regression guards: OK")

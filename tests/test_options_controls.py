@@ -6,6 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 HTML = (ROOT / "extension/options/options.html").read_text(encoding="utf-8")
 JS = (ROOT / "extension/options/options.js").read_text(encoding="utf-8")
+BOOTSTRAP = (ROOT / "extension/options/options-bootstrap.js").read_text(encoding="utf-8")
 CSS = (ROOT / "extension/options/options.css").read_text(encoding="utf-8")
 
 
@@ -32,7 +33,8 @@ for button in parser.buttons:
     if button.get("type", "submit") == "submit":
         continue
     control_id = button["id"]
-    assert f'"{control_id}"' in JS, f"Unwired options button: {control_id}"
+    runtime = BOOTSTRAP if control_id in {"retry-settings-load", "copy-settings-diagnostic"} else JS
+    assert f'"{control_id}"' in runtime, f"Unwired options button: {control_id}"
 
 for required in (
     "status-toast",
@@ -76,6 +78,20 @@ for required_guard in (
 ):
     assert required_guard in JS, required_guard
 
+for required_bootstrap_guard in (
+    'window.addEventListener("error"',
+    'window.addEventListener("unhandledrejection"',
+    "STARTUP_WATCHDOG_MS",
+    'loadClassicScript("../api/pinInbox/modules/settings.js")',
+    'import("./options.js")',
+    'mark("main:requested")',
+    'mark("main:evaluated")',
+    'mark("dom:ready")',
+    'byId("retry-settings-load")',
+    'location.reload()',
+):
+    assert required_bootstrap_guard in BOOTSTRAP, required_bootstrap_guard
+
 non_setting_controls = {"clear-stars-after-import", "import-file", "shortcut"}
 for control in parser.settings_controls:
     control_id = control["id"]
@@ -83,8 +99,11 @@ for control in parser.settings_controls:
         continue
     assert f'"{control_id}"' in JS, f"Unregistered settings control: {control_id}"
 
-assert '<script src="../api/pinInbox/modules/settings.js" defer></script>' in HTML
-assert HTML.index('../api/pinInbox/modules/settings.js') < HTML.index('options.js')
+assert '<script src="options-bootstrap.js" defer></script>' in HTML
+assert '<script src="options.js"' not in HTML
+assert '<script src="../api/pinInbox/modules/settings.js"' not in HTML
+assert '<span data-i18n="previewRestore">' in HTML
+assert '<label class="file-button secondary" data-i18n="previewRestore">' not in HTML
 assert 'id="settings-form"' in HTML and 'aria-busy="true" hidden' in HTML
 assert 'id="save-all-floating" type="submit"' in HTML
 assert 'id="discard-changes" type="reset"' in HTML

@@ -1,5 +1,8 @@
 "use strict";
 
+const PinSettings = globalThis.PinSettings;
+const startup = globalThis.MailPerchOptionsStartup;
+
 let configuration = null;
 let configurationReady = false;
 let saveInFlight = false;
@@ -23,6 +26,7 @@ const inboxControls = new Map();
 const $ = id => document.getElementById(id);
 const wait = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
 const INITIALIZATION_TIMEOUTS = Object.freeze({
+  apiNamespace: 2_000,
   configuration: 10_000,
   shortcut: 5_000,
   calendar: 7_000,
@@ -60,6 +64,18 @@ function pinInboxMethod(name) {
     throw new Error(`L’API MailPerch « ${name} » n’est pas disponible.`);
   }
   return method.bind(globalThis.messenger.pinInbox);
+}
+
+async function waitForPinInbox() {
+  const startedAt = Date.now();
+  while (Date.now() - startedAt < INITIALIZATION_TIMEOUTS.apiNamespace) {
+    if (typeof globalThis.messenger?.pinInbox?.getConfiguration === "function") {
+      startup?.mark("api:namespace-present");
+      return;
+    }
+    await wait(50);
+  }
+  throw new OptionsInitializationTimeout("api-namespace", INITIALIZATION_TIMEOUTS.apiNamespace);
 }
 
 function initializationDiagnostic(error) {
@@ -106,16 +122,21 @@ function setConfigurationReady(ready) {
   setInitializationState(ready ? "ready" : "loading");
 }
 
-async function fetchConfigurationWithRetry(attempts = 3) {
+async function fetchConfigurationWithRetry(attempts = 1) {
+  await waitForPinInbox();
   let lastError = null;
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     try {
+      startup?.mark("api:getConfiguration:start");
       const value = await withTimeout(
         () => pinInboxMethod("getConfiguration")(),
         INITIALIZATION_TIMEOUTS.configuration,
         "configuration"
       );
-      if (value?.settings && typeof value.settings === "object") return value;
+      if (value?.settings && typeof value.settings === "object") {
+        startup?.mark("options:getConfiguration:resolved");
+        return value;
+      }
       lastError = new Error("La configuration reçue est vide.");
     } catch (error) {
       lastError = error;
@@ -1168,6 +1189,7 @@ async function applyConfiguration(config) {
   setConfigurationReady(true);
   rememberPersistedDraft();
   setDirty(false);
+  startup?.complete();
   // Calendar discovery is useful but cannot keep primary settings hidden.
   // The selector starts with the valid “ask” choice and fills in afterwards.
   void renderCalendars(settings.preferredCalendarId);
@@ -1229,31 +1251,11 @@ async function reload({preserveEdits = false} = {}) {
   return config;
 }
 
-async function copyInitializationDiagnostic() {
-  const diagnostic = lastInitializationDiagnostic;
-  try {
-    if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(diagnostic);
-    } else {
-      const source = $("settings-error-diagnostic");
-      const selection = window.getSelection();
-      const range = document.createRange();
-      range.selectNodeContents(source);
-      selection?.removeAllRanges();
-      selection?.addRange(range);
-      if (!document.execCommand("copy")) throw new Error("Copie indisponible.");
-      selection?.removeAllRanges();
-    }
-    setStatus("Diagnostic technique copié.", "success");
-  } catch {
-    setStatus("Copie du diagnostic impossible. Vous pouvez sélectionner le code affiché.", "error", {persistent: true});
-  }
-}
-
 async function initializeOptions({preserveEdits = false} = {}) {
   if (initializationInFlight) return;
   const generation = ++initializationGeneration;
   initializationInFlight = true;
+  startup?.mark("options:init:start");
   setInitializationState("loading");
   clearStatus();
   try {
@@ -1264,6 +1266,7 @@ async function initializeOptions({preserveEdits = false} = {}) {
     if (generation !== initializationGeneration) return;
     console.error("MailPerch : initialisation des paramètres impossible", initializationDiagnostic(error));
     setInitializationState("error", error);
+    startup?.fail("options-initialize", error, lastInitializationDiagnostic);
   } finally {
     if (generation === initializationGeneration) {
       initializationInFlight = false;
@@ -1445,7 +1448,11 @@ function localize() {
   document.documentElement.lang = (messenger.i18n.getUILanguage?.() || "fr").split("-")[0];
   for (const element of document.querySelectorAll("[data-i18n]")) {
     const value = messenger.i18n.getMessage(element.dataset.i18n);
-    if (value) element.textContent = value;
+    if (!value) continue;
+    if (element.childElementCount) {
+      throw new Error(`Cible de traduction non terminale : ${element.dataset.i18n}`);
+    }
+    element.textContent = value;
   }
   for (const element of document.querySelectorAll("[data-i18n-placeholder]")) {
     const value = messenger.i18n.getMessage(element.dataset.i18nPlaceholder);
@@ -1480,13 +1487,13 @@ function renderBrandVersion() {
   $("app-version").textContent = version ? `v${version}` : "";
 }
 
-window.addEventListener("DOMContentLoaded", async () => {
-  $("retry-settings-load").addEventListener("click", () => {
-    void initializeOptions();
-  });
-  $("copy-settings-diagnostic").addEventListener("click", () => {
-    void copyInitializationDiagnostic();
-  });
+let optionsPageInstalled = false;
+
+async function startOptions() {
+  if (optionsPageInstalled) {
+    await initializeOptions();
+    return;
+  }
   try {
     installCriticalSettingsActions();
     localize();
@@ -1497,7 +1504,8 @@ window.addEventListener("DOMContentLoaded", async () => {
   } catch (error) {
     console.error("MailPerch : préparation des paramètres impossible", initializationDiagnostic(error));
     setInitializationState("error", error);
-    return;
+    startup?.fail("options-prepare", error, lastInitializationDiagnostic);
+    throw error;
   }
 
   const form = $("settings-form");
@@ -1811,5 +1819,14 @@ window.addEventListener("DOMContentLoaded", async () => {
     void initializeOptions({preserveEdits: true});
   });
 
+  optionsPageInstalled = true;
+  startup?.setRetry(() => initializeOptions());
   await initializeOptions();
+}
+
+Object.defineProperty(globalThis, "MailPerchOptionsMain", {
+  value: Object.freeze({startOptions}),
+  configurable: false,
+  enumerable: false,
+  writable: false
 });

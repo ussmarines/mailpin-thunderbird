@@ -37,25 +37,35 @@ async page => {
     const writeMeta = value => localStorage.setItem(META_KEY, JSON.stringify(value));
     const initializationMode = () => sessionStorage.getItem("mailperch-options-initialization-mode") || "normal";
     globalThis.__mailperchSetInitializationMode = mode => {
-      sessionStorage.setItem("mailperch-options-initialization-mode", String(mode));
+      const value = String(mode);
+      sessionStorage.setItem("mailperch-options-initialization-mode", value);
+      if (value === "api-absent") delete globalThis.messenger?.pinInbox;
+      else if (globalThis.messenger && typeof pinInbox !== "undefined") globalThis.messenger.pinInbox = pinInbox;
     };
-    const configuration = () => ({
-      ...clone(readPersisted()),
-      accounts: clone(accounts),
-      stats: {pinned: 0, waiting: 0, overdue: 0, history: 0},
-      storage: {backend: "test", database: "synthetic.sqlite", schemaVersion: 5},
-      compatibility: {mode: "test", missing: []},
-      providerMatrix: {checkedAt: 0, accounts: [], providers: [], calendars: []},
-      performance: {renders: 0, averageRenderMs: 0, maxRenderMs: 0}
-    });
+    const configuration = () => {
+      const value = {
+        ...clone(readPersisted()),
+        accounts: clone(accounts),
+        stats: {pinned: 0, waiting: 0, overdue: 0, history: 0},
+        storage: {backend: "test", database: "synthetic.sqlite", schemaVersion: 5},
+        compatibility: {mode: "test", missing: []},
+        providerMatrix: {checkedAt: 0, accounts: [], providers: [], calendars: []},
+        performance: {renders: 0, averageRenderMs: 0, maxRenderMs: 0}
+      };
+      if (initializationMode() === "normalization-throw") {
+        value.settings = new Proxy({}, {
+          get() { throw new TypeError("synthetic normalization failure"); }
+        });
+      }
+      return value;
+    };
 
     globalThis.__mailperchPointerEvents = {pointerdown: 0, pointerup: 0, click: 0};
     for (const type of Object.keys(globalThis.__mailperchPointerEvents)) {
       document.addEventListener(type, () => { globalThis.__mailperchPointerEvents[type] += 1; }, true);
     }
 
-    globalThis.messenger = {
-      pinInbox: new Proxy({}, {
+    const pinInbox = new Proxy({}, {
         get(_target, name) {
           if (name === "getConfiguration") {
             return async () => {
@@ -100,21 +110,27 @@ async page => {
           if (name === "getBackupStatus" || name === "getHealthReport") return async () => null;
           return async () => ({});
         }
-      }),
+      });
+    globalThis.messenger = {
       commands: {
         getAll: async () => [{name: "toggle-pin-selected", shortcut: "Alt+P"}],
         update: async () => {}
       },
       runtime: {
-        getManifest: () => ({version: "3.2.9"}),
+        getManifest: () => ({version: "3.2.10"}),
         getURL: path => path
       },
       i18n: {
         getUILanguage: () => "fr",
-        getMessage: () => ""
+        getMessage: key => String(key)
       },
       tabs: {create: async () => ({})}
     };
+    if (initializationMode() === "api-delayed") {
+      setTimeout(() => { globalThis.messenger.pinInbox = pinInbox; }, 150);
+    } else if (initializationMode() !== "api-absent") {
+      globalThis.messenger.pinInbox = pinInbox;
+    }
   });
 
   const assert = (condition, message) => {
@@ -124,6 +140,21 @@ async page => {
     await page.waitForSelector("body[data-configuration-ready]");
     await page.waitForFunction(() => document.querySelector("#settings-form")?.hidden === false);
   };
+  const waitStartupError = async () => {
+    await page.waitForFunction(() => {
+      const loading = document.querySelector("#settings-loading");
+      const error = document.querySelector("#settings-error");
+      const form = document.querySelector("#settings-form");
+      return loading?.hidden && !error?.hidden && form?.hidden &&
+        document.body.dataset.initializationState === "error";
+    }, null, {timeout: 12_000});
+  };
+  const startupState = () => page.evaluate(() => ({
+    trace: globalThis.MailPerchOptionsStartup?.getTrace?.() || [],
+    stage: document.body.dataset.optionsStartupStage || "",
+    failureStage: document.body.dataset.optionsStartupFailureStage || "",
+    diagnostic: document.querySelector("#settings-error-diagnostic")?.textContent || ""
+  }));
   const dockState = () => page.evaluate(() => {
     const dock = document.querySelector("#save-dock");
     const save = document.querySelector("#save-all-floating");
@@ -163,7 +194,18 @@ async page => {
   }, value);
 
   await page.goto(optionsUrl);
+  assert(await page.locator("#import-file").count() === 1,
+    "Localization must not remove the nested restore file input");
   await waitReady();
+  const successfulStartup = await startupState();
+  for (const stage of [
+    "html:loaded", "bootstrap:loaded", "settings:requested", "settings:loaded",
+    "main:requested", "main:evaluated", "dom:ready", "options:init:start",
+    "api:namespace-present", "api:getConfiguration:start",
+    "options:getConfiguration:resolved", "ui:ready"
+  ]) {
+    assert(successfulStartup.trace.includes(stage), `Successful startup must report ${stage}`);
+  }
 
   const initial = await page.evaluate(() => ({
     formHidden: document.querySelector("#settings-form").hidden,
@@ -337,13 +379,7 @@ async page => {
   // then allow a user-driven retry without reconstructing the document.
   await page.evaluate(() => globalThis.__mailperchSetInitializationMode("configuration-never"));
   await page.reload();
-  await page.waitForFunction(() => {
-    const loading = document.querySelector("#settings-loading");
-    const error = document.querySelector("#settings-error");
-    const form = document.querySelector("#settings-form");
-    return loading?.hidden && !error?.hidden && form?.hidden &&
-      document.body.dataset.initializationState === "error";
-  }, null, {timeout: 35_000});
+  await waitStartupError();
   assert(await page.locator("#settings-error-diagnostic").textContent() === "options:init:timeout:configuration",
     "A non-settling configuration promise must produce a non-sensitive timeout diagnostic");
 
@@ -352,6 +388,42 @@ async page => {
   await waitReady();
   assert(await page.locator("#settings-error").isHidden(), "Retry must return the same document to the ready state");
 
+  // The namespace can be absent, delayed or immediately available. Absence is
+  // terminal and retryable; a delayed Experiment registration must still reach
+  // the same complete startup trace.
+  await page.evaluate(() => globalThis.__mailperchSetInitializationMode("api-absent"));
+  await page.reload();
+  await waitStartupError();
+  assert((await startupState()).diagnostic === "options:init:timeout:api-namespace",
+    "A missing Experiment namespace must end with a bounded diagnostic");
+  await page.evaluate(() => globalThis.__mailperchSetInitializationMode("normal"));
+  await page.locator("#retry-settings-load").click();
+  await waitReady();
+
+  await page.evaluate(() => globalThis.__mailperchSetInitializationMode("api-delayed"));
+  await page.reload();
+  await waitReady();
+  assert((await startupState()).trace.includes("api:namespace-present"),
+    "A delayed Experiment namespace must be observed before configuration");
+
+  await page.evaluate(() => globalThis.__mailperchSetInitializationMode("configuration-reject"));
+  await page.reload();
+  await waitStartupError();
+  assert((await startupState()).diagnostic === "options:init:error:Error",
+    "A rejected configuration request must become a visible error");
+  await page.evaluate(() => globalThis.__mailperchSetInitializationMode("normal"));
+  await page.locator("#retry-settings-load").click();
+  await waitReady();
+
+  await page.evaluate(() => globalThis.__mailperchSetInitializationMode("normalization-throw"));
+  await page.reload();
+  await waitStartupError();
+  assert((await startupState()).diagnostic === "options:init:error:TypeError",
+    "A normalization exception must become a visible error");
+  await page.evaluate(() => globalThis.__mailperchSetInitializationMode("normal"));
+  await page.locator("#retry-settings-load").click();
+  await waitReady();
+
   await page.evaluate(() => globalThis.__mailperchSetInitializationMode("calendar-never"));
   await page.reload();
   await waitReady();
@@ -359,9 +431,58 @@ async page => {
     "A non-settling optional calendar request must not hold the primary form");
   await page.evaluate(() => globalThis.__mailperchSetInitializationMode("normal"));
 
+  // Bootstrap failures are tested against the production HTML and bootstrap.
+  // Only the requested dependency response is fault-injected.
+  const missingMain = route => route.fulfill({status: 404, contentType: "text/plain", body: "missing"});
+  await page.route("**/options.js", missingMain);
+  await page.goto(`${optionsUrl}?startup=main-absent`);
+  await waitStartupError();
+  let bootFailure = await startupState();
+  assert(bootFailure.failureStage === "main-load" && bootFailure.trace.includes("bootstrap:loaded") &&
+    !bootFailure.trace.includes("main:evaluated"),
+  "A missing main module must remain diagnosable from the standalone bootstrap");
+  await page.unroute("**/options.js", missingMain);
+  await page.locator("#retry-settings-load").click();
+  await waitReady();
+
+  const rejectedImport = route => route.abort("failed");
+  await page.route("**/options.js", rejectedImport);
+  await page.goto(`${optionsUrl}?startup=import-rejected`);
+  await waitStartupError();
+  bootFailure = await startupState();
+  assert(bootFailure.failureStage === "main-load" && bootFailure.diagnostic.startsWith("options:startup:main-load:"),
+    "A rejected dynamic import must show a terminal module diagnostic");
+  await page.unroute("**/options.js", rejectedImport);
+
+  const throwingMain = route => route.fulfill({
+    status: 200,
+    contentType: "application/javascript",
+    body: "throw new TypeError('synthetic top-level failure');"
+  });
+  await page.route("**/options.js", throwingMain);
+  await page.goto(`${optionsUrl}?startup=top-level-exception`);
+  await waitStartupError();
+  bootFailure = await startupState();
+  assert(bootFailure.failureStage === "main-load" && bootFailure.diagnostic.endsWith(":TypeError"),
+    "A top-level module exception must show its expurgated error type");
+  await page.unroute("**/options.js", throwingMain);
+
+  const missingSettings = route => route.abort("failed");
+  await page.route("**/settings.js", missingSettings);
+  await page.goto(`${optionsUrl}?startup=settings-absent`);
+  await waitStartupError();
+  bootFailure = await startupState();
+  assert(bootFailure.failureStage === "settings-load" && bootFailure.trace.includes("settings:requested") &&
+    !bootFailure.trace.includes("main:requested"),
+  "A missing settings registry must fail before the main module is requested");
+  await page.unroute("**/settings.js", missingSettings);
+  await page.locator("#retry-settings-load").click();
+  await waitReady();
+
   return {
     controlsExercised: controls.length,
     finalMeta: await meta(),
+    startupStages: (await startupState()).trace.length,
     initialRecommended: {
       showSearch: initial.showSearch,
       showQuickActions: initial.showQuickActions,
