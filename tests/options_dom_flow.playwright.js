@@ -118,6 +118,11 @@ async page => {
           return async () => ({});
         }
       });
+    const englishDynamicMessages = {
+      dynamicName: "Name", dynamicTitle: "Title", dynamicRuleEnabled: "Enabled",
+      dynamicMoveUp: "Move this item up", dynamicMoveDown: "Move this item down",
+      dynamicChooseCalendar: "Choose a compatible calendar before creating the Calendar item."
+    };
     globalThis.messenger = {
       commands: {
         getAll: async () => [{name: "toggle-pin-selected", shortcut: "Alt+P"}],
@@ -128,8 +133,10 @@ async page => {
         getURL: path => path
       },
       i18n: {
-        getUILanguage: () => "fr",
-        getMessage: key => String(key)
+        getUILanguage: () => sessionStorage.getItem("mailperch-options-test-locale") || "fr",
+        getMessage: key => (sessionStorage.getItem("mailperch-options-test-locale") === "en"
+          ? englishDynamicMessages[key] || `English ${key}`
+          : `Français ${key}`)
       },
       tabs: {create: async () => ({})}
     };
@@ -272,6 +279,15 @@ async page => {
       .map(node => node.getBoundingClientRect()).some(rect => overlaps(result, rect));
   });
   assert(!simulationGeometry, "The simulation result must not overlap its button, help or actions");
+
+  // Dynamic labels must use a non-empty English translation, not a French
+  // source literal, after the document is reconstructed in English.
+  await page.evaluate(() => sessionStorage.setItem("mailperch-options-test-locale", "en"));
+  await page.reload();
+  await waitReady();
+  await page.locator("#add-template").click();
+  assert(await page.locator(".template-row .entity-field > span").first().textContent() === "Name",
+    "Generated fields must render their non-empty English translation");
 
   // Use a real select interaction and a real save-button click. The visible
   // click path must issue one write, read it back and persist after reload.

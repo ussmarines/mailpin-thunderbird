@@ -122,12 +122,12 @@ for required in (
     "function syncToggleCards()",
     "dataset.enabled",
     "toggle-recommended-badge",
-    "function entityField(label, control, help = \"\")",
+    "function entityField(labelKey, control, helpKey = \"\")",
     "Échéance",
     "Anticipation",
-    "Nombre maximal d’actions par minute",
-    "Choisissez un calendrier compatible",
-    "Saisissez une date et une heure",
+    "dynamicRuleLimitHelp",
+    "dynamicChooseCalendar",
+    "dynamicCalendarDueRequired",
 ):
     assert required in JS, required
 for required in (

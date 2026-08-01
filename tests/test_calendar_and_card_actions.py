@@ -62,10 +62,10 @@ for token in [
 assert ".filter(calendar => !calendar.readOnly && !calendar.disabled)" not in impl
 assert "caseItem.calendarItemType || \"task\"" in impl
 assert "caseItem.calendarItemType=type" in impl
-assert "Saisissez une date et une heure avant de créer l’élément Agenda." in impl
-assert "Choisissez un calendrier compatible avant de créer l’élément Agenda." in impl
+assert 'this._t("caseCalendarDueRequired", "")' in impl
+assert 'this._t("caseCalendarSelectionRequired", "")' in impl
 assert "const start=caseItem.dueAt;" in impl
-assert "this._recordDiagnostic(\"warning\", \"Écriture Agenda refusée\"" in impl
+assert 'this._recordDiagnostic("warning", this._t("calendarWriteRefused", "")' in impl
 assert "Détail Thunderbird : ${raw}" not in impl
 
 # Calendar choice is exposed from all user surfaces.

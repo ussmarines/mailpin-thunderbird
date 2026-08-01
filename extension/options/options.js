@@ -378,6 +378,12 @@ function genericControlHelp(control) {
   return "Cette valeur est appliquée après l’enregistrement des paramètres.";
 }
 
+function msg(key, substitutions = undefined) {
+  const value = messenger.i18n.getMessage(key, substitutions);
+  if (!value) throw new Error(`Traduction dynamique absente : ${key}`);
+  return value;
+}
+
 function syncToggleCards() {
   const recommended = configuration?.recommendedSettings || {};
   for (const card of document.querySelectorAll(".setting-toggle")) {
@@ -388,8 +394,8 @@ function syncToggleCards() {
     let badge = card.querySelector(":scope > .toggle-recommended-badge");
     const isRecommendedButDisabled = recommended[checkbox.id] === true && !active;
     if (isRecommendedButDisabled && !badge) {
-      badge = node("span", "toggle-recommended-badge", "Recommandé");
-      badge.setAttribute("aria-label", "Réglage recommandé, actuellement désactivé");
+      badge = node("span", "toggle-recommended-badge", msg("dynamicRecommended"));
+      badge.setAttribute("aria-label", msg("dynamicRecommendedDisabled"));
       card.append(badge);
     }
     if (badge) badge.hidden = !isRecommendedButDisabled;
@@ -725,10 +731,10 @@ function moveButtons(list, index, render) {
   up.type = down.type = "button";
   up.disabled = index === 0;
   down.disabled = index >= list.length - 1;
-  up.setAttribute("aria-label", "Monter");
-  down.setAttribute("aria-label", "Descendre");
-  up.title = "Monter cet élément";
-  down.title = "Descendre cet élément";
+  up.setAttribute("aria-label", msg("dynamicMoveUp"));
+  down.setAttribute("aria-label", msg("dynamicMoveDown"));
+  up.title = msg("dynamicMoveUp");
+  down.title = msg("dynamicMoveDown");
   up.addEventListener("click", () => {
     if (!index) return;
     [list[index - 1], list[index]] = [list[index], list[index - 1]];
@@ -744,12 +750,12 @@ function moveButtons(list, index, render) {
   return [up, down];
 }
 
-function entityField(label, control, help = "") {
+function entityField(labelKey, control, helpKey = "") {
   const field = node("label", "entity-field");
-  const caption = node("span", "", label);
+  const caption = node("span", "", msg(labelKey));
   field.append(caption, control);
-  if (help) {
-    const hint = node("small", "entity-field-help", help);
+  if (helpKey) {
+    const hint = node("small", "entity-field-help", msg(helpKey));
     const hintId = `entity-help-${uniqueEntityId("field", [])}`;
     hint.id = hintId;
     control.setAttribute("aria-describedby", [control.getAttribute("aria-describedby"), hintId].filter(Boolean).join(" "));
@@ -759,12 +765,12 @@ function entityField(label, control, help = "") {
 }
 
 function calendarLabel(id) {
-  return availableCalendars.find(calendar => calendar.id === id)?.name || "le calendrier choisi";
+  return availableCalendars.find(calendar => calendar.id === id)?.name || msg("dynamicSelectedCalendar");
 }
 
 function calendarOptions(type, selectedId = "") {
   const compatible = availableCalendars.filter(calendar => type === "event" ? calendar.eventCompatible : calendar.taskCompatible);
-  const control = select([["", "Choisir un calendrier compatible"], ...compatible.map(calendar => [calendar.id, calendar.name])], selectedId, "Calendrier cible");
+  const control = select([["", msg("dynamicChooseCalendar")], ...compatible.map(calendar => [calendar.id, calendar.name])], selectedId, msg("calendarTarget"));
   control.required = true;
   return {control, compatible};
 }
@@ -832,10 +838,10 @@ function renderCases(){
     const row=node("article","group-row case-editor-row");row.style.setProperty("--group-color",item.color);
     const name=document.createElement("input");name.value=item.name;name.maxLength=120;name.required=true;
     const color=document.createElement("input");color.type="color";color.value=item.color;
-    const status=select([["active","À traiter"],["waiting","En attente"],["planned","Planifié"],["completed","Terminé"]],item.status||"active","Statut");
+    const status=select([["active",msg("statusActive")],["waiting",msg("statusWaiting")],["planned",msg("statusPlanned")],["completed",msg("statusComplete")]],item.status||"active",msg("dynamicStatus"));
     const due=document.createElement("input");due.type="datetime-local";due.required=true;due.value=item.dueAt?new Date(item.dueAt-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16):"";
-    const note=document.createElement("input");note.value=item.note||"";note.placeholder="Note globale";
-    const type=select([["task","Tâche"],["event","Événement"]],item.calendarItemType||currentSettings().calendarItemType||"task","Type Agenda");
+    const note=document.createElement("input");note.value=item.note||"";note.placeholder=msg("notes");
+    const type=select([["task",msg("task")],["event",msg("event")]],item.calendarItemType||currentSettings().calendarItemType||"task",msg("calendarItemType"));
     let {control: calendar, compatible} = calendarOptions(type.value, item.calendarId || currentSettings().preferredCalendarId || "");
     const sync=()=>Object.assign(item,{name:name.value.trim().slice(0,120),color:color.value,status:status.value,dueAt:due.value?new Date(due.value).getTime():0,note:note.value.slice(0,4000),calendarItemType:type.value,calendarId:calendar.value,updatedAt:Date.now()});
     type.addEventListener("change", () => {
@@ -846,19 +852,19 @@ function renderCases(){
       sync();
     });
     for(const control of[name,color,status,due,note,type,calendar])control.addEventListener("input",sync);
-    const agenda = node("button", "secondary compact", item.calendarItemId ? "Synchroniser Agenda" : "Créer dans Agenda");
+    const agenda = node("button", "secondary compact", item.calendarItemId ? msg("dynamicCalendarSync") : msg("calendarCreate"));
     agenda.type = "button";
     agenda.addEventListener("click", async event => {
       try {
         sync();
-        if (!item.name) throw new Error("Saisissez le titre de l’affaire avant de créer un élément Agenda.");
-        if (!item.dueAt) throw new Error("Saisissez une date et une heure avant de créer l’élément Agenda.");
+        if (!item.name) throw new Error(msg("dynamicCalendarTitleRequired"));
+        if (!item.dueAt) throw new Error(msg("dynamicCalendarDueRequired"));
         if (!calendar.value) {
           throw new Error(compatible.length
-            ? "Choisissez un calendrier compatible avant de créer l’élément Agenda."
-            : `Aucun calendrier inscriptible ne peut recevoir ${type.value === "event" ? "un événement" : "une tâche"}.`);
+            ? msg("dynamicChooseCalendar")
+            : msg(type.value === "event" ? "dynamicNoEventCalendar" : "dynamicNoTaskCalendar"));
         }
-        const result = await withBusy(event.currentTarget, "Synchronisation de l’affaire avec l’Agenda…", async () => {
+        const result = await withBusy(event.currentTarget, msg("dynamicCalendarBusy"), async () => {
           await messenger.pinInbox.updateCase(item.id, item);
           return messenger.pinInbox.createCaseCalendarItem(
             item.id,
@@ -870,7 +876,7 @@ function renderCases(){
         item.calendarId = result.calendarId || item.calendarId || "";
         renderCases();
         setStatus(
-          `${result.updated ? "Affaire synchronisée" : "Affaire créée"} dans ${calendarLabel(result.calendarId || calendar.value)} — ${result.itemType === "event" ? "événement" : "tâche"}, ${new Date(item.dueAt).toLocaleString()}.`,
+          msg(result.updated ? "dynamicCaseSynchronized" : "dynamicCaseCreated", [calendarLabel(result.calendarId || calendar.value), msg(result.itemType === "event" ? "event" : "task"), new Date(item.dueAt).toLocaleString()]),
           "success"
         );
       } catch (error) {
@@ -878,7 +884,7 @@ function renderCases(){
       }
     });
     const[up,down]=moveButtons(cases,index,renderCases);
-    row.append(entityField("Titre",name,"Nom visible de l’affaire (120 caractères maximum)."),entityField("Couleur",color),entityField("Statut",status),entityField("Échéance",due,"Date obligatoire pour créer une tâche ou un événement."),entityField("Note",note),entityField("Type Agenda",type),entityField("Calendrier",calendar,"Seuls les calendriers inscriptibles compatibles sont proposés."),agenda,up,down,removeButton(()=>{cases.splice(index,1);renderCases();renderRules();renderTemplates();}));host.append(row);
+    row.append(entityField("dynamicTitle",name,"dynamicCaseTitleHelp"),entityField("dynamicColor",color),entityField("dynamicStatus",status),entityField("deadline",due,"dynamicCaseDueHelp"),entityField("notes",note),entityField("calendarItemType",type),entityField("calendarTarget",calendar,"calendarCreateHelp"),agenda,up,down,removeButton(()=>{cases.splice(index,1);renderCases();renderRules();renderTemplates();}));host.append(row);
   });
 }
 function renderTemplates(){
@@ -900,7 +906,7 @@ function renderTemplates(){
     const sync=()=>Object.assign(item,{name:name.value.slice(0,120),groupId:group.value,caseId:caseSelect.value,priorityLevel:priority.value,workflowStatus:status.value,dueOffsetDays:Number(due.value)||0,followUpDelayDays:Number(follow.value)||0,reminderLeadMinutes:Number(lead.value)||0,recurrenceRule:recurrence.value,recurrenceInterval:Number(interval.value)||1,notePrefix:note.value.slice(0,500)});
     for(const control of[name,group,caseSelect,priority,status,due,follow,lead,recurrence,interval,note])control.addEventListener("input",sync);
     const[up,down]=moveButtons(templates,index,renderTemplates);
-    row.append(entityField("Nom",name,"Nom du modèle (120 caractères maximum)."),entityField("Groupe",group),entityField("Affaire",caseSelect),entityField("Priorité",priority),entityField("Statut",status),entityField("Échéance",due,"Décalage avant échéance, en jours (0 à 3650)."),entityField("Relance",follow,"Décalage avant relance, en jours (0 à 365)."),entityField("Anticipation",lead,"Rappel anticipé, en minutes (0 à 10 080)."),entityField("Récurrence",recurrence),entityField("Intervalle",interval,"Nombre d’unités entre deux récurrences (1 à 100)."),entityField("Préfixe de note",note),up,down,removeButton(()=>{templates.splice(index,1);renderTemplates();renderRules();}));
+    row.append(entityField("dynamicName",name,"dynamicTemplateNameHelp"),entityField("group",group),entityField("case",caseSelect),entityField("priority",priority),entityField("dynamicStatus",status),entityField("deadline",due,"dynamicTemplateDeadlineHelp"),entityField("dynamicFollowUp",follow,"dynamicTemplateFollowUpHelp"),entityField("dynamicLead",lead,"dynamicTemplateLeadHelp"),entityField("dynamicRecurrence",recurrence),entityField("dynamicInterval",interval,"dynamicTemplateIntervalHelp"),entityField("dynamicNotePrefix",note),up,down,removeButton(()=>{templates.splice(index,1);renderTemplates();renderRules();}));
     host.append(row);
   });
 }
@@ -981,7 +987,7 @@ function renderRules(){
     const template=select([["","Aucun modèle"],...templates.map(t=>[t.id,t.name])],rule.templateId||"","Modèle cible");
     const status=select([["active","À traiter"],["waiting","En attente"],["planned","Planifié"],["completed","Terminé"]],rule.workflowStatus||"active","Statut cible");
     const stopLabel=node("label","compact-check");const stop=document.createElement("input");stop.type="checkbox";stop.checked=rule.stopProcessing!==false;stopLabel.append(stop,document.createTextNode("Arrêter"));
-    const rate=document.createElement("input");rate.type="number";rate.min="1";rate.max="1000";rate.value=rule.maxPerMinute||60;rate.title="Nombre maximal d’actions par minute";
+    const rate=document.createElement("input");rate.type="number";rate.min="1";rate.max="1000";rate.value=rule.maxPerMinute||60;rate.title=msg("dynamicRuleLimitHelp");
     const sync=()=>Object.assign(rule,{
       enabled:enabled.checked,name:name.value.slice(0,100),priority:Number(priority.value)||100,
       trigger:trigger.value,action:action.value,trackingMode:target.value,
@@ -992,7 +998,7 @@ function renderRules(){
     });
     for(const control of[enabled,name,priority,trigger,action,target,sender,subject,tag,account,folder,group,caseSelect,template,status,stop,rate])control.addEventListener("input",sync);
     const [up,down]=moveButtons(rules,index,renderRules);
-    row.append(entityField("Activée",enabled,"Une règle désactivée n’est jamais évaluée."),entityField("Nom",name,"Nom local de la règle."),entityField("Priorité",priority,"Ordre d’exécution : le plus petit nombre passe d’abord (1 à 10 000)."),entityField("Déclencheur",trigger),entityField("Action",action),entityField("Cible",target),entityField("Expéditeur contient",sender),entityField("Objet contient",subject),entityField("Clé d’étiquette",tag),entityField("Compte",account),entityField("Dossier",folder,"URI exacte, facultative."),entityField("Groupe cible",group),entityField("Affaire cible",caseSelect),entityField("Modèle cible",template),entityField("Statut cible",status),stopLabel,entityField("Limite",rate,"Nombre maximal d’actions par minute pour cette règle (1 à 1000)."),up,down,removeButton(()=>{rules.splice(index,1);renderRules();}));
+    row.append(entityField("dynamicRuleEnabled",enabled,"dynamicRuleEnabledHelp"),entityField("dynamicName",name,"dynamicRuleNameHelp"),entityField("priority",priority,"dynamicRulePriorityHelp"),entityField("dynamicTrigger",trigger),entityField("dynamicAction",action),entityField("dynamicTarget",target),entityField("dynamicSenderContains",sender),entityField("dynamicSubjectContains",subject),entityField("dynamicTagKey",tag),entityField("dynamicAccount",account),entityField("folder",folder,"dynamicFolderHelp"),entityField("dynamicGroupTarget",group),entityField("dynamicCaseTarget",caseSelect),entityField("dynamicTemplateTarget",template),entityField("dynamicStatusTarget",status),stopLabel,entityField("dynamicRuleLimit",rate,"dynamicRuleLimitHelp"),up,down,removeButton(()=>{rules.splice(index,1);renderRules();}));
     host.append(row);
   });
 }
@@ -1613,7 +1619,7 @@ async function startOptions() {
   $("add-case").addEventListener("click", () => {
     cases.push({
       id: uniqueEntityId("case", cases),
-      name: "Nouvelle affaire",
+      name: msg("dynamicNewCase"),
       color: "#0f6cbd",
       status: "active",
       createdAt: Date.now(),
@@ -1628,7 +1634,7 @@ async function startOptions() {
   $("add-template").addEventListener("click", () => {
     templates.push({
       id: uniqueEntityId("template", templates),
-      name: "Nouveau modèle",
+      name: msg("dynamicNewTemplate"),
       priorityLevel: "normal",
       workflowStatus: "active",
       recurrenceInterval: 1
@@ -1641,7 +1647,7 @@ async function startOptions() {
   $("add-rule").addEventListener("click", () => {
     rules.push({
       id: uniqueEntityId("rule", rules),
-      name: "Nouvelle règle",
+      name: msg("dynamicNewRule"),
       enabled: true,
       priority: (rules.length + 1) * 100,
       trigger: "messageAdded",
@@ -1657,10 +1663,10 @@ async function startOptions() {
   $("simulate-rules").addEventListener("click", async event => {
     const result = await run(
       () => messenger.pinInbox.simulateRules({trigger: "messageAdded", limit: 1000}),
-      value => `${value.matches.length} correspondance(s) sur ${value.scanned} message(s).`,
+      value => msg("dynamicSimulationSummary", [value.matches.length, value.scanned]),
       {
         control: event.currentTarget,
-        busyMessage: "Simulation des règles…",
+        busyMessage: msg("dynamicSimulationBusy"),
         reloadAfter: false
       }
     );
@@ -1668,7 +1674,7 @@ async function startOptions() {
       $("rule-simulation").textContent =
         result.matches.slice(0, 20)
           .map(item => `${item.ruleName} → ${item.action} · ${item.subject}`)
-          .join("\n") || "Aucune correspondance.";
+          .join("\n") || msg("dynamicSimulationNoMatch");
     }
   });
 

@@ -58,7 +58,15 @@
       cancel: "Annuler",
       continue: "Continuer",
       healthAttention: "Santé MailPerch à vérifier",
-      healthHealthy: "Santé MailPerch correcte"
+      healthHealthy: "Santé MailPerch correcte",
+      calendarWriteAllowed: "écriture autorisée selon les vérifications locales",
+      calendarStateUnknown: "état inconnu",
+      calendarWriteRefused: "Écriture Agenda refusée",
+      calendarUnknown: "inconnu",
+      calendarWriteFailed: "Impossible d’écrire {label} dans le calendrier « {calendar} ». État détecté : {state}. Vérifiez les droits, la lecture seule, la synchronisation et les capacités du fournisseur, puis choisissez un autre calendrier. Le détail technique est disponible dans le diagnostic local.",
+      caseCalendarTitleRequired: "Saisissez le titre de l’affaire avant de créer un élément Agenda.",
+      caseCalendarDueRequired: "Saisissez une date et une heure avant de créer l’élément Agenda.",
+      caseCalendarSelectionRequired: "Choisissez un calendrier compatible avant de créer l’élément Agenda."
     }),
     en: Object.freeze({
       pinnedMessages: "Pinned messages",
@@ -116,7 +124,15 @@
       cancel: "Cancel",
       continue: "Continue",
       healthAttention: "MailPerch health needs attention",
-      healthHealthy: "MailPerch health is good"
+      healthHealthy: "MailPerch health is good",
+      calendarWriteAllowed: "write access is allowed by local checks",
+      calendarStateUnknown: "unknown state",
+      calendarWriteRefused: "Calendar write refused",
+      calendarUnknown: "unknown",
+      calendarWriteFailed: "Could not write {label} to calendar “{calendar}”. Detected state: {state}. Check permissions, read-only state, synchronization, and provider capabilities, then choose another calendar. The technical detail is available in the local diagnostic.",
+      caseCalendarTitleRequired: "Enter the case title before creating a Calendar item.",
+      caseCalendarDueRequired: "Enter a date and time before creating the Calendar item.",
+      caseCalendarSelectionRequired: "Choose a compatible calendar before creating the Calendar item."
     })
   });
 
