@@ -15,6 +15,10 @@ assert 'iconInfo?.insertBefore(button, nativeStar || null);' in IMPLEMENTATION
 assert '.thread-card-icon-info .button-star' not in CSS
 assert '.thread-card-icon-info .pin-mails-independent-button' not in CSS
 assert 'The two controls share the same native flex container' not in CSS
+assert 'display: flex !important;' in CSS
+assert 'align-items: center !important;' in CSS
+assert 'min-block-size: 24px !important;' in CSS
+assert 'padding-block: 8px;' in CSS
 
 # Explicit save boundary is asynchronous and only returns after SQLite flush.
 assert 'async _setConfiguration(configuration)' in IMPLEMENTATION

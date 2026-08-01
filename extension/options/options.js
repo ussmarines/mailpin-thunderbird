@@ -8,6 +8,7 @@ let rules = [];
 let cases = [];
 let templates = [];
 let dirty = false;
+let persistedDraftSnapshot = "";
 let statusTimer = null;
 let lastStatusControl = null;
 let calendarRenderGeneration = 0;
@@ -273,11 +274,35 @@ function enhanceSettingsPage() {
 function syncSaveControls() {
   const save = $("save-all-floating");
   const discard = $("discard-changes");
-  if (save) save.disabled = !configurationReady || saveInFlight;
-  if (discard) discard.disabled = !configurationReady || saveInFlight;
+  const disabled = !configurationReady || saveInFlight || !dirty;
+  if (save) save.disabled = disabled;
+  if (discard) discard.disabled = disabled;
 }
 
-function setDirty(value = true) {
+function stableSnapshot(value) {
+  if (Array.isArray(value)) return `[${value.map(stableSnapshot).join(",")}]`;
+  if (value && typeof value === "object") {
+    return `{${Object.keys(value).sort().map(key => `${JSON.stringify(key)}:${stableSnapshot(value[key])}`).join(",")}}`;
+  }
+  return JSON.stringify(value);
+}
+
+function currentDraftSnapshot() {
+  if (!configurationReady || !configuration?.settings) return "";
+  return stableSnapshot({
+    settings: collectSettings(),
+    groups,
+    rules,
+    cases,
+    templates
+  });
+}
+
+function rememberPersistedDraft() {
+  persistedDraftSnapshot = currentDraftSnapshot();
+}
+
+function setDirty(value = false) {
   dirty = Boolean(value);
   document.body.toggleAttribute("data-dirty", dirty);
   const dock = $("save-dock");
@@ -288,6 +313,11 @@ function setDirty(value = true) {
       ? "Modifications non enregistrées — elles ne seront appliquées qu’après Enregistrer."
       : "Paramètres enregistrés.";
   }
+}
+
+function syncDirtyState() {
+  if (!configurationReady) return;
+  setDirty(currentDraftSnapshot() !== persistedDraftSnapshot);
 }
 
 function clearStatus() {
@@ -387,7 +417,7 @@ function removeButton(callback) {
   button.type = "button";
   button.addEventListener("click", () => {
     callback();
-    setDirty();
+    syncDirtyState();
   });
   return button;
 }
@@ -404,13 +434,13 @@ function moveButtons(list, index, render) {
     if (!index) return;
     [list[index - 1], list[index]] = [list[index], list[index - 1]];
     render();
-    setDirty();
+    syncDirtyState();
   });
   down.addEventListener("click", () => {
     if (index >= list.length - 1) return;
     [list[index + 1], list[index]] = [list[index], list[index + 1]];
     render();
-    setDirty();
+    syncDirtyState();
   });
   return [up, down];
 }
@@ -561,7 +591,7 @@ function renderAccounts(accounts) {
     reset.addEventListener("click", () => {
       color.value = account.defaultColor;
       card.style.setProperty("--account-color", account.defaultColor);
-      setDirty();
+      syncDirtyState();
     });
     header.append(title, color, reset);
     card.append(header);
@@ -838,12 +868,17 @@ function applyConfiguration(config) {
   renderRules();
   renderAccounts(config.accounts || []);
   renderWaitingGroups(settings.waitingGroupId);
-  void renderCalendars(settings.preferredCalendarId);
+  void renderCalendars(settings.preferredCalendarId).then(() => {
+    // The calendar selector is populated asynchronously. Refresh the baseline
+    // only when the user has not started editing while it was loading.
+    if (!dirty && configuration?.settings === settings) rememberPersistedDraft();
+  });
   applyUxPreferences(settings);
   updateRuntimeSummary(config);
   renderProviderMatrix(config.providerMatrix);
-  setDirty(false);
   setConfigurationReady(true);
+  rememberPersistedDraft();
+  setDirty(false);
 }
 
 function readFiniteControlNumber(id, fallback) {
@@ -1106,11 +1141,11 @@ window.addEventListener("DOMContentLoaded", async () => {
   // click path. Both routes converge on the same guarded functions.
   form.addEventListener("input", event => {
     if (event.target.id === "shortcut" || event.target.id === "import-file") return;
-    setDirty();
+    if (configurationReady) syncDirtyState();
   });
   form.addEventListener("change", event => {
     if (event.target.id === "shortcut" || event.target.id === "import-file") return;
-    setDirty();
+    if (configurationReady) syncDirtyState();
   });
 
   $("status-close").addEventListener("click", clearStatus);
@@ -1125,7 +1160,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     renderGroups();
     renderRules();
     renderTemplates();
-    setDirty();
+    syncDirtyState();
   });
 
   $("add-case").addEventListener("click", () => {
@@ -1140,7 +1175,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     renderCases();
     renderRules();
     renderTemplates();
-    setDirty();
+    syncDirtyState();
   });
 
   $("add-template").addEventListener("click", () => {
@@ -1153,7 +1188,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     });
     renderTemplates();
     renderRules();
-    setDirty();
+    syncDirtyState();
   });
 
   $("add-rule").addEventListener("click", () => {
@@ -1169,7 +1204,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       maxPerMinute: 60
     });
     renderRules();
-    setDirty();
+    syncDirtyState();
   });
 
   $("simulate-rules").addEventListener("click", async event => {
@@ -1399,6 +1434,15 @@ window.addEventListener("DOMContentLoaded", async () => {
     if (!dirty) return;
     event.preventDefault();
     event.returnValue = "";
+  });
+
+  // Thunderbird can restore an Options tab from its back/forward cache. A
+  // cached document must not display an old draft after returning to it.
+  window.addEventListener("pageshow", event => {
+    if (!event.persisted) return;
+    void reload().catch(error => {
+      setStatus(`Rechargement impossible : ${error.message || error}`, "error", {persistent: true});
+    });
   });
 
   try {

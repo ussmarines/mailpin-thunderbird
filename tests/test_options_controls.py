@@ -6,6 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 HTML = (ROOT / "extension/options/options.html").read_text(encoding="utf-8")
 JS = (ROOT / "extension/options/options.js").read_text(encoding="utf-8")
+CSS = (ROOT / "extension/options/options.css").read_text(encoding="utf-8")
 
 
 class ControlParser(HTMLParser):
@@ -50,8 +51,16 @@ for required_guard in (
     "setConfigurationReady(true)",
     "currentSettings({settingsExperience",
     "if (!configuration?.settings) await reload()",
+    "function currentDraftSnapshot()",
+    "function rememberPersistedDraft()",
+    "function syncDirtyState()",
+    "const disabled = !configurationReady || saveInFlight || !dirty;",
 ):
     assert required_guard in JS, required_guard
+
+assert ".save-dock {" in CSS
+assert ".save-dock { pointer-events: none" not in CSS
+assert "pointer-events: none" not in CSS[CSS.index(".save-dock {"):CSS.index("@media (max-width: 1050px)")]
 
 assert "configuration.settings.preferredCalendarId" not in JS
 assert "{...configuration.settings" not in JS

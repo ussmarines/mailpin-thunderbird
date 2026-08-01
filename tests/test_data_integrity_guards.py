@@ -45,8 +45,7 @@ assert "if (generation !== loadGeneration) return false;" in dashboard
 assert dashboard.count("if (generation !== loadGeneration)") >= 1
 assert "calendarRenderGeneration" in options
 assert "uniqueEntityId" in options
-assert "account.defaultColor);" in options and "setDirty();" in options
-assert "account.defaultColor);" in options and "setDirty();" in options
+assert "account.defaultColor);" in options and "syncDirtyState();" in options
 
 # Recurrence guard and protected archive fields remain present in the pure model.
 assert "const jumps = Math.floor" in workflow

@@ -26,32 +26,40 @@ const context = {console, document, messenger, persisted, calls, HTMLElement: El
 context.globalThis = context;
 let source = fs.readFileSync(new URL("../extension/options/options.js", import.meta.url), "utf8");
 source += `
-  applyConfiguration = config => { configuration = {...config, settings: {...config.settings}}; setDirty(false); setConfigurationReady(true); };
-  reload = async () => { calls.push(["reload"]); configuration = {...persisted, settings: {...persisted.settings}}; };
+  applyConfiguration = config => { configuration = {...config, settings: {...config.settings}}; document.getElementById("pinMode").value = config.settings.pinMode; setConfigurationReady(true); rememberPersistedDraft(); setDirty(false); };
+  reload = async () => { calls.push(["reload"]); applyConfiguration(persisted); };
   globalThis.__optionsHarness = {
     bind: installCriticalSettingsActions,
-    ready() { configuration = {...persisted, settings: {...persisted.settings}}; setConfigurationReady(true); },
+    ready() { applyConfiguration(persisted); },
     status() { return document.getElementById("status-message").textContent; },
-    setDirty,
+    changePinMode(value) { document.getElementById("pinMode").value = value; syncDirtyState(); },
+    state() { return {dirty, dockHidden: document.getElementById("save-dock").hidden, saveDisabled: document.getElementById("save-all-floating").disabled, discardDisabled: document.getElementById("discard-changes").disabled}; },
     failSave() { messenger.pinInbox.setConfiguration = async () => { throw new Error("échec API"); }; }
   };`;
 vm.runInNewContext(source, context, {filename: "options.js"});
 context.__optionsHarness.bind();
 context.__optionsHarness.ready();
 
-context.__optionsHarness.setDirty(true);
+const assertState = expected => assert.equal(JSON.stringify(context.__optionsHarness.state()), JSON.stringify(expected));
+
+context.__optionsHarness.changePinMode("nativeStar");
+assertState({dirty: true, dockHidden: false, saveDisabled: false, discardDisabled: false});
 await get("save-all-floating").activate();
 assert.equal(calls.filter(([name]) => name === "set").length, 1);
 assert.ok(calls.filter(([name]) => name === "get").length >= 1);
 assert.equal(context.__optionsHarness.status(), "Paramètres enregistrés.");
 
-context.__optionsHarness.setDirty(true);
+context.__optionsHarness.changePinMode("nativeStar");
 await get("discard-changes").activate();
 assert.ok(calls.some(([name]) => name === "reload"));
 assert.equal(context.__optionsHarness.status(), "Modifications annulées.");
 
-context.__optionsHarness.setDirty(true);
+context.__optionsHarness.changePinMode("nativeStar");
 context.__optionsHarness.failSave();
 await get("save-all-floating").activate();
 assert.match(context.__optionsHarness.status(), /Erreur : échec API/);
+assertState({dirty: true, dockHidden: false, saveDisabled: false, discardDisabled: false});
+
+context.__optionsHarness.changePinMode("independent");
+assertState({dirty: false, dockHidden: true, saveDisabled: true, discardDisabled: true});
 console.log("Options save/cancel integration harness: OK");

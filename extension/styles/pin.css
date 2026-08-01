@@ -1298,7 +1298,11 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
  * conteneur flex natif et le même centrage vertical, y compris au recyclage
  * des cartes. Le menu « Plus » conserve sa position native dans l'en-tête. */
 :root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-column:last-child {
-  padding-block: 4px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-block: 8px;
 }
 :root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout :is(.thread-card-row, .thread-card-dynamic-row) {
   position: static;
@@ -1310,8 +1314,16 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   padding-block: 0;
 }
 :root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-icon-info {
-  min-block-size: 19px;
+  display: flex !important;
+  align-items: center !important;
+  align-self: center;
+  min-block-size: 24px !important;
+  block-size: 24px;
+  margin-block: 0 !important;
   padding-inline-end: 0;
+}
+:root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .thread-card-icon-info > * {
+  align-self: center;
 }
 :root[pin-mails-inbox] #threadTree[rows="thread-card"] tr.card-layout .pin-mails-independent-button {
   display: grid !important;
