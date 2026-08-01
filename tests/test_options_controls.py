@@ -116,4 +116,27 @@ assert "configuration.settings.preferredCalendarId" not in JS
 assert "{...configuration.settings" not in JS
 assert "Object.assign(configuration.settings" not in JS
 
+# Generated settings entities must explain their business values, and a card's
+# appearance must be synchronized from its checkbox rather than a stale class.
+for required in (
+    "function syncToggleCards()",
+    "dataset.enabled",
+    "toggle-recommended-badge",
+    "function entityField(label, control, help = \"\")",
+    "Échéance",
+    "Anticipation",
+    "Nombre maximal d’actions par minute",
+    "Choisissez un calendrier compatible",
+    "Saisissez une date et une heure",
+):
+    assert required in JS, required
+for required in (
+    ".setting-toggle[data-enabled=\"true\"]",
+    ".setting-toggle.featured[data-enabled=\"true\"]",
+    ".toggle-recommended-badge",
+    ".subsection-header:has(+ #rule-simulation)",
+    "calc(7rem + env(safe-area-inset-bottom))",
+):
+    assert required in CSS, required
+
 print(f"Options registry and feedback guards ({len(parser.settings_controls)} static controls): OK")

@@ -4,7 +4,7 @@
 > Lire ce document avant tout autre fichier. Il donne l’état courant, les invariants,
 > la carte du dépôt et les chemins exacts à ouvrir selon la tâche.
 >
-> Version de travail : **3.2.10**
+> Version de travail : **3.2.11**
 > Base de travail vérifiée : `main` au commit `3ffd5b88d03230d3b2d6792da18534d897fdd06c`
 > Produit : **MailPerch — Email Pins & Follow-up**
 > Extension ID de développement : `pin-mails@MailPerch.local`
@@ -49,6 +49,12 @@ globales et garantit un état terminal même si un script ou l’API manque. Dan
 profil jetable sans compte, Thunderbird 153.0.1 a validé les recommandations, le
 dock Enregistrer/Annuler, la réouverture et la persistance après redémarrage.
 
+La version 3.2.11 rend l’état des cartes de réglage strictement dépendant de leur
+case, avec un badge séparé pour une recommandation désactivée. Elle donne une
+structure accessible aux affaires, modèles et règles, et bloque toute création
+Agenda d’affaire sans titre, date, type et calendrier compatible ; l’Experiment
+applique les mêmes validations et ne crée plus une échéance artificielle.
+
 ## 2. Invariants non négociables
 
 1. Ne jamais modifier les compteurs natifs de nouveaux messages, non-lus ou totaux.
@@ -76,7 +82,7 @@ dock Enregistrer/Annuler, la réouverture et la persistance après redémarrage.
 
 | Élément | Valeur |
 |---|---|
-| Version extension/package | `3.2.10` |
+| Version extension/package | `3.2.11` |
 | Thunderbird déclaré | `128.0` à `153.*` |
 | Manifest | MV3 |
 | Permission WebExtension | `menus` uniquement |

@@ -31,6 +31,11 @@ for (const required of [
   "settings-absent",
   "options:init:timeout:configuration",
   "#retry-settings-load"
+  ,"Keyboard checkbox activation"
+  ,"__mailperchCalendarCreates"
+  ,"Every generated model, rule and case field"
+  ,"simulation result must not overlap"
+  ,"getBoundingClientRect"
 ]) {
   assert.ok(scenario.includes(required), `Missing real-browser assertion: ${required}`);
 }

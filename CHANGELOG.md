@@ -1,5 +1,12 @@
 # Journal des modifications
 
+## 3.2.11 — réglages explicites et création Agenda validée
+
+- les cartes de réglage exposent désormais leur état réel : fond actif uniquement lorsque la case est cochée, focus/survol distincts et badge « Recommandé » pour une recommandation désactivée ;
+- les lignes générées des affaires, modèles et règles ont des libellés, aides, limites, unités et actions de réorganisation accessibles ;
+- une affaire exige titre, échéance, type et calendrier compatible avant tout appel Agenda ; l’Experiment revalide ces préconditions, ne fabrique plus d’échéance et conserve le détail technique seulement dans le diagnostic local ;
+- la simulation de règles est structurée en zones non chevauchantes et le bas du formulaire réserve l’espace de la barre Enregistrer/Annuler.
+
 ## 3.2.10 — amorçage Options prouvé dans Thunderbird
 
 - correction de la cause réelle du chargeur permanent : la localisation du libellé de restauration supprimait l’`input#import-file`, puis `options.js` échouait avant `initializeOptions()` ;

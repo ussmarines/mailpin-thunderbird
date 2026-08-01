@@ -4225,10 +4225,11 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     const raw = String(error?.message || error || "MODIFICATION_FAILED");
     const label = itemType === "event" ? "l’événement" : "la tâche";
     const state = descriptor?.reason || (descriptor?.writable ? "écriture autorisée selon les vérifications locales" : "état inconnu");
+    this._recordDiagnostic("warning", "Écriture Agenda refusée", raw, {component: "calendar"});
     return new ExtensionError(
       `Impossible d’écrire ${label} dans le calendrier « ${descriptor?.name || "inconnu"} ». ` +
       `État détecté : ${state}. Vérifiez les droits, la lecture seule, la synchronisation et les capacités du fournisseur, ` +
-      `puis choisissez un autre calendrier. Détail Thunderbird : ${raw}`
+      "puis choisissez un autre calendrier. Le détail technique est disponible dans le diagnostic local."
     );
   }
 
@@ -4304,6 +4305,10 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     calendarId = boundedText(calendarId, 512);
     if(!this._settings.enableCalendarIntegration)throw new ExtensionError("L’intégration Agenda est désactivée.");
     const caseItem=(this._data.cases||[]).find(item=>item.id===String(caseId||""));if(!caseItem)throw new ExtensionError("Affaire introuvable.");
+    if (!String(caseItem.name || "").trim()) throw new ExtensionError("Saisissez le titre de l’affaire avant de créer un élément Agenda.");
+    if (!Number.isFinite(Number(caseItem.dueAt)) || Number(caseItem.dueAt) <= 0) {
+      throw new ExtensionError("Saisissez une date et une heure avant de créer l’élément Agenda.");
+    }
     const type = itemType === "event" ? "event" : "task";
     const calendars = lazy.cal.manager.getCalendars();
     if(caseItem.calendarItemId&&caseItem.calendarId){
@@ -4339,7 +4344,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
           caseItem.updatedAt=Date.now();
           if(save)this._saveData("case-calendar-update");
           if(refresh)this._refreshAllStates(true);
-          return{created:false,updated:true,caseId:caseItem.id,itemId:caseItem.calendarItemId};
+          return{created:false,updated:true,caseId:caseItem.id,calendarId:caseItem.calendarId,itemId:caseItem.calendarItemId,itemType:type};
         }
         if (!createIfMissing) return {created:false,updated:false,missing:true,caseId:caseItem.id};
       }catch(error){
@@ -4347,8 +4352,11 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         if (!createIfMissing) return {created:false,updated:false,missing:true,caseId:caseItem.id};
       }
     }
-    const {calendar, descriptor} = this._selectCalendarForItem(type, calendarId);
-    const start=caseItem.dueAt||Date.now()+3600000;let item;
+    if (!calendarId && !caseItem.calendarId) {
+      throw new ExtensionError("Choisissez un calendrier compatible avant de créer l’élément Agenda.");
+    }
+    const {calendar, descriptor} = this._selectCalendarForItem(type, calendarId || caseItem.calendarId);
+    const start=caseItem.dueAt;let item;
     if(type==="event"){item=new lazy.CalEvent();item.title=caseItem.name||"Affaire";item.startDate=lazy.cal.dtz.jsDateToDateTime(new Date(start));item.endDate=lazy.cal.dtz.jsDateToDateTime(new Date(start+3600000));}
     else{item=new lazy.CalTodo();item.title=caseItem.name||"Affaire";item.entryDate=lazy.cal.dtz.jsDateToDateTime(new Date());item.dueDate=lazy.cal.dtz.jsDateToDateTime(new Date(start));}
     item.calendar=calendar;item.setProperty("DESCRIPTION",caseItem.note||"");item.setProperty("X-PIN-MAILS-CASE-ID",caseItem.id);item.setProperty("X-PIN-MAILS-VERSION","3");

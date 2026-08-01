@@ -62,6 +62,11 @@ for token in [
 assert ".filter(calendar => !calendar.readOnly && !calendar.disabled)" not in impl
 assert "caseItem.calendarItemType || \"task\"" in impl
 assert "caseItem.calendarItemType=type" in impl
+assert "Saisissez une date et une heure avant de créer l’élément Agenda." in impl
+assert "Choisissez un calendrier compatible avant de créer l’élément Agenda." in impl
+assert "const start=caseItem.dueAt;" in impl
+assert "this._recordDiagnostic(\"warning\", \"Écriture Agenda refusée\"" in impl
+assert "Détail Thunderbird : ${raw}" not in impl
 
 # Calendar choice is exposed from all user surfaces.
 assert "pin-mails-editor-calendar" in impl

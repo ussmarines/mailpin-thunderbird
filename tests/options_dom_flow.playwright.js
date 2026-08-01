@@ -25,6 +25,7 @@ async page => {
       cases: [],
       templates: []
     };
+    globalThis.__mailperchCalendarCreates = [];
     const readPersisted = () => {
       try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || clone(initial); }
       catch { return clone(initial); }
@@ -106,6 +107,12 @@ async page => {
               eventCompatible: true,
               reason: ""
             }];
+          }
+          if (name === "createCaseCalendarItem") {
+            return async (...args) => {
+              globalThis.__mailperchCalendarCreates.push(args);
+              return {created: true, calendarId: args[2], itemId: "calendar-item-test", itemType: args[1]};
+            };
           }
           if (name === "getBackupStatus" || name === "getHealthReport") return async () => null;
           return async () => ({});
@@ -229,6 +236,42 @@ async page => {
 
   let state = await dockState();
   assert(!state.dirty && state.hidden && state.ariaHidden === "true", "The initial draft must be clean");
+
+  // A setting card has one visual source of truth: the native checkbox. The
+  // label click and keyboard activation must keep the draft and card in sync.
+  const rulesToggle = page.locator("#enableAutomaticRules");
+  const rulesCard = rulesToggle.locator("xpath=ancestor::label[contains(@class, 'setting-toggle')]");
+  assert(await rulesCard.getAttribute("data-enabled") === "false", "Unchecked setting cards must be visibly inactive");
+  await rulesToggle.focus();
+  await page.keyboard.press("Space");
+  assert(await rulesToggle.isChecked() && await rulesCard.getAttribute("data-enabled") === "true",
+    "Keyboard checkbox activation must activate exactly the matching card");
+  await rulesCard.click();
+  assert(!(await rulesToggle.isChecked()) && await rulesCard.getAttribute("data-enabled") === "false",
+    "Clicking a card must perform one native checkbox change and restore the inactive appearance");
+
+  // Generated case/template/rule fields use visible labels and real bounds.
+  await page.locator("#add-case").click();
+  await page.locator("#add-template").click();
+  await page.locator("#add-rule").click();
+  const dynamicFields = page.locator(".case-editor-row input, .case-editor-row select, .template-row input, .template-row select, .rule-row input, .rule-row select");
+  const missingDynamicNames = await dynamicFields.evaluateAll(nodes => nodes.filter(control => {
+    const labelled = control.getAttribute("aria-label") || control.labels?.[0]?.textContent?.trim();
+    return !labelled;
+  }).map(control => control.outerHTML));
+  assert(missingDynamicNames.length === 0, "Every generated model, rule and case field must have an accessible visible name");
+  const caseAgenda = page.locator(".case-editor-row button").filter({hasText: "Agenda"});
+  await caseAgenda.click();
+  assert((await page.evaluate(() => globalThis.__mailperchCalendarCreates.length)) === 0,
+    "A case without a due date must not call the Calendar API");
+  await page.locator("#simulate-rules").click();
+  const simulationGeometry = await page.evaluate(() => {
+    const overlaps = (a, b) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+    const result = document.querySelector("#rule-simulation").getBoundingClientRect();
+    return [...document.querySelectorAll("#simulate-rules, #simulate-rules + .button-help, #clear-rule-log, #add-rule")]
+      .map(node => node.getBoundingClientRect()).some(rect => overlaps(result, rect));
+  });
+  assert(!simulationGeometry, "The simulation result must not overlap its button, help or actions");
 
   // Use a real select interaction and a real save-button click. The visible
   // click path must issue one write, read it back and persist after reload.

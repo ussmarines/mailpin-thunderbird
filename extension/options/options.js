@@ -16,6 +16,7 @@ let draftStateError = null;
 let statusTimer = null;
 let lastStatusControl = null;
 let calendarRenderGeneration = 0;
+let availableCalendars = [];
 let entitySequence = 0;
 let initializationGeneration = 0;
 let initializationInFlight = false;
@@ -377,6 +378,24 @@ function genericControlHelp(control) {
   return "Cette valeur est appliquée après l’enregistrement des paramètres.";
 }
 
+function syncToggleCards() {
+  const recommended = configuration?.recommendedSettings || {};
+  for (const card of document.querySelectorAll(".setting-toggle")) {
+    const checkbox = card.querySelector('input[type="checkbox"]');
+    if (!checkbox) continue;
+    const active = checkbox.checked;
+    card.dataset.enabled = String(active);
+    let badge = card.querySelector(":scope > .toggle-recommended-badge");
+    const isRecommendedButDisabled = recommended[checkbox.id] === true && !active;
+    if (isRecommendedButDisabled && !badge) {
+      badge = node("span", "toggle-recommended-badge", "Recommandé");
+      badge.setAttribute("aria-label", "Réglage recommandé, actuellement désactivé");
+      card.append(badge);
+    }
+    if (badge) badge.hidden = !isRecommendedButDisabled;
+  }
+}
+
 function slugify(value) {
   return String(value || "section")
     .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -708,6 +727,8 @@ function moveButtons(list, index, render) {
   down.disabled = index >= list.length - 1;
   up.setAttribute("aria-label", "Monter");
   down.setAttribute("aria-label", "Descendre");
+  up.title = "Monter cet élément";
+  down.title = "Descendre cet élément";
   up.addEventListener("click", () => {
     if (!index) return;
     [list[index - 1], list[index]] = [list[index], list[index - 1]];
@@ -721,6 +742,31 @@ function moveButtons(list, index, render) {
     syncDirtyState();
   });
   return [up, down];
+}
+
+function entityField(label, control, help = "") {
+  const field = node("label", "entity-field");
+  const caption = node("span", "", label);
+  field.append(caption, control);
+  if (help) {
+    const hint = node("small", "entity-field-help", help);
+    const hintId = `entity-help-${uniqueEntityId("field", [])}`;
+    hint.id = hintId;
+    control.setAttribute("aria-describedby", [control.getAttribute("aria-describedby"), hintId].filter(Boolean).join(" "));
+    field.append(hint);
+  }
+  return field;
+}
+
+function calendarLabel(id) {
+  return availableCalendars.find(calendar => calendar.id === id)?.name || "le calendrier choisi";
+}
+
+function calendarOptions(type, selectedId = "") {
+  const compatible = availableCalendars.filter(calendar => type === "event" ? calendar.eventCompatible : calendar.taskCompatible);
+  const control = select([["", "Choisir un calendrier compatible"], ...compatible.map(calendar => [calendar.id, calendar.name])], selectedId, "Calendrier cible");
+  control.required = true;
+  return {control, compatible};
 }
 
 function renderGroups() {
@@ -784,31 +830,47 @@ function renderCases(){
   if(!cases.length)host.append(node("p","hint","Aucune affaire."));
   cases.forEach((item,index)=>{
     const row=node("article","group-row case-editor-row");row.style.setProperty("--group-color",item.color);
-    const name=document.createElement("input");name.value=item.name;name.maxLength=120;
+    const name=document.createElement("input");name.value=item.name;name.maxLength=120;name.required=true;
     const color=document.createElement("input");color.type="color";color.value=item.color;
     const status=select([["active","À traiter"],["waiting","En attente"],["planned","Planifié"],["completed","Terminé"]],item.status||"active","Statut");
-    const due=document.createElement("input");due.type="datetime-local";due.value=item.dueAt?new Date(item.dueAt-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16):"";
+    const due=document.createElement("input");due.type="datetime-local";due.required=true;due.value=item.dueAt?new Date(item.dueAt-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16):"";
     const note=document.createElement("input");note.value=item.note||"";note.placeholder="Note globale";
-    const sync=()=>Object.assign(item,{name:name.value.slice(0,120),color:color.value,status:status.value,dueAt:due.value?new Date(due.value).getTime():0,note:note.value.slice(0,4000),updatedAt:Date.now()});
-    for(const control of[name,color,status,due,note])control.addEventListener("input",sync);
+    const type=select([["task","Tâche"],["event","Événement"]],item.calendarItemType||currentSettings().calendarItemType||"task","Type Agenda");
+    let {control: calendar, compatible} = calendarOptions(type.value, item.calendarId || currentSettings().preferredCalendarId || "");
+    const sync=()=>Object.assign(item,{name:name.value.trim().slice(0,120),color:color.value,status:status.value,dueAt:due.value?new Date(due.value).getTime():0,note:note.value.slice(0,4000),calendarItemType:type.value,calendarId:calendar.value,updatedAt:Date.now()});
+    type.addEventListener("change", () => {
+      const next = calendarOptions(type.value, "");
+      compatible = next.compatible;
+      calendar.replaceChildren(...next.control.options);
+      calendar.value = "";
+      sync();
+    });
+    for(const control of[name,color,status,due,note,type,calendar])control.addEventListener("input",sync);
     const agenda = node("button", "secondary compact", item.calendarItemId ? "Synchroniser Agenda" : "Créer dans Agenda");
     agenda.type = "button";
     agenda.addEventListener("click", async event => {
       try {
+        sync();
+        if (!item.name) throw new Error("Saisissez le titre de l’affaire avant de créer un élément Agenda.");
+        if (!item.dueAt) throw new Error("Saisissez une date et une heure avant de créer l’élément Agenda.");
+        if (!calendar.value) {
+          throw new Error(compatible.length
+            ? "Choisissez un calendrier compatible avant de créer l’élément Agenda."
+            : `Aucun calendrier inscriptible ne peut recevoir ${type.value === "event" ? "un événement" : "une tâche"}.`);
+        }
         const result = await withBusy(event.currentTarget, "Synchronisation de l’affaire avec l’Agenda…", async () => {
-          sync();
           await messenger.pinInbox.updateCase(item.id, item);
           return messenger.pinInbox.createCaseCalendarItem(
             item.id,
-            "task",
-            currentSettings().preferredCalendarId || ""
+            type.value,
+            calendar.value
           );
         });
         item.calendarItemId = result.itemId || item.calendarItemId || "";
         item.calendarId = result.calendarId || item.calendarId || "";
         renderCases();
         setStatus(
-          result.updated ? "Affaire synchronisée avec l’Agenda." : "Tâche Agenda créée pour l’affaire.",
+          `${result.updated ? "Affaire synchronisée" : "Affaire créée"} dans ${calendarLabel(result.calendarId || calendar.value)} — ${result.itemType === "event" ? "événement" : "tâche"}, ${new Date(item.dueAt).toLocaleString()}.`,
           "success"
         );
       } catch (error) {
@@ -816,7 +878,7 @@ function renderCases(){
       }
     });
     const[up,down]=moveButtons(cases,index,renderCases);
-    row.append(name,color,status,due,note,agenda,up,down,removeButton(()=>{cases.splice(index,1);renderCases();renderRules();renderTemplates();}));host.append(row);
+    row.append(entityField("Titre",name,"Nom visible de l’affaire (120 caractères maximum)."),entityField("Couleur",color),entityField("Statut",status),entityField("Échéance",due,"Date obligatoire pour créer une tâche ou un événement."),entityField("Note",note),entityField("Type Agenda",type),entityField("Calendrier",calendar,"Seuls les calendriers inscriptibles compatibles sont proposés."),agenda,up,down,removeButton(()=>{cases.splice(index,1);renderCases();renderRules();renderTemplates();}));host.append(row);
   });
 }
 function renderTemplates(){
@@ -838,7 +900,7 @@ function renderTemplates(){
     const sync=()=>Object.assign(item,{name:name.value.slice(0,120),groupId:group.value,caseId:caseSelect.value,priorityLevel:priority.value,workflowStatus:status.value,dueOffsetDays:Number(due.value)||0,followUpDelayDays:Number(follow.value)||0,reminderLeadMinutes:Number(lead.value)||0,recurrenceRule:recurrence.value,recurrenceInterval:Number(interval.value)||1,notePrefix:note.value.slice(0,500)});
     for(const control of[name,group,caseSelect,priority,status,due,follow,lead,recurrence,interval,note])control.addEventListener("input",sync);
     const[up,down]=moveButtons(templates,index,renderTemplates);
-    row.append(name,group,caseSelect,priority,status,due,follow,lead,recurrence,interval,note,up,down,removeButton(()=>{templates.splice(index,1);renderTemplates();renderRules();}));
+    row.append(entityField("Nom",name,"Nom du modèle (120 caractères maximum)."),entityField("Groupe",group),entityField("Affaire",caseSelect),entityField("Priorité",priority),entityField("Statut",status),entityField("Échéance",due,"Décalage avant échéance, en jours (0 à 3650)."),entityField("Relance",follow,"Décalage avant relance, en jours (0 à 365)."),entityField("Anticipation",lead,"Rappel anticipé, en minutes (0 à 10 080)."),entityField("Récurrence",recurrence),entityField("Intervalle",interval,"Nombre d’unités entre deux récurrences (1 à 100)."),entityField("Préfixe de note",note),up,down,removeButton(()=>{templates.splice(index,1);renderTemplates();renderRules();}));
     host.append(row);
   });
 }
@@ -903,7 +965,7 @@ function renderRules(){
   const accountOptions=[["","Tous les comptes"],...(configuration?.accounts||[]).map(account=>[account.key,account.name||account.email||account.key])];
   rules.forEach((rule,index)=>{
     const row=node("article","rule-row");
-    const enabled=document.createElement("input");enabled.type="checkbox";enabled.checked=rule.enabled!==false;enabled.title="Activer la règle";
+    const enabled=document.createElement("input");enabled.type="checkbox";enabled.checked=rule.enabled!==false;enabled.title="Activer la règle";enabled.setAttribute("aria-label","Activer la règle");
     const name=document.createElement("input");name.value=rule.name||`Règle ${index+1}`;name.placeholder="Nom";
     const priority=document.createElement("input");priority.type="number";priority.min="1";priority.max="10000";priority.value=rule.priority||((index+1)*100);priority.title="Priorité d’exécution";
     const trigger=select([["messageAdded","Nouveau message"],["read","Lecture"],["archive","Archivage"],["reply","Réponse"],["move","Déplacement"],["delete","Suppression"],["complete","Terminé"],["calendar","Agenda"]],rule.trigger||"messageAdded","Déclencheur");
@@ -930,7 +992,7 @@ function renderRules(){
     });
     for(const control of[enabled,name,priority,trigger,action,target,sender,subject,tag,account,folder,group,caseSelect,template,status,stop,rate])control.addEventListener("input",sync);
     const [up,down]=moveButtons(rules,index,renderRules);
-    row.append(enabled,name,priority,trigger,action,target,sender,subject,tag,account,folder,group,caseSelect,template,status,stopLabel,rate,up,down,removeButton(()=>{rules.splice(index,1);renderRules();}));
+    row.append(entityField("Activée",enabled,"Une règle désactivée n’est jamais évaluée."),entityField("Nom",name,"Nom local de la règle."),entityField("Priorité",priority,"Ordre d’exécution : le plus petit nombre passe d’abord (1 à 10 000)."),entityField("Déclencheur",trigger),entityField("Action",action),entityField("Cible",target),entityField("Expéditeur contient",sender),entityField("Objet contient",subject),entityField("Clé d’étiquette",tag),entityField("Compte",account),entityField("Dossier",folder,"URI exacte, facultative."),entityField("Groupe cible",group),entityField("Affaire cible",caseSelect),entityField("Modèle cible",template),entityField("Statut cible",status),stopLabel,entityField("Limite",rate,"Nombre maximal d’actions par minute pour cette règle (1 à 1000)."),up,down,removeButton(()=>{rules.splice(index,1);renderRules();}));
     host.append(row);
   });
 }
@@ -951,6 +1013,7 @@ async function renderCalendars(selected) {
     );
     if (!Array.isArray(calendars)) throw new Error("La liste des calendriers est invalide.");
     if (generation !== calendarRenderGeneration) return;
+    availableCalendars = calendars.filter(calendar => calendar && typeof calendar.id === "string");
     for (const calendar of calendars) {
       const option = node(
         "option",
@@ -991,6 +1054,7 @@ async function renderCalendars(selected) {
       info.appendChild(node("p", "hint", "Aucun calendrier Thunderbird n’est disponible ou l’intégration Agenda est désactivée."));
     }
   } catch (error) {
+    availableCalendars = [];
     if (generation !== calendarRenderGeneration) return;
     console.warn("MailPerch : calendriers indisponibles", initializationDiagnostic(error));
     setStatus("Les calendriers Thunderbird ne sont pas disponibles.", "error", {control: el});
@@ -1181,6 +1245,7 @@ async function applyConfiguration(config) {
   renderCases();
   renderTemplates();
   renderRules();
+  syncToggleCards();
   renderAccounts(config.accounts || []);
   renderWaitingGroups(settings.waitingGroupId);
   applyUxPreferences(settings);
@@ -1517,11 +1582,17 @@ async function startOptions() {
   // click path. Both routes converge on the same guarded functions.
   form.addEventListener("input", event => {
     if (event.target.id === "shortcut" || event.target.id === "import-file") return;
-    if (configurationReady) syncDirtyState();
+    if (configurationReady) {
+      syncToggleCards();
+      syncDirtyState();
+    }
   });
   form.addEventListener("change", event => {
     if (event.target.id === "shortcut" || event.target.id === "import-file") return;
-    if (configurationReady) syncDirtyState();
+    if (configurationReady) {
+      syncToggleCards();
+      syncDirtyState();
+    }
   });
 
   $("status-close").addEventListener("click", clearStatus);

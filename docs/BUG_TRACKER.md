@@ -5,7 +5,7 @@
 > fichier après `PROJECT_MEMORY.md`.
 
 Dernière mise à jour : **2026-08-01**
-Version de travail : **3.2.10**
+Version de travail : **3.2.11**
 
 ## Règles de suivi
 
@@ -46,6 +46,7 @@ et la frontière de démarrage sont corrigées en 3.2.10.
 | MP-2026-007 | 3.2.7 | Sur une installation neuve ou une configuration vide/partielle, les fonctions recommandées semblent toutes désactivées. | Options acceptait tout objet `settings`, puis rendait les booléens absents avec `Boolean(undefined)`, alors que les recommandations et la normalisation vivaient seulement dans l'Experiment ; aucune source partagée ne garantissait le rendu d'une réponse partielle. | `extension/api/pinInbox/modules/settings.js`, `extension/api/pinInbox/implementation.js`, `extension/options/options.js` | `tests/settings_defaults.mjs`, `tests/options_dom_flow.playwright.js`, `tests/test_options_controls.py` | CORRIGÉ | 3.2.10 | Thunderbird 153.0.1, profil jetable neuf : recommandations visibles et activées ; les choix explicitement désactivés restent désactivés. |
 | MP-2026-008 | 3.2.8 | La page Paramètres reste sur « Chargement des recommandations » sans contrôle ni erreur. | Dans le XPI 3.2.9, `localize()` remplaçait le `textContent` du label de restauration et supprimait son enfant `input#import-file` ; l’enregistrement d’écouteur suivant levait `TypeError` avant `initializeOptions()`, donc les délais et le panneau terminal 3.2.9 ne pouvaient pas agir. | `extension/options/options-bootstrap.js`, `extension/options/options.js`, `extension/options/options.html` | `tests/options_dom_flow.playwright.js`, `tests/test_options_controls.py`, `tests/test_regressions_3_2_9.py`, `tests/test_build_reproducible.py` | CORRIGÉ | 3.2.10 | Reproduit avec le XPI 3.2.9 (`options.js:1773:4`), puis validé avec le XPI 3.2.10 dans Thunderbird 153.0.1 : formulaire, état terminal, Enregistrer/Annuler, réouverture et persistance après redémarrage. |
 | MP-2026-009 | 3.2.9 | Thunderbird journalise une erreur au démarrage lors de la création du menu de message affiché. | `menus.create()` recevait le contexte obsolète `message_display`, refusé par Thunderbird 153 ; l’action dédiée `messageDisplayAction` couvre déjà ce point d’entrée. | `extension/background.js` | `tests/test_message_menu_and_row_ux.py` | CORRIGÉ | 3.2.10 | Erreur reproduite dans la console du profil jetable, puis absente après installation du XPI 3.2.10 ; l’écouteur `messageDisplayAction.onClicked` est conservé. |
+| MP-2026-010 | 3.2.10 | Cartes de réglage ambiguës, champs générés sans libellé et création Agenda d’une affaire en erreur. | Les cartes ne reflétaient pas explicitement le brouillon, les lignes dynamiques étaient construites sans structure de champ, et l’affaire forçait une tâche sans date tout en laissant l’Experiment choisir une échéance. | `extension/options/options.js`, `extension/options/options.css`, `extension/api/pinInbox/implementation.js` | `tests/options_dom_flow.playwright.js`, `tests/test_options_controls.py`, `tests/test_calendar_and_card_actions.py` | À VALIDER | 3.2.11 | Vérifier dans Thunderbird 153 avec un calendrier local synthétique : validations titre/date/calendrier, tâche incompatible refusée, événement créé et rendu des lignes sans chevauchement. |
 
 ## Modèle pour une nouvelle entrée
 

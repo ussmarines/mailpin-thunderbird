@@ -74,7 +74,7 @@ button.compact { min-height: 2.15rem; padding: .35rem .6rem; font-size: .86rem; 
 :focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 60%, transparent); outline-offset: 2px; }
 [hidden] { display: none !important; }
 
-.settings-app { width: min(1480px, 100%); margin: 0 auto; padding: var(--space-5) clamp(1rem, 3vw, 2.75rem) 7rem; }
+.settings-app { width: min(1480px, 100%); margin: 0 auto; padding: var(--space-5) clamp(1rem, 3vw, 2.75rem) calc(7rem + env(safe-area-inset-bottom)); }
 .page-header {
   display: flex;
   align-items: center;
@@ -146,7 +146,11 @@ h1 { margin-bottom: .25rem; font-size: clamp(1.65rem, 3vw, 2.25rem); line-height
 .input-with-unit > small { white-space: nowrap; }
 .toggle-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .65rem; margin-top: var(--space-4); }
 .setting-toggle { display: flex; align-items: flex-start; gap: .65rem; min-height: 3rem; padding: .75rem; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-2); font-weight: 620; }
-.setting-toggle:has(input:checked) { border-color: color-mix(in srgb, var(--accent) 50%, var(--border)); background: var(--accent-soft); }
+.setting-toggle[data-enabled="true"] { border-color: color-mix(in srgb, var(--accent) 65%, var(--border)); background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); }
+.setting-toggle:hover { border-color: color-mix(in srgb, var(--accent) 38%, var(--border)); background: var(--surface-3); }
+.setting-toggle[data-enabled="true"]:hover { background: color-mix(in srgb, var(--accent-soft) 84%, var(--surface-3)); }
+.setting-toggle:focus-within { outline: 3px solid color-mix(in srgb, var(--accent) 42%, transparent); outline-offset: 2px; }
+.toggle-recommended-badge { margin-left: auto; align-self: flex-start; padding: .18rem .45rem; border: 1px solid color-mix(in srgb, var(--warning) 45%, var(--border)); border-radius: 999px; color: var(--warning); background: var(--warning-soft); font-size: .72rem; font-weight: 750; white-space: nowrap; }
 .feature-map { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); margin-top: var(--space-4); }
 .feature-map > div { display: grid; gap: .25rem; padding: var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-2); }
 .feature-map span { color: var(--muted); }
@@ -338,8 +342,13 @@ body[data-settings-experience="guided"] details.advanced-group:not([data-guided-
   line-height: 1.4;
 }
 .setting-toggle.featured {
-  border-color: color-mix(in srgb, var(--accent) 58%, var(--border));
+  border-color: var(--border);
+  background: var(--surface-2);
+}
+.setting-toggle.featured[data-enabled="true"] {
+  border-color: color-mix(in srgb, var(--accent) 65%, var(--border));
   background: var(--accent-soft);
+  box-shadow: inset 3px 0 0 var(--accent);
 }
 .setting-toggle.featured > span {
   display: grid;
@@ -415,6 +424,22 @@ body[data-settings-experience="guided"] details.advanced-group:not([data-guided-
   display: none;
 }
 
+.subsection-header:has(+ #rule-simulation) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, auto);
+  gap: var(--space-3);
+  align-items: start;
+}
+.subsection-header:has(+ #rule-simulation) .button-row {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.subsection-header:has(+ #rule-simulation) .button-help-wrap { min-width: 0; max-width: 20rem; }
+#rule-simulation { clear: both; margin-top: var(--space-3); min-width: 0; }
+
 .group-editor-row {
   display: grid;
   grid-template-columns: auto minmax(14rem, 1fr) minmax(8rem, auto) auto;
@@ -442,6 +467,7 @@ body[data-settings-experience="guided"] details.advanced-group:not([data-guided-
   font-size: .78rem;
   font-weight: 700;
 }
+.entity-field-help { color: var(--muted); font-size: .76rem; font-weight: 450; line-height: 1.35; }
 .entity-actions {
   display: flex;
   align-items: center;
@@ -461,7 +487,8 @@ body[data-settings-experience="guided"] details.advanced-group:not([data-guided-
   grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
 }
 .rule-row,
-.template-row {
+.template-row,
+.case-editor-row {
   padding: var(--space-4);
 }
 .rule-row > input[type="checkbox"] {
@@ -698,6 +725,7 @@ button.danger-quiet {
   .button-row > .button-help-wrap {
     max-width: 100%;
   }
+  .subsection-header:has(+ #rule-simulation) { grid-template-columns: 1fr; }
 }
 
 
