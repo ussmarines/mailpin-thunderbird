@@ -1,17 +1,20 @@
-/* MailPerch — Email Pins & Follow-up 3.2.6 */
+@import url("./tokens.css");
+
+/* MailPerch — Email Pins & Follow-up 3.2.12 */
 
 :root {
-  --pin-mails-accent: light-dark(#0f6cbd, #62b0e8);
-  --pin-mails-accent-hover: light-dark(#115ea3, #82c8f2);
-  --pin-mails-muted-icon: light-dark(#5b6570, #bcc5ce);
-  --pin-mails-hover-icon: light-dark(#0f6cbd, #7dc9ff);
-  --pin-mails-hover-bg: light-dark(#dceeff, color-mix(in srgb, #62b0e8 24%, transparent));
+  --pin-mails-accent: light-dark(var(--mp-brand), var(--mp-brand-soft));
+  --pin-mails-accent-hover: light-dark(var(--mp-brand-hover), var(--mp-brand-soft));
+  --pin-mails-accent-pressed: light-dark(var(--mp-brand-pressed), var(--mp-brand-soft));
+  --pin-mails-muted-icon: var(--mp-text-muted);
+  --pin-mails-hover-icon: var(--mp-brand);
+  --pin-mails-hover-bg: light-dark(var(--mp-brand-soft), color-mix(in srgb, var(--mp-brand) 24%, transparent));
   --pin-mails-panel-bg: var(--layout-background-0);
   --pin-mails-header-bg: var(--layout-background-1);
   --pin-mails-border: var(--sidebar-border);
   --pin-mails-card-bg: var(--layout-background-0);
   --pin-mails-card-hover: var(--layout-background-2);
-  --pin-mails-soft: light-dark(#e8f2fb, color-mix(in srgb, #0f6cbd 22%, transparent));
+  --pin-mails-soft: light-dark(var(--mp-brand-soft), color-mix(in srgb, var(--mp-brand) 22%, transparent));
   --pin-mails-max-height: 360px;
   --pin-mails-card-gap: 4px;
   --pin-mails-card-padding: 8px 10px 8px 12px;
@@ -64,7 +67,7 @@
   min-inline-size: 30px;
   min-block-size: 30px;
   border: 0;
-  border-radius: 5px;
+  border-radius: var(--mp-radius-md);
   background: transparent;
   color: inherit;
   cursor: pointer;
@@ -85,7 +88,7 @@
   border-inline-end: 2px solid currentColor;
   border-block-end: 2px solid currentColor;
   transform: rotate(45deg) translate(-1px, -1px);
-  transition: transform 120ms ease;
+  transition: transform var(--mp-duration-fast) var(--mp-ease-standard);
 }
 
 #pin-mails-panel[data-collapsed] .pin-mails-chevron {
@@ -94,12 +97,9 @@
 
 .pin-mails-header-icon {
   flex: 0 0 auto;
-  inline-size: 22px;
-  block-size: 22px;
-  background-color: var(--pin-mails-accent);
-  -webkit-mask: url("../icons/pin-filled.svg") center / 22px 22px no-repeat;
-  mask: url("../icons/pin-filled.svg") center / 22px 22px no-repeat;
-  filter: drop-shadow(0 0 1px color-mix(in srgb, var(--pin-mails-accent) 60%, transparent));
+  inline-size: 24px;
+  block-size: 24px;
+  background: url("../icons/mailperch-icon.svg") center / contain no-repeat;
 }
 
 .pin-mails-title-wrap {
@@ -128,7 +128,7 @@
   max-inline-size: 145px;
   padding: 2px 24px 2px 7px;
   border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
-  border-radius: 5px;
+  border-radius: var(--mp-radius-md);
   background: var(--layout-background-0);
   color: inherit;
   font: inherit;
@@ -154,7 +154,7 @@
 .pin-mails-account-group {
   margin-block-end: 5px;
   border: 1px solid color-mix(in srgb, var(--pin-account-color, var(--pin-mails-accent)) 32%, var(--pin-mails-border));
-  border-radius: 7px;
+  border-radius: var(--mp-radius-md);
   overflow: clip;
 }
 
@@ -194,7 +194,7 @@
   margin: 2px;
   padding: var(--pin-mails-card-padding);
   border: 1px solid transparent;
-  border-radius: 6px;
+  border-radius: var(--mp-radius-md);
   background: var(--pin-mails-card-bg);
   cursor: default;
   outline: none;
@@ -220,6 +220,8 @@
 }
 .pin-mails-card:focus-visible {
   border-color: color-mix(in srgb, var(--pin-account-color) 72%, currentColor);
+  outline: 3px solid color-mix(in srgb, var(--pin-mails-accent) 62%, transparent);
+  outline-offset: -1px;
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--pin-account-color) 55%, transparent);
 }
 .pin-mails-card[data-selected] {
@@ -237,7 +239,7 @@
 .pin-mails-card[data-drop-after] { box-shadow: 0 3px 0 var(--pin-account-color); }
 
 :root[pin-mails-animate="true"] .pin-mails-card {
-  transition: background-color 120ms ease, border-color 120ms ease, transform 120ms ease;
+  transition: background-color var(--mp-duration-fast) var(--mp-ease-standard), border-color var(--mp-duration-fast) var(--mp-ease-standard), transform var(--mp-duration-fast) var(--mp-ease-standard);
 }
 
 .pin-mails-card[data-just-pinned] { animation: pin-mails-pop 220ms ease-out; }

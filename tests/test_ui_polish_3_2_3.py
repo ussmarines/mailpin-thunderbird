@@ -16,6 +16,7 @@ pin_css = (ROOT / "extension/styles/pin.css").read_text(encoding="utf-8")
 options_html = (ROOT / "extension/options/options.html").read_text(encoding="utf-8")
 options_js = (ROOT / "extension/options/options.js").read_text(encoding="utf-8")
 options_css = (ROOT / "extension/options/options.css").read_text(encoding="utf-8")
+tokens_css = (ROOT / "extension/styles/tokens.css").read_text(encoding="utf-8")
 deep_audit = (ROOT / "scripts/deep_audit.py").read_text(encoding="utf-8")
 
 VERSION = "3.2.12"
@@ -55,6 +56,14 @@ assert "padding-inline-end: 58px" not in pin_css
 for minimum in ("--pin-mails-card-min-height: 48px", "--pin-mails-card-min-height: 56px", "--pin-mails-card-min-height: 66px"):
     assert minimum in pin_css, minimum
 assert "min-block-size: var(--pin-mails-card-min-height)" in pin_css
+
+# Fluent identity remains shared rather than duplicated by each HTML surface.
+for token in ("--mp-brand: #0F6CBD", "--mp-secondary: #0E8F8F", "--mp-radius-lg: 12px", "--mp-shadow-low"):
+    assert token in tokens_css, token
+assert 'href="../styles/tokens.css"' in options_html
+assert "--accent: var(--mp-brand)" in options_css
+assert 'url("../icons/mailperch-icon.svg")' in pin_css
+assert re.search(r"#import-file\s*\{[^}]*width:\s*1px", options_css, re.S)
 
 # The toast close control belongs in the top-right cell, not under the message.
 for token in (

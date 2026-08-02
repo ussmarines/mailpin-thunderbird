@@ -33,6 +33,14 @@ Les éléments suivants sont historiques et ne doivent pas être renommés sans 
 
 Les modifier sans migration pourrait créer une seconde installation, perdre l’accès aux données existantes ou casser les sauvegardes. L’ID public définitif devra être choisi une seule fois avant la première publication ATN.
 
+## Identité visuelle Fluent
+
+- Les valeurs visuelles canoniques vivent dans `extension/styles/tokens.css` sous le préfixe `--mp-*`.
+- La marque utilise le bleu `#0F6CBD`, le turquoise `#0E8F8F` et la pile locale `"Segoe UI Variable", "Segoe UI", system-ui, -apple-system, sans-serif`.
+- `extension/icons/mailperch-icon.svg` est le symbole couleur des en-têtes et surfaces de marque ; ses PNG 16 à 128 px servent au manifeste.
+- `extension/icons/mailperch-icon-mono.svg` et les icônes d’action existantes restent réservés aux contrôles internes.
+- Le panneau natif conserve les surfaces et la géométrie Thunderbird ; la marque y reste limitée au symbole, aux punaises, aux focus et aux liserés.
+
 ## Métadonnées GitHub recommandées
 
 - **Description :** MailPerch — Pin, organize and follow up on your emails in Thunderbird.

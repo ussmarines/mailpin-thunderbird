@@ -38,6 +38,13 @@ npm run ci
 ```
 
 Puis suivre `docs/MANUAL_TEST_PLAN.md`, particulièrement la section 3.2.4.
+
+## Identité Fluent 3.2.12
+
+- `extension/styles/tokens.css` est la source visuelle commune ; Options, dashboard et panneau natif utilisent ses variables `--mp-*` ;
+- les icônes produit couleur 16 à 128 px sont déclarées dans le manifeste, avec variantes SVG couleur et monochrome ;
+- aucune logique de formulaire, de dashboard ou d’intégration Thunderbird n’a été modifiée ;
+- valider encore visuellement les thèmes clair/sombre/contraste élevé, le zoom 200 % et le panneau dans Thunderbird 128–153.
 ## Passe 3.2.5
 
 - étoiles natives laissées intactes en mode indépendant ;

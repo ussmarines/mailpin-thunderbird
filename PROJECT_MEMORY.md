@@ -55,6 +55,11 @@ structure accessible aux affaires, modèles et règles, et bloque toute créatio
 Agenda d’affaire sans titre, date, type et calendrier compatible ; l’Experiment
 applique les mêmes validations et ne crée plus une échéance artificielle.
 
+La version de travail 3.2.12 partage désormais l’identité Fluent entre Options,
+dashboard et panneau natif via `extension/styles/tokens.css`. Le manifeste et les
+en-têtes utilisent le nouveau symbole couleur décliné de 16 à 128 px, tandis que
+les contrôles internes conservent des icônes monochromes et la géométrie native.
+
 ## 2. Invariants non négociables
 
 1. Ne jamais modifier les compteurs natifs de nouveaux messages, non-lus ou totaux.
@@ -203,6 +208,7 @@ applique les mêmes validations et ne crée plus une échéance artificielle.
 - `_locales/fr/messages.json` et `_locales/en/messages.json` : toutes les chaînes.
 - `icons/*.svg` : icônes locales.
 - `styles/pin.css` : styles injectés dans Thunderbird.
+- `styles/tokens.css` : tokens Fluent partagés entre les surfaces HTML et le panneau.
 - `options/options-bootstrap.js` : garde terminale précoce et chargement contrôlé.
 - `options/options.html` : structure de la page paramètres.
 - `options/options.js` : chargement, rendu, sauvegarde et outils.

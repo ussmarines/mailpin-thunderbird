@@ -60,9 +60,13 @@ required_runtime = [
     "api/pinInbox/modules/workflow.js", "api/pinInbox/modules/rules.js",
     "api/pinInbox/modules/calendar.js", "options/options.html", "options/options.css",
     "options/options-bootstrap.js", "options/options.js", "dashboard/dashboard.html", "dashboard/dashboard.css",
-    "dashboard/dashboard.js", "styles/pin.css", "icons/pin.svg",
+    "dashboard/dashboard.js", "styles/tokens.css", "styles/pin.css", "icons/pin.svg",
     "icons/pin-regular.svg", "icons/pin-filled.svg", "icons/conversation.svg",
-    "icons/dashboard.svg", "icons/add.svg", "_locales/fr/messages.json",
+    "icons/dashboard.svg", "icons/add.svg", "icons/mailperch-icon.svg",
+    "icons/mailperch-icon-mono.svg", "icons/mailperch-icon-16.png",
+    "icons/mailperch-icon-24.png", "icons/mailperch-icon-32.png",
+    "icons/mailperch-icon-48.png", "icons/mailperch-icon-64.png",
+    "icons/mailperch-icon-96.png", "icons/mailperch-icon-128.png", "_locales/fr/messages.json",
     "_locales/en/messages.json"
 ]
 for relative in required_runtime:
@@ -122,9 +126,25 @@ assert 'messenger.tabs.create({' in background
 
 for icon in EXT.glob("icons/*.svg"):
     text = icon.read_text(encoding="utf-8")
-    assert 'viewBox="0 0 24 24"' in text
+    expected_viewbox = 'viewBox="0 0 64 64"' if icon.name.startswith("mailperch-icon") else 'viewBox="0 0 24 24"'
+    assert expected_viewbox in text, icon
     assert "<script" not in text.lower()
     assert "foreignObject" not in text
+
+tokens = (EXT / "styles/tokens.css").read_text(encoding="utf-8")
+for token in [
+    "--mp-brand: #0F6CBD", "--mp-secondary: #0E8F8F", "--mp-bg: light-dark(#F4F7FB, #101318)",
+    "--mp-surface: light-dark(#FFFFFF, #1B1F27)", "--mp-text: light-dark(#172033, #F5F7FA)",
+    "--mp-font-family", "--mp-radius-md: 8px", "--mp-radius-lg: 12px", "--mp-duration-normal: 180ms"
+]:
+    assert token in tokens, token
+for html_name in ["options/options.html", "dashboard/dashboard.html"]:
+    html = (EXT / html_name).read_text(encoding="utf-8")
+    assert "../styles/tokens.css" in html, html_name
+    assert "../icons/mailperch-icon.svg" in html, html_name
+assert '@import url("./tokens.css")' in css
+for size in (16, 24, 32, 48, 64, 96, 128):
+    assert manifest["icons"][str(size)] == f"icons/mailperch-icon-{size}.png"
 
 for path in ROOT.rglob("*"):
     if path.is_file() and ".git" not in path.parts:
