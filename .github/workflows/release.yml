@@ -72,7 +72,7 @@ jobs:
             --title "MailPerch ${VERSION}" \
             --notes-file release-notes.md \
             --latest
-      - name: Remove obsolete Fluent migration branches
+      - name: Remove obsolete maintenance branches
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
@@ -89,6 +89,9 @@ jobs:
             automation/fluent-2-3213-run
             automation/fluent-2-3213-trigger
             automation/fluent-2-3213-workflow
+            dependabot/github_actions/actions/checkout-7.0.1
+            dependabot/github_actions/actions/setup-node-7.0.0
+            dependabot/github_actions/actions/setup-python-7.0.0
           )
           for branch in "${branches[@]}"; do
             encoded="${branch//\//%2F}"
