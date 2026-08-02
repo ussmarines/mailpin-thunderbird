@@ -1,20 +1,20 @@
 @import url("./tokens.css");
 
-/* MailPerch — Email Pins & Follow-up 3.2.12 */
+/* MailPerch — Email Pins & Follow-up 3.2.13 */
 
 :root {
-  --pin-mails-accent: light-dark(var(--mp-brand), var(--mp-brand-soft));
-  --pin-mails-accent-hover: light-dark(var(--mp-brand-hover), var(--mp-brand-soft));
-  --pin-mails-accent-pressed: light-dark(var(--mp-brand-pressed), var(--mp-brand-soft));
+  --pin-mails-accent: var(--mp-brand-foreground);
+  --pin-mails-accent-hover: var(--mp-brand-foreground-hover);
+  --pin-mails-accent-pressed: var(--mp-brand-background-pressed);
   --pin-mails-muted-icon: var(--mp-text-muted);
   --pin-mails-hover-icon: var(--mp-brand);
-  --pin-mails-hover-bg: light-dark(var(--mp-brand-soft), color-mix(in srgb, var(--mp-brand) 24%, transparent));
+  --pin-mails-hover-bg: var(--mp-brand-subtle);
   --pin-mails-panel-bg: var(--layout-background-0);
   --pin-mails-header-bg: var(--layout-background-1);
   --pin-mails-border: var(--sidebar-border);
   --pin-mails-card-bg: var(--layout-background-0);
   --pin-mails-card-hover: var(--layout-background-2);
-  --pin-mails-soft: light-dark(var(--mp-brand-soft), color-mix(in srgb, var(--mp-brand) 22%, transparent));
+  --pin-mails-soft: var(--mp-brand-subtle);
   --pin-mails-max-height: 360px;
   --pin-mails-card-gap: 4px;
   --pin-mails-card-padding: 8px 10px 8px 12px;
@@ -50,12 +50,12 @@
 
 .pin-mails-panel-header {
   flex: 0 0 auto;
-  min-block-size: 38px;
+  min-block-size: 44px;
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 7px;
-  background: var(--pin-mails-header-bg);
+  gap: 7px;
+  padding: 6px 8px;
+  background: linear-gradient(105deg, color-mix(in srgb, var(--pin-mails-accent) 13%, var(--pin-mails-header-bg)), var(--pin-mails-header-bg) 48%, color-mix(in srgb, var(--mp-secondary-foreground) 8%, var(--pin-mails-header-bg)));
   border-block-end: 1px solid var(--pin-mails-border);
 }
 
@@ -66,7 +66,7 @@
   block-size: 30px;
   min-inline-size: 30px;
   min-block-size: 30px;
-  border: 0;
+  border: 1px solid transparent;
   border-radius: var(--mp-radius-md);
   background: transparent;
   color: inherit;
@@ -77,7 +77,8 @@
 .pin-mails-collapse-button:focus-visible,
 .pin-mails-header-action:hover,
 .pin-mails-header-action:focus-visible {
-  background: var(--pin-mails-card-hover);
+  border-color: color-mix(in srgb, var(--pin-mails-accent) 20%, var(--pin-mails-border));
+  background: var(--pin-mails-hover-bg);
 }
 
 .pin-mails-chevron {
@@ -97,8 +98,8 @@
 
 .pin-mails-header-icon {
   flex: 0 0 auto;
-  inline-size: 24px;
-  block-size: 24px;
+  inline-size: 28px;
+  block-size: 28px;
   background: url("../icons/mailperch-icon.svg") center / contain no-repeat;
 }
 
@@ -110,7 +111,7 @@
   margin-inline-end: auto;
 }
 
-.pin-mails-title { font-weight: 700; }
+.pin-mails-title { color: var(--pin-mails-accent); font-weight: 700; letter-spacing: -.01em; }
 
 .pin-mails-count,
 .pin-mails-group-count {
@@ -128,7 +129,7 @@
   max-inline-size: 145px;
   padding: 2px 24px 2px 7px;
   border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
-  border-radius: var(--mp-radius-md);
+  border-radius: var(--mp-radius-lg);
   background: var(--layout-background-0);
   color: inherit;
   font: inherit;
@@ -139,7 +140,7 @@
   min-block-size: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 4px;
+  padding: 6px;
   scrollbar-gutter: stable;
 }
 
@@ -279,7 +280,7 @@
   inline-size: 8px;
   block-size: 8px;
   border-radius: 50%;
-  background: light-dark(#107c10, #6ccb78);
+  background: var(--mp-color-success-foreground);
 }
 
 .pin-mails-card-pin {
@@ -335,7 +336,7 @@
   text-align: center;
 }
 
-.pin-mails-priority { color: light-dark(#b42318, #ff8178); font-weight: 800; }
+.pin-mails-priority { color: var(--mp-color-danger-foreground); font-weight: 800; }
 
 .pin-mails-tags {
   display: flex;
@@ -702,10 +703,10 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   font-size: .78rem;
   border: 1px solid color-mix(in srgb, currentColor 28%, transparent);
 }
-.pin-mails-card[data-overdue] .pin-mails-due { color: light-dark(#a4262c, #ff9ca2); background: light-dark(#fde7e9, #4a1b1e); }
+.pin-mails-card[data-overdue] .pin-mails-due { color: var(--mp-color-danger-foreground); background: var(--mp-color-danger-background); }
 .pin-mails-group-chip { color: var(--pin-group-color); border-color: color-mix(in srgb, var(--pin-group-color) 60%, transparent); }
-.pin-mails-priority-chip.high { color: light-dark(#8a4b00, #ffc46b); }
-.pin-mails-priority-chip.urgent { color: light-dark(#a4262c, #ff9ca2); font-weight: 750; }
+.pin-mails-priority-chip.high { color: var(--mp-color-warning-foreground); }
+.pin-mails-priority-chip.urgent { color: var(--mp-color-danger-foreground); font-weight: 750; }
 .pin-mails-card-actions {
   display: flex;
   justify-content: flex-end;
@@ -893,11 +894,11 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.pin-mails-workflow-chip.waiting { color: light-dark(#8a4b00, #ffc46b); background: light-dark(#fff4ce, #3d2b0e); }
-.pin-mails-workflow-chip.planned { color: light-dark(#004578, #86d0ff); background: light-dark(#deecf9, #102c3d); }
-.pin-mails-follow-up-chip { color: light-dark(#5c2e91, #d7b6ff); }
-.pin-mails-follow-up-chip.overdue { color: light-dark(#a4262c, #ff9ca2); font-weight: 750; }
-.pin-mails-recurrence-chip { color: light-dark(#107c10, #77df78); }
+.pin-mails-workflow-chip.waiting { color: var(--mp-color-warning-foreground); background: var(--mp-color-warning-background); }
+.pin-mails-workflow-chip.planned { color: var(--mp-color-info-foreground); background: var(--mp-color-info-background); }
+.pin-mails-follow-up-chip { color: color-mix(in srgb, var(--mp-brand-foreground) 65%, #8764b8); }
+.pin-mails-follow-up-chip.overdue { color: var(--mp-color-danger-foreground); font-weight: 750; }
+.pin-mails-recurrence-chip { color: var(--mp-color-success-foreground); }
 .pin-mails-case-chip { color: var(--pin-case-color); border-color: color-mix(in srgb, var(--pin-case-color) 60%, transparent); }
 .pin-mails-editor-calendar-row .secondary { min-block-size: 32px; padding: 5px 9px; border: 1px solid var(--pin-mails-border); border-radius: 6px; background: transparent; color: inherit; cursor: pointer; }
 .pin-mails-editor-calendar-row .secondary:hover,
@@ -1041,10 +1042,10 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
 
 
 .pin-mails-toast[data-kind="success"] {
-  border-inline-start: 4px solid light-dark(#107c10, #70d48f);
+  border-inline-start: 4px solid var(--mp-color-success-foreground);
 }
 .pin-mails-toast[data-kind="error"] {
-  border-inline-start: 4px solid light-dark(#d13438, #ff9ca2);
+  border-inline-start: 4px solid var(--mp-color-danger-foreground);
 }
 .pin-mails-toast[data-kind="busy"] {
   border-inline-start: 4px solid var(--pin-mails-accent);
@@ -1108,14 +1109,14 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   gap: 4px;
   padding: 2px 7px;
   border-radius: 999px;
-  background: light-dark(#eee9ff, #322750);
-  color: light-dark(#5636a0, #c9b7ff);
+  background: color-mix(in srgb, #8764b8 20%, var(--pin-mails-card-bg));
+  color: color-mix(in srgb, #8764b8 68%, var(--mp-text));
   font-size: .75rem;
   font-weight: 650;
 }
 .pin-mails-no-reply-chip.overdue {
-  background: light-dark(#fff0ef, #431d1d);
-  color: light-dark(#b42318, #ff9ca2);
+  background: var(--mp-color-danger-background);
+  color: var(--mp-color-danger-foreground);
 }
 @media (forced-colors: active) {
   .pin-mails-smart-view-select,
@@ -1127,8 +1128,8 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   padding: 3px 9px;
   border: 1px solid color-mix(in srgb, #ca5010 45%, var(--pin-mails-border));
   border-radius: 999px;
-  background: light-dark(#fff4ce, #493b16);
-  color: light-dark(#7a3e00, #ffd580);
+  background: var(--mp-color-warning-background);
+  color: var(--mp-color-warning-foreground);
   font: inherit;
   font-size: .76rem;
   font-weight: 700;
@@ -1136,8 +1137,8 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
 }
 .pin-mails-health-indicator[data-status="critical"] {
   border-color: color-mix(in srgb, #d13438 58%, var(--pin-mails-border));
-  background: light-dark(#fde7e9, #442021);
-  color: light-dark(#a4262c, #ffb3b8);
+  background: var(--mp-color-danger-background);
+  color: var(--mp-color-danger-foreground);
 }
 .pin-mails-health-indicator:hover,
 .pin-mails-health-indicator:focus-visible {
@@ -1146,7 +1147,7 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   outline-offset: 1px;
 }
 
-/* 3.2.8 à 3.2.12 — rail structurel des actions dans le DOM ThreadCard de Thunderbird
+/* 3.2.8 à 3.2.13 — rail structurel des actions dans le DOM ThreadCard de Thunderbird
  * 153. Le conteneur natif comporte une ligne expéditeur, une ligne objet puis
  * une ligne informations/actions. `display: contents` expose ces enfants à la
  * grille de la colonne et le rail d’actions couvre toutes les lignes. */
@@ -1251,10 +1252,10 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
 }
 :root[pin-mails-inbox] #threadTree tr.card-layout[data-properties~="new"] .card-container {
   border-inline-start-width: 5px;
-  border-inline-start-color: light-dark(#b75c00, #ffbf66);
+  border-inline-start-color: var(--mp-color-warning-foreground);
 }
 :root[pin-mails-inbox] #threadTree tr.card-layout[data-properties~="new"]:not(.selected):not(.current) .card-container {
-  background: light-dark(color-mix(in srgb, #ffb100 13%, white), color-mix(in srgb, #ffb100 12%, transparent));
+  background: var(--mp-color-warning-background);
 }
 :root[pin-mails-inbox] #threadTree tr.card-layout[data-properties~="new"] .sender,
 :root[pin-mails-inbox] #threadTree tr.card-layout[data-properties~="new"] .subject {
@@ -1262,7 +1263,7 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
 }
 :root[pin-mails-inbox] #threadTree tr.card-layout[data-properties~="new"] .read-status {
   --read-status-size: 20px;
-  color: light-dark(#9a4d00, #ffc46b);
+  color: var(--mp-color-warning-foreground);
   filter: drop-shadow(0 0 3px color-mix(in srgb, currentColor 45%, transparent));
 }
 .pin-mails-table-host {

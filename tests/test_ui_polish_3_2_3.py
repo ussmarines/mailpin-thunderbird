@@ -19,11 +19,11 @@ options_css = (ROOT / "extension/options/options.css").read_text(encoding="utf-8
 tokens_css = (ROOT / "extension/styles/tokens.css").read_text(encoding="utf-8")
 deep_audit = (ROOT / "scripts/deep_audit.py").read_text(encoding="utf-8")
 
-VERSION = "3.2.12"
+VERSION = "3.2.13"
 assert package["version"] == VERSION
 assert manifest["version"] == VERSION
 assert state["extensionVersion"] == VERSION
-assert state["baseGitHub"]["commit"] == "3ffd5b88d03230d3b2d6792da18534d897fdd06c"
+assert state["baseGitHub"]["commit"] == "caab268b187d463f704c3f91cc33ba1038151bcb"
 assert f"Version de travail : **{VERSION}**" in memory
 
 # Settings spacing must stay scoped to the settings page. Stale attributes are
@@ -58,10 +58,15 @@ for minimum in ("--pin-mails-card-min-height: 48px", "--pin-mails-card-min-heigh
 assert "min-block-size: var(--pin-mails-card-min-height)" in pin_css
 
 # Fluent identity remains shared rather than duplicated by each HTML surface.
-for token in ("--mp-brand: #0F6CBD", "--mp-secondary: #0E8F8F", "--mp-radius-lg: 12px", "--mp-shadow-low"):
+for token in (
+    "--mp-brand-background: #0f6cbd", "--mp-secondary-background: #0e8f8f",
+    ":root[data-mp-theme=\"dark\"]", "--mp-radius-lg: var(--mp-radius-xxlarge)",
+    "--mp-shadow-low",
+):
     assert token in tokens_css, token
+assert 'src="../styles/theme.js"' in options_html
 assert 'href="../styles/tokens.css"' in options_html
-assert "--accent: var(--mp-brand)" in options_css
+assert "--accent: var(--mp-brand-background)" in options_css
 assert 'url("../icons/mailperch-icon.svg")' in pin_css
 assert re.search(r"#import-file\s*\{[^}]*width:\s*1px", options_css, re.S)
 

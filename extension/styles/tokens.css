@@ -1,46 +1,67 @@
+/* MailPerch Fluent 2 design tokens.
+ * Global values are separated from semantic aliases so every surface can share
+ * the same light, dark and high-contrast behavior without hard-coded overrides. */
 :root {
-  color-scheme: light dark;
-  --mp-font-family: "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, sans-serif;
+  color-scheme: light;
+  --mp-font-family: "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 
-  /* Brand */
-  --mp-brand: #0F6CBD;
-  --mp-brand-hover: #0B5A9E;
-  --mp-brand-pressed: #084B82;
-  --mp-brand-soft: #DCEEFF;
-  --mp-secondary: #0E8F8F;
-  --mp-secondary-hover: #0B7777;
-  --mp-secondary-soft: #DDF7F5;
-  --mp-brand-gradient: linear-gradient(135deg, #0F6CBD 0%, #0E8F8F 100%);
+  /* Brand palette */
+  --mp-brand-background: #0f6cbd;
+  --mp-brand-background-hover: #115ea3;
+  --mp-brand-background-pressed: #0e4775;
+  --mp-brand-foreground: #0f6cbd;
+  --mp-brand-foreground-hover: #115ea3;
+  --mp-brand-subtle: #ebf3fc;
+  --mp-brand-subtle-hover: #dcecff;
+  --mp-brand-stroke: #77b7e8;
+  --mp-secondary-background: #0e8f8f;
+  --mp-secondary-background-hover: #0b7777;
+  --mp-secondary-foreground: #087f7f;
+  --mp-secondary-subtle: #e3f7f5;
+  --mp-brand-gradient: linear-gradient(135deg, #0f6cbd 0%, #0b7f91 58%, #0e8f8f 100%);
 
-  /* Semantic */
-  --mp-success: #107C10;
-  --mp-success-soft: #E7F6E7;
-  --mp-warning: #B75C00;
-  --mp-warning-soft: #FFF2D8;
-  --mp-danger: #C50F1F;
-  --mp-danger-soft: #FDE7E9;
-  --mp-info: #0F6CBD;
-  --mp-info-soft: #DCEEFF;
+  /* Fluent neutral aliases — light */
+  --mp-color-neutral-background-1: #ffffff;
+  --mp-color-neutral-background-2: #fafafa;
+  --mp-color-neutral-background-3: #f5f5f5;
+  --mp-color-neutral-background-4: #f0f0f0;
+  --mp-color-neutral-background-canvas: #f4f7fb;
+  --mp-color-neutral-background-inverted: #242424;
+  --mp-color-neutral-card-background: #ffffff;
+  --mp-color-neutral-card-background-hover: #ffffff;
+  --mp-color-neutral-foreground-1: #242424;
+  --mp-color-neutral-foreground-2: #616161;
+  --mp-color-neutral-foreground-3: #707070;
+  --mp-color-neutral-foreground-inverted: #ffffff;
+  --mp-color-neutral-stroke-1: #d1d1d1;
+  --mp-color-neutral-stroke-2: #e0e0e0;
+  --mp-color-neutral-stroke-accessible: #8a8a8a;
+  --mp-color-neutral-stroke-focus: #242424;
 
-  /* Adaptive neutrals */
-  --mp-bg: light-dark(#F4F7FB, #101318);
-  --mp-surface: light-dark(#FFFFFF, #1B1F27);
-  --mp-surface-alt: light-dark(#F8FAFC, #232832);
-  --mp-surface-raised: light-dark(#FFFFFF, #272D38);
-  --mp-border: light-dark(#D8E0EB, #394150);
-  --mp-border-strong: light-dark(#AEB9C8, #586174);
-  --mp-text: light-dark(#172033, #F5F7FA);
-  --mp-text-muted: light-dark(#667085, #AAB4C4);
-  --mp-text-subtle: #8792A2;
+  /* Semantic aliases — light */
+  --mp-color-success-foreground: #0e700e;
+  --mp-color-success-background: #eaf6ea;
+  --mp-color-success-stroke: #9fd89f;
+  --mp-color-warning-foreground: #8a3700;
+  --mp-color-warning-background: #fff4ce;
+  --mp-color-warning-stroke: #f2c661;
+  --mp-color-danger-foreground: #b10e1c;
+  --mp-color-danger-background: #fde7e9;
+  --mp-color-danger-stroke: #dc626d;
+  --mp-color-info-foreground: #0f548c;
+  --mp-color-info-background: #e7f3ff;
+  --mp-color-info-stroke: #9ccbf2;
 
-  /* Shape */
-  --mp-radius-sm: 4px;
-  --mp-radius-md: 8px;
-  --mp-radius-lg: 12px;
-  --mp-radius-xl: 16px;
-  --mp-radius-round: 999px;
-
-  /* 4 px grid */
+  /* Geometry and rhythm */
+  --mp-radius-none: 0;
+  --mp-radius-small: 2px;
+  --mp-radius-medium: 4px;
+  --mp-radius-large: 6px;
+  --mp-radius-xlarge: 8px;
+  --mp-radius-xxlarge: 12px;
+  --mp-radius-round: 9999px;
+  --mp-stroke-width: 1px;
+  --mp-stroke-width-thick: 2px;
   --mp-space-1: 4px;
   --mp-space-2: 8px;
   --mp-space-3: 12px;
@@ -50,21 +71,188 @@
   --mp-space-8: 32px;
   --mp-space-10: 40px;
   --mp-space-12: 48px;
+  --mp-space-16: 64px;
 
-  /* Elevation */
-  --mp-shadow-low: 0 1px 2px rgb(16 24 40 / .06), 0 1px 3px rgb(16 24 40 / .10);
-  --mp-shadow-medium: 0 8px 24px rgb(16 24 40 / .12);
-  --mp-shadow-high: 0 18px 48px rgb(16 24 40 / .18);
+  /* Elevation — light */
+  --mp-shadow-2: 0 1px 2px rgb(0 0 0 / 0.08), 0 0 2px rgb(0 0 0 / 0.06);
+  --mp-shadow-4: 0 2px 4px rgb(0 0 0 / 0.10), 0 0 2px rgb(0 0 0 / 0.06);
+  --mp-shadow-8: 0 4px 8px rgb(0 0 0 / 0.12), 0 0 2px rgb(0 0 0 / 0.06);
+  --mp-shadow-16: 0 8px 16px rgb(0 0 0 / 0.14), 0 0 2px rgb(0 0 0 / 0.08);
+  --mp-shadow-28: 0 14px 28px rgb(0 0 0 / 0.18), 0 0 8px rgb(0 0 0 / 0.08);
 
   /* Motion */
+  --mp-duration-ultra-fast: 50ms;
   --mp-duration-fast: 100ms;
   --mp-duration-normal: 180ms;
-  --mp-ease-standard: cubic-bezier(.2, 0, 0, 1);
+  --mp-duration-slow: 260ms;
+  --mp-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --mp-ease-decelerate: cubic-bezier(0.1, 0.9, 0.2, 1);
+
+  /* Compatibility aliases retained for the injected Thunderbird panel. */
+  --mp-brand: var(--mp-brand-background);
+  --mp-brand-hover: var(--mp-brand-background-hover);
+  --mp-brand-pressed: var(--mp-brand-background-pressed);
+  --mp-brand-soft: var(--mp-brand-subtle);
+  --mp-secondary: var(--mp-secondary-background);
+  --mp-secondary-hover: var(--mp-secondary-background-hover);
+  --mp-secondary-soft: var(--mp-secondary-subtle);
+  --mp-success: var(--mp-color-success-foreground);
+  --mp-success-soft: var(--mp-color-success-background);
+  --mp-warning: var(--mp-color-warning-foreground);
+  --mp-warning-soft: var(--mp-color-warning-background);
+  --mp-danger: var(--mp-color-danger-foreground);
+  --mp-danger-soft: var(--mp-color-danger-background);
+  --mp-info: var(--mp-color-info-foreground);
+  --mp-info-soft: var(--mp-color-info-background);
+  --mp-bg: var(--mp-color-neutral-background-canvas);
+  --mp-surface: var(--mp-color-neutral-background-1);
+  --mp-surface-alt: var(--mp-color-neutral-background-2);
+  --mp-surface-raised: var(--mp-color-neutral-card-background);
+  --mp-border: var(--mp-color-neutral-stroke-1);
+  --mp-border-strong: var(--mp-color-neutral-stroke-accessible);
+  --mp-text: var(--mp-color-neutral-foreground-1);
+  --mp-text-muted: var(--mp-color-neutral-foreground-2);
+  --mp-text-subtle: var(--mp-color-neutral-foreground-3);
+  --mp-radius-sm: var(--mp-radius-large);
+  --mp-radius-md: var(--mp-radius-xlarge);
+  --mp-radius-lg: var(--mp-radius-xxlarge);
+  --mp-radius-xl: 16px;
+  --mp-shadow-low: var(--mp-shadow-2);
+  --mp-shadow-medium: var(--mp-shadow-8);
+  --mp-shadow-high: var(--mp-shadow-28);
+}
+
+:root[data-mp-theme="dark"] {
+  color-scheme: dark;
+  --mp-brand-background: #115ea3;
+  --mp-brand-background-hover: #0f6cbd;
+  --mp-brand-background-pressed: #2886de;
+  --mp-brand-foreground: #479ef5;
+  --mp-brand-foreground-hover: #62abf5;
+  --mp-brand-subtle: #0c3156;
+  --mp-brand-subtle-hover: #0f3d69;
+  --mp-brand-stroke: #2886de;
+  --mp-secondary-background: #0b7777;
+  --mp-secondary-background-hover: #0e8f8f;
+  --mp-secondary-foreground: #5bd6d1;
+  --mp-secondary-subtle: #123b3a;
+
+  --mp-color-neutral-background-1: #292929;
+  --mp-color-neutral-background-2: #1f1f1f;
+  --mp-color-neutral-background-3: #141414;
+  --mp-color-neutral-background-4: #333333;
+  --mp-color-neutral-background-canvas: #111315;
+  --mp-color-neutral-background-inverted: #ffffff;
+  --mp-color-neutral-card-background: #292929;
+  --mp-color-neutral-card-background-hover: #333333;
+  --mp-color-neutral-foreground-1: #ffffff;
+  --mp-color-neutral-foreground-2: #d6d6d6;
+  --mp-color-neutral-foreground-3: #adadad;
+  --mp-color-neutral-foreground-inverted: #242424;
+  --mp-color-neutral-stroke-1: #525252;
+  --mp-color-neutral-stroke-2: #3d3d3d;
+  --mp-color-neutral-stroke-accessible: #8a8a8a;
+  --mp-color-neutral-stroke-focus: #ffffff;
+
+  --mp-color-success-foreground: #6ccb5f;
+  --mp-color-success-background: #173b1a;
+  --mp-color-success-stroke: #359b35;
+  --mp-color-warning-foreground: #f9d77e;
+  --mp-color-warning-background: #4a3705;
+  --mp-color-warning-stroke: #d39300;
+  --mp-color-danger-foreground: #ff99a4;
+  --mp-color-danger-background: #4a1e23;
+  --mp-color-danger-stroke: #e05260;
+  --mp-color-info-foreground: #75bffc;
+  --mp-color-info-background: #123450;
+  --mp-color-info-stroke: #2886de;
+
+  --mp-shadow-2: 0 1px 2px rgb(0 0 0 / 0.32), 0 0 2px rgb(0 0 0 / 0.22);
+  --mp-shadow-4: 0 2px 4px rgb(0 0 0 / 0.38), 0 0 2px rgb(0 0 0 / 0.24);
+  --mp-shadow-8: 0 4px 8px rgb(0 0 0 / 0.44), 0 0 3px rgb(0 0 0 / 0.28);
+  --mp-shadow-16: 0 8px 16px rgb(0 0 0 / 0.50), 0 0 4px rgb(0 0 0 / 0.30);
+  --mp-shadow-28: 0 14px 28px rgb(0 0 0 / 0.56), 0 0 8px rgb(0 0 0 / 0.34);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-mp-theme="light"]) {
+    color-scheme: dark;
+    --mp-brand-background: #115ea3;
+    --mp-brand-background-hover: #0f6cbd;
+    --mp-brand-background-pressed: #2886de;
+    --mp-brand-foreground: #479ef5;
+    --mp-brand-foreground-hover: #62abf5;
+    --mp-brand-subtle: #0c3156;
+    --mp-brand-subtle-hover: #0f3d69;
+    --mp-brand-stroke: #2886de;
+    --mp-secondary-background: #0b7777;
+    --mp-secondary-background-hover: #0e8f8f;
+    --mp-secondary-foreground: #5bd6d1;
+    --mp-secondary-subtle: #123b3a;
+    --mp-color-neutral-background-1: #292929;
+    --mp-color-neutral-background-2: #1f1f1f;
+    --mp-color-neutral-background-3: #141414;
+    --mp-color-neutral-background-4: #333333;
+    --mp-color-neutral-background-canvas: #111315;
+    --mp-color-neutral-background-inverted: #ffffff;
+    --mp-color-neutral-card-background: #292929;
+    --mp-color-neutral-card-background-hover: #333333;
+    --mp-color-neutral-foreground-1: #ffffff;
+    --mp-color-neutral-foreground-2: #d6d6d6;
+    --mp-color-neutral-foreground-3: #adadad;
+    --mp-color-neutral-foreground-inverted: #242424;
+    --mp-color-neutral-stroke-1: #525252;
+    --mp-color-neutral-stroke-2: #3d3d3d;
+    --mp-color-neutral-stroke-accessible: #8a8a8a;
+    --mp-color-neutral-stroke-focus: #ffffff;
+    --mp-color-success-foreground: #6ccb5f;
+    --mp-color-success-background: #173b1a;
+    --mp-color-success-stroke: #359b35;
+    --mp-color-warning-foreground: #f9d77e;
+    --mp-color-warning-background: #4a3705;
+    --mp-color-warning-stroke: #d39300;
+    --mp-color-danger-foreground: #ff99a4;
+    --mp-color-danger-background: #4a1e23;
+    --mp-color-danger-stroke: #e05260;
+    --mp-color-info-foreground: #75bffc;
+    --mp-color-info-background: #123450;
+    --mp-color-info-stroke: #2886de;
+    --mp-shadow-2: 0 1px 2px rgb(0 0 0 / 0.32), 0 0 2px rgb(0 0 0 / 0.22);
+    --mp-shadow-4: 0 2px 4px rgb(0 0 0 / 0.38), 0 0 2px rgb(0 0 0 / 0.24);
+    --mp-shadow-8: 0 4px 8px rgb(0 0 0 / 0.44), 0 0 3px rgb(0 0 0 / 0.28);
+    --mp-shadow-16: 0 8px 16px rgb(0 0 0 / 0.50), 0 0 4px rgb(0 0 0 / 0.30);
+    --mp-shadow-28: 0 14px 28px rgb(0 0 0 / 0.56), 0 0 8px rgb(0 0 0 / 0.34);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   :root {
+    --mp-duration-ultra-fast: 0ms;
     --mp-duration-fast: 0ms;
     --mp-duration-normal: 0ms;
+    --mp-duration-slow: 0ms;
+  }
+}
+
+@media (forced-colors: active) {
+  :root {
+    --mp-brand-background: Highlight;
+    --mp-brand-background-hover: Highlight;
+    --mp-brand-background-pressed: Highlight;
+    --mp-brand-foreground: LinkText;
+    --mp-brand-subtle: Canvas;
+    --mp-brand-stroke: Highlight;
+    --mp-bg: Canvas;
+    --mp-surface: Canvas;
+    --mp-surface-alt: Canvas;
+    --mp-surface-raised: Canvas;
+    --mp-border: CanvasText;
+    --mp-border-strong: CanvasText;
+    --mp-text: CanvasText;
+    --mp-text-muted: CanvasText;
+    --mp-text-subtle: CanvasText;
+    --mp-shadow-low: none;
+    --mp-shadow-medium: none;
+    --mp-shadow-high: none;
   }
 }

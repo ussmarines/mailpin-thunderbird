@@ -2,7 +2,7 @@
 
 MailPerch is a local-first Thunderbird extension for pinning, organizing, and following up on important email without replacing the native message list.
 
-> **Status: development build 3.2.12.** Compatible with Thunderbird 128 through 153. Complete manual UI and Calendar validation is still required before publication.
+> **Status: development build 3.2.13.** Compatible with Thunderbird 128 through 153. Complete manual UI and Calendar validation is still required before publication.
 
 ## Main features
 
@@ -16,7 +16,7 @@ MailPerch is a local-first Thunderbird extension for pinning, organizing, and fo
 
 1. Build the extension with `npm run build`.
 2. In Thunderbird, open **Add-ons and Themes**, then **Install Add-on From File**.
-3. Select `dist/MailPerch_v3.2.12.xpi`.
+3. Select `dist/MailPerch_v3.2.13.xpi`.
 4. Restart Thunderbird and begin with a test profile.
 
 MailPerch is not yet announced as available through Thunderbird Add-ons.

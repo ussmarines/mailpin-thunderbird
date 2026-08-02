@@ -4,8 +4,8 @@
 > Lire ce document avant tout autre fichier. Il donne l’état courant, les invariants,
 > la carte du dépôt et les chemins exacts à ouvrir selon la tâche.
 >
-> Version de travail : **3.2.12**
-> Base de travail vérifiée : `main` au commit `3ffd5b88d03230d3b2d6792da18534d897fdd06c`
+> Version de travail : **3.2.13**
+> Base de travail vérifiée : `main` au commit `caab268b187d463f704c3f91cc33ba1038151bcb`
 > Produit : **MailPerch — Email Pins & Follow-up**
 > Extension ID de développement : `pin-mails@MailPerch.local`
 
@@ -55,10 +55,12 @@ structure accessible aux affaires, modèles et règles, et bloque toute créatio
 Agenda d’affaire sans titre, date, type et calendrier compatible ; l’Experiment
 applique les mêmes validations et ne crée plus une échéance artificielle.
 
-La version de travail 3.2.12 partage désormais l’identité Fluent entre Options,
-dashboard et panneau natif via `extension/styles/tokens.css`. Le manifeste et les
-en-têtes utilisent le nouveau symbole couleur décliné de 16 à 128 px, tandis que
-les contrôles internes conservent des icônes monochromes et la géométrie native.
+La version de travail 3.2.13 applique réellement l’identité Fluent 2 aux paramètres,
+au dashboard et au panneau natif via `extension/styles/tokens.css`. Un pont local
+`extension/styles/theme.js` suit le thème courant de Thunderbird et utilise le
+thème système comme repli. Les en-têtes donnent désormais une vraie place au logo,
+les surfaces, boutons, champs et états disposent d’une hiérarchie claire, tandis
+que les identifiants, comportements, données et géométrie native restent inchangés.
 
 ## 2. Invariants non négociables
 
@@ -87,7 +89,7 @@ les contrôles internes conservent des icônes monochromes et la géométrie nat
 
 | Élément | Valeur |
 |---|---|
-| Version extension/package | `3.2.12` |
+| Version extension/package | `3.2.13` |
 | Thunderbird déclaré | `128.0` à `153.*` |
 | Manifest | MV3 |
 | Permission WebExtension | `menus` uniquement |

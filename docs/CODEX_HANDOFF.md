@@ -5,8 +5,8 @@ court afin d’éviter de dupliquer le contexte.
 
 ## État courant
 
-- version de travail : **3.2.12** ;
-- base GitHub : `main` au commit `3ffd5b88d03230d3b2d6792da18534d897fdd06c` ;
+- version de travail : **3.2.13** ;
+- base GitHub : `main` au commit `caab268b187d463f704c3f91cc33ba1038151bcb` ;
 - ID : `pin-mails@MailPerch.local` ;
 - schémas : SQLite 5, paramètres 6, données 6 ;
 - aucune publication distante automatique.
@@ -39,12 +39,13 @@ npm run ci
 
 Puis suivre `docs/MANUAL_TEST_PLAN.md`, particulièrement la section 3.2.4.
 
-## Identité Fluent 3.2.12
+## Identité Fluent 3.2.13
 
-- `extension/styles/tokens.css` est la source visuelle commune ; Options, dashboard et panneau natif utilisent ses variables `--mp-*` ;
-- les icônes produit couleur 16 à 128 px sont déclarées dans le manifeste, avec variantes SVG couleur et monochrome ;
-- aucune logique de formulaire, de dashboard ou d’intégration Thunderbird n’a été modifiée ;
-- valider encore visuellement les thèmes clair/sombre/contraste élevé, le zoom 200 % et le panneau dans Thunderbird 128–153.
+- `extension/styles/tokens.css` est la source visuelle commune et expose des palettes explicites clair/sombre ;
+- `extension/styles/theme.js` synchronise Options et dashboard avec le thème Thunderbird, avec repli `prefers-color-scheme` ;
+- Options et dashboard ont été réorganisés visuellement sans modifier leurs IDs, contrats DOM ni logique métier ;
+- le panneau natif consomme les mêmes tokens tout en conservant ses interactions et sa géométrie Thunderbird ;
+- les captures navigateur clair/sombre sont validées, mais les thèmes, le zoom 200 % et le panneau restent à confirmer dans Thunderbird 128–153.
 ## Passe 3.2.5
 
 - étoiles natives laissées intactes en mode indépendant ;

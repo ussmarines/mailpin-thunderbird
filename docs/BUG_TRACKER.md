@@ -4,8 +4,8 @@
 > avant ou pendant sa correction. Codex et les contributeurs doivent lire ce
 > fichier après `PROJECT_MEMORY.md`.
 
-Dernière mise à jour : **2026-08-01**
-Version de travail : **3.2.12**
+Dernière mise à jour : **2026-08-02**
+Version de travail : **3.2.13**
 
 ## Règles de suivi
 
@@ -47,6 +47,7 @@ et la frontière de démarrage sont corrigées en 3.2.10.
 | MP-2026-008 | 3.2.8 | La page Paramètres reste sur « Chargement des recommandations » sans contrôle ni erreur. | Dans le XPI 3.2.9, `localize()` remplaçait le `textContent` du label de restauration et supprimait son enfant `input#import-file` ; l’enregistrement d’écouteur suivant levait `TypeError` avant `initializeOptions()`, donc les délais et le panneau terminal 3.2.9 ne pouvaient pas agir. | `extension/options/options-bootstrap.js`, `extension/options/options.js`, `extension/options/options.html` | `tests/options_dom_flow.playwright.js`, `tests/test_options_controls.py`, `tests/test_regressions_3_2_9.py`, `tests/test_build_reproducible.py` | CORRIGÉ | 3.2.10 | Reproduit avec le XPI 3.2.9 (`options.js:1773:4`), puis validé avec le XPI 3.2.10 dans Thunderbird 153.0.1 : formulaire, état terminal, Enregistrer/Annuler, réouverture et persistance après redémarrage. |
 | MP-2026-009 | 3.2.9 | Thunderbird journalise une erreur au démarrage lors de la création du menu de message affiché. | `menus.create()` recevait le contexte obsolète `message_display`, refusé par Thunderbird 153 ; l’action dédiée `messageDisplayAction` couvre déjà ce point d’entrée. | `extension/background.js` | `tests/test_message_menu_and_row_ux.py` | CORRIGÉ | 3.2.10 | Erreur reproduite dans la console du profil jetable, puis absente après installation du XPI 3.2.10 ; l’écouteur `messageDisplayAction.onClicked` est conservé. |
 | MP-2026-010 | 3.2.10 | Cartes de réglage ambiguës, champs générés sans libellé et création Agenda d’une affaire en erreur. | Les cartes ne reflétaient pas explicitement le brouillon, les lignes dynamiques étaient construites sans structure de champ, et l’affaire forçait une tâche sans date tout en laissant l’Experiment choisir une échéance. | `extension/options/options.js`, `extension/options/options.css`, `extension/api/pinInbox/implementation.js` | `tests/options_dom_flow.playwright.js`, `tests/test_options_controls.py`, `tests/test_calendar_and_card_actions.py` | À VALIDER | 3.2.11 | Vérifier dans Thunderbird 153 avec un calendrier local synthétique : validations titre/date/calendrier, tâche incompatible refusée, événement créé et rendu des lignes sans chevauchement. |
+| MP-2026-011 | 3.2.12 | L’identité Fluent reste presque identique à l’ancienne interface et le mode sombre de Thunderbird ne change pas réellement les surfaces. | La première intégration reposait principalement sur des alias `light-dark()` et conservait la structure visuelle antérieure ; aucune passerelle ne déterminait explicitement le thème actif de Thunderbird et le logo restait contraint à une petite tuile alignée. | `extension/styles/theme.js`, `extension/styles/tokens.css`, `extension/options/options.html`, `extension/options/options.css`, `extension/dashboard/dashboard.html`, `extension/dashboard/dashboard.css`, `extension/styles/pin.css` | `tests/theme_bridge.mjs`, `tests/static_checks.py`, `tests/test_ui_polish_3_2_3.py`, `npm run ci` | À VALIDER | 3.2.13 | Installer le XPI dans Thunderbird 128–153, basculer clair/sombre sans redémarrer, puis vérifier Options, dashboard et panneau à 100 % et 200 % de zoom. |
 
 ## Modèle pour une nouvelle entrée
 

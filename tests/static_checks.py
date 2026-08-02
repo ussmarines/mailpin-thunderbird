@@ -10,7 +10,7 @@ manifest = json.loads((EXT / "manifest.json").read_text(encoding="utf-8"))
 version = manifest["version"]
 
 assert manifest["manifest_version"] == 3
-assert version == "3.2.12"
+assert version == "3.2.13"
 assert manifest["permissions"] == ["menus"]
 assert manifest["browser_specific_settings"]["gecko"]["id"] == "pin-mails@MailPerch.local"
 assert manifest["browser_specific_settings"]["gecko"]["strict_min_version"] == "128.0"
@@ -133,15 +133,23 @@ for icon in EXT.glob("icons/*.svg"):
 
 tokens = (EXT / "styles/tokens.css").read_text(encoding="utf-8")
 for token in [
-    "--mp-brand: #0F6CBD", "--mp-secondary: #0E8F8F", "--mp-bg: light-dark(#F4F7FB, #101318)",
-    "--mp-surface: light-dark(#FFFFFF, #1B1F27)", "--mp-text: light-dark(#172033, #F5F7FA)",
-    "--mp-font-family", "--mp-radius-md: 8px", "--mp-radius-lg: 12px", "--mp-duration-normal: 180ms"
+    "--mp-brand-background: #0f6cbd", "--mp-secondary-background: #0e8f8f",
+    "--mp-color-neutral-background-canvas: #f4f7fb", "--mp-color-neutral-background-canvas: #111315",
+    "--mp-color-neutral-foreground-1: #ffffff", ":root[data-mp-theme=\"dark\"]",
+    "@media (prefers-color-scheme: dark)", "--mp-brand: var(--mp-brand-background)",
+    "--mp-font-family", "--mp-radius-md: var(--mp-radius-xlarge)",
+    "--mp-radius-lg: var(--mp-radius-xxlarge)", "--mp-duration-normal: 180ms"
 ]:
     assert token in tokens, token
 for html_name in ["options/options.html", "dashboard/dashboard.html"]:
     html = (EXT / html_name).read_text(encoding="utf-8")
+    assert "../styles/theme.js" in html, html_name
     assert "../styles/tokens.css" in html, html_name
     assert "../icons/mailperch-icon.svg" in html, html_name
+
+theme_bridge = (EXT / "styles/theme.js").read_text(encoding="utf-8")
+for token in ("getCurrent", "prefers-color-scheme: dark", "dataset.mpTheme", "onUpdated"):
+    assert token in theme_bridge, token
 assert '@import url("./tokens.css")' in css
 for size in (16, 24, 32, 48, 64, 96, 128):
     assert manifest["icons"][str(size)] == f"icons/mailperch-icon-{size}.png"

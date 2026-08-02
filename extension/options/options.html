@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title data-i18n="optionsTitle">Paramètres de MailPerch</title>
+  <script src="../styles/theme.js"></script>
   <link rel="stylesheet" href="../styles/tokens.css">
   <link rel="stylesheet" href="options.css">
   <script src="options-bootstrap.js" defer></script>
@@ -13,8 +14,9 @@
   <main class="settings-app">
     <header class="page-header">
       <div class="brand-lockup">
-        <span class="brand-mark" aria-hidden="true"><img src="../icons/mailperch-icon.svg" alt="" width="40" height="40"></span>
-        <div>
+        <span class="brand-mark" aria-hidden="true"><img src="../icons/mailperch-icon.svg" alt="" width="96" height="96"></span>
+        <div class="brand-copy">
+          <span class="brand-overline" data-i18n="optionsTitle">Paramètres de MailPerch</span>
           <div class="title-line"><h1 data-i18n="optionsHeading">MailPerch</h1><span id="app-version" class="app-version"></span></div>
           <p data-i18n="optionsIntro">Personnalisez MailPerch sans vous perdre : commencez par l’essentiel, puis ouvrez les réglages avancés uniquement lorsque vous en avez besoin.</p>
         </div>
@@ -25,10 +27,10 @@
     </header>
 
     <section class="quick-overview" aria-label="Résumé MailPerch">
-      <article><span class="overview-label" data-i18n="overviewPinned">Épingles</span><strong id="overview-pinned">—</strong><small data-i18n="overviewPinnedHelp">messages suivis</small></article>
-      <article><span class="overview-label" data-i18n="overviewAttention">À traiter</span><strong id="overview-attention">—</strong><small data-i18n="overviewAttentionHelp">retards et relances</small></article>
-      <article><span class="overview-label" data-i18n="overviewHealth">Santé</span><strong id="overview-health">—</strong><small data-i18n="overviewHealthHelp">état local de MailPerch</small></article>
-      <article><span class="overview-label" data-i18n="overviewBackup">Sauvegarde</span><strong id="overview-backup">—</strong><small data-i18n="overviewBackupHelp">dernière protection locale</small></article>
+      <article data-tone="brand"><span class="overview-label" data-i18n="overviewPinned">Épingles</span><strong id="overview-pinned">—</strong><small data-i18n="overviewPinnedHelp">messages suivis</small></article>
+      <article data-tone="warning"><span class="overview-label" data-i18n="overviewAttention">À traiter</span><strong id="overview-attention">—</strong><small data-i18n="overviewAttentionHelp">retards et relances</small></article>
+      <article data-tone="success"><span class="overview-label" data-i18n="overviewHealth">Santé</span><strong id="overview-health">—</strong><small data-i18n="overviewHealthHelp">état local de MailPerch</small></article>
+      <article data-tone="teal"><span class="overview-label" data-i18n="overviewBackup">Sauvegarde</span><strong id="overview-backup">—</strong><small data-i18n="overviewBackupHelp">dernière protection locale</small></article>
     </section>
 
     <div class="settings-layout">
@@ -73,10 +75,6 @@
             <div><strong data-i18n="featureMapDashboard">Dans le tableau de bord</strong><span data-i18n="featureMapDashboardHelp">Vues intelligentes, sélection multiple, Kanban et centre de santé.</span></div>
             <div><strong data-i18n="featureMapSettings">Dans les paramètres</strong><span data-i18n="featureMapSettingsHelp">Activez les fonctions et consultez immédiatement leur état.</span></div>
           </div>
-          <aside class="support-panel" aria-labelledby="support-title">
-            <div><h3 id="support-title" data-i18n="supportTitle"></h3><p data-i18n="supportIntro"></p></div>
-            <div class="support-links"><a id="support-paypal" class="primary" href="https://paypal.me/ussmarinesdot" target="_blank" rel="noopener noreferrer" data-support-link data-i18n="supportPayPal"></a><a id="support-author" href="https://github.com/ussmarines" target="_blank" rel="noopener noreferrer" data-support-link data-i18n="supportAuthor"></a><a id="support-repository" href="https://github.com/ussmarines/mailperch-thunderbird" target="_blank" rel="noopener noreferrer" data-support-link data-i18n="supportRepository"></a></div>
-          </aside>
         </section>
 
         <section class="settings-section" data-nav-icon="⌖" data-nav-group="Essentiel">
@@ -188,6 +186,10 @@
         </section>
 
         <footer class="form-footer"><div><strong data-i18n="readyToSave">Résumé local</strong><span id="stats"></span></div><span class="hint">Utilisez la barre Enregistrer/Annuler qui apparaît uniquement après une modification.</span></footer>
+        <aside class="support-panel" aria-labelledby="support-title">
+          <div><h3 id="support-title" data-i18n="supportTitle"></h3><p data-i18n="supportIntro"></p></div>
+          <div class="support-links"><a id="support-paypal" class="primary" href="https://paypal.me/ussmarinesdot" target="_blank" rel="noopener noreferrer" data-support-link data-i18n="supportPayPal"></a><a id="support-author" href="https://github.com/ussmarines" target="_blank" rel="noopener noreferrer" data-support-link data-i18n="supportAuthor"></a><a id="support-repository" href="https://github.com/ussmarines/mailperch-thunderbird" target="_blank" rel="noopener noreferrer" data-support-link data-i18n="supportRepository"></a></div>
+        </aside>
         <div id="save-dock" class="save-dock" aria-hidden="true" hidden><span id="save-dock-message" data-i18n="unsavedChanges">Des modifications ne sont pas encore enregistrées.</span><span class="save-dock-actions"><button id="discard-changes" type="reset" class="secondary" aria-disabled="true" disabled data-i18n="cancelChanges">Annuler</button><button id="save-all-floating" type="submit" class="primary" aria-disabled="true" disabled data-i18n="save">Enregistrer</button></span></div>
       </form>
     </div>

@@ -1,5 +1,13 @@
 # Journal des modifications
 
+## 3.2.13 — interface Fluent 2 réellement adaptative
+
+- refonte visuelle complète des paramètres et du tableau de bord avec hiérarchie Fluent 2, logo de grande taille, boutons, champs, navigation, cartes et états sémantiques cohérents ;
+- ajout d’un pont de thème local qui suit le thème courant de Thunderbird et conserve un repli système fiable pour les modes clair et sombre ;
+- panneau d’épingles harmonisé avec les nouveaux tokens sans modifier la géométrie ni les interactions natives de Thunderbird ;
+- footer des paramètres réorganisé pour garder les liens essentiels accessibles, avec contrastes élevés et réduction des animations préservés ;
+- tests statiques, test du pont de thème et captures de validation navigateur ajoutés avant la construction reproductible du XPI.
+
 ## 3.2.12 — identité du projet et soutien facultatif
 
 - métadonnées manifest et package complétées pour `ussmarines`, le dépôt officiel et le soutien PayPal facultatif ;
