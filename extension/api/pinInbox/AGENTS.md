@@ -3,7 +3,7 @@
 > Contexte global : lire `PROJECT_MEMORY.md` à la racine avant ce fichier.
 
 Zone la plus risquée du dépôt. Elle a accès aux fonctions internes de Thunderbird.
-Lire aussi `docs/SECURITY_BOUNDARY.md` et `SECURITY_AUDIT_3.2.4.md` avant toute modification.
+Lire aussi `docs/SECURITY_BOUNDARY.md` et `SECURITY_AUDIT_1.0.0.md` avant toute modification.
 
 ## Invariants
 

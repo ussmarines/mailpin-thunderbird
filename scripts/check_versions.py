@@ -13,14 +13,14 @@ assert re.fullmatch(r"\d+\.\d+\.\d+", version), version
 assert manifest["version"] == version, (manifest["version"], version)
 
 checks = {
-    "README.md": [f"build de développement {version}", f"MailPerch_v{version}.xpi"],
-    "README.en.md": [f"development build {version}", f"MailPerch_v{version}.xpi"],
+    "README.md": [f"**MailPerch :** `{version}`", f"MailPerch_v{version}.xpi"],
+    "README.en.md": [f"**MailPerch:** `{version}`", f"MailPerch_v{version}.xpi"],
     "CHANGELOG.md": [f"## {version}"],
-    "THIRD_PARTY_NOTICES.md": [f"build {version}"],
+    "THIRD_PARTY_NOTICES.md": [f"MailPerch {version}"],
     "extension/styles/pin.css": [version],
-    "PROJECT_MEMORY.md": [f"Version de travail : **{version}**"],
+    "PROJECT_MEMORY.md": [f"Version publique : **{version}**"],
     "docs/PROJECT_STATE.json": [f'"extensionVersion": "{version}"'],
-    "docs/BUG_TRACKER.md": [f"Version de travail : **{version}**"],
+    "docs/BUG_TRACKER.md": [f"Version publique : **{version}**"],
 }
 for relative, tokens in checks.items():
     text = (ROOT / relative).read_text(encoding="utf-8")

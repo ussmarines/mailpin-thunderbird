@@ -1,17 +1,34 @@
-# Instructions de build pour reviewers
+# Instructions de build pour les reviewers
 
-Prérequis : Python 3.11+ et Node.js 20+. Aucun téléchargement de dépendance npm ou Python n’est nécessaire : les contrôles utilisent uniquement la bibliothèque standard Python et Node fourni par l’environnement.
+## Environnement
+
+Le build 1.0.0 est conçu pour l’environnement reviewer standard et a besoin uniquement de :
+
+- Ubuntu 24.04 ou système équivalent ;
+- Python 3.11+ ;
+- Node.js 20+ et npm 10+ ;
+- Git.
+
+La CI du projet utilise Node.js 24 et Python 3.12. Aucune dépendance npm ou Python tierce n’est installée : les scripts reposent uniquement sur Python et Node fournis par l’environnement.
+
+## Reproduction
+
+Depuis la racine de l’archive source :
 
 ```bash
 npm run ci
 ```
 
-Cette commande exécute : contrôles du dépôt, détection de secrets, tests statiques et de modèles, test SQLite, gardes UI/compteurs et build reproductible.
+Cette commande exécute les contrôles du dépôt, le scan de secrets, les tests statiques et de modèles, les tests SQLite, les gardes UI/compteurs, puis deux constructions comparées pour vérifier la reproductibilité.
 
-Le XPI résultant se trouve dans `dist/`. Le contenu de `extension/` est placé directement à la racine du XPI. Aucun fichier d’exécution n’est minifié, transpilé, généré ou obfusqué. Les fichiers sont triés et les timestamps ZIP sont fixes pour permettre une reproduction binaire.
+Les fichiers produits sont :
 
-Le packaging sélectionne exclusivement les fichiers suivis par Git : un profil
-Thunderbird, une sauvegarde, un export ou un secret local ignoré ne peut donc
-pas entrer dans le XPI ni dans le ZIP source. Le ZIP source embarque la liste
-des fichiers sélectionnés afin que cette même frontière reste applicable après
-extraction, sans répertoire `.git`.
+```text
+dist/MailPerch_v1.0.0.xpi
+dist/MailPerch_GitHub_Repository_v1.0.0.zip
+dist/SHA256SUMS.txt
+```
+
+Le contenu de `extension/` est placé directement à la racine du XPI. Aucun JavaScript ou CSS n’est minifié, transpilé, concaténé, généré ou obfusqué. Les fichiers sont triés et les horodatages ZIP sont fixes afin de permettre une comparaison binaire.
+
+Le packaging sélectionne exclusivement les fichiers suivis par Git ou listés dans `.mailperch-source-files.json` dans l’archive reviewer. Un profil Thunderbird, une sauvegarde, un export, un secret local ou un fichier ignoré ne peut donc pas être inclus accidentellement.

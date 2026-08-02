@@ -49,11 +49,11 @@ npm run build
 npm run ci
 ```
 
-Le rapport courant est [SECURITY_AUDIT_3.2.4.md](SECURITY_AUDIT_3.2.4.md).
+Le rapport courant est [SECURITY_AUDIT_1.0.0.md](SECURITY_AUDIT_1.0.0.md).
 
 ## Limite importante
 
 Les contrôles statiques ne prouvent pas toutes les interactions XUL privilégiées.
-Toute version publique doit être testée sur les versions Thunderbird annoncées
+Toute version destinée au store doit être testée sur les versions Thunderbird annoncées
 et relue humainement après toute modification de permission, API Experiment,
 stockage, import, Agenda ou désinstallation.

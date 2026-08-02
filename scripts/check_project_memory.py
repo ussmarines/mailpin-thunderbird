@@ -13,7 +13,7 @@ version = str(package["version"])
 
 assert manifest["version"] == version
 assert state["extensionVersion"] == version
-assert f"Version de travail : **{version}**" in memory
+assert f"Version publique : **{version}**" in memory
 for path in state["entrypoints"].values():
     assert (ROOT / path).is_file(), path
     assert path in memory, f"PROJECT_MEMORY.md ne référence pas {path}"

@@ -4,10 +4,10 @@
 > Lire ce document avant tout autre fichier. Il donne l’état courant, les invariants,
 > la carte du dépôt et les chemins exacts à ouvrir selon la tâche.
 >
-> Version de travail : **3.2.13**
-> Base de travail vérifiée : `main` au commit `caab268b187d463f704c3f91cc33ba1038151bcb`
+> Version publique : **1.0.0**
+> Base de travail vérifiée : `main` au commit `f7497870423683f1bb1622111634a2513c304aa6`
 > Produit : **MailPerch — Email Pins & Follow-up**
-> Extension ID de développement : `pin-mails@MailPerch.local`
+> Extension ID public permanent : `pin-mails@MailPerch.local`
 
 ## 1. Résumé en 30 secondes
 
@@ -55,7 +55,7 @@ structure accessible aux affaires, modèles et règles, et bloque toute créatio
 Agenda d’affaire sans titre, date, type et calendrier compatible ; l’Experiment
 applique les mêmes validations et ne crée plus une échéance artificielle.
 
-La version de travail 3.2.13 applique réellement l’identité Fluent 2 aux paramètres,
+La version publique 1.0.0 applique l’identité Fluent 2 aux paramètres,
 au dashboard et au panneau natif via `extension/styles/tokens.css`. Un pont local
 `extension/styles/theme.js` suit le thème courant de Thunderbird et utilise le
 thème système comme repli. Les en-têtes donnent désormais une vraie place au logo,
@@ -71,14 +71,14 @@ que les identifiants, comportements, données et géométrie native restent inch
 5. Aucun `eval`, `new Function`, `innerHTML`, `outerHTML` ou HTML construit depuis
    des métadonnées de courrier.
 6. Ne jamais stocker le corps des messages ni le contenu des pièces jointes.
-7. Conserver l’ID `pin-mails@MailPerch.local` durant le développement et les migrations.
+7. Conserver définitivement l’ID public `pin-mails@MailPerch.local` afin de préserver les installations et les données.
 8. Le dashboard est ouvert par le background avec `tabs.create`.
 9. Les écritures SQLite restent incrémentales, transactionnelles et sérialisées.
 10. Chaque écouteur, observer, timer, popup, feuille de style et nœud injecté doit
     être nettoyé à la fermeture.
 11. Une sauvegarde de sécurité précède une migration ou une restauration.
 12. Toute action destructrice groupée respecte les confirmations configurées.
-13. Aucune publication, branche distante ou release sans accord explicite.
+13. Toute publication exige une version synchronisée, `npm run ci` réussi et un accord explicite du propriétaire.
 14. Aucun rôle administrateur client, secret maître ou autorisation fondée sur le DOM.
 15. Toute entrée de page/import est revalidée et bornée dans l’Experiment.
 16. Une désinstallation ferme le stockage avant de purger les données gérées.
@@ -89,7 +89,7 @@ que les identifiants, comportements, données et géométrie native restent inch
 
 | Élément | Valeur |
 |---|---|
-| Version extension/package | `3.2.13` |
+| Version extension/package | `1.0.0` |
 | Thunderbird déclaré | `128.0` à `153.*` |
 | Manifest | MV3 |
 | Permission WebExtension | `menus` uniquement |
@@ -199,7 +199,7 @@ que les identifiants, comportements, données et géométrie native restent inch
 - `ISSUE_TEMPLATE/*` : bugs, compatibilité, fonctions.
 - `PULL_REQUEST_TEMPLATE.md` : checklist PR.
 - `workflows/ci.yml` : CI Linux/Windows.
-- `workflows/release.yml` : Release Candidate manuelle.
+- `workflows/release.yml` : build reproductible et release GitHub automatique lors d’un changement de version fusionné dans `main`.
 - `dependabot.yml` : suivi hebdomadaire des GitHub Actions épinglées.
 
 ### `extension/`
@@ -391,12 +391,12 @@ Une modification est terminée seulement si :
 - les docs et cette mémoire sont à jour ;
 - les invariants sont respectés ;
 - les tests Thunderbird réellement exécutés sont listés honnêtement ;
-- aucune publication distante n’a été faite sans accord.
+- toute publication distante correspond à une version explicitement préparée et validée.
 
 
-## Frontière de sécurité 3.2.4
+## Frontière de sécurité 1.0.0
 
-Lire `docs/SECURITY_BOUNDARY.md` et `SECURITY_AUDIT_3.2.4.md` avant toute
+Lire `docs/SECURITY_BOUNDARY.md` et `SECURITY_AUDIT_1.0.0.md` avant toute
 modification de l’Experiment, des imports, des sauvegardes ou du cycle de vie.
 
 Règles essentielles :

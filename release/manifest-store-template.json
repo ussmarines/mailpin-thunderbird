@@ -1,8 +1,8 @@
 {
-  "note": "REMPLACER les valeurs entre chevrons, puis copier ces champs dans manifest.json uniquement pour la première publication publique. Ne pas installer ce fichier tel quel.",
+  "note": "Référence de métadonnées pour la publication 1.0.0. Les valeurs doivent rester synchronisées avec extension/manifest.json.",
   "browser_specific_settings": {
     "gecko": {
-      "id": "<ATN_USER>.mailperch@addons.thunderbird.net",
+      "id": "pin-mails@MailPerch.local",
       "strict_min_version": "128.0",
       "strict_max_version": "153.*"
     }

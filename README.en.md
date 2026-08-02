@@ -1,74 +1,77 @@
+<div align="center">
+  <img src="extension/icons/mailperch-icon.svg" width="128" height="128" alt="MailPerch logo">
+
 # MailPerch
 
-MailPerch is a local-first Thunderbird extension for pinning, organizing, and following up on important email without replacing the native message list.
+**Pin, organize and follow up on important email in Thunderbird.**
 
-> **Status: development build 3.2.13.** Compatible with Thunderbird 128 through 153. Complete manual UI and Calendar validation is still required before publication.
+[![QA](https://github.com/ussmarines/mailperch-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailperch-thunderbird/actions/workflows/ci.yml)
+![Release](https://img.shields.io/badge/release-v1.0.0-0078D4)
+![License](https://img.shields.io/badge/license-MailPerch%20Source--Available%201.0-6A5ACD)
+</div>
 
-## Main features
+MailPerch adds a dedicated pinned-message panel above Thunderbird’s native message list. It keeps important mail visible, supports follow-up planning, and organizes work without replacing Thunderbird’s normal workflow.
 
-- a separate pinned-message panel above the native message list;
-- local follow-ups, deadlines, reminders, groups, cases, and templates;
-- local rules with simulation and loop protection;
-- Calendar tasks and events based on compatible calendars;
-- dashboard, smart views, and a redacted local diagnostic.
+## Features
+
+- pin a message or conversation independently from Thunderbird’s native star;
+- follow-ups, deadlines, reminders, and workflow states;
+- groups, cases, templates, local rules, and smart views;
+- Thunderbird calendar tasks and events where supported;
+- dashboard, Kanban, history, and a local health center;
+- backup, restore, and redacted diagnostics.
+
+## Compatibility
+
+- **MailPerch:** `1.0.0`;
+- **Thunderbird:** `128.0` through `153.*`;
+- **Format:** Manifest V3 MailExtension;
+- **Languages:** French and English;
+- **Target systems:** Windows, Linux, and macOS.
+
+The manifest declares this compatibility range, but the full Windows/Linux/macOS matrix and the range endpoints still require manual validation before store submission.
+
+MailPerch includes a privileged Experiment API to integrate its panel into Thunderbird, manage its local SQLite storage, and access required Calendar features. Thunderbird therefore displays the full-access warning during installation.
 
 ## Installation
 
-1. Build the extension with `npm run build`.
-2. In Thunderbird, open **Add-ons and Themes**, then **Install Add-on From File**.
-3. Select `dist/MailPerch_v3.2.13.xpi`.
-4. Restart Thunderbird and begin with a test profile.
+### From a GitHub release
 
-MailPerch is not yet announced as available through Thunderbird Add-ons.
+1. Download `MailPerch_v1.0.0.xpi` from release `v1.0.0`.
+2. In Thunderbird, open **Add-ons and Themes**.
+3. From the gear menu, select **Install Add-on From File**.
+4. Select the XPI and restart Thunderbird if required.
 
-## Quick start
+> Internal `3.2.x` development builds used a version number higher than the first public release. To test `1.0.0` after a development build, use a clean test profile or uninstall the previous build after exporting your MailPerch data.
 
-1. Open MailPerch settings.
-2. Keep the recommended settings or adjust the display and follow-up options.
-3. Pin a message from the list, context menu, or configured shortcut.
-4. Use the panel or dashboard to organize follow-ups.
+### From source
 
-## Privacy and local operation
-
-MailPerch makes no network calls, sends no telemetry, and loads no remote content. Tracking data stays in the Thunderbird profile; message bodies and attachment contents are not copied to its local database. See [PRIVACY.md](PRIVACY.md).
-
-## Permissions and Experiment API
-
-The extension contains a privileged Experiment API to integrate its panel with Thunderbird and access the required local features. This entails Thunderbird’s full-access warning and depends on internal Thunderbird interfaces. See [SECURITY.md](SECURITY.md), the [threat model](docs/THREAT_MODEL.md), and [known limitations](docs/KNOWN_LIMITATIONS.md).
-
-## Development and tests
-
-Requirements: Python 3.11+ and Node.js 20+. No npm dependencies are required.
+Requirements: Python 3.11+ and Node.js 20+. No third-party npm or Python dependency is downloaded.
 
 ```bash
-npm run check
-npm test
-npm run build
 npm run ci
 ```
 
-Manual validation is described in [docs/MANUAL_TEST_PLAN.md](docs/MANUAL_TEST_PLAN.md). Contributors should also read [AGENTS.md](AGENTS.md) and [docs/CODEX_HANDOFF.md](docs/CODEX_HANDOFF.md).
+Reproducible release artifacts are generated in `dist/`: XPI, source archive, and SHA-256 checksums.
 
-## Documentation and issues
+## Privacy and security
 
-- [Architecture](docs/ARCHITECTURE.md)
-- [Bug tracker](docs/BUG_TRACKER.md)
-- [Debugging guide](docs/DEBUGGING.md)
+MailPerch is local-first: no network calls, telemetry, advertising, or remotely loaded code. Metadata required for pinned messages remains in the Thunderbird profile; complete message bodies and attachment contents are not copied into the MailPerch database.
+
+- [Privacy policy](PRIVACY.md)
+- [Security policy](SECURITY.md)
+- [1.0.0 security audit](SECURITY_AUDIT_1.0.0.md)
+- [Known limitations](docs/KNOWN_LIMITATIONS.md)
+
+## Documentation and support
+
+- [Architecture guide](docs/ARCHITECTURE.md)
+- [Reviewer build instructions](release/BUILD_INSTRUCTIONS.md)
+- [Thunderbird Add-ons submission preparation](STORE_RELEASE.md)
 - [Report an issue](https://github.com/ussmarines/mailperch-thunderbird/issues)
 
-## Author and official links
-
-- [ussmarines](https://github.com/ussmarines)
-- [MailPerch repository](https://github.com/ussmarines/mailperch-thunderbird)
-
-## Support MailPerch
-
-Enjoying MailPerch? You can support its continued development with a donation.
-
-[**Support the project via PayPal**](https://paypal.me/ussmarinesdot)
-
-Donations are optional and do not unlock any features.
+MailPerch is maintained by [ussmarines](https://github.com/ussmarines). Donations through [PayPal](https://paypal.me/ussmarinesdot) are optional and do not unlock features.
 
 ## License
 
-This repository is provided under a restrictive source-available, non-commercial license with no right to public redistribution. See [LICENSE](LICENSE).
+MailPerch is distributed under the **MailPerch Source-Available License 1.0**. Mozilla/Thunderbird reviewer inspection and official distribution by the owner are allowed; public redistribution, distributed forks, and commercial use require written permission. See [LICENSE](LICENSE).

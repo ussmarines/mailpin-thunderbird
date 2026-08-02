@@ -120,7 +120,7 @@ manifest = load_json(EXT / "manifest.json")
 check(manifest.get("manifest_version") == 3, "manifest_version doit être 3")
 check(manifest.get("permissions") == ["menus"], "permissions WebExtension inattendues")
 check(manifest.get("default_locale") == "fr", "default_locale doit être fr")
-check(manifest.get("browser_specific_settings", {}).get("gecko", {}).get("id") == "pin-mails@MailPerch.local", "ID de développement modifié")
+check(manifest.get("browser_specific_settings", {}).get("gecko", {}).get("id") == "pin-mails@MailPerch.local", "ID public MailPerch modifié")
 check(manifest.get("content_security_policy", {}).get("extension_pages") == "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; connect-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'", "CSP inattendue")
 version = str(manifest.get("version", ""))
 check(bool(re.fullmatch(r"\d+\.\d+\.\d+", version)), "version SemVer invalide")
@@ -138,7 +138,7 @@ check(en_locale.get("brandSlogan", {}).get("message") == "Keep important mail wi
 
 required_root = [
     "AGENTS.md", "PROJECT_MEMORY.md", "BRANDING.md", "README.md", "README.en.md", "LICENSE", "NOTICE.md", "CHANGELOG.md",
-    "CONTRIBUTING.md", "CODE_OF_CONDUCT.md", "SECURITY.md", "SECURITY_AUDIT_3.2.4.md", "PRIVACY.md", "ROADMAP.md", "SUPPORT.md", "docs/BUG_TRACKER.md",
+    "CONTRIBUTING.md", "CODE_OF_CONDUCT.md", "SECURITY.md", "SECURITY_AUDIT_1.0.0.md", "PRIVACY.md", "ROADMAP.md", "SUPPORT.md", "docs/BUG_TRACKER.md",
     "package.json", ".editorconfig", ".gitattributes", ".gitignore", "extension/AGENTS.md",
     "extension/api/pinInbox/AGENTS.md", "tests/AGENTS.md",
     "docs/PROJECT_STATE.json", "docs/ARCHITECTURE.md", "docs/CODEX_HANDOFF.md", "docs/DATA_MODEL.md", "docs/DEBUGGING.md", "docs/SECURITY_BOUNDARY.md",
@@ -278,8 +278,16 @@ workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
 check("cache: npm" not in workflow, "cache npm déclaré sans lockfile")
 store_template = load_json(ROOT / "release/manifest-store-template.json")
 store_id = str(store_template.get("browser_specific_settings", {}).get("gecko", {}).get("id", ""))
-check("<ATN_USER>" in store_id, "le modèle de publication doit conserver un identifiant ATN explicitement à remplacer")
+check(store_id == manifest.get("browser_specific_settings", {}).get("gecko", {}).get("id"), "identifiant store/manifeste incohérent")
 check((ROOT / "dist/.gitkeep").is_file(), "dist/.gitkeep manquant")
+readme = (ROOT / "README.md").read_text(encoding="utf-8")
+check("actions/workflows/ci.yml/badge.svg?branch=main" in readme, "badge QA manquant")
+check(f"release-v{version}" in readme, "badge release incohérent")
+check("MailPerch%20Source--Available%201.0" in readme, "badge licence incohérent")
+check(not (ROOT / ".github/workflows/FUNDING.yml").exists(), "FUNDING.yml ne doit pas être placé dans workflows")
+release_workflow = (ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8")
+check("gh release create" in release_workflow and "npm run ci" in release_workflow, "workflow release incomplet")
+
 
 # Avoid symlink-based source exfiltration, accidental secret/config files and oversized sources.
 for candidate in ROOT.rglob("*"):

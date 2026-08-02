@@ -1,47 +1,61 @@
-# Notes pour les reviewers ATN — MailPerch
+# Notes pour les reviewers ATN — MailPerch 1.0.0
 
-## Identité du module
+## Identité
 
 - **Nom :** MailPerch — Email Pins & Follow-up
 - **Nom court :** MailPerch
-- **Sous-titre FR :** Épinglez, organisez et suivez vos e-mails dans Thunderbird.
-- **Subtitle EN:** Pin, organize and follow up on your emails in Thunderbird.
-- **Slogan :** Keep important mail within reach.
+- **Version :** 1.0.0
+- **ID :** `pin-mails@MailPerch.local`
+- **Compatibilité :** Thunderbird 128.0 à 153.*
+- **Langues :** français et anglais
 
 ## Fonction principale
 
-MailPerch ajoute un panneau local de messages épinglés au-dessus de la liste native, avec workflows, rappels et outils facultatifs.
+MailPerch ajoute un panneau local de messages épinglés au-dessus de la liste native, avec suivis, échéances, rappels, groupes, règles, Agenda et tableau de bord. La liste native des messages et ses compteurs ne sont pas remplacés.
 
-## Permission privilégiée
+## Permission et API privilégiée
 
-L’extension contient l’Experiment `pinInbox`, nécessaire pour :
+La permission WebExtension déclarée est uniquement `menus`. L’extension embarque l’Experiment `pinInbox`, nécessaire pour :
 
-- injecter le panneau dans `about:3pane` ;
+- intégrer le panneau dans `about:3pane` ;
 - résoudre les messages déplacés à partir des bases locales ;
-- utiliser SQLite structuré ;
+- gérer le stockage SQLite local ;
 - écouter les notifications de dossiers ;
-- intégrer l’Agenda Thunderbird.
+- créer et synchroniser les tâches et événements Agenda compatibles ;
+- gérer correctement l’arrêt, la mise à jour et la désinstallation.
 
-Le reste des points d’entrée utilise les API WebExtension publiques.
+L’Experiment possède par nature un accès privilégié et provoque l’avertissement d’accès complet de Thunderbird. Les entrées sont validées par schéma et dans l’implémentation privilégiée.
 
-## Réseau et données
+## Réseau, données et code
 
-Aucun appel réseau. Aucun corps de message ou pièce jointe n’est copié. Voir `PRIVACY.md`.
+- aucun appel réseau et `connect-src 'none'` ;
+- aucune télémétrie, publicité ou collecte distante ;
+- aucun code distant, `eval`, fonction générée ou HTML injecté ;
+- aucun corps complet de message ni contenu de pièce jointe copié ;
+- aucune dépendance d’exécution ou de build tierce ;
+- code source lisible, non minifié et build reproductible.
 
-## Build
-
-Voir `release/BUILD_INSTRUCTIONS.md`. Aucune dépendance de build ou d’exécution tierce.
+Voir `PRIVACY.md`, `SECURITY.md`, `SECURITY_AUDIT_1.0.0.md` et `release/BUILD_INSTRUCTIONS.md`.
 
 ## Scénario de test rapide
 
-1. installer dans un profil de test ;
-2. épingler un message depuis la liste ;
-3. vérifier qu’il apparaît dans le panneau et reste dans la liste ;
-4. cliquer la carte : le message s’affiche sans défilement ;
-5. utiliser le clic droit sur la carte ;
-6. ouvrir le tableau de bord MailPerch ;
-7. désépingler et confirmer que le compteur non lu n’a pas changé.
+1. Installer le XPI dans un profil Thunderbird propre.
+2. Épingler un message depuis la liste, le menu contextuel et le bouton du message affiché.
+3. Vérifier que le message apparaît dans le panneau sans quitter la liste native.
+4. Tester clic simple, double-clic, clic droit, menu `…` et désépinglage.
+5. Ajouter une échéance et un rappel.
+6. Créer une tâche ou un événement dans un calendrier compatible choisi explicitement.
+7. Ouvrir le dashboard et les paramètres, puis basculer les thèmes clair et sombre.
+8. Vérifier que les compteurs natifs de dossiers et l’état lu/non lu ne changent pas.
+9. Exporter une sauvegarde, la prévisualiser et la restaurer en mode sûr.
+10. Désinstaller depuis un profil de test et vérifier la purge des données internes.
 
-## Versions testées
+## Validation automatisée
 
-À compléter avant soumission avec versions Thunderbird, systèmes et types de comptes effectivement testés.
+`npm run ci` contrôle le dépôt, les permissions, la CSP, les ressources, l’absence de réseau, les contrats de l’Experiment, les migrations, le stockage, les actions de cartes, l’accessibilité, les traductions, la reproductibilité et les secrets.
+
+## Validation manuelle à renseigner avant soumission
+
+| Thunderbird | Système | Type de compte | Thème | Résultat |
+|---|---|---|---|---|
+| À compléter | À compléter | IMAP/POP/local | clair/sombre | À compléter |

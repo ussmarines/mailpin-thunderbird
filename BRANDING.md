@@ -21,17 +21,17 @@
 4. Les traductions doivent conserver le nom MailPerch sans le traduire.
 5. Le slogan peut être localisé, mais sa version anglaise canonique reste « Keep important mail within reach. »
 
-## Identifiants techniques conservés temporairement
+## Identifiants techniques permanents
 
 Les éléments suivants sont historiques et ne doivent pas être renommés sans migration explicite :
 
-- ID de développement : `pin-mails@MailPerch.local` ;
+- ID public permanent : `pin-mails@MailPerch.local` ;
 - base locale : `pin-mails-v2.sqlite` ;
 - formats d’import/export existants ;
 - préfixes DOM, classes CSS, topics et clés internes `pin-mails-*` ;
 - nom de l’API Experiment `pinInbox`.
 
-Les modifier sans migration pourrait créer une seconde installation, perdre l’accès aux données existantes ou casser les sauvegardes. L’ID public définitif devra être choisi une seule fois avant la première publication ATN.
+Les modifier sans migration pourrait créer une seconde installation, perdre l’accès aux données existantes ou casser les sauvegardes. L’ID historique est donc figé pour la ligne publique 1.x et ne doit plus être modifié.
 
 ## Identité visuelle Fluent
 

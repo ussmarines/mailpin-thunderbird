@@ -1,41 +1,56 @@
-# Checklist de publication Add-ons for Thunderbird
+# Checklist de publication Add-ons for Thunderbird — 1.0.0
 
-## Identité
+Les cases cochées sont vérifiées automatiquement ou directement dans les sources. Les cases non cochées nécessitent une action humaine ou l’accès au portail ATN.
 
-- [ ] nom définitif validé, sans risque de marque ;
-- [ ] identifiant définitif sur un domaine durable ou format ATN ;
-- [ ] auteur, support, dépôt et page de confidentialité ;
-- [ ] icônes finales aux tailles nécessaires.
+## Identité et fiche
+
+- [x] nom, sous-titres FR/EN, auteur et icônes synchronisés ;
+- [x] identifiant permanent défini avant la première publication ;
+- [x] version 1.0.0 synchronisée dans le manifeste, le package, la documentation et les livrables ;
+- [x] licence et mentions de marque explicites ;
+- [ ] recherche juridique finale de disponibilité de la marque ;
+- [ ] dépôt, support et politique de confidentialité accessibles publiquement.
 
 ## Compatibilité
 
-- [ ] versions min/max réellement testées ;
-- [ ] ESR et branche mensuelle ciblées ;
-- [ ] IMAP, POP, Gmail, boîte unifiée, dossiers virtuels ;
-- [ ] Windows, Linux et macOS selon la cible.
+- [x] Manifest V3 et clés de manifeste contrôlés ;
+- [x] plage déclarée Thunderbird 128.0 à 153.* ;
+- [x] thèmes clair/sombre et réduction de mouvement couverts par les gardes automatisées ;
+- [ ] test réel Thunderbird 128 ESR ;
+- [ ] test réel Thunderbird 140 ESR ou branche ESR actuellement ciblée ;
+- [ ] test réel Thunderbird 153.* ;
+- [ ] matrice Windows, Linux et macOS ;
+- [ ] IMAP, POP, Gmail, dossiers locaux, boîte unifiée et dossiers virtuels.
 
-## Review
+## Review et build
 
-- [ ] code lisible non obfusqué ;
-- [ ] instructions de build reproductible ;
-- [ ] source complète sans profil ni secret ;
-- [ ] notes de test détaillées pour les reviewers ;
-- [ ] justification de chaque usage de l’Experiment ;
-- [ ] inventaire des bibliothèques tierces, même vide.
+- [x] code lisible, non minifié, non transpilé et non obfusqué ;
+- [x] instructions de build reproductible ;
+- [x] archive source complète sans profil ni secret ;
+- [x] notes de test et justification de l’Experiment ;
+- [x] inventaire des bibliothèques tierces : aucune ;
+- [x] actions GitHub épinglées par SHA ;
+- [x] Dependabot configuré uniquement pour GitHub Actions, seul écosystème dépendant ;
+- [ ] téléversement du XPI et de l’archive source sur ATN.
 
 ## Confidentialité et sécurité
 
-- [ ] politique de confidentialité à jour ;
-- [ ] description exacte des données locales ;
-- [ ] scan de secrets ;
-- [ ] aucune connexion réseau inattendue ;
-- [ ] audit des actions destructives et migrations ;
-- [ ] sauvegarde/restauration testées.
+- [x] politique de confidentialité à jour ;
+- [x] données locales et suppression documentées ;
+- [x] permissions minimales et CSP sans réseau ;
+- [x] scan de secrets et recherche de primitives dangereuses ;
+- [x] audit des imports, actions destructives, migrations et désinstallation ;
+- [x] sauvegarde/restauration couverte par les tests de modèles ;
+- [ ] validation manuelle de sauvegarde/restauration dans Thunderbird ;
+- [ ] validation manuelle complète de l’Agenda.
 
 ## Livrables
 
-- [ ] `npm run ci` réussi ;
-- [ ] XPI testé depuis un profil propre ;
-- [ ] mise à niveau testée depuis la dernière version ;
-- [ ] `SHA256SUMS.txt` généré ;
-- [ ] CHANGELOG et version synchronisés.
+- [x] `npm run ci` ;
+- [x] XPI reproductible ;
+- [x] archive source reviewer ;
+- [x] `SHA256SUMS.txt` ;
+- [x] CHANGELOG et version synchronisés ;
+- [ ] installation du XPI depuis un profil propre ;
+- [ ] test de remplacement d’une build interne 3.2.x ;
+- [ ] soumission et validation par les reviewers ATN.

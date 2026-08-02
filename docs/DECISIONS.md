@@ -1,8 +1,8 @@
 # Décisions techniques
 
-## D001 — ID de développement conservé
+## D001 — ID public permanent conservé
 
-`pin-mails@MailPerch.local` reste utilisé afin que les builds de test mettent à niveau la même installation et conservent les données. L’ID public sera choisi une seule fois avant la première publication.
+`pin-mails@MailPerch.local` est figé comme identifiant public de MailPerch 1.x. Le modifier créerait une seconde installation et séparerait les données existantes ; toute évolution future devra donc conserver cet ID ou fournir une migration explicite.
 
 ## D002 — Dashboard ouvert par le background
 

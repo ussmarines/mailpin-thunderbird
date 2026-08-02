@@ -19,8 +19,8 @@ for name in ("check", "test", "build"):
 
 assert "runs-on: windows-latest" in ci
 assert "npm run check && npm test" in ci
-assert "python3 scripts/check_versions.py" not in release
-assert "python scripts/check_versions.py" in release
+assert "npm run ci" in release
+assert "gh release create" in release
 
 expected_actions = {
     "actions/checkout": "de0fac2e4500dabe0009e67214ff5f5447ce83dd",
@@ -33,7 +33,7 @@ for workflow in (ci, release):
         if action == "actions/upload-artifact" and workflow is ci:
             assert f"{action}@{sha}" in workflow
         elif action == "actions/upload-artifact" and workflow is release:
-            assert f"{action}@{sha}" in workflow
+            assert f"{action}@{sha}" not in workflow
         elif action != "actions/upload-artifact":
             assert f"{action}@{sha}" in workflow
     assert not re.search(r"uses:\s+[^\s]+@v\d", workflow), workflow
@@ -44,9 +44,9 @@ for workflow in (ci, release):
 assert ci.count("persist-credentials: false") == 2
 assert release.count("persist-credentials: false") == 1
 assert "retention-days: 14" in ci
-assert "retention-days: 30" in release
+assert "--latest" in release
 assert "include-hidden-files: false" in ci
-assert "include-hidden-files: false" in release
+assert "MailPerch_GitHub_Repository_v${VERSION}.zip" in release
 assert "package-ecosystem: github-actions" in dependabot
 assert "BeautifulSoup" not in check_repo
 assert "tinycss2" not in check_repo

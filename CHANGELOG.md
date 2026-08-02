@@ -1,5 +1,15 @@
 # Journal des modifications
 
+## 1.0.0 — première version publique
+
+- première release publique stable de MailPerch, issue des builds internes 3.2.x ;
+- interface Fluent 2 adaptative en thèmes clair, sombre et contraste élevé ;
+- panneau d’épingles, suivis, rappels, groupes, règles, Agenda, dashboard et Kanban ;
+- fonctionnement local sans réseau, télémétrie, publicité ni code distant ;
+- permissions minimales côté WebExtension et API Experiment documentée pour l’intégration Thunderbird ;
+- build reproductible, archive source reviewer, sommes SHA-256 et automatisation de release GitHub ;
+- dépôt nettoyé, Dependabot limité aux GitHub Actions réellement utilisées et contrôles de sécurité intégrés à la QA.
+
 ## 3.2.13 — interface Fluent 2 réellement adaptative
 
 - refonte visuelle complète des paramètres et du tableau de bord avec hiérarchie Fluent 2, logo de grande taille, boutons, champs, navigation, cartes et états sémantiques cohérents ;

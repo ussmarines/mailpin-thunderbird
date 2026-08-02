@@ -1,32 +1,56 @@
-# Préparation de publication de MailPerch
+# Publication de MailPerch 1.0.0
 
-## Identité retenue
+## Identité
 
 - **Nom :** MailPerch
 - **Nom complet :** MailPerch — Email Pins & Follow-up
+- **Version publique :** 1.0.0
 - **Sous-titre FR :** Épinglez, organisez et suivez vos e-mails dans Thunderbird.
 - **Subtitle EN:** Pin, organize and follow up on your emails in Thunderbird.
-- **Slogan :** Keep important mail within reach.
-- **Auteur public :** [ussmarines](https://github.com/ussmarines)
-- **Projet :** https://github.com/ussmarines/mailperch-thunderbird
-- **Soutien facultatif :** https://paypal.me/ussmarinesdot
+- **Auteur public :** ussmarines
+- **Identifiant permanent :** `pin-mails@MailPerch.local`
+- **Compatibilité déclarée :** Thunderbird 128.0 à 153.*
+- **Licence :** MailPerch Source-Available License 1.0
 
-Voir `BRANDING.md` pour les règles de nommage et les identifiants techniques conservés.
+L’identifiant historique est conservé comme identifiant public permanent afin de ne pas créer une seconde installation ni séparer les données des utilisateurs existants. Il ne doit plus être modifié après la première publication.
 
-## État
+## État de préparation
 
-La build 3.2.13 reste une Release Candidate de développement et n’est pas déclarée prête pour Add-ons for Thunderbird.
+La release GitHub 1.0.0 est construite de manière reproductible et les contrôles automatisés du dépôt couvrent la syntaxe, les ressources, les permissions, la CSP, l’absence de réseau, les contrats API, les migrations, les compteurs natifs, l’accessibilité, les modèles JavaScript/SQLite, le scan de secrets et le packaging.
 
-Avant publication :
+La soumission Add-ons for Thunderbird reste une action manuelle : seul le portail ATN et ses reviewers peuvent valider ou refuser la publication. Avant l’envoi, le propriétaire doit terminer les cases manuelles de `docs/ATN_RELEASE_CHECKLIST.md`, rendre accessibles publiquement la page de support et la politique de confidentialité, puis tester le XPI dans les versions et systèmes annoncés.
 
-- effectuer une recherche finale de disponibilité juridique de la marque MailPerch ;
-- remplacer l’ID de développement par un ID définitif et durable ;
-- rendre accessibles publiquement la page d’accueil, le support et la politique de confidentialité ;
-- exécuter la matrice `docs/MANUAL_TEST_PLAN.md` ;
-- relire les traductions FR/EN et compléter les rares diagnostics techniques encore uniquement en français ;
-- fournir aux reviewers le code source lisible et `python3 scripts/build.py --source` ;
-- justifier l’API Experiment et son avertissement d’accès complet ;
-- confirmer la licence et les mentions légales avec un professionnel ;
-- préparer notes de revue, captures et support.
+## Fichiers à soumettre
 
-Voir `docs/ATN_RELEASE_CHECKLIST.md`.
+Après `npm run ci` :
+
+- `dist/MailPerch_v1.0.0.xpi` — extension à téléverser ;
+- `dist/MailPerch_GitHub_Repository_v1.0.0.zip` — sources complètes pour review ;
+- `dist/SHA256SUMS.txt` — empreintes des deux archives ;
+- `release/ATN_REVIEW_NOTES_TEMPLATE.md` — informations de test et justification de l’Experiment ;
+- `release/BUILD_INSTRUCTIONS.md` — reproduction exacte du build.
+
+## Informations de fiche ATN
+
+### Description courte FR
+
+Épinglez, organisez et suivez vos e-mails importants directement dans Thunderbird, avec rappels, groupes, Agenda et tableau de bord local.
+
+### Short description EN
+
+Pin, organize, and follow up on important email directly in Thunderbird with reminders, groups, Calendar integration, and a local dashboard.
+
+### Confidentialité
+
+MailPerch ne transmet aucune donnée. Aucun corps complet de message ni contenu de pièce jointe n’est copié dans sa base. Voir `PRIVACY.md`.
+
+### Permission privilégiée
+
+L’API Experiment `pinInbox` est nécessaire pour intégrer le panneau dans `about:3pane`, résoudre les messages déplacés, utiliser SQLite, écouter les changements de dossiers et créer des tâches/événements Agenda. Cette API explique l’avertissement d’accès complet affiché par Thunderbird.
+
+## Blocages externes restants
+
+- publication du dépôt, de la politique de confidentialité et du support à des URL accessibles au public ;
+- validation manuelle Windows, Linux et macOS sur les versions Thunderbird réellement annoncées ;
+- création du compte développeur et soumission dans le portail Add-ons for Thunderbird ;
+- décision finale des reviewers ATN.

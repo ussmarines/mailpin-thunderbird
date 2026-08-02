@@ -1,7 +1,5 @@
 # Contribution
 
-Le dépôt est destiné à rester privé jusqu’à décision contraire du propriétaire.
-
 1. Lire `AGENTS.md` et `docs/ARCHITECTURE.md`.
 2. Créer une branche courte et ciblée.
 3. Ajouter un test ou une garde pour chaque correction.

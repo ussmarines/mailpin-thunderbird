@@ -20,7 +20,7 @@ CHECK_REPO = (ROOT / "scripts/check_repo.py").read_text(encoding="utf-8")
 CI_WORKFLOW = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
 RELEASE_WORKFLOW = (ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8")
 
-assert PACKAGE["version"] == MANIFEST["version"] == "3.2.13"
+assert PACKAGE["version"] == MANIFEST["version"] == "1.0.0"
 assert MANIFEST["permissions"] == ["menus"]
 assert "content_scripts" not in MANIFEST
 assert "externally_connectable" not in MANIFEST
@@ -232,7 +232,8 @@ for workflow in (CI_WORKFLOW, RELEASE_WORKFLOW):
     assert "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd" in workflow
     assert "actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e" in workflow
     assert "actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405" in workflow
-    assert "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a" in workflow
+assert "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a" in CI_WORKFLOW
+assert "gh release create" in RELEASE_WORKFLOW
 assert PACKAGE.get("dependencies") is None
 assert PACKAGE.get("devDependencies") is None
 

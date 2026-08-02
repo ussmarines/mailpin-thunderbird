@@ -42,10 +42,10 @@
 - confirmer les valeurs recommandées sur un profil neuf : mode guidé, densité normale, automatisations destructives désactivées ;
 - tester les imports malformés, volumineux et contenant des clés dangereuses ;
 - vérifier les sauvegardes dans le dossier interne puis dans un dossier choisi par le sélecteur natif ;
-- maintenir `SECURITY_AUDIT_3.2.4.md`, `docs/SECURITY_BOUNDARY.md` et le test de durcissement dans chaque future version ;
+- maintenir `SECURITY_AUDIT_1.0.0.md`, `docs/SECURITY_BOUNDARY.md` et le test de durcissement dans chaque future version ;
 - exécuter une revue de sécurité indépendante avant toute publication publique.
 
-## 3.2.x — consolidation en cours
+## 1.0.x — stabilisation après publication
 
 - exécuter les tests browser/XPCShell dans un checkout Thunderbird réel ;
 - compléter la matrice manuelle Windows/Linux pour IMAP, POP, Gmail, Microsoft, boîte unifiée, dossiers virtuels et calendriers ;
@@ -53,9 +53,9 @@
 - corriger les résultats de l’audit lecteur d’écran NVDA/Orca ;
 - finir la traduction des messages techniques rares et des journaux de maintenance.
 
-## 3.3.x — préparation publique
+## 1.1.x — compatibilité et automatisation
 
-- stabiliser l’identifiant public, le nom et la licence ;
+- conserver l’identifiant public, le nom et la licence désormais figés ;
 - figer une plage Thunderbird réellement testée ;
 - ajouter un harnais Thunderbird téléchargeable pour la CI graphique ;
 - préparer captures, notes reviewers, politique de support et procédure de retour arrière.
@@ -65,4 +65,4 @@
 - fournir le code source lisible et les instructions de build reproductible ;
 - joindre la matrice de compatibilité réelle et les hashes SHA-256 ;
 - confirmer la conformité des marques, de la licence et des données personnelles ;
-- publier d’abord une Release Candidate, puis une version stable après validation manuelle.
+- soumettre la version stable 1.0.0 après validation manuelle complète et traiter les retours reviewers sans modifications hors périmètre.

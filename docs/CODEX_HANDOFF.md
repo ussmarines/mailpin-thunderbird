@@ -5,11 +5,11 @@ court afin d’éviter de dupliquer le contexte.
 
 ## État courant
 
-- version de travail : **3.2.13** ;
-- base GitHub : `main` au commit `caab268b187d463f704c3f91cc33ba1038151bcb` ;
+- version publique : **1.0.0** ;
+- base GitHub : `main` au commit `f7497870423683f1bb1622111634a2513c304aa6` ;
 - ID : `pin-mails@MailPerch.local` ;
 - schémas : SQLite 5, paramètres 6, données 6 ;
-- aucune publication distante automatique.
+- une modification de version fusionnée dans `main` déclenche la QA, le build et la release GitHub correspondante.
 
 ## Passe 3.2.4
 
@@ -39,7 +39,7 @@ npm run ci
 
 Puis suivre `docs/MANUAL_TEST_PLAN.md`, particulièrement la section 3.2.4.
 
-## Identité Fluent 3.2.13
+## Identité Fluent 1.0.0
 
 - `extension/styles/tokens.css` est la source visuelle commune et expose des palettes explicites clair/sombre ;
 - `extension/styles/theme.js` synchronise Options et dashboard avec le thème Thunderbird, avec repli `prefers-color-scheme` ;
