@@ -10,6 +10,10 @@ dist/*
 # Local profiles and secrets
 .env
 .env.*
+!.env.example
+!.env.sample
+!.env.template
+!.env.dist
 *.pem
 *.key
 *.p12
@@ -33,3 +37,22 @@ ROUNDTRIP_CI_LOG_*.txt
 
 # Generated only inside reviewer source archives
 .mailperch-source-files.json
+
+# BEGIN managed secret hardening
+auth.json
+credentials.json
+credentials.*.json
+service-account.json
+service-account*.json
+!credentials.example.json
+!service-account.example.json
+.npmrc
+.pypirc
+.netrc
+*.jks
+*.keystore
+*.tfstate
+*.tfstate.*
+secrets/
+.secrets/
+# END managed secret hardening
