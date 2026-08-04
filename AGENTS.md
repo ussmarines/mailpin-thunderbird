@@ -4,10 +4,13 @@ Ce dépôt contient une MailExtension Thunderbird Manifest V3 avec une API Exper
 
 **Ordre de lecture obligatoire pour économiser le contexte :**
 
-1. `PROJECT_MEMORY.md` — état courant, carte complète et procédures ;
-2. `docs/BUG_TRACKER.md` — bugs ouverts, corrigés et validations réelles restantes ;
-3. le fichier `AGENTS.md` le plus proche de la zone modifiée ;
-4. uniquement les fichiers spécialisés indiqués par la mémoire.
+1. `docs/IDENTITY_MIGRATION_REQUIRED.md` — décision canonique et historique de l’identifiant ;
+2. `PROJECT_MEMORY.md` — état courant, carte complète et procédures ;
+3. `docs/BUG_TRACKER.md` — bugs ouverts, corrigés et validations réelles restantes ;
+4. le fichier `AGENTS.md` le plus proche de la zone modifiée ;
+5. uniquement les fichiers spécialisés indiqués par la mémoire.
+
+En cas de contradiction sur l’identité de l’extension, `docs/IDENTITY_MIGRATION_REQUIRED.md`, `extension/manifest.json` et `docs/PROJECT_STATE.json` sont prioritaires sur les anciennes mentions conservées dans la mémoire historique.
 
 ## But du produit
 
@@ -21,7 +24,7 @@ Afficher des messages épinglés dans un panneau distinct au-dessus de la liste 
 4. Aucun réseau, télémétrie, publicité, code distant ou dépendance CDN.
 5. Aucun `eval`, `new Function`, `innerHTML`, `outerHTML` ou HTML construit avec des métadonnées de courrier.
 6. Ne jamais stocker le corps des messages ni le contenu des pièces jointes.
-7. L’identifiant source est `pin-mails@ussmarines.local`. Toute release suivant un changement d’identifiant reste interdite avant validation manuelle de la migration et de la continuité des données Thunderbird.
+7. L’identifiant canonique et sensible à la casse est `pin-mails@MailPerch.local`. Toute modification future doit mettre à jour dans le même changement Git le manifeste, les métadonnées de publication, l’état projet, la documentation et les tests listés dans `docs/IDENTITY_MIGRATION_REQUIRED.md`.
 8. Le tableau de bord doit être ouvert par le background via `tabs.create`; l’Experiment émet `onDashboardRequested`.
 9. Les écritures SQLite doivent rester incrémentales, transactionnelles et sérialisées.
 10. Toute écoute, minuterie, feuille de style, menu et nœud injecté doit être nettoyé dans `onShutdown`/`cleanup`.
@@ -36,7 +39,7 @@ Afficher des messages épinglés dans un panneau distinct au-dessus de la liste 
 - Vérifier les fichiers sensibles par leur chemin, leurs permissions ou leur schéma sans exposer les valeurs.
 - Les secrets restent dans un coffre et sont injectés uniquement à l’exécution. Ils ne passent ni dans les prompts, ni dans les arguments de commande, ni dans les logs, artefacts, captures ou rapports.
 - Tout secret exposé doit être révoqué ou tourné immédiatement, puis l’incident et sa cause doivent être examinés.
-- Utiliser uniquement l’identité publique `ussmarines` et le profil `https://github.com/ussmarines`.
+- Utiliser uniquement l’identité publique `ussmarines` et le profil `https://github.com/ussmarines` pour le mainteneur ; l’identifiant technique de l’extension reste indépendant et lié au produit MailPerch.
 
 ## Carte rapide
 
