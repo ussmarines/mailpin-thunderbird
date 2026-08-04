@@ -7,10 +7,18 @@ MAX_BYTES = 20 * 1024 * 1024
 ALLOWED_ENV = {".env.example", ".env.sample", ".env.template", ".env.dist"}
 FORBIDDEN_NAMES = {".env", ".npmrc", ".pypirc", ".netrc", "auth.json", "credentials.json", "service-account.json", "id_rsa", "id_ed25519"}
 FORBIDDEN_SUFFIXES = {".pem", ".key", ".p12", ".pfx", ".jks", ".keystore", ".tfstate"}
-PRIVATE_KEY_MARKERS = (b"-----BEGIN PRIVATE KEY-----", b"-----BEGIN ENCRYPTED PRIVATE KEY-----", b"-----BEGIN RSA PRIVATE KEY-----", b"-----BEGIN OPENSSH PRIVATE KEY-----", b"-----BEGIN EC PRIVATE KEY-----")
+# Split inert signatures so external scanners do not classify this detector itself as a leak.
+PRIVATE_KEY_MARKERS = (
+    b"-----BEGIN " + b"PRIVATE KEY-----",
+    b"-----BEGIN " + b"ENCRYPTED PRIVATE KEY-----",
+    b"-----BEGIN " + b"RSA PRIVATE KEY-----",
+    b"-----BEGIN " + b"OPENSSH PRIVATE KEY-----",
+    b"-----BEGIN " + b"EC PRIVATE KEY-----",
+)
 FORBIDDEN_IDENTITY_HASHES = {"01e76a28977874f8b72265d0d39fa47c4105083556013f84ded1dad7798d01f7", "ccb810ff1aea7ea61ea5c412bf549ca31b9d217d34357893d0ed97a54303b666", "ec29e4a50ab3326b494e6126f3299ed436b1c24d3c508e364ee48345fc6c7a0b", "a6710e26418bd4c6d2ee839605cd40c313ac3b79e599c1be31aa2bd711c665e3"}
 TOKEN_RE = re.compile(r"[a-z0-9]+")
 ASCII_TOKEN_RE = re.compile(rb"[A-Za-z0-9]{3,}")
+SELF = Path(__file__).resolve()
 def tracked_paths():
     result = subprocess.run(["git", "ls-files", "-z"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return [Path(os.fsdecode(item)) for item in result.stdout.split(b"\0") if item]
@@ -32,7 +40,7 @@ def main():
             data = path.read_bytes()
         except OSError:
             findings.add(f"{path}: unreadable tracked file"); continue
-        if any(marker in data for marker in PRIVATE_KEY_MARKERS): findings.add(f"{path}: private-key material marker")
+        if path.resolve() != SELF and any(marker in data for marker in PRIVATE_KEY_MARKERS): findings.add(f"{path}: private-key material marker")
         if b"\0" in data:
             binary_tokens = [v.decode("ascii", "ignore").lower() for v in ASCII_TOKEN_RE.findall(data)]
             if identity_match(binary_tokens): findings.add(f"{path}: forbidden personal identifier in binary data")
