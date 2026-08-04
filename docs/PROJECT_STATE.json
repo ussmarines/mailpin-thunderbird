@@ -25,7 +25,6 @@
     "options": "extension/options/options.html",
     "dashboard": "extension/dashboard/dashboard.html",
     "projectMemory": "PROJECT_MEMORY.md",
-    "identityHistory": "docs/IDENTITY_MIGRATION_REQUIRED.md",
     "securityBoundary": "docs/SECURITY_BOUNDARY.md",
     "bugTracker": "docs/BUG_TRACKER.md"
   },
