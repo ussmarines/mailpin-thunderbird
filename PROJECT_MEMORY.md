@@ -7,7 +7,8 @@
 > Version publique : **1.1.0**
 > Base de travail vérifiée : `main` au commit `a1e26bee9400279109b447cc80b90b24913b8bca`
 > Produit : **MailPerch — Email Pins & Follow-up**
-> Extension ID public permanent : `pin-mails@MailPerch.local`
+> Extension ID source : `pin-mails@ussmarines.local`
+> Publication : **bloquée** tant que la migration d’identité et la continuité des données Thunderbird ne sont pas validées manuellement.
 
 ## 1. Résumé en 30 secondes
 
@@ -79,7 +80,7 @@ Thunderbird/Gmail forte et reste confirmée par l’utilisateur.
 5. Aucun `eval`, `new Function`, `innerHTML`, `outerHTML` ou HTML construit depuis
    des métadonnées de courrier.
 6. Ne jamais stocker le corps des messages ni le contenu des pièces jointes.
-7. Conserver définitivement l’ID public `pin-mails@MailPerch.local` afin de préserver les installations et les données.
+7. L’ID source est `pin-mails@ussmarines.local`. Toute release suivant un changement d’identité exige un test manuel de migration, persistance, redémarrage et désinstallation dans un profil jetable.
 8. Le dashboard est ouvert par le background avec `tabs.create`.
 9. Les écritures SQLite restent incrémentales, transactionnelles et sérialisées.
 10. Chaque écouteur, observer, timer, popup, feuille de style et nœud injecté doit
@@ -92,6 +93,7 @@ Thunderbird/Gmail forte et reste confirmée par l’utilisateur.
 16. Une désinstallation ferme le stockage avant de purger les données gérées.
 17. Une sentinelle native effacée par Gecko distingue une installation active d’une réinstallation et force la purge avant l’ouverture de SQLite.
 18. Les workflows n’installent aucun helper Python depuis le réseau et toutes les actions externes sont épinglées par SHA.
+19. Les règles de `SECURITY_PRODUCTION_RULES.md` sont obligatoires ; les secrets restent hors du contexte des agents, sont injectés à l’exécution et sont expurgés des logs.
 
 ## 3. État technique courant
 
@@ -177,8 +179,8 @@ Thunderbird/Gmail forte et reste confirmée par l’utilisateur.
 | Build reproductible | `scripts/build.py` | test build |
 | Audit dépôt | `scripts/check_repo.py`, `deep_audit.py` | CI |
 | Cohérence versions | `scripts/check_versions.py` | README/CHANGELOG |
-| Secrets | `scripts/scan_secrets.py` | CI |
-| CI GitHub | `.github/workflows/ci.yml` | `tests/test_cross_platform_ci.py` |
+| Secrets | `scripts/scan_secrets.py`, `.github/scripts/security_guard.py` | CI |
+| CI GitHub | `.github/workflows/ci.yml`, `.github/workflows/security-secrets.yml` | `tests/test_cross_platform_ci.py` |
 | Release candidate | `.github/workflows/release.yml` | `release/` |
 | Bugs connus | `docs/BUG_TRACKER.md` | `scripts/check_bug_tracker.py` |
 
@@ -195,8 +197,7 @@ Thunderbird/Gmail forte et reste confirmée par l’utilisateur.
 - `README.md` / `README.en.md` : présentation et installation.
 - `CHANGELOG.md` : historique des versions.
 - `ROADMAP.md` : priorités encore ouvertes.
-- `SECURITY.md`, `PRIVACY.md`, `NOTICE.md`, `LICENSE` : sécurité, vie privée,
-  marques et licence.
+- `SECURITY.md`, `SECURITY_PRODUCTION_RULES.md`, `PRIVACY.md`, `NOTICE.md`, `LICENSE` : sécurité, vie privée, marques et licence.
 - `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SUPPORT.md` : contribution/support.
 - `BRANDING.md`, `STORE_RELEASE.md`, `THIRD_PARTY_NOTICES.md` : publication.
 - `TEST_PLAN.md` : point d’entrée vers la validation.
@@ -209,6 +210,7 @@ Thunderbird/Gmail forte et reste confirmée par l’utilisateur.
 - `ISSUE_TEMPLATE/*` : bugs, compatibilité, fonctions.
 - `PULL_REQUEST_TEMPLATE.md` : checklist PR.
 - `workflows/ci.yml` : CI Linux/Windows.
+- `workflows/security-secrets.yml` : scan expurgé des secrets et références personnelles.
 - `workflows/release.yml` : build reproductible et release GitHub automatique lors d’un changement de version fusionné dans `main`.
 - `dependabot.yml` : suivi hebdomadaire des GitHub Actions épinglées.
 
@@ -342,9 +344,6 @@ performances et capacités. Il ne doit pas contenir :
 ## 9. Commandes obligatoires
 
 ```bash
-npm run check
-npm test
-npm run build
 npm run ci
 ```
 
@@ -390,6 +389,7 @@ neuf. Le XPI et le ZIP doivent être reproductibles.
 - La matrice fournisseurs doit continuer à être validée sur comptes réels.
 - La localisation de certaines chaînes générées dynamiquement reste perfectible.
 - `implementation.js` demeure volumineux ; tout découpage doit être progressif.
+- Le changement d’identité de l’extension n’est pas considéré comme livrable avant validation manuelle de la continuité des données.
 
 ## 12. Définition de terminé
 
@@ -402,7 +402,6 @@ Une modification est terminée seulement si :
 - les invariants sont respectés ;
 - les tests Thunderbird réellement exécutés sont listés honnêtement ;
 - toute publication distante correspond à une version explicitement préparée et validée.
-
 
 ## Frontière de sécurité 1.0.0
 
