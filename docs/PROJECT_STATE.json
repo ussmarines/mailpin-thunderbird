@@ -7,7 +7,7 @@
     "branch": "main",
     "commit": "a1e26bee9400279109b447cc80b90b24913b8bca"
   },
-  "extensionId": "pin-mails@MailPerch.local",
+  "extensionId": "pin-mails@ussmarines.local",
   "thunderbird": {
     "min": "128.0",
     "max": "153.*"
