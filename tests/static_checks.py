@@ -12,7 +12,7 @@ version = manifest["version"]
 assert manifest["manifest_version"] == 3
 assert version == "1.1.0"
 assert manifest["permissions"] == ["menus"]
-assert manifest["browser_specific_settings"]["gecko"]["id"] == "pin-mails@ussmarines.local"
+assert manifest["browser_specific_settings"]["gecko"]["id"] == "pin-mails@MailPerch.local"
 assert manifest["browser_specific_settings"]["gecko"]["strict_min_version"] == "128.0"
 assert manifest["browser_specific_settings"]["gecko"]["strict_max_version"] == "153.*"
 assert manifest["default_locale"] == "fr"
