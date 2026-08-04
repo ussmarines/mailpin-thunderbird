@@ -7,7 +7,7 @@
     "branch": "main",
     "commit": "a1e26bee9400279109b447cc80b90b24913b8bca"
   },
-  "extensionId": "pin-mails@ussmarines.local",
+  "extensionId": "pin-mails@MailPerch.local",
   "thunderbird": {
     "min": "128.0",
     "max": "153.*"
@@ -25,6 +25,7 @@
     "options": "extension/options/options.html",
     "dashboard": "extension/dashboard/dashboard.html",
     "projectMemory": "PROJECT_MEMORY.md",
+    "identityHistory": "docs/IDENTITY_MIGRATION_REQUIRED.md",
     "securityBoundary": "docs/SECURITY_BOUNDARY.md",
     "bugTracker": "docs/BUG_TRACKER.md"
   },
