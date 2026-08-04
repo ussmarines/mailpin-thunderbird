@@ -1,5 +1,6 @@
 # Limites connues
 
+- Les fonctions 1.1.0 (veille, Aujourd’hui/Revue, rappels interactifs, raccourcis et fusion) sont couvertes automatiquement mais doivent encore être validées dans une session Thunderbird graphique réelle avec messages et comptes.
 - La page Options 3.2.10 a été exécutée dans Thunderbird 153.0.1 avec un profil jetable sans compte ; les cartes `about:3pane` n’ont pas pu être validées sans jeu de messages.
 - Les gardes automatiques valident les contrats, la syntaxe, les modèles, les données et le build, mais ne remplacent pas un clic réel dans `about:3pane`.
 - Les tests XPCShell/Mochitest fournis nécessitent un checkout de développement Thunderbird et ne sont pas exécutés par la CI générique.

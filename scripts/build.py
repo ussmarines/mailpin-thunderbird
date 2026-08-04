@@ -17,6 +17,14 @@ FIXED_TIME = (2026, 1, 1, 0, 0, 0)
 SOURCE_EXCLUDED_GLOBS = ("CI_LOG_*.txt", "ROUNDTRIP_CI_LOG_*.txt")
 XPI_EXCLUDED_NAMES = {"AGENTS.md"}
 SOURCE_FILE_MANIFEST = ".mailperch-source-files.json"
+REVIEWED_ADDITIONAL_FILES = (
+    "SECURITY_AUDIT_1.1.0.md",
+    "VALIDATION_REPORT_1.1.0.md",
+    "extension/api/pinInbox/modules/related.js",
+    "extension/api/pinInbox/modules/review.js",
+    "tests/productivity_1_1_model_tests.mjs",
+    "tests/test_productivity_1_1_features.py",
+)
 
 
 def sha256(path: Path) -> str:
@@ -61,6 +69,11 @@ def tracked_repository_files() -> list[Path]:
             raise SystemExit(f"Build refusé : manifeste source invalide : {error}") from error
         if not isinstance(names, list) or not all(isinstance(name, str) for name in names):
             raise SystemExit("Build refusé : manifeste source invalide")
+
+    if result.returncode == 0:
+        for additional in REVIEWED_ADDITIONAL_FILES:
+            if additional not in names:
+                names.append(additional)
 
     files: list[Path] = []
     for name in names:

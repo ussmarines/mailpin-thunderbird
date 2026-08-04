@@ -5,7 +5,13 @@ const MENU_IDS = Object.freeze({
   conversation: "pin-mails-toggle-conversation",
   dashboard: "pin-mails-dashboard",
   options: "pin-mails-options",
-  undo: "pin-mails-undo"
+  undo: "pin-mails-undo",
+  quickRoot: "pin-mails-quick-root",
+  quickSimple: "pin-mails-quick-simple",
+  quickToday: "pin-mails-quick-today",
+  quickTomorrow: "pin-mails-quick-tomorrow",
+  quickWaiting: "pin-mails-quick-waiting",
+  quickNoReply: "pin-mails-quick-no-reply"
 });
 
 const translate = (key, fallback) => messenger.i18n.getMessage(key) || fallback;
@@ -91,6 +97,20 @@ function createMenus() {
     contexts: ["message_list"]
   });
   messenger.menus.create({
+    id: MENU_IDS.quickRoot,
+    title: translate("menuQuickCapture", "Ajouter au suivi…"),
+    contexts: ["message_list"]
+  });
+  for (const [id, title, preset] of [
+    [MENU_IDS.quickSimple, translate("menuQuickSimple", "Épingler simplement"), "simple"],
+    [MENU_IDS.quickToday, translate("menuQuickToday", "À traiter aujourd’hui"), "today"],
+    [MENU_IDS.quickTomorrow, translate("menuQuickTomorrow", "À traiter demain"), "tomorrow"],
+    [MENU_IDS.quickWaiting, translate("menuQuickWaiting", "Placer en attente"), "waiting"],
+    [MENU_IDS.quickNoReply, translate("menuQuickNoReply", "Relancer si aucune réponse"), "noReply"]
+  ]) {
+    messenger.menus.create({id, parentId: MENU_IDS.quickRoot, title, contexts: ["message_list"], visible: true});
+  }
+  messenger.menus.create({
     id: MENU_IDS.dashboard,
     title: translate("menuDashboard", "Tableau de bord MailPerch"),
     contexts: ["tools_menu"]
@@ -120,7 +140,8 @@ messenger.menus.onShown.addListener(async (_info, tab) => {
       messenger.menus.update(MENU_IDS.conversation, {
         visible: usable && state?.conversationEnabled !== false && Boolean(state?.conversationCount),
         title: conversationMenuTitle(state)
-      })
+      }),
+      messenger.menus.update(MENU_IDS.quickRoot, {visible: usable})
     ]);
     await messenger.menus.refresh();
   } catch (error) {
@@ -147,6 +168,16 @@ messenger.menus.onClicked.addListener(async (info, tab) => {
         return await toggleSelected(tab.id);
       case MENU_IDS.conversation:
         return await toggleConversation(tab.id);
+      case MENU_IDS.quickSimple:
+        return await messenger.pinInbox.quickCaptureSelected(tab.id, "simple");
+      case MENU_IDS.quickToday:
+        return await messenger.pinInbox.quickCaptureSelected(tab.id, "today");
+      case MENU_IDS.quickTomorrow:
+        return await messenger.pinInbox.quickCaptureSelected(tab.id, "tomorrow");
+      case MENU_IDS.quickWaiting:
+        return await messenger.pinInbox.quickCaptureSelected(tab.id, "waiting");
+      case MENU_IDS.quickNoReply:
+        return await messenger.pinInbox.quickCaptureSelected(tab.id, "noReply");
       default:
         return undefined;
     }
@@ -174,6 +205,12 @@ messenger.commands.onCommand.addListener(async (command, tab) => {
         return await messenger.pinInbox.performSelected(tab.id, "planned");
       case "activate-selected-pin":
         return await messenger.pinInbox.performSelected(tab.id, "active");
+      case "snooze-selected-pin":
+        return await messenger.pinInbox.performSelected(tab.id, "snooze");
+      case "track-no-reply-selected":
+        return await messenger.pinInbox.quickCaptureSelected(tab.id, "noReply");
+      case "quick-today-selected":
+        return await messenger.pinInbox.quickCaptureSelected(tab.id, "today");
       default:
         return undefined;
     }

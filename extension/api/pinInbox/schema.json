@@ -90,6 +90,23 @@
         ]
       },
       {
+        "name": "quickCaptureSelected",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "tabId",
+            "type": "integer"
+          },
+          {
+            "name": "preset",
+            "type": "string",
+            "maxLength": 32,
+            "optional": true
+          }
+        ]
+      },
+      {
         "name": "getConfiguration",
         "type": "function",
         "async": true,
@@ -309,6 +326,22 @@
             "name": "options",
             "$ref": "ReferenceActionOptions",
             "optional": true
+          }
+        ]
+      },
+      {
+        "name": "mergeRelatedReferences",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "stableKeys",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 8192
+            },
+            "maxItems": 50
           }
         ]
       },
@@ -695,6 +728,10 @@
             },
             "maxItems": 20,
             "optional": true
+          },
+          "shortcuts": {
+            "type": "any",
+            "optional": true
           }
         },
         "additionalProperties": {
@@ -733,6 +770,11 @@
           "useSmartView": {
             "type": "boolean",
             "optional": true
+          },
+          "reviewMode": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 32
           }
         }
       },
@@ -846,6 +888,10 @@
           "keepWaiting": {
             "type": "boolean",
             "optional": true
+          },
+          "until": {
+            "type": "number",
+            "optional": true
           }
         }
       },
@@ -871,6 +917,14 @@
             "type": "string",
             "optional": true,
             "maxLength": 4096
+          },
+          "rules": {
+            "type": "array",
+            "items": {
+              "type": "any"
+            },
+            "optional": true,
+            "maxItems": 200
           }
         }
       },

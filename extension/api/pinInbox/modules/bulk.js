@@ -9,7 +9,7 @@
     priority: {}, deadline: {}, group: {}, case: {}, template: {},
     trackNoReply: {}, cancelNoReply: {},
     archive: {destructive: true}, delete: {destructive: true}, unpin: {destructive: true},
-    calendar: {single: true}, snooze: {single: true}, setMetadata: {}
+    calendar: {single: true}, snooze: {}, wake: {}, dismissReminder: {}, setMetadata: {}
   });
 
   function normalizeKeys(value, maximum = 5000) {
@@ -71,6 +71,7 @@
         break;
       case "snooze":
         result.durationMs = Math.max(60_000, Math.min(30 * 86400000, Number(source.durationMs) || 3_600_000));
+        if (Number(source.until) > 0) result.until = Number(source.until);
         break;
       default:
         break;

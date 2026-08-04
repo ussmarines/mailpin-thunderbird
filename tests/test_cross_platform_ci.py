@@ -23,9 +23,9 @@ assert "npm run ci" in release
 assert "gh release create" in release
 
 expected_actions = {
-    "actions/checkout": "de0fac2e4500dabe0009e67214ff5f5447ce83dd",
-    "actions/setup-node": "48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e",
-    "actions/setup-python": "a309ff8b426b58ec0e2a45f0f869d46889d02405",
+    "actions/checkout": "3d3c42e5aac5ba805825da76410c181273ba90b1",
+    "actions/setup-node": "820762786026740c76f36085b0efc47a31fe5020",
+    "actions/setup-python": "5fda3b95a4ea91299a34e894583c3862153e4b97",
     "actions/upload-artifact": "043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
 }
 for workflow in (ci, release):

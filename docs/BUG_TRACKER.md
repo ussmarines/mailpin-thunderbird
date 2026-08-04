@@ -4,8 +4,8 @@
 > avant ou pendant sa correction. Codex et les contributeurs doivent lire ce
 > fichier après `PROJECT_MEMORY.md`.
 
-Dernière mise à jour : **2026-08-02**
-Version publique : **1.0.0**
+Dernière mise à jour : **2026-08-04**
+Version publique : **1.1.0**
 
 ## Règles de suivi
 

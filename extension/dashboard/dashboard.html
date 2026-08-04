@@ -29,11 +29,14 @@
     </header>
 
     <section id="stats" class="stats-grid" aria-label="Résumé MailPerch"></section>
+    <section id="reminder-center" class="reminder-center" aria-labelledby="reminder-center-title" hidden></section>
 
     <nav class="view-tabs" aria-label="Vues principales">
-      <button type="button" data-view="list" aria-pressed="true" data-i18n="viewList">Liste</button>
+      <button type="button" data-view="today" aria-pressed="true" data-i18n="viewToday">Aujourd’hui</button>
+      <button type="button" data-view="list" aria-pressed="false" data-i18n="viewList">Liste</button>
       <button type="button" data-view="kanban" aria-pressed="false" data-i18n="viewKanban">Kanban</button>
       <button type="button" data-view="cases" aria-pressed="false" data-i18n="viewCases">Affaires</button>
+      <button type="button" data-view="review" aria-pressed="false" data-i18n="viewReview">Revue</button>
       <button type="button" data-view="history" aria-pressed="false" data-i18n="viewHistory">Historique</button>
       <button type="button" data-view="health" aria-pressed="false" data-i18n="viewHealth">Centre de santé</button>
     </nav>
@@ -63,6 +66,7 @@
               <optgroup label="Suivi">
                 <option value="active" data-i18n="statusActive">À traiter</option><option value="waiting" data-i18n="statusWaiting">En attente</option><option value="planned" data-i18n="statusPlanned">Planifier</option><option value="complete" data-i18n="statusComplete">Terminer</option>
                 <option value="trackNoReply" data-i18n="trackNoReply">Me relancer si aucune réponse</option><option value="cancelNoReply" data-i18n="cancelNoReplyTracking">Arrêter le suivi sans réponse</option>
+                <option value="snooze" data-i18n="bulkSnooze">Mettre en veille</option><option value="wake" data-i18n="bulkWake">Réveiller</option>
                 <option value="priority" data-i18n="changePriority">Changer la priorité</option><option value="deadline" data-i18n="changeDeadline">Changer l’échéance</option>
               </optgroup>
               <optgroup label="Organisation">
@@ -74,6 +78,7 @@
             </select></label>
             <label id="bulk-priority-wrap" hidden><span class="visually-hidden" data-i18n="priority">Priorité</span><select id="bulk-priority"><option value="normal" data-i18n="priorityNormal">Normale</option><option value="high" data-i18n="priorityHigh">Haute</option><option value="urgent" data-i18n="priorityUrgent">Urgente</option></select></label>
             <label id="bulk-deadline-wrap" hidden><span class="visually-hidden" data-i18n="deadline">Échéance</span><input id="bulk-deadline" type="datetime-local"></label>
+            <label id="bulk-snooze-wrap" hidden><span class="visually-hidden" data-i18n="snoozeDuration">Durée de veille</span><select id="bulk-snooze"><option value="3600000" data-i18n="snoozeOneHour">Reporter d’une heure</option><option value="tomorrow" data-i18n="snoozeOneDay">Jusqu’à demain</option><option value="604800000" data-i18n="snoozeOneWeek">Pendant une semaine</option></select></label>
             <label id="bulk-group-wrap" hidden><span class="visually-hidden" data-i18n="group">Groupe</span><select id="bulk-group"></select></label>
             <label id="bulk-case-wrap" hidden><span class="visually-hidden" data-i18n="case">Affaire</span><select id="bulk-case"></select></label>
             <label id="bulk-template-wrap" hidden><span class="visually-hidden" data-i18n="template">Modèle</span><select id="bulk-template"></select></label>
@@ -81,9 +86,11 @@
           </div>
         </section>
 
-        <section id="items" class="items" aria-label="Messages épinglés"></section>
+        <section id="today" class="focus-board" aria-label="Aujourd’hui"></section>
+        <section id="items" class="items" aria-label="Messages épinglés" hidden></section>
         <section id="kanban" class="kanban" aria-label="Vue Kanban" hidden></section>
         <section id="cases" class="case-board" aria-label="Affaires" hidden></section>
+        <section id="review" class="review-board" aria-label="Revue de suivi" hidden></section>
         <section id="history" class="history-board" aria-label="Historique" hidden></section>
         <section id="health" class="health-board" aria-label="Centre de santé" hidden></section>
       </div>

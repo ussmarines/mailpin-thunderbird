@@ -737,7 +737,12 @@ pre, #rule-simulation {
 }
 .import-export-panel > :last-child, .import-preview { grid-column: 1 / -1; }
 .import-preview { display: grid; gap: var(--space-3); }
-.shortcut-row { display: grid; grid-template-columns: minmax(12rem, 1fr) auto; gap: var(--space-3); align-items: end; }
+.shortcut-list { display: grid; gap: var(--space-2); }
+.shortcut-item { display: grid; grid-template-columns: minmax(15rem, 1fr) minmax(11rem, 18rem); gap: var(--space-4); align-items: center; padding: var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-raised); }
+.shortcut-item > span { display: grid; gap: .15rem; }
+.shortcut-item small { color: var(--muted); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: .72rem; }
+.shortcut-item input { width: 100%; }
+.shortcut-row { display: flex; justify-content: flex-end; gap: var(--space-3); align-items: center; }
 
 .form-footer {
   display: flex;
@@ -855,7 +860,10 @@ body[data-reduce-motion="always"] *, body[data-reduce-motion="always"] *::before
   .setting-grid.three-columns, .toggle-grid, .feature-map { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 780px) {
-  .group-editor-row, .account-header, .shortcut-row, .import-export-panel { grid-template-columns: 1fr; }
+  .group-editor-row, .account-header, .import-export-panel { grid-template-columns: 1fr; }
+  .shortcut-item { grid-template-columns: 1fr; }
+  .shortcut-row { justify-content: stretch; }
+  .shortcut-row button { width: 100%; }
   .group-drag { display: none; }
   .entity-actions { justify-content: flex-start; }
   .button-row > .button-help-wrap { max-width: 100%; }

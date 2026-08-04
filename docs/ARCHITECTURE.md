@@ -16,6 +16,8 @@ Experiment privilégié pinInbox
        ├── modules/rules.js          validation et anti-boucle
        ├── modules/calendar.js       métadonnées Agenda
        ├── modules/bulk.js           validation des actions groupées
+       ├── modules/review.js         plan Aujourd’hui et revues périodiques
+       ├── modules/related.js        détection et fusion prudente des doublons
        ├── modules/diagnostics.js    journal borné et expurgation
        ├── modules/health.js         score et anomalies locales
        ├── modules/localization.js   chaînes de l’interface injectée
@@ -28,18 +30,20 @@ Experiment privilégié pinInbox
 ## Frontières de confiance
 
 - Les pages `options/` et `dashboard/` sont des pages d’extension non privilégiées.
-- `background.js` expose les points d’entrée publics et ouvre le dashboard avec `tabs.create`.
+- `background.js` expose les points d’entrée publics, les menus de capture rapide et ouvre le dashboard avec `tabs.create`.
 - L’Experiment manipule l’interface interne, les en-têtes de messages, SQLite et l’Agenda.
 - Les paramètres et retours traversant l’API sont normalisés et doivent rester clonables.
 - Les imports sont analysés avant écriture, les clés dangereuses sont rejetées et une restauration crée une sauvegarde de sécurité.
 
 ## Barrière de sécurité de l’API Experiment
 
-L’API `pinInbox` est une frontière privilégiée et ne fait jamais confiance aux objets provenant des pages Options ou Dashboard. Le schéma borne les collections et les chaînes ; l’implémentation applique en plus une validation récursive, refuse les clés de pollution de prototype, limite profondeur/taille/nombre de nœuds et normalise chaque action avant tout accès à Thunderbird, SQLite, Agenda ou au système de fichiers.
+L’API `pinInbox` est une frontière privilégiée et ne fait jamais confiance aux objets provenant des pages Options ou Dashboard. Le schéma borne les collections et les chaînes ; l’implémentation applique en plus une validation récursive, refuse les clés de pollution de prototype, limite profondeur, taille et nombre de nœuds, puis normalise chaque action avant tout accès à Thunderbird, SQLite, Agenda ou au système de fichiers.
 
 Il n’existe aucun rôle administrateur dans le produit. Les pages d’extension peuvent demander uniquement les opérations exposées par `schema.json`. Les chemins de sauvegarde sont modifiés exclusivement par le sélecteur natif privilégié ; `setConfiguration` conserve toujours le chemin déjà validé.
 
 Les imports sont des données non fiables : les automatismes, règles actives, liens Agenda et chemins locaux sont neutralisés avant persistance. Le diagnostic remplace les identités de comptes et calendriers par des libellés anonymes.
+
+Les nouvelles opérations de productivité restent fermées et bornées : 500 références au maximum pour une action groupée, 50 pour une fusion. Une fusion exige une identité forte commune fournie par Thunderbird ou Gmail ; une ressemblance d’objet ne suffit jamais. L’interface demande une confirmation et l’Experiment refuse les conflits Agenda non résolus.
 
 ## Désinstallation
 
@@ -52,18 +56,27 @@ Avant toute lecture de préférences ou ouverture de SQLite, l’Experiment vér
 `_setupAbout3Pane()` injecte :
 
 - l’interrupteur du panneau ;
-- la section Épinglés et ses vues intelligentes ;
+- la section Épinglés et ses vues intelligentes, dont la veille ;
 - l’en-tête « Tous les messages » ;
 - les boutons de punaise des lignes natives ;
 - les cartes, actions rapides, sélection multiple et actions groupées ;
+- un centre de rappels local et interactif ;
 - un `menupopup` Thunderbird natif ;
 - l’éditeur de métadonnées et l’indicateur de santé discret.
 
 Le rendu utilise une signature de liste et un cache de cartes par `stableKey`. Au-delà du seuil configuré, seule une première tranche est montée puis l’utilisateur peut charger la suite. Le clic sur une carte utilise le volet de lecture et ne doit pas faire défiler la liste native.
 
+Le centre de rappels ne lance aucune action destructive ni aucun envoi. Il permet uniquement d’ouvrir, terminer, reporter ou acquitter une alerte via les méthodes validées de l’Experiment.
+
 ## Tableau de bord et paramètres
 
-Le dashboard regroupe liste, vues intelligentes, Kanban, affaires, historique, actions groupées, matrice fournisseurs et centre de santé. Les paramètres utilisent une navigation groupée, une recherche, des aides sous chaque contrôle et des notifications fixes mais non bloquantes.
+Le dashboard s’ouvre sur **Aujourd’hui** et regroupe aussi liste, vues intelligentes, Kanban, affaires, revue quotidienne ou hebdomadaire, historique, actions groupées, rappels interactifs, détection des conversations associées, matrice fournisseurs et centre de santé.
+
+Les vues Aujourd’hui et Revue sont dérivées à la demande depuis les références : échéances, suivis sans réponse, réveils de veille, éléments en attente et inactivité. Elles ne créent pas de copie des messages.
+
+La détection des éléments associés produit uniquement des propositions. La fusion est déclenchée par l’utilisateur, confirmée dans le dashboard, validée à nouveau dans l’Experiment et enregistrée dans la pile d’annulation.
+
+Les paramètres utilisent une navigation groupée, une recherche, des aides sous chaque contrôle, un aperçu des règles avant enregistrement et des notifications fixes mais non bloquantes. Les dix commandes MailPerch sont personnalisables avec l’API `commands` de Thunderbird et sont incluses dans les exports de configuration.
 
 Le bouton injecté émet `pinInbox.onDashboardRequested`; le background ouvre la page d’extension avec `messenger.tabs.create`, afin de conserver le bon principal de sécurité.
 
@@ -79,24 +92,27 @@ Le bouton injecté émet `pinInbox.onDashboardRequested`; le background ouvre la
 - sauvegarde obligatoire avant migration et restauration ;
 - préférence de secours limitée.
 
-Le nom historique de la base est conservé pour la migration.
+Le nom historique de la base est conservé pour la migration. Les champs 1.1.0 sont optionnels et normalisés avec une valeur sûre, ce qui préserve les données 1.0.0 sans migration destructive.
 
 ## Diagnostic et confidentialité
 
 Le diagnostic est désactivable, borné entre 50 et 500 entrées et filtré par niveau. L’export ne doit contenir ni corps de message, ni pièce jointe, ni adresse brute, ni chemin local sensible. Les données ne quittent pas le poste.
+
+Les fonctions 1.1.0 n’ajoutent aucune connexion réseau, dépendance d’exécution distante, télémétrie ou secret. Les résumés de revue et groupes associés sont calculés localement à partir des métadonnées déjà disponibles.
 
 ## Événements
 
 - observateur de données inter-fenêtres via `Services.obs` ;
 - notifications de dossiers pour ajout, suppression, déplacement/copie et changement de clé IMAP ;
 - détection des messages sortants et réponses entrantes pour le suivi sans réponse ;
+- minuterie locale de rappels, réveils et récurrences ;
 - observateurs Agenda lorsque la synchronisation bidirectionnelle est activée ;
 - nettoyage systématique des observateurs, popups, timers et nœuds à la fermeture.
 
 ## Isolation des préférences visuelles
 
-- `uiPreset` est appliqué uniquement à `options/options.html` via `body[data-ui-preset]`.
-- `density` est appliqué uniquement au panneau d’épingles via `pin-mails-density`.
+- `uiPreset` est appliqué uniquement à `options/options.html` via `body[data-ui-preset]` ;
+- `density` est appliqué uniquement au panneau d’épingles via `pin-mails-density` ;
 - aucune préférence MailPerch ne doit modifier la hauteur virtuelle `ThreadCard` de Thunderbird ;
 - étoile, punaise et menu sont positionnés dans un rail d’actions centré sans changer le modèle de données natif.
 

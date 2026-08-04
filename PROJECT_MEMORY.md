@@ -4,8 +4,8 @@
 > Lire ce document avant tout autre fichier. Il donne l’état courant, les invariants,
 > la carte du dépôt et les chemins exacts à ouvrir selon la tâche.
 >
-> Version publique : **1.0.0**
-> Base de travail vérifiée : `main` au commit `f7497870423683f1bb1622111634a2513c304aa6`
+> Version publique : **1.1.0**
+> Base de travail vérifiée : `main` au commit `a1e26bee9400279109b447cc80b90b24913b8bca`
 > Produit : **MailPerch — Email Pins & Follow-up**
 > Extension ID public permanent : `pin-mails@MailPerch.local`
 
@@ -55,12 +55,20 @@ structure accessible aux affaires, modèles et règles, et bloque toute créatio
 Agenda d’affaire sans titre, date, type et calendrier compatible ; l’Experiment
 applique les mêmes validations et ne crée plus une échéance artificielle.
 
-La version publique 1.0.0 applique l’identité Fluent 2 aux paramètres,
+La version publique 1.0.0 appliquait l’identité Fluent 2 aux paramètres,
 au dashboard et au panneau natif via `extension/styles/tokens.css`. Un pont local
 `extension/styles/theme.js` suit le thème courant de Thunderbird et utilise le
 thème système comme repli. Les en-têtes donnent désormais une vraie place au logo,
 les surfaces, boutons, champs et états disposent d’une hiérarchie claire, tandis
 que les identifiants, comportements, données et géométrie native restent inchangés.
+
+La version publique 1.1.0 ajoute une couche de productivité sans réseau ni nouveau
+schéma de données : suivi automatique sans réponse, mise en veille réelle, vue
+Aujourd’hui, revue quotidienne/hebdomadaire, rappels interactifs, actions groupées
+étendues, capture rapide, aperçu des règles, dix raccourcis personnalisables et
+fusion prudente des conversations. Les décisions de revue et de fusion sont isolées
+dans `modules/review.js` et `modules/related.js` ; une fusion exige une identité
+Thunderbird/Gmail forte et reste confirmée par l’utilisateur.
 
 ## 2. Invariants non négociables
 
@@ -89,7 +97,7 @@ que les identifiants, comportements, données et géométrie native restent inch
 
 | Élément | Valeur |
 |---|---|
-| Version extension/package | `1.0.0` |
+| Version extension/package | `1.1.0` |
 | Thunderbird déclaré | `128.0` à `153.*` |
 | Manifest | MV3 |
 | Permission WebExtension | `menus` uniquement |
@@ -157,6 +165,8 @@ que les identifiants, comportements, données et géométrie native restent inch
 | Performance/cache | `modules/performance.js` | rendu du panneau |
 | Fournisseurs | `modules/providers.js` | matrice comptes/calendriers |
 | Vues intelligentes | `modules/smart.js` | panneau/dashboard |
+| Revue Aujourd’hui/hebdomadaire | `modules/review.js` | dashboard + rappels |
+| Conversations associées | `modules/related.js` | détection/fusion confirmée |
 | Style panneau et liste native | `extension/styles/pin.css` | `docs/UI_SPEC.md` |
 | Bootstrap paramètres | `extension/options/options-bootstrap.js` | capture terminale + chargement des dépendances |
 | Paramètres HTML | `extension/options/options.html` | `options-bootstrap.js`, `options.js`, `options.css` |

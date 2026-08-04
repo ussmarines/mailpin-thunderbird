@@ -49,7 +49,7 @@ npm run build
 npm run ci
 ```
 
-Le rapport courant est [SECURITY_AUDIT_1.0.0.md](SECURITY_AUDIT_1.0.0.md).
+Le rapport courant est [SECURITY_AUDIT_1.1.0.md](SECURITY_AUDIT_1.1.0.md).
 
 ## Limite importante
 

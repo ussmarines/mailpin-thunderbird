@@ -6,7 +6,7 @@
 **Épinglez, organisez et suivez vos e-mails importants dans Thunderbird.**
 
 [![QA](https://github.com/ussmarines/mailperch-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailperch-thunderbird/actions/workflows/ci.yml)
-![Release](https://img.shields.io/badge/release-v1.0.0-0078D4)
+![Release](https://img.shields.io/badge/release-v1.1.0-0078D4)
 ![Licence](https://img.shields.io/badge/licence-MailPerch%20Source--Available%201.0-6A5ACD)
 </div>
 
@@ -15,15 +15,16 @@ MailPerch ajoute à Thunderbird un panneau d’épingles distinct au-dessus de l
 ## Fonctionnalités
 
 - épinglage d’un message ou d’une conversation, indépendamment de l’étoile native ;
-- suivis, échéances, rappels et états de traitement ;
-- groupes, affaires, modèles, règles locales et vues intelligentes ;
+- suivi automatique des réponses, échéances, rappels interactifs et mise en veille ;
+- vues **Aujourd’hui** et **Revue**, actions groupées et capture rapide depuis un message ;
+- groupes, affaires, modèles, règles locales avec aperçu et vues intelligentes ;
 - création de tâches et d’événements dans les calendriers Thunderbird compatibles ;
 - tableau de bord, Kanban, historique et centre de santé local ;
 - sauvegarde, restauration et diagnostics expurgés.
 
 ## Compatibilité
 
-- **MailPerch :** `1.0.0` ;
+- **MailPerch :** `1.1.0` ;
 - **Thunderbird :** `128.0` à `153.*` ;
 - **Format :** MailExtension Manifest V3 ;
 - **Langues :** français et anglais ;
@@ -37,12 +38,12 @@ MailPerch utilise une API Experiment privilégiée pour intégrer son panneau à
 
 ### Depuis une release GitHub
 
-1. Téléchargez `MailPerch_v1.0.0.xpi` depuis la release `v1.0.0`.
+1. Téléchargez `MailPerch_v1.1.0.xpi` depuis la release `v1.1.0`.
 2. Dans Thunderbird, ouvrez **Extensions et thèmes**.
 3. Dans le menu de l’engrenage, choisissez **Installer un module depuis un fichier**.
 4. Sélectionnez le fichier XPI, puis redémarrez Thunderbird si nécessaire.
 
-> Les anciennes builds internes `3.2.x` utilisaient un numéro supérieur à la première version publique. Pour tester `1.0.0` après une build de développement, utilisez un profil de test propre ou désinstallez d’abord l’ancienne build après avoir exporté vos données MailPerch.
+> Les anciennes builds internes `3.2.x` utilisaient un numéro supérieur à la première version publique. Pour tester `1.1.0` après une build de développement, utilisez un profil de test propre ou désinstallez d’abord l’ancienne build après avoir exporté vos données MailPerch.
 
 ### Depuis les sources
 
@@ -60,7 +61,7 @@ MailPerch fonctionne localement : aucun appel réseau, aucune télémétrie, auc
 
 - [Politique de confidentialité](PRIVACY.md)
 - [Politique de sécurité](SECURITY.md)
-- [Audit de sécurité 1.0.0](SECURITY_AUDIT_1.0.0.md)
+- [Audit de sécurité 1.1.0](SECURITY_AUDIT_1.1.0.md)
 - [Limites connues](docs/KNOWN_LIMITATIONS.md)
 
 ## Documentation et support

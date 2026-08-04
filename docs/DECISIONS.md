@@ -76,3 +76,15 @@ La barre fixe peut rester hors du formulaire dans le DOM, mais ses boutons cible
 ## Le suivi des bugs est permanent
 
 `docs/BUG_TRACKER.md` est la source unique des bugs reproduits. Un correctif graphique reste `À VALIDER` tant qu’il n’a pas été confirmé dans Thunderbird réel. La CI valide la structure du registre sans effacer son historique.
+
+## 2026-08-04 — productivité 1.1.0 sans nouvelle permission
+
+Les fonctions Aujourd’hui, Revue, veille, rappels interactifs, capture rapide, actions groupées et raccourcis réutilisent l’API Experiment existante et la permission `menus`. Aucune permission réseau, de message supplémentaire ou dépendance d’exécution n’est ajoutée. Les projections quotidiennes et hebdomadaires sont calculées depuis les métadonnées locales au lieu de créer une seconde base de tâches.
+
+## 2026-08-04 — fusion uniquement sur identité forte
+
+MailPerch peut proposer le regroupement d’épingles uniquement lorsqu’elles partagent, dans le même compte, un fil Gmail, un Message-ID racine, un `threadId` Thunderbird ou une clé de conversation dérivée de ces identités. L’objet seul est interdit comme preuve. La fusion reste manuelle, confirmée, bornée à 50 éléments, annulable et refusée en cas de liens Agenda distincts.
+
+## 2026-08-04 — état explicite des rappels interactifs
+
+Un rappel possède un horodatage de déclenchement et un horodatage d’acquittement distincts. Cette séparation permet de conserver un rappel récurrent visible jusqu’à une action utilisateur, de reporter sans dupliquer et d’ignorer sans supprimer l’épingle. Le centre de rappels n’envoie, ne déplace et ne supprime jamais de message.

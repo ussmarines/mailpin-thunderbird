@@ -8,6 +8,7 @@
     {id: "week", labelKey: "smartViewWeek", fallback: "Cette semaine"},
     {id: "waiting", labelKey: "smartViewWaiting", fallback: "En attente"},
     {id: "noReply", labelKey: "smartViewNoReply", fallback: "Relances sans réponse"},
+    {id: "snoozed", labelKey: "smartViewSnoozed", fallback: "En veille"},
     {id: "noDue", labelKey: "smartViewNoDue", fallback: "Sans échéance"},
     {id: "unread", labelKey: "smartViewUnread", fallback: "Non lus"},
     {id: "missing", labelKey: "smartViewMissing", fallback: "Messages introuvables"},
@@ -33,6 +34,7 @@
     const due = dueFor(ref);
     const {tomorrow, week} = boundaries(now);
     if (ref?.completedAt || ref?.workflowStatus === "completed") return "recentCompleted";
+    if (Number(ref?.snoozeUntil || 0) > now) return "snoozed";
     if (ref?.missingSince || context.missing) return "missing";
     if (ref?.calendarSyncError || context.calendarError) return "calendarError";
     if (ref?.noReplyTracking && ref?.noReplyAt && ref.noReplyAt <= now) return "noReply";
@@ -51,6 +53,9 @@
     const due = dueFor(ref);
     const {tomorrow, week, recent} = boundaries(now);
     const completed = Boolean(ref?.completedAt || ref?.workflowStatus === "completed");
+    const snoozed = !completed && Number(ref?.snoozeUntil || 0) > now;
+    if (id === "snoozed") return snoozed;
+    if (id !== "all" && snoozed) return false;
     switch (id) {
       case "active": return !completed && (ref?.workflowStatus || "active") === "active";
       case "completed": return completed;

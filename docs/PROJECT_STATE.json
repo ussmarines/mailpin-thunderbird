@@ -2,10 +2,10 @@
   "format": "mailperch-project-state",
   "version": 1,
   "project": "MailPerch — Email Pins & Follow-up",
-  "extensionVersion": "1.0.0",
+  "extensionVersion": "1.1.0",
   "baseGitHub": {
     "branch": "main",
-    "commit": "f7497870423683f1bb1622111634a2513c304aa6"
+    "commit": "a1e26bee9400279109b447cc80b90b24913b8bca"
   },
   "extensionId": "pin-mails@MailPerch.local",
   "thunderbird": {
@@ -71,7 +71,10 @@
     "imports and restores",
     "uninstall lifecycle",
     "privileged API input validation",
-    "settings save/cancel lifecycle"
+    "settings save/cancel lifecycle",
+    "interactive reminders",
+    "snooze lifecycle",
+    "related-conversation merge"
   ],
   "security": {
     "uninstallLifecycle": "AddonManager early signal + awaited Gecko Management uninstall purge + core-cleared ExtensionStorage reinstall sentinel",

@@ -179,7 +179,7 @@
     settings.settingsExperience = enumValue(source.settingsExperience, new Set(["guided", "advanced"]), settings.settingsExperience);
     settings.reduceMotion = enumValue(source.reduceMotion, new Set(["auto", "always", "never"]), settings.reduceMotion);
     settings.diagnosticLevel = enumValue(source.diagnosticLevel, new Set(["debug", "info", "warning", "error"]), settings.diagnosticLevel);
-    settings.defaultSmartView = enumValue(source.defaultSmartView, new Set(["all", "today", "overdue", "week", "waiting", "noReply", "noDue", "unread", "missing", "calendarError", "recentCompleted"]), settings.defaultSmartView);
+    settings.defaultSmartView = enumValue(source.defaultSmartView, new Set(["all", "today", "overdue", "week", "waiting", "noReply", "snoozed", "noDue", "unread", "missing", "calendarError", "recentCompleted"]), settings.defaultSmartView);
     settings.panelScope = enumValue(source.panelScope, new Set(["currentInbox", "currentAccount", "global"]), settings.panelScope);
     settings.sortMode = enumValue(source.sortMode, new Set(["manual", "pinnedAt", "messageDate", "sender", "account", "deadline", "priority"]), settings.sortMode);
     settings.density = enumValue(source.density, new Set(["compact", "normal", "comfortable"]), settings.density);

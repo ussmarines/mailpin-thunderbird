@@ -417,3 +417,28 @@ Attendu : `centerDelta ≤ 1`, cibles entièrement dans la carte, espace inféri
 `≥ 8` quand la hauteur le permet, aucun recouvrement avec le menu ou la pièce
 jointe, et une cible correcte pour `pinHit`/`starHit`. Joindre les résultats à
 MP-2026-004/005/007 avant de modifier leur statut.
+## Validation manuelle 1.1.0 — productivité
+
+Utiliser un profil de test avec au moins deux comptes, plusieurs conversations, un
+calendrier inscriptible et des messages envoyés/reçus réels.
+
+1. **Suivi sans réponse** — épingler une conversation, envoyer une réponse, vérifier
+   le passage en attente et l’échéance ; recevoir une réponse et vérifier l’annulation.
+2. **Veille** — mettre une et plusieurs épingles en veille, vérifier leur retrait des
+   vues actives, la vue « En veille », le réveil manuel et la réapparition automatique.
+3. **Aujourd’hui/Revue** — vérifier chaque section, le basculement quotidien/hebdomadaire,
+   le redémarrage de Thunderbird et la persistance de la vue choisie.
+4. **Rappels interactifs** — déclencher un rappel puis tester Ouvrir, Terminer, Reporter
+   d’une heure, Reporter à demain et Ignorer dans le dashboard et le panneau.
+5. **Actions groupées** — sélection simple, Ctrl/Cmd-clic, Maj-clic, sélection visible,
+   veille/réveil, statuts, priorité, échéance, groupe, affaire et confirmations destructives.
+6. **Capture rapide** — tester les cinq préréglages du menu contextuel sur un ou plusieurs
+   messages et confirmer que les compteurs natifs lu/non-lu/nouveaux ne changent pas.
+7. **Règles** — modifier une règle sans enregistrer, simuler, vérifier les exemples et
+   les comptes, puis enregistrer et confirmer que le résultat actif correspond.
+8. **Raccourcis** — attribuer, supprimer, exporter, restaurer et exécuter les dix commandes ;
+   vérifier les conflits refusés proprement par Thunderbird.
+9. **Fusion** — fusionner uniquement un groupe proposé ; vérifier notes, priorité, dates,
+   Agenda et historique. Confirmer qu’aucune suggestion n’est faite sur le seul objet.
+10. **Régression** — clic droit, désépinglage, Agenda, paramètres, thèmes, zoom 200 %,
+    lecteur d’écran, clavier seul, comptes IMAP/POP et dossiers virtuels.

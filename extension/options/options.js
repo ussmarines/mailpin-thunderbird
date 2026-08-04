@@ -33,6 +33,18 @@ const INITIALIZATION_TIMEOUTS = Object.freeze({
   calendar: 7_000,
   auxiliary: 7_000
 });
+const COMMANDS = Object.freeze([
+  ["toggle-pin-selected", "commandToggle", "Épingler ou désépingler la sélection"],
+  ["toggle-conversation-selected", "commandConversation", "Épingler ou désépingler la conversation"],
+  ["complete-selected-pin", "commandComplete", "Marquer la sélection comme terminée"],
+  ["wait-selected-pin", "commandWait", "Placer la sélection en attente"],
+  ["plan-selected-pin", "commandPlan", "Planifier la sélection"],
+  ["activate-selected-pin", "commandActivate", "Remettre la sélection à traiter"],
+  ["snooze-selected-pin", "commandSnooze", "Mettre la sélection en veille"],
+  ["track-no-reply-selected", "commandTrackNoReply", "Activer le suivi sans réponse"],
+  ["quick-today-selected", "commandQuickToday", "Ajouter la sélection à aujourd’hui"],
+  ["open-pin-dashboard", "commandDashboard", "Ouvrir le tableau de bord"]
+]);
 const SETTINGS_REGISTRY_AVAILABLE = Boolean(
   globalThis.PinSettings?.DEFAULTS &&
   typeof globalThis.PinSettings.normalize === "function" &&
@@ -669,17 +681,47 @@ function uniqueEntityId(prefix, items) {
   return candidate;
 }
 
-async function getShortcut() {
+async function getShortcuts() {
   try {
     const commands = await withTimeout(
       () => globalThis.messenger?.commands?.getAll?.() || Promise.reject(new Error("Les raccourcis MailPerch sont indisponibles.")),
       INITIALIZATION_TIMEOUTS.shortcut,
       "shortcut"
     );
-    return commands.find(c => c.name === "toggle-pin-selected")?.shortcut || "";
+    return Object.fromEntries(commands.map(command => [String(command.name || ""), String(command.shortcut || "")]));
   } catch {
-    return "Alt+P";
+    return {"toggle-pin-selected": "Alt+P"};
   }
+}
+
+async function getShortcut() {
+  return (await getShortcuts())["toggle-pin-selected"] || "";
+}
+
+function renderShortcuts(values = {}) {
+  const host = $("shortcut-list");
+  if (!host) return;
+  host.replaceChildren();
+  for (const [name, labelKey, fallback] of COMMANDS) {
+    const label = node("label", "shortcut-item");
+    const copy = node("span", "");
+    copy.append(node("strong", "", msg(labelKey) || fallback), node("small", "", name));
+    const input = document.createElement("input");
+    input.type = "text";
+    input.dataset.commandName = name;
+    input.value = String(values[name] || "");
+    input.autocomplete = "off";
+    input.spellcheck = false;
+    input.setAttribute("aria-label", msg(labelKey) || fallback);
+    if (name === "toggle-pin-selected") input.id = "shortcut";
+    label.append(copy, input);
+    host.append(label);
+  }
+}
+
+function collectShortcuts() {
+  return Object.fromEntries([...document.querySelectorAll("#shortcut-list [data-command-name]")]
+    .map(input => [input.dataset.commandName, input.value.trim()]));
 }
 
 async function withBusy(control, message, task) {
@@ -1170,8 +1212,12 @@ function renderImportPreview(preview, configurationData) {
     try {
       await withBusy(control, "Restauration en cours…", async () => {
         await messenger.pinInbox.restoreConfiguration(configurationData, strategy);
-        if (typeof configurationData.shortcut === "string") {
-          await messenger.commands.update({name: "toggle-pin-selected", shortcut: configurationData.shortcut}).catch(() => {});
+        const restoredShortcuts = configurationData.shortcuts && typeof configurationData.shortcuts === "object"
+          ? configurationData.shortcuts
+          : (typeof configurationData.shortcut === "string" ? {"toggle-pin-selected": configurationData.shortcut} : {});
+        for (const [name, shortcut] of Object.entries(restoredShortcuts)) {
+          if (!COMMANDS.some(([commandName]) => commandName === name)) continue;
+          await messenger.commands.update({name, shortcut: String(shortcut || "").slice(0, 64)}).catch(() => {});
         }
         await reload();
       });
@@ -1242,7 +1288,7 @@ async function applyConfiguration(config) {
     control.dataset.settingMigration = PinSettings.MIGRATION_STRATEGY;
     if (entry.dependency) control.dataset.settingDependency = entry.dependency;
   }
-  $("shortcut").value = config.shortcut || "Alt+P";
+  renderShortcuts(config.shortcuts || {"toggle-pin-selected": config.shortcut || "Alt+P"});
   groups = (config.groups || []).map(item => ({...item}));
   rules = (config.rules || []).map(item => ({...item}));
   cases = (config.cases || []).map(item => ({...item}));
@@ -1303,8 +1349,9 @@ async function refreshOptionalConfiguration(config) {
 
 async function reload({preserveEdits = false} = {}) {
   const config = await fetchConfigurationWithRetry();
-  const shortcut = await getShortcut();
-  config.shortcut = shortcut;
+  const shortcuts = await getShortcuts();
+  config.shortcuts = shortcuts;
+  config.shortcut = shortcuts["toggle-pin-selected"] || "";
   if (preserveEdits && configuration) {
     configuration = {
       ...configuration,
@@ -1407,6 +1454,7 @@ async function saveAll(event = null) {
       return {
         ...persisted,
         settings: {...persisted.settings},
+        shortcuts: await getShortcuts(),
         shortcut: await getShortcut()
       };
     });
@@ -1452,14 +1500,14 @@ async function discardChanges(event = null) {
 
 async function saveShortcut(event) {
   try {
-    await withBusy(event?.currentTarget || $("save-shortcut"), "Enregistrement du raccourci…", async () => {
-      await messenger.commands.update({
-        name: "toggle-pin-selected",
-        shortcut: $("shortcut").value.trim()
-      });
-      $("shortcut").value = await getShortcut();
+    await withBusy(event?.currentTarget || $("save-shortcut"), "Enregistrement des raccourcis…", async () => {
+      const requested = collectShortcuts();
+      for (const [name, shortcut] of Object.entries(requested)) {
+        await messenger.commands.update({name, shortcut});
+      }
+      renderShortcuts(await getShortcuts());
     });
-    setStatus("Raccourci enregistré.", "success");
+    setStatus("Raccourcis enregistrés.", "success");
   } catch (error) {
     setStatus(`Raccourci refusé : ${error.message || error}`, "error");
   }
@@ -1605,14 +1653,14 @@ async function startOptions() {
   // technology, and bind the visible controls directly as the authoritative
   // click path. Both routes converge on the same guarded functions.
   form.addEventListener("input", event => {
-    if (event.target.id === "shortcut" || event.target.id === "import-file") return;
+    if (event.target.id === "import-file" || event.target.closest?.("#shortcut-list")) return;
     if (configurationReady) {
       syncToggleCards();
       syncDirtyState();
     }
   });
   form.addEventListener("change", event => {
-    if (event.target.id === "shortcut" || event.target.id === "import-file") return;
+    if (event.target.id === "import-file" || event.target.closest?.("#shortcut-list")) return;
     if (configurationReady) {
       syncToggleCards();
       syncDirtyState();
@@ -1680,7 +1728,7 @@ async function startOptions() {
 
   $("simulate-rules").addEventListener("click", async event => {
     const result = await run(
-      () => messenger.pinInbox.simulateRules({trigger: "messageAdded", limit: 1000}),
+      () => messenger.pinInbox.simulateRules({trigger: "messageAdded", limit: 1000, rules}),
       value => msg("dynamicSimulationSummary", [value.matches.length, value.scanned]),
       {
         control: event.currentTarget,
@@ -1689,10 +1737,16 @@ async function startOptions() {
       }
     );
     if (result) {
-      $("rule-simulation").textContent =
-        result.matches.slice(0, 20)
-          .map(item => `${item.ruleName} → ${item.action} · ${item.subject}`)
-          .join("\n") || msg("dynamicSimulationNoMatch");
+      const counts = new Map();
+      for (const item of result.matches) counts.set(item.ruleName, (counts.get(item.ruleName) || 0) + 1);
+      const summary = [...counts].map(([name, count]) => `${name} : ${count} correspondance(s)`).join("\n");
+      const examples = result.matches.slice(0, 20).map(item => `• ${item.ruleName} → ${item.action} · ${item.subject}`).join("\n");
+      $("rule-simulation").textContent = [
+        `${result.rules || rules.length} règle(s) testée(s) sur ${result.scanned} message(s).`,
+        summary,
+        examples,
+        result.truncated ? "Résultat tronqué : affinez les conditions avant activation." : ""
+      ].filter(Boolean).join("\n\n") || msg("dynamicSimulationNoMatch");
     }
   });
 
@@ -1863,7 +1917,8 @@ async function startOptions() {
     try {
       const data = await withBusy(event.currentTarget, "Préparation de la sauvegarde…", async () => {
         const value = await messenger.pinInbox.exportConfiguration();
-        value.shortcut = await getShortcut();
+        value.shortcuts = await getShortcuts();
+        value.shortcut = value.shortcuts["toggle-pin-selected"] || "";
         return value;
       });
       downloadJson(`mailperch-${new Date().toISOString().slice(0, 10)}.json`, data);

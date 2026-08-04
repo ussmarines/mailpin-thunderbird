@@ -1,5 +1,17 @@
 # Feuille de route
 
+## 1.1.0 — productivité intégrée
+
+- [x] suivi automatique sans réponse et capture rapide ;
+- [x] mise en veille réelle, réveil et vue dédiée ;
+- [x] vues Aujourd’hui et Revue quotidienne/hebdomadaire ;
+- [x] actions groupées étendues et sélection par plage ;
+- [x] centre de rappels interactif ;
+- [x] aperçu des règles avant enregistrement ;
+- [x] personnalisation des dix raccourcis ;
+- [x] détection et fusion prudente des conversations associées ;
+- [ ] validation manuelle du XPI 1.1.0 dans une vraie liste de messages Thunderbird sur les systèmes annoncés.
+
 ## 3.2.10 — validation réelle de la page Options
 
 - recommandations, dock, Enregistrer, Annuler, réouverture et redémarrage validés dans Thunderbird 153.0.1 avec un profil jetable ;

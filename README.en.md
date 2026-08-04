@@ -6,7 +6,7 @@
 **Pin, organize and follow up on important email in Thunderbird.**
 
 [![QA](https://github.com/ussmarines/mailperch-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailperch-thunderbird/actions/workflows/ci.yml)
-![Release](https://img.shields.io/badge/release-v1.0.0-0078D4)
+![Release](https://img.shields.io/badge/release-v1.1.0-0078D4)
 ![License](https://img.shields.io/badge/license-MailPerch%20Source--Available%201.0-6A5ACD)
 </div>
 
@@ -15,15 +15,16 @@ MailPerch adds a dedicated pinned-message panel above Thunderbird’s native mes
 ## Features
 
 - pin a message or conversation independently from Thunderbird’s native star;
-- follow-ups, deadlines, reminders, and workflow states;
-- groups, cases, templates, local rules, and smart views;
+- automatic reply follow-up, deadlines, interactive reminders, and snoozing;
+- **Today** and **Review** views, bulk actions, and quick capture from a message;
+- groups, cases, templates, local rules with preview, and smart views;
 - Thunderbird calendar tasks and events where supported;
 - dashboard, Kanban, history, and a local health center;
 - backup, restore, and redacted diagnostics.
 
 ## Compatibility
 
-- **MailPerch:** `1.0.0`;
+- **MailPerch:** `1.1.0`;
 - **Thunderbird:** `128.0` through `153.*`;
 - **Format:** Manifest V3 MailExtension;
 - **Languages:** French and English;
@@ -37,12 +38,12 @@ MailPerch includes a privileged Experiment API to integrate its panel into Thund
 
 ### From a GitHub release
 
-1. Download `MailPerch_v1.0.0.xpi` from release `v1.0.0`.
+1. Download `MailPerch_v1.1.0.xpi` from release `v1.1.0`.
 2. In Thunderbird, open **Add-ons and Themes**.
 3. From the gear menu, select **Install Add-on From File**.
 4. Select the XPI and restart Thunderbird if required.
 
-> Internal `3.2.x` development builds used a version number higher than the first public release. To test `1.0.0` after a development build, use a clean test profile or uninstall the previous build after exporting your MailPerch data.
+> Internal `3.2.x` development builds used a version number higher than the first public release. To test `1.1.0` after a development build, use a clean test profile or uninstall the previous build after exporting your MailPerch data.
 
 ### From source
 
@@ -60,7 +61,7 @@ MailPerch is local-first: no network calls, telemetry, advertising, or remotely 
 
 - [Privacy policy](PRIVACY.md)
 - [Security policy](SECURITY.md)
-- [1.0.0 security audit](SECURITY_AUDIT_1.0.0.md)
+- [1.1.0 security audit](SECURITY_AUDIT_1.1.0.md)
 - [Known limitations](docs/KNOWN_LIMITATIONS.md)
 
 ## Documentation and support

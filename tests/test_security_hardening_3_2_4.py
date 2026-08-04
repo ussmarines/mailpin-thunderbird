@@ -20,7 +20,7 @@ CHECK_REPO = (ROOT / "scripts/check_repo.py").read_text(encoding="utf-8")
 CI_WORKFLOW = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
 RELEASE_WORKFLOW = (ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8")
 
-assert PACKAGE["version"] == MANIFEST["version"] == "1.0.0"
+assert PACKAGE["version"] == MANIFEST["version"] == "1.1.0"
 assert MANIFEST["permissions"] == ["menus"]
 assert "content_scripts" not in MANIFEST
 assert "externally_connectable" not in MANIFEST
@@ -229,9 +229,9 @@ for workflow in (CI_WORKFLOW, RELEASE_WORKFLOW):
     assert "beautifulsoup4" not in workflow
     assert "tinycss2" not in workflow
     assert "persist-credentials: false" in workflow
-    assert "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd" in workflow
-    assert "actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e" in workflow
-    assert "actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405" in workflow
+    assert "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" in workflow
+    assert "actions/setup-node@820762786026740c76f36085b0efc47a31fe5020" in workflow
+    assert "actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97" in workflow
 assert "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a" in CI_WORKFLOW
 assert "gh release create" in RELEASE_WORKFLOW
 assert PACKAGE.get("dependencies") is None

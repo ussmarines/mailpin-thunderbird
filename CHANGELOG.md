@@ -1,5 +1,18 @@
 # Journal des modifications
 
+## 1.1.0 — suivi quotidien et productivité
+
+- suivi automatique des réponses sortantes et annulation du suivi lorsqu’une réponse entrante est détectée ;
+- vraie mise en veille, vue intelligente dédiée, réveil manuel et réapparition automatique ;
+- nouvelles vues **Aujourd’hui** et **Revue** quotidienne/hebdomadaire avec regroupement des retards, relances, attentes et éléments inactifs ;
+- centre de rappels interactif dans le tableau de bord et le panneau Thunderbird : ouvrir, terminer, reporter ou ignorer ;
+- actions groupées étendues, sélection par plage et capture rapide depuis le menu contextuel d’un message ;
+- simulation des règles sur le brouillon non enregistré avant activation ;
+- personnalisation et sauvegarde des dix raccourcis clavier MailPerch ;
+- détection et fusion contrôlée des épingles liées par une identité de conversation forte, sans rapprochement approximatif par objet ;
+- nouveaux modules purs `review.js` et `related.js`, tests de modèles, gardes d’intégration et contrôles de sécurité renforcés ;
+- correction des gardes CI pour les versions immuablement épinglées des actions GitHub.
+
 ## 1.0.0 — première version publique
 
 - première release publique stable de MailPerch, issue des builds internes 3.2.x ;

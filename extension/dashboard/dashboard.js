@@ -11,6 +11,7 @@ let searchTimer = null;
 let statusTimer = null;
 let pendingCalendarKeys = [];
 let loading = false;
+let lastSelectedKey = "";
 
 const ACTION_MESSAGES = Object.freeze({
   open: "Message ouvert.", reply: "Fenêtre de réponse ouverte.", active: "Message remis à traiter.",
@@ -19,7 +20,8 @@ const ACTION_MESSAGES = Object.freeze({
   archive: "Message archivé.", delete: "Message supprimé.", unpin: "Message désépinglé.",
   trackNoReply: "Suivi sans réponse activé.", cancelNoReply: "Suivi sans réponse arrêté.",
   priority: "Priorité mise à jour.", deadline: "Échéance mise à jour.", group: "Groupe mis à jour.",
-  case: "Affaire mise à jour.", template: "Modèle appliqué.", calendar: "Élément Agenda créé."
+  case: "Affaire mise à jour.", template: "Modèle appliqué.", calendar: "Élément Agenda créé.",
+  snooze: "Message mis en veille.", wake: "Message réveillé.", dismissReminder: "Rappel ignoré."
 });
 
 function msg(key, fallback) {
@@ -183,6 +185,7 @@ function badgesFor(item) {
   badge(host, item.unread, msg("unread", "Non lu"));
   badge(host, item.workflowStatus === "waiting", msg("statusWaiting", "En attente"), "waiting");
   badge(host, item.workflowStatus === "planned", msg("statusPlanned", "Planifié"), "planned");
+  badge(host, Number(item.snoozeUntil || 0) > Date.now(), msg("snoozedUntil", "En veille jusqu’au $1").replace("$1", formatDate(item.snoozeUntil)), "snoozed");
   badge(host, item.noReplyTracking, item.noReplyAt && item.noReplyAt <= Date.now()
     ? msg("noReplyDue", "Sans réponse · à relancer")
     : `${msg("noReplyTracking", "Sans réponse")} · ${formatDate(item.noReplyAt)}`, "no-reply");
@@ -222,8 +225,21 @@ function createCard(item, {compact = false, selectable = true} = {}) {
     check.type = "checkbox";
     check.checked = selected.has(item.stableKey);
     check.setAttribute("aria-label", `Sélectionner ${item.subject || "ce message"}`);
-    check.addEventListener("change", () => {
-      if (check.checked) selected.add(item.stableKey); else selected.delete(item.stableKey);
+    check.addEventListener("click", event => {
+      const key = item.stableKey;
+      if (event.shiftKey && lastSelectedKey && lastSelectedKey !== key) {
+        const visibleKeys = [...document.querySelectorAll('.dashboard-content section:not([hidden]) .item input[type="checkbox"]')]
+          .map(input => input.closest(".item")?.dataset.key || "")
+          .filter(Boolean);
+        const start = visibleKeys.indexOf(lastSelectedKey);
+        const end = visibleKeys.indexOf(key);
+        if (start >= 0 && end >= 0) {
+          for (const rangeKey of visibleKeys.slice(Math.min(start, end), Math.max(start, end) + 1)) {
+            if (check.checked) selected.add(rangeKey); else selected.delete(rangeKey);
+          }
+        }
+      } else if (check.checked) selected.add(key); else selected.delete(key);
+      lastSelectedKey = key;
       updateSelectionBar();
     });
     card.append(check);
@@ -242,6 +258,7 @@ function createCard(item, {compact = false, selectable = true} = {}) {
       actionButton("open", msg("open", "Ouvrir")),
       actionButton("reply", msg("reply", "Répondre")),
       actionButton(item.completedAt ? "active" : "complete", item.completedAt ? msg("reopen", "Rouvrir") : msg("statusComplete", "Terminer")),
+      actionButton(Number(item.snoozeUntil || 0) > Date.now() ? "wake" : "snooze", Number(item.snoozeUntil || 0) > Date.now() ? msg("wakeNow", "Réveiller maintenant") : msg("snoozeOneHour", "Reporter d’une heure")),
       actionButton("waiting", msg("statusWaiting", "Attente")),
       actionButton(item.noReplyTracking ? "cancelNoReply" : "trackNoReply", item.noReplyTracking ? msg("cancelNoReplyTracking", "Arrêter la relance") : msg("trackNoReply", "Relancer sans réponse")),
       actionButton("calendar", msg("calendar", "Agenda")),
@@ -261,6 +278,7 @@ function renderStats() {
     statCard(msg("statusPlanned", "Planifiées"), stats.planned || 0),
     statCard(msg("overdue", "En retard"), stats.overdue || 0, stats.overdue ? "warning" : ""),
     statCard(msg("noReplyTracking", "Sans réponse"), stats.noReply || 0),
+    statCard(msg("smartViewSnoozed", "En veille"), stats.snoozed || 0),
     statCard(msg("statusComplete", "Terminées"), stats.completed || 0)
   );
 }
@@ -272,7 +290,7 @@ function renderSmartViews() {
     {id: "all", fallback: "Toutes"}, {id: "today", fallback: "Aujourd’hui"},
     {id: "overdue", fallback: "En retard"}, {id: "week", fallback: "Cette semaine"},
     {id: "waiting", fallback: "En attente"}, {id: "noReply", fallback: "Relances sans réponse"},
-    {id: "noDue", fallback: "Sans échéance"}, {id: "unread", fallback: "Non lus"},
+    {id: "snoozed", fallback: "En veille"}, {id: "noDue", fallback: "Sans échéance"}, {id: "unread", fallback: "Non lus"},
     {id: "missing", fallback: "Messages introuvables"}, {id: "calendarError", fallback: "Agenda à vérifier"},
     {id: "recentCompleted", fallback: "Récemment terminés"}
   ];
@@ -284,6 +302,116 @@ function renderSmartViews() {
     button.append(node("span", "", msg(view.labelKey || "", view.fallback || view.id)), node("span", "smart-view-count", current.smartCounts?.[view.id] || 0));
     host.append(button);
   }
+}
+
+
+function reviewBucketLabel(id) {
+  const labels = {
+    overdue: ["reviewOverdue", "En retard"], today: ["reviewToday", "À faire aujourd’hui"],
+    noReply: ["reviewNoReply", "Sans réponse"], waking: ["reviewWaking", "Réveillés aujourd’hui"],
+    waiting: ["reviewWaiting", "En attente"], stale: ["reviewStale", "Sans activité récente"],
+    upcoming: ["reviewUpcoming", "À venir"]
+  };
+  const [key, fallback] = labels[id] || ["", id];
+  return msg(key, fallback);
+}
+
+function appendBucket(host, id, items, {empty = false} = {}) {
+  const section = node("section", "focus-section");
+  const heading = node("header", "focus-section-header");
+  heading.append(node("h2", "", reviewBucketLabel(id)), node("span", "focus-count", items.length));
+  section.append(heading);
+  const list = node("div", "focus-list");
+  if (!items.length && empty) list.append(createEmpty(msg("reviewEmpty", "Aucun élément dans cette section.")));
+  for (const item of items) list.append(createCard(item));
+  section.append(list);
+  host.append(section);
+}
+
+function renderReminderCenter() {
+  const host = $("reminder-center");
+  const reminders = current?.pendingReminders || [];
+  host.replaceChildren();
+  host.hidden = reminders.length === 0;
+  if (!reminders.length) return;
+  const header = node("header", "reminder-center-header");
+  const copy = node("div", "");
+  copy.append(node("h2", "", msg("pendingReminders", "Rappels à traiter")), node("p", "", msg("reminderCenterHelp", "Agissez directement sur les rappels récents ou reportez-les sans perdre le contexte.")));
+  header.append(copy, node("span", "focus-count", reminders.length));
+  host.append(header);
+  const list = node("div", "reminder-list");
+  for (const item of reminders) {
+    const card = node("article", "reminder-item");
+    card.dataset.key = item.stableKey;
+    const body = node("div", "");
+    body.append(node("strong", "", item.subject || msg("noSubject", "(sans objet)")), node("span", "", [item.author, formatDate(item.reminderFiredAt)].filter(Boolean).join(" · ")));
+    const actions = node("div", "reminder-actions");
+    actions.append(
+      actionButton("open", msg("open", "Ouvrir")),
+      actionButton("complete", msg("statusComplete", "Terminer")),
+      actionButton("snooze-hour", msg("snoozeOneHour", "Reporter d’une heure")),
+      actionButton("snooze-tomorrow", msg("snoozeTomorrow", "Reporter à demain")),
+      actionButton("dismissReminder", msg("dismissReminder", "Ignorer le rappel"))
+    );
+    card.append(body, actions);
+    list.append(card);
+  }
+  host.append(list);
+}
+
+function renderToday() {
+  const host = $("today");
+  host.replaceChildren();
+  const plan = current?.todayPlan || {buckets: {}, actionable: 0};
+  const hero = node("header", "board-intro");
+  const copy = node("div", "");
+  copy.append(node("h2", "", msg("todayHeading", "Votre journée")), node("p", "", msg("todayIntro", "Les messages qui demandent une action aujourd’hui, regroupés par priorité de suivi.")));
+  hero.append(copy, node("strong", "board-total", msg("reviewActionable", "$1 élément(s) demandent votre attention.").replace("$1", plan.actionable || 0)));
+  host.append(hero);
+  let visible = 0;
+  for (const id of ["overdue", "today", "noReply", "waking"]) {
+    const items = plan.buckets?.[id] || [];
+    visible += items.length;
+    if (items.length) appendBucket(host, id, items);
+  }
+  if (!visible) host.append(createEmpty(msg("reviewEmpty", "Aucun élément ne demande votre attention aujourd’hui.")));
+}
+
+function renderReview() {
+  const host = $("review");
+  host.replaceChildren();
+  const review = current?.review || {mode: "daily", buckets: {}, actionable: 0, total: 0};
+  const hero = node("header", "board-intro");
+  const copy = node("div", "");
+  copy.append(node("h2", "", msg("reviewHeading", "Revue de suivi")), node("p", "", msg("reviewIntro", "Passez en revue les retards, attentes, relances et conversations associées sans parcourir toute la boîte mail.")));
+  const modes = node("div", "review-mode");
+  for (const [mode, key, fallback] of [["daily", "reviewDaily", "Revue quotidienne"], ["weekly", "reviewWeekly", "Revue hebdomadaire"]]) {
+    const button = node("button", "", msg(key, fallback));
+    button.type = "button";
+    button.dataset.reviewMode = mode;
+    button.setAttribute("aria-pressed", String(review.mode === mode));
+    modes.append(button);
+  }
+  hero.append(copy, modes);
+  host.append(hero);
+  const buckets = node("div", "review-buckets");
+  for (const id of ["overdue", "today", "noReply", "waking", "waiting", "stale", "upcoming"]) appendBucket(buckets, id, review.buckets?.[id] || [], {empty: false});
+  host.append(buckets);
+
+  const related = node("section", "related-section");
+  related.append(node("h2", "", msg("relatedItems", "Conversations associées")), node("p", "", msg("relatedItemsHelp", "MailPerch ne propose une fusion que lorsqu’un identifiant de conversation fiable est partagé.")));
+  const groups = current?.relatedGroups || [];
+  if (!groups.length) related.append(createEmpty(msg("noRelatedItems", "Aucun doublon de conversation fiable détecté.")));
+  for (const group of groups) {
+    const card = node("article", "related-card");
+    card.dataset.relatedId = group.id;
+    const body = node("div", "");
+    body.append(node("strong", "", group.subject || msg("noSubject", "(sans objet)")), node("span", "", `${group.count} ${msg("messages", "messages")}`));
+    const merge = actionButton("merge-related", msg("mergeRelated", "Fusionner en conversation"), "primary");
+    card.append(body, merge);
+    related.append(card);
+  }
+  host.append(related);
 }
 
 function renderList() {
@@ -432,15 +560,17 @@ function populateBulkControls() {
 }
 
 const VIEW_SECTION_IDS = Object.freeze({
+  today: "today",
   list: "items",
   kanban: "kanban",
   cases: "cases",
+  review: "review",
   history: "history",
   health: "health"
 });
 
 function setView(view) {
-  const next = Object.prototype.hasOwnProperty.call(VIEW_SECTION_IDS, view) ? view : "list";
+  const next = Object.prototype.hasOwnProperty.call(VIEW_SECTION_IDS, view) ? view : "today";
   for (const button of document.querySelectorAll("[data-view]")) {
     button.setAttribute("aria-pressed", String(button.dataset.view === next));
   }
@@ -453,15 +583,18 @@ function setView(view) {
 
 function render() {
   renderStats();
+  renderReminderCenter();
   renderSmartViews();
   populateBulkControls();
+  renderToday();
   renderList();
   renderKanban();
   renderCases();
+  renderReview();
   renderHistory();
   renderHealth();
   renderActivity();
-  setView(current.view || "list");
+  setView(current.view || "today");
   updateSelectionBar();
 }
 
@@ -473,7 +606,8 @@ async function load({silent = false} = {}) {
     const options = {
       search: $("search").value.trim(),
       smartView: current?.smartView || configuration.settings?.defaultSmartView || "today",
-      view: current?.view || "list",
+      view: current?.view || "today",
+      reviewMode: current?.reviewMode || "daily",
       useSmartView: true
     };
     const [data, calendarList] = await Promise.all([
@@ -505,6 +639,16 @@ function actionOptions(action) {
   if (action === "case") return {caseId: $("bulk-case").value};
   if (action === "template") return {templateId: $("bulk-template").value};
   if (action === "trackNoReply") return {days: configuration?.settings?.noReplyDefaultDays || 5};
+  if (action === "snooze") {
+    const value = $("bulk-snooze").value;
+    if (value === "tomorrow") {
+      const target = new Date();
+      target.setDate(target.getDate() + 1);
+      target.setHours(9, 0, 0, 0);
+      return {until: target.getTime()};
+    }
+    return {durationMs: Number(value) || 60 * 60_000};
+  }
   return {};
 }
 
@@ -535,7 +679,8 @@ function updateBulkVisibility() {
   const action = $("bulk-action").value;
   for (const [id, visible] of [
     ["bulk-priority-wrap", action === "priority"], ["bulk-deadline-wrap", action === "deadline"],
-    ["bulk-group-wrap", action === "group"], ["bulk-case-wrap", action === "case"], ["bulk-template-wrap", action === "template"]
+    ["bulk-snooze-wrap", action === "snooze"], ["bulk-group-wrap", action === "group"],
+    ["bulk-case-wrap", action === "case"], ["bulk-template-wrap", action === "template"]
   ]) $(id).hidden = !visible;
 }
 
@@ -565,6 +710,43 @@ async function refreshHealth(control = null) {
     setStatus(`Analyse terminée : score ${current.health.score}/100.`, "success");
   } catch (error) { setStatus(`Analyse impossible : ${error.message || error}`, "error", {persistent: true}); }
   finally { setButtonBusy(control, false); }
+}
+
+
+function snoozeUntilTomorrow() {
+  const target = new Date();
+  target.setDate(target.getDate() + 1);
+  target.setHours(9, 0, 0, 0);
+  return target.getTime();
+}
+
+async function handleActionClick(event) {
+  const control = eventElement(event)?.closest("[data-action]");
+  if (!control) return;
+  const card = control.closest(".item, .reminder-item, .related-card");
+  const action = control.dataset.action;
+  if (action === "merge-related") {
+    const group = (current?.relatedGroups || []).find(item => item.id === card?.dataset.relatedId);
+    if (!group) return;
+    const prompt = msg("mergeRelatedConfirm", "Fusionner ces $1 épingles en une seule conversation ?").replace("$1", group.count);
+    if (!confirm(prompt)) return;
+    setButtonBusy(control, true);
+    setStatus("Fusion de la conversation…", "busy", {persistent: true});
+    try {
+      await api.pinInbox.mergeRelatedReferences(group.stableKeys);
+      await load({silent: true});
+      setStatus(msg("mergeRelated", "Conversation fusionnée."), "success");
+    } catch (error) { setStatus(`Fusion impossible : ${error.message || error}`, "error", {persistent: true}); }
+    finally { setButtonBusy(control, false); }
+    return;
+  }
+  const key = card?.dataset.key;
+  if (!key) return;
+  if (action === "calendar") { openCalendarDialog([key]); return; }
+  if (action === "snooze-hour") return perform([key], "snooze", {durationMs: 60 * 60_000}, {control});
+  if (action === "snooze-tomorrow") return perform([key], "snooze", {until: snoozeUntilTomorrow()}, {control});
+  if (action === "snooze") return perform([key], "snooze", {durationMs: 60 * 60_000}, {control});
+  return perform([key], action, actionOptions(action), {reload: !["open", "reply"].includes(action), control});
 }
 
 function bindEvents() {
@@ -604,14 +786,12 @@ function bindEvents() {
     });
   }
 
-  const actionHost = $("items");
-  actionHost.addEventListener("click", event => {
-    const control = eventElement(event)?.closest("[data-action]");
-    const card = control?.closest(".item");
-    if (!control || !card) return;
-    const action = control.dataset.action;
-    if (action === "calendar") { openCalendarDialog([card.dataset.key]); return; }
-    perform([card.dataset.key], action, actionOptions(action), {reload: !["open", "reply"].includes(action), control});
+  for (const id of ["items", "today", "review", "reminder-center"]) $(id).addEventListener("click", handleActionClick);
+  $("review").addEventListener("click", event => {
+    const button = eventElement(event)?.closest("[data-review-mode]");
+    if (!button || !current) return;
+    current.reviewMode = button.dataset.reviewMode;
+    load({silent: true});
   });
 
   $("cases").addEventListener("click", event => {

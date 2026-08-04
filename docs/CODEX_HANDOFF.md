@@ -5,9 +5,10 @@ court afin d’éviter de dupliquer le contexte.
 
 ## État courant
 
-- version publique : **1.0.0** ;
-- base GitHub : `main` au commit `f7497870423683f1bb1622111634a2513c304aa6` ;
+- version publique : **1.1.0** ;
+- base GitHub : `main` au commit `a1e26bee9400279109b447cc80b90b24913b8bca` ;
 - ID : `pin-mails@MailPerch.local` ;
+- productivité 1.1.0 : Aujourd’hui, Revue, veille, rappels interactifs, capture rapide, aperçu des règles, raccourcis et fusion prudente ;
 - schémas : SQLite 5, paramètres 6, données 6 ;
 - une modification de version fusionnée dans `main` déclenche la QA, le build et la release GitHub correspondante.
 

@@ -27,7 +27,7 @@ const PIN_MODULES = {};
 const MODULE_PATHS = [
   "settings.js", "identity.js", "storage.js", "workflow.js", "rules.js", "calendar.js",
   "smart.js", "bulk.js", "diagnostics.js", "providers.js", "health.js",
-  "migrations.js", "performance.js", "localization.js"
+  "migrations.js", "performance.js", "localization.js", "review.js", "related.js"
 ];
 
 const STYLE_SHEET_SERVICE = "@mozilla.org/content/style-sheet-service;1";
@@ -312,7 +312,7 @@ const DEFAULT_DATA = Object.freeze({
   history: [],
   ruleLog: [],
   activity: [],
-  dashboard: {filter: "active", smartView: "today", search: "", view: "list"},
+  dashboard: {filter: "active", smartView: "today", search: "", view: "today", reviewMode: "daily"},
   providerMatrix: {checkedAt: 0, accounts: [], providers: [], calendars: []},
   migration: {from: 0, to: 6, completedAt: 0},
   revision: 0
@@ -707,6 +707,7 @@ function normalizeReference(key, value) {
     dueAt: Math.max(0, Number(value.dueAt) || 0),
     reminderAt: Math.max(0, Number(value.reminderAt) || 0),
     reminderFiredAt: Math.max(0, Number(value.reminderFiredAt) || 0),
+    reminderAcknowledgedAt: Math.max(0, Number(value.reminderAcknowledgedAt) || 0),
     priorityLevel: ["normal", "high", "urgent"].includes(value.priorityLevel) ? value.priorityLevel : "normal",
     groupId: GROUP_ID_RE.test(groupId) ? groupId : "",
     trackingMode: value.trackingMode === "conversation" ? "conversation" : "message",
@@ -807,10 +808,11 @@ function normalizeData(value) {
   data.dashboard = {
     filter: ["active", "all", "overdue", "today", "week", "completed", "unread", "waiting", "planned", "noReply", "noDue", "missing", "calendarError", "recentCompleted"].includes(source.dashboard?.filter)
       ? source.dashboard.filter : "active",
-    smartView: ["all", "today", "overdue", "week", "waiting", "noReply", "noDue", "unread", "missing", "calendarError", "recentCompleted"].includes(source.dashboard?.smartView)
+    smartView: ["all", "today", "overdue", "week", "waiting", "noReply", "snoozed", "noDue", "unread", "missing", "calendarError", "recentCompleted"].includes(source.dashboard?.smartView)
       ? source.dashboard.smartView : "today",
+    reviewMode: source.dashboard?.reviewMode === "weekly" ? "weekly" : "daily",
     search: boundedText(source.dashboard?.search, 500),
-    view: ["list", "kanban", "cases", "history", "health"].includes(source.dashboard?.view) ? source.dashboard.view : "list"
+    view: ["today", "list", "kanban", "cases", "review", "history", "health"].includes(source.dashboard?.view) ? source.dashboard.view : "today"
   };
   data.providerMatrix = normalizeProviderMatrix(source.providerMatrix);
   data.migration = {
@@ -1119,6 +1121,7 @@ const SMART_SECTION_LABELS = Object.freeze({
   week: "Cette semaine",
   waiting: "En attente",
   noReply: "Sans réponse",
+  snoozed: "En veille",
   later: "Plus tard",
   noDue: "Sans échéance",
   unread: "Non lus",
@@ -1767,6 +1770,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         toggleDisplayed: ready((tabId, forceState) => this._toggleDisplayedByTab(context, tabId, forceState)),
         getSelectionState: ready(tabId => this._getSelectionStateByTab(context, tabId)),
         performSelected: ready((tabId, action) => this._performSelectedByTab(context, tabId, action)),
+        quickCaptureSelected: ready((tabId, preset) => this._quickCaptureSelectedByTab(context, tabId, preset)),
         getConfiguration: ready(() => this._getConfiguration()),
         setConfiguration: ready(configuration => this._setConfiguration(configuration)),
         exportConfiguration: ready(() => this._exportConfiguration()),
@@ -1790,6 +1794,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         getDashboardData: ready(options => this._getDashboardData(options || {})),
         openReference: ready(stableKey => this._openReference(stableKey)),
         performReferenceAction: ready((stableKeys, action, options) => this._performReferenceAction(stableKeys, action, options || {})),
+        mergeRelatedReferences: ready(stableKeys => this._mergeRelatedReferences(stableKeys)),
         getCalendars: ready(() => this._getCalendars()),
         createCalendarItem: ready((stableKey, itemType, calendarId) => this._createCalendarItem(stableKey, itemType, calendarId)),
         createCaseCalendarItem: ready((caseId, itemType, calendarId) => this._createCaseCalendarItem(caseId, itemType, calendarId)),
@@ -1942,7 +1947,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         }
       }
       this._data.cases ||= []; this._data.caseOrder ||= []; this._data.templates ||= []; this._data.history ||= []; this._data.ruleLog ||= [];
-      this._data.dashboard = {...(this._data.dashboard || {}), smartView: this._data.dashboard?.smartView || this._settings.defaultSmartView || "today", view: this._data.dashboard?.view || "list"};
+      this._data.dashboard = {...(this._data.dashboard || {}), smartView: this._data.dashboard?.smartView || this._settings.defaultSmartView || "today", view: this._data.dashboard?.view || "today"};
       this._data.providerMatrix ||= {checkedAt:0,accounts:[],providers:[],calendars:[]};
       for (const ref of Object.values(this._data.refs || {})) {
         ref.noReplyTracking = Boolean(ref.noReplyTracking);
@@ -2067,7 +2072,10 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       const baseTrigger = ref.snoozeUntil || ref.reminderAt || (ref.workflowStatus === "waiting" && ref.followUpAt ? ref.followUpAt : (ref.dueAt ? ref.dueAt - lead : 0));
       if (!baseTrigger || baseTrigger > now || ref.reminderFiredAt >= baseTrigger) continue;
       if (this._settings.missedReminderPolicy === "ignore" && now - baseTrigger > DAY_MS) {
-        ref.reminderFiredAt = now; changed = true; continue;
+        ref.reminderFiredAt = now;
+        ref.reminderAcknowledgedAt = now;
+        changed = true;
+        continue;
       }
       const title = ref.workflowStatus === "waiting" && ref.followUpAt && ref.followUpAt <= now ? "Relance à effectuer" : (ref.dueAt && ref.dueAt < now ? "Message épinglé en retard" : "Rappel de message épinglé");
       const text = `${ref.subject || "(sans objet)"} — ${ref.author || ref.accountName || ""}`;
@@ -2084,13 +2092,13 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         this._recordDiagnostic("warning", "Notification de rappel impossible", error);
       }
       ref.reminderFiredAt = now;
+      ref.reminderAcknowledgedAt = 0;
       ref.snoozeUntil = 0;
       if (ref.workflowStatus === "waiting" && ref.followUpAt && ref.followUpAt <= now) ref.followUpCount = (ref.followUpCount || 0) + 1;
       const next = this._nextRepeatedReminder(ref, ref.reminderAt || ref.dueAt || now);
       if (next) {
         if (ref.reminderAt) ref.reminderAt = next;
         if (ref.dueAt) ref.dueAt = next;
-        ref.reminderFiredAt = 0;
       }
       this._recordActivity("reminder", ref.stableKey, title);
       changed = true;
@@ -2604,6 +2612,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       dueAt: 0,
       reminderAt: 0,
       reminderFiredAt: 0,
+      reminderAcknowledgedAt: 0,
       priorityLevel: "normal",
       groupId: "",
       trackingMode: trackingMode === "conversation" ? "conversation" : "message",
@@ -2969,21 +2978,122 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
 
   async _performSelectedByTab(context, tabId, action) {
     const normalizedAction = boundedText(action, 64);
-    const allowedActions = new Set(["read", "unread", "toggleRead", "reply", "archive", "delete", "complete", "uncomplete", "unpin", "active", "waiting", "planned"]);
+    const referenceActions = new Set([
+      "complete", "uncomplete", "unpin", "active", "waiting", "planned",
+      "snooze", "wake", "trackNoReply", "cancelNoReply", "dismissReminder"
+    ]);
+    const allowedActions = new Set(["read", "unread", "toggleRead", "reply", "archive", "delete", ...referenceActions]);
     if (!allowedActions.has(normalizedAction)) return {count: 0, unsupported: true};
     const pane = this._about3PaneForTab(context, tabId);
     const headers = pane ? this._getSelectedHeaders(pane) : [];
     if (!headers.length) return {count: 0};
-    if (["complete", "uncomplete", "unpin", "active", "waiting", "planned"].includes(normalizedAction)) {
+    if (referenceActions.has(normalizedAction)) {
       const keys = [];
       for (const hdr of headers) {
         const conversationKey = conversationStableKey(hdr);
         const key = hasOwn(this._data.refs, conversationKey) ? conversationKey : messageStableKey(hdr);
         if (hasOwn(this._data.refs, key) && !keys.includes(key)) keys.push(key);
       }
-      return this._performReferenceAction(keys, normalizedAction, {});
+      const options = normalizedAction === "snooze"
+        ? {durationMs: 60 * 60_000}
+        : normalizedAction === "trackNoReply"
+          ? {days: this._settings.noReplyDefaultDays}
+          : {};
+      return this._performReferenceAction(keys, normalizedAction, options);
     }
     return this._performMessageAction(normalizedAction, headers, pane);
+  }
+
+  _quickPresetDueAt(preset, now = Date.now()) {
+    const target = new Date(now);
+    if (preset === "tomorrow") {
+      target.setDate(target.getDate() + 1);
+      target.setHours(9, 0, 0, 0);
+      return target.getTime();
+    }
+    if (preset === "today") {
+      target.setHours(17, 0, 0, 0);
+      if (target.getTime() <= now) return now + 60 * 60_000;
+      return target.getTime();
+    }
+    return 0;
+  }
+
+  async _quickCaptureSelectedByTab(context, tabId, preset = "simple") {
+    const normalizedPreset = ["simple", "today", "tomorrow", "waiting", "noReply"].includes(preset) ? preset : "simple";
+    const pane = this._about3PaneForTab(context, tabId);
+    const folder = pane?.gFolder;
+    const headers = pane ? this._getSelectedHeaders(pane).filter(Boolean) : [];
+    if (!folder || !headers.length || (!(folder.flags & Ci.nsMsgFolderFlags.Inbox) && !this._settings.allowPinOutsideInbox)) return {count: 0};
+
+    const trackingMode = this._settings.defaultPinTarget === "conversation" && this._settings.enableConversationPins ? "conversation" : "message";
+    const counterSnapshot = this._captureFolderCounters(headers);
+    this._pushUndo("Capture rapide", this._captureFlags(headers));
+    const refs = new Map();
+    const byFolder = new Map();
+    const now = Date.now();
+    for (const hdr of headers) {
+      const ref = this._ensureReference(hdr, folder.URI || hdr.folder?.URI || "", trackingMode);
+      refs.set(ref.stableKey, ref);
+      if (this._settings.pinMode === "nativeStar") {
+        const list = byFolder.get(hdr.folder) || [];
+        list.push(hdr);
+        byFolder.set(hdr.folder, list);
+      }
+    }
+    if (this._settings.pinMode === "nativeStar") {
+      for (const [targetFolder, list] of byFolder) targetFolder.markMessagesFlagged(list, true);
+    }
+
+    const dueAt = this._quickPresetDueAt(normalizedPreset, now);
+    for (const ref of refs.values()) {
+      ref.completedAt = 0;
+      ref.snoozeUntil = 0;
+      ref.reminderAcknowledgedAt = 0;
+      if (dueAt) {
+        ref.workflowStatus = "planned";
+        ref.waitingSince = 0;
+        ref.followUpAt = 0;
+        ref.noReplyTracking = false;
+        ref.noReplyAt = 0;
+        ref.noReplyStartedAt = 0;
+        ref.noReplyBaselineMessageId = "";
+        ref.dueAt = dueAt;
+        const lead = Math.max(0, Number(ref.reminderLeadMinutes || this._settings.reminderLeadMinutes || 0)) * 60_000;
+        ref.reminderAt = Math.max(now, dueAt - lead);
+        ref.reminderFiredAt = 0;
+      } else if (normalizedPreset === "waiting") {
+        ref.workflowStatus = "waiting";
+        ref.waitingSince = now;
+        ref.noReplyTracking = false;
+        ref.noReplyAt = 0;
+        ref.noReplyStartedAt = 0;
+        ref.noReplyBaselineMessageId = "";
+        ref.followUpAt = now + Math.max(1, this._settings.defaultFollowUpDays || 3) * DAY_MS;
+        ref.reminderAt = ref.followUpAt;
+        ref.reminderFiredAt = 0;
+      } else if (normalizedPreset === "noReply") {
+        ref.workflowStatus = "waiting";
+        ref.waitingSince = now;
+        ref.noReplyTracking = true;
+        ref.noReplyStartedAt = now;
+        ref.noReplyAt = now + Math.max(1, this._settings.noReplyDefaultDays || 5) * DAY_MS;
+        ref.noReplyBaselineMessageId = String(ref.headerMessageId || "");
+        ref.followUpAt = ref.noReplyAt;
+        ref.reminderAt = ref.noReplyAt;
+        ref.reminderFiredAt = 0;
+      } else if (ref.workflowStatus === "completed") {
+        ref.workflowStatus = "active";
+      }
+      ref.updatedAt = now;
+      this._recordActivity(`quick-${normalizedPreset}`, ref.stableKey, ref.subject);
+    }
+    this._saveData(`quick-${normalizedPreset}`);
+    this._resolveCache?.clear();
+    this._refreshAllStates(true);
+    this._showToastAll(`${refs.size} message(s) ajouté(s) au suivi.`, true);
+    this._scheduleCounterRegressionCheck(counterSnapshot, `quick-${normalizedPreset}`);
+    return {count: refs.size, preset: normalizedPreset, stableKeys: [...refs.keys()], dueAt};
   }
 
   _about3PaneForTab(context, tabId) {
@@ -3611,10 +3721,11 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     return false;
   }
 
-  _applyCustomRules(trigger, hdr, {simulate=false} = {}) {
+  _applyCustomRules(trigger, hdr, {simulate=false, rules=null} = {}) {
     if (!hdr || (simulate ? !this._settings.enableRuleSimulation : !this._settings.enableAutomaticRules)) return simulate ? [] : false;
     let changed=false,logged=false;const results=[];
-    const ordered=PIN_MODULES.PinRules?.ordered(this._data.rules||[])||[...(this._data.rules||[])];
+    const sourceRules = Array.isArray(rules) ? rules : (this._data.rules || []);
+    const ordered=PIN_MODULES.PinRules?.ordered(sourceRules)||[...sourceRules];
     for(const rule of ordered){
       if(rule.trigger!==trigger||!rule.enabled)continue;
       const match=PIN_MODULES.PinRules?.matches(this._ruleContext(hdr,trigger),rule)||{matched:this._messageMatchesRule(hdr,rule,trigger),reasons:[]};
@@ -3636,8 +3747,11 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
   async _simulateRules(options = {}) {
-    assertStructuredInput(options, "Options de simulation", {maxBytes: 64 * 1024, maxNodes: 1000});
+    assertStructuredInput(options, "Options de simulation", {maxBytes: 512 * 1024, maxNodes: 20_000});
     const trigger=["messageAdded","read","archive","reply","move","delete","complete","calendar"].includes(options.trigger)?options.trigger:"messageAdded";
+    const candidateRules = Array.isArray(options.rules)
+      ? options.rules.slice(0, MAX_RULES).map((rule, index) => normalizeRule(rule, index)).filter(Boolean)
+      : (this._data.rules || []);
     const limit=clampNumber(options.limit,1,10000,1000);const matches=[];let scanned=0;
     for(const account of MailServices.accounts.accounts){
       const root=account?.incomingServer?.rootFolder;if(!root)continue;
@@ -3648,7 +3762,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
           while(messages.hasMoreElements()&&scanned<limit){
             const hdr=messages.getNext().QueryInterface(Ci.nsIMsgDBHdr);
             scanned++;
-            const simulated=this._applyCustomRules(trigger,hdr,{simulate:true});
+            const simulated=this._applyCustomRules(trigger,hdr,{simulate:true,rules:candidateRules});
             if (Array.isArray(simulated)) matches.push(...simulated);
             if (scanned % 250 === 0) await new Promise(resolve=>Services.tm.dispatchToMainThread(resolve));
           }
@@ -3657,7 +3771,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       }
       if(scanned>=limit)break;
     }
-    return {trigger,scanned,matches:matches.slice(0,5000),truncated:matches.length>5000};
+    return {trigger,scanned,rules: candidateRules.length,matches:matches.slice(0,5000),truncated:matches.length>5000};
   }
 
   _applyBuiltInRule(trigger, hdr, destination = null) {
@@ -3825,56 +3939,208 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
   _serializeReference(ref, includeActivity = false) {
-    const hdr=this._resolveReference(ref,false);const caseItem=(this._data.cases||[]).find(item=>item.id===ref.caseId);const group=this._groupForId(ref.groupId);
+    const hdr = this._resolveReference(ref, false);
+    const caseItem = (this._data.cases || []).find(item => item.id === ref.caseId);
+    const group = this._groupForId(ref.groupId);
+    const unread = Boolean(hdr && !(hdr.flags & Ci.nsMsgMessageFlags.Read));
+    const missing = !hdr;
     return {
-      stableKey:ref.stableKey,subject:hdr?formatSubject(hdr):ref.subject,author:hdr?formatAuthor(hdr):ref.author,accountKey:ref.accountKey,accountName:ref.accountName,
-      folderName:ref.folderName,date:ref.date,pinnedAt:ref.pinnedAt,note:ref.note,dueAt:ref.dueAt,reminderAt:ref.reminderAt,followUpAt:ref.followUpAt,
-      priorityLevel:ref.priorityLevel,groupId:ref.groupId,groupName:group?.name||"",caseId:ref.caseId,caseName:caseItem?.name||"",templateId:ref.templateId,
-      completedAt:ref.completedAt,workflowStatus:PIN_MODULES.PinWorkflow?.statusForReference(ref)||ref.workflowStatus||"active",waitingSince:ref.waitingSince,lastReplyAt:ref.lastReplyAt,lastOutgoingAt:ref.lastOutgoingAt,followUpCount:ref.followUpCount,
-      noReplyTracking:Boolean(ref.noReplyTracking),noReplyAt:ref.noReplyAt||0,noReplyStartedAt:ref.noReplyStartedAt||0,calendarSyncError:ref.calendarSyncError||"",
-      recurrenceRule:ref.recurrenceRule,recurrenceInterval:ref.recurrenceInterval,trackingMode:ref.trackingMode,conversationCount:ref.conversationCount,conversationUnread:ref.conversationUnread,
-      unread:Boolean(hdr&&!(hdr.flags&Ci.nsMsgMessageFlags.Read)),missing:!hdr,smartSection:PIN_MODULES.PinSmartViews?.sectionFor(ref,{unread:Boolean(hdr&&!(hdr.flags&Ci.nsMsgMessageFlags.Read)),missing:!hdr,calendarError:Boolean(ref.calendarSyncError)})||smartSectionForRef(ref),accountColor:this._getAccountColor(ref.accountKey),calendarItemId:ref.calendarItemId,calendarId:ref.calendarId,
-      activity:includeActivity?(this._data.activity||[]).filter(item=>item.stableKey===ref.stableKey).slice(-20):undefined
+      stableKey: ref.stableKey,
+      subject: hdr ? formatSubject(hdr) : ref.subject,
+      author: hdr ? formatAuthor(hdr) : ref.author,
+      accountKey: ref.accountKey,
+      accountName: ref.accountName,
+      folderName: ref.folderName,
+      date: ref.date,
+      pinnedAt: ref.pinnedAt,
+      updatedAt: ref.updatedAt || ref.pinnedAt,
+      note: ref.note,
+      dueAt: ref.dueAt,
+      reminderAt: ref.reminderAt,
+      reminderFiredAt: ref.reminderFiredAt,
+      reminderAcknowledgedAt: ref.reminderAcknowledgedAt,
+      followUpAt: ref.followUpAt,
+      snoozeUntil: ref.snoozeUntil,
+      priorityLevel: ref.priorityLevel,
+      groupId: ref.groupId,
+      groupName: group?.name || "",
+      caseId: ref.caseId,
+      caseName: caseItem?.name || "",
+      templateId: ref.templateId,
+      completedAt: ref.completedAt,
+      workflowStatus: PIN_MODULES.PinWorkflow?.statusForReference(ref) || ref.workflowStatus || "active",
+      waitingSince: ref.waitingSince,
+      lastReplyAt: ref.lastReplyAt,
+      lastOutgoingAt: ref.lastOutgoingAt,
+      followUpCount: ref.followUpCount,
+      noReplyTracking: Boolean(ref.noReplyTracking),
+      noReplyAt: ref.noReplyAt || 0,
+      noReplyStartedAt: ref.noReplyStartedAt || 0,
+      calendarSyncError: ref.calendarSyncError || "",
+      recurrenceRule: ref.recurrenceRule,
+      recurrenceInterval: ref.recurrenceInterval,
+      trackingMode: ref.trackingMode,
+      conversationCount: ref.conversationCount,
+      conversationUnread: ref.conversationUnread,
+      unread,
+      missing,
+      smartSection: PIN_MODULES.PinSmartViews?.sectionFor(ref, {unread, missing, calendarError: Boolean(ref.calendarSyncError)}) || smartSectionForRef(ref),
+      accountColor: this._getAccountColor(ref.accountKey),
+      calendarItemId: ref.calendarItemId,
+      calendarId: ref.calendarId,
+      activity: includeActivity ? (this._data.activity || []).filter(item => item.stableKey === ref.stableKey).slice(-20) : undefined
     };
   }
 
   _getDashboardData(options = {}) {
     assertStructuredInput(options, "Options du tableau de bord", {maxBytes: 64 * 1024, maxNodes: 1000});
-    const validFilters = new Set(["active","all","overdue","today","week","completed","unread","waiting","planned","noReply","noDue","missing","calendarError","recentCompleted"]);
-    const validViews = new Set(["list","kanban","cases","history","health"]);
+    const validFilters = new Set(["active", "all", "overdue", "today", "week", "completed", "unread", "waiting", "planned", "noReply", "snoozed", "noDue", "missing", "calendarError", "recentCompleted"]);
+    const validViews = new Set(["today", "list", "kanban", "cases", "review", "history", "health"]);
     const filter = validFilters.has(options.filter) ? options.filter : (this._data.dashboard?.filter || "active");
     const smartView = validFilters.has(options.smartView) ? options.smartView : (this._data.dashboard?.smartView || this._settings.defaultSmartView || "today");
     const search = sanitizeSearchText(options.search ?? this._data.dashboard?.search ?? "");
-    const view = validViews.has(options.view) ? options.view : (this._data.dashboard?.view || "list");
-    const nextDashboard = {filter, smartView, search:String(options.search ?? this._data.dashboard?.search ?? "").slice(0,500), view};
-    if ((PIN_MODULES.PinStorageHelpers?.stableStringify(this._data.dashboard)||JSON.stringify(this._data.dashboard)) !==
-        (PIN_MODULES.PinStorageHelpers?.stableStringify(nextDashboard)||JSON.stringify(nextDashboard))) {
+    const view = validViews.has(options.view) ? options.view : (this._data.dashboard?.view || "today");
+    const reviewMode = options.reviewMode === "weekly" ? "weekly" : (options.reviewMode === "daily" ? "daily" : (this._data.dashboard?.reviewMode === "weekly" ? "weekly" : "daily"));
+    const nextDashboard = {filter, smartView, search: String(options.search ?? this._data.dashboard?.search ?? "").slice(0, 500), view, reviewMode};
+    if ((PIN_MODULES.PinStorageHelpers?.stableStringify(this._data.dashboard) || JSON.stringify(this._data.dashboard)) !==
+        (PIN_MODULES.PinStorageHelpers?.stableStringify(nextDashboard) || JSON.stringify(nextDashboard))) {
       this._data.dashboard = nextDashboard;
       this._saveData("dashboard-state");
     }
+
+    const refs = Object.values(this._data.refs);
+    const now = Date.now();
+    const serializedAll = refs.map(ref => this._serializeReference(ref));
+    const serializedByKey = new Map(serializedAll.map(item => [item.stableKey, item]));
     const allItems = [];
-    for (const ref of Object.values(this._data.refs)) {
-      const item = this._serializeReference(ref);
-      const context = {unread:item.unread, missing:item.missing, calendarError:Boolean(item.calendarSyncError)};
+    for (const item of serializedAll) {
+      const ref = this._data.refs[item.stableKey];
+      const context = {unread: item.unread, missing: item.missing, calendarError: Boolean(item.calendarSyncError), now};
       const activeFilter = options.useSmartView !== false && this._settings.enableSmartViews ? smartView : filter;
       const matches = PIN_MODULES.PinSmartViews?.matches(activeFilter, ref, context) ?? (activeFilter === "all" || item.smartSection === activeFilter || item.workflowStatus === activeFilter);
       if (!matches) continue;
-      if (search && !sanitizeSearchText([item.subject,item.author,item.note,item.accountName,item.folderName,item.groupName,item.caseName,item.workflowStatus].join(" ")).includes(search)) continue;
+      if (search && !sanitizeSearchText([item.subject, item.author, item.note, item.accountName, item.folderName, item.groupName, item.caseName, item.workflowStatus].join(" ")).includes(search)) continue;
       allItems.push(item);
     }
-    allItems.sort((a,b)=>(a.dueAt||a.followUpAt||a.noReplyAt||Number.MAX_SAFE_INTEGER)-(b.dueAt||b.followUpAt||b.noReplyAt||Number.MAX_SAFE_INTEGER)||b.date-a.date);
-    const refs = Object.values(this._data.refs), now = Date.now();
-    const serializedAll = refs.map(ref => this._serializeReference(ref));
-    const smartCounts = PIN_MODULES.PinSmartViews?.counts(serializedAll.map(item => ({ref:item, unread:item.unread, missing:item.missing, calendarError:Boolean(item.calendarSyncError)})), now) || {};
-    const diagnosticSummary = PIN_MODULES.PinDiagnostics?.summary(this._diagnosticEvents || []) || {total:(this._diagnosticEvents||[]).length,counts:{}};
-    const health = PIN_MODULES.PinHealth?.build({data:this._data,settings:this._settings,compatibility:this._compatibility,performance:this._getPerformanceReport(),diagnostics:diagnosticSummary}) || null;
+    allItems.sort((left, right) =>
+      (left.snoozeUntil || left.dueAt || left.followUpAt || left.noReplyAt || Number.MAX_SAFE_INTEGER) -
+      (right.snoozeUntil || right.dueAt || right.followUpAt || right.noReplyAt || Number.MAX_SAFE_INTEGER) || right.date - left.date);
+
+    const smartCounts = PIN_MODULES.PinSmartViews?.counts(serializedAll.map(item => ({ref: item, unread: item.unread, missing: item.missing, calendarError: Boolean(item.calendarSyncError)})), now) || {};
+    const dailyReview = PIN_MODULES.PinReview?.build(serializedAll, {now, mode: "daily"}) || {mode: "daily", buckets: {}, counts: {}, actionable: 0, total: 0};
+    const weeklyReview = PIN_MODULES.PinReview?.build(serializedAll, {now, mode: "weekly"}) || {mode: "weekly", buckets: {}, counts: {}, actionable: 0, total: 0};
+    const relatedGroups = (PIN_MODULES.PinRelated?.detect(refs) || []).map(group => ({
+      ...group,
+      items: group.stableKeys.map(key => serializedByKey.get(key)).filter(Boolean)
+    }));
+    const pendingReminders = (PIN_MODULES.PinReview?.pendingReminders(serializedAll, {now}) || []).slice(0, 20);
+    const diagnosticSummary = PIN_MODULES.PinDiagnostics?.summary(this._diagnosticEvents || []) || {total: (this._diagnosticEvents || []).length, counts: {}};
+    const health = PIN_MODULES.PinHealth?.build({data: this._data, settings: this._settings, compatibility: this._compatibility, performance: this._getPerformanceReport(), diagnostics: diagnosticSummary}) || null;
     return {
-      items:allItems, filter, smartView, search:options.search||"", view, smartViews:clone(PIN_MODULES.PinSmartViews?.VIEWS || []), smartCounts,
-      groups:clone(this._data.groups), cases:clone(this._data.cases||[]), templates:clone(this._data.templates||[]),
-      history:this._getHistory({limit:200,search:options.historySearch||""}), ruleLog:clone((this._data.ruleLog||[]).slice(-200).reverse()),
-      stats:{total:refs.length,active:refs.filter(r=>(r.workflowStatus||"active")==="active"&&!r.completedAt).length,waiting:refs.filter(r=>r.workflowStatus==="waiting").length,planned:refs.filter(r=>r.workflowStatus==="planned").length,completed:refs.filter(r=>r.completedAt||r.workflowStatus==="completed").length,overdue:refs.filter(r=>!r.completedAt&&((r.dueAt&&r.dueAt<now)||(r.followUpAt&&r.followUpAt<now))).length,noReply:refs.filter(r=>r.noReplyTracking).length,missing:refs.filter(r=>r.missingSince).length},
-      activity:clone((this._data.activity||[]).slice(-100).reverse()), compatibility:clone(this._compatibility), providerMatrix:clone(this._data.providerMatrix||DEFAULT_DATA.providerMatrix),
-      performance:this._getPerformanceReport(), health, diagnostics:diagnosticSummary, revision:this._data.revision||0, counterRegressionEvents:clone(this._counterRegressionEvents||[])
+      items: allItems,
+      filter,
+      smartView,
+      search: options.search || "",
+      view,
+      reviewMode,
+      smartViews: clone(PIN_MODULES.PinSmartViews?.VIEWS || []),
+      smartCounts,
+      todayPlan: dailyReview,
+      review: reviewMode === "weekly" ? weeklyReview : dailyReview,
+      pendingReminders,
+      relatedGroups,
+      groups: clone(this._data.groups),
+      cases: clone(this._data.cases || []),
+      templates: clone(this._data.templates || []),
+      history: this._getHistory({limit: 200, search: options.historySearch || ""}),
+      ruleLog: clone((this._data.ruleLog || []).slice(-200).reverse()),
+      stats: {
+        total: refs.length,
+        active: refs.filter(ref => (ref.workflowStatus || "active") === "active" && !ref.completedAt).length,
+        waiting: refs.filter(ref => ref.workflowStatus === "waiting").length,
+        planned: refs.filter(ref => ref.workflowStatus === "planned").length,
+        completed: refs.filter(ref => ref.completedAt || ref.workflowStatus === "completed").length,
+        overdue: refs.filter(ref => !ref.completedAt && ((ref.dueAt && ref.dueAt < now) || (ref.followUpAt && ref.followUpAt < now))).length,
+        noReply: refs.filter(ref => ref.noReplyTracking).length,
+        snoozed: refs.filter(ref => Number(ref.snoozeUntil || 0) > now && !ref.completedAt).length,
+        missing: refs.filter(ref => ref.missingSince).length
+      },
+      activity: clone((this._data.activity || []).slice(-100).reverse()),
+      compatibility: clone(this._compatibility),
+      providerMatrix: clone(this._data.providerMatrix || DEFAULT_DATA.providerMatrix),
+      performance: this._getPerformanceReport(),
+      health,
+      diagnostics: diagnosticSummary,
+      revision: this._data.revision || 0,
+      counterRegressionEvents: clone(this._counterRegressionEvents || [])
+    };
+  }
+
+  _mergeRelatedReferences(stableKeys) {
+    const keys = normalizeStableKeyList(stableKeys).slice(0, 50);
+    const refs = keys.map(key => this._data.refs[key]).filter(Boolean);
+    if (refs.length < 2) throw new ExtensionError("Sélectionnez au moins deux épingles associées.");
+    if (this._settings.pinMode === "nativeStar") {
+      throw new ExtensionError("La fusion de conversations est indisponible lorsque l’étoile native pilote les épingles.");
+    }
+    const identitySets = refs.map(ref => new Set(PIN_MODULES.PinRelated?.identityKeys(ref) || []));
+    const sharedIdentities = [...identitySets[0]].filter(identity => identitySets.every(set => set.has(identity)));
+    if (!sharedIdentities.length) throw new ExtensionError("Ces épingles ne partagent pas une identité de conversation suffisamment fiable.");
+
+    const calendarLinks = [...new Set(refs.map(ref => ref.calendarItemId).filter(Boolean))];
+    if (calendarLinks.length > 1) {
+      throw new ExtensionError("Plusieurs éléments Agenda distincts sont liés à cette conversation. Retirez les doublons Agenda avant la fusion.");
+    }
+    const seedHeader = refs.map(ref => this._resolveReference(ref, true)).find(Boolean);
+    if (!seedHeader) throw new ExtensionError("La conversation ne peut pas être résolue dans Thunderbird.");
+
+    this._pushUndo("Fusion des épingles associées");
+    const target = this._ensureReference(seedHeader, seedHeader.folder?.URI || refs[0].sourceInboxURI || "", "conversation");
+    const metadata = PIN_MODULES.PinRelated?.mergeMetadata([...refs, target]);
+    if (!metadata) throw new ExtensionError("La fusion des métadonnées a échoué.");
+    Object.assign(target, {
+      note: metadata.note,
+      priorityLevel: metadata.priorityLevel,
+      pinnedAt: metadata.pinnedAt,
+      dueAt: metadata.dueAt,
+      reminderAt: metadata.reminderAt,
+      followUpAt: metadata.followUpAt,
+      snoozeUntil: metadata.snoozeUntil,
+      groupId: metadata.groupId,
+      caseId: metadata.caseId,
+      noReplyTracking: metadata.noReplyTracking,
+      noReplyAt: metadata.noReplyAt,
+      noReplyStartedAt: metadata.noReplyStartedAt,
+      workflowStatus: metadata.workflowStatus,
+      trackingMode: "conversation",
+      updatedAt: Date.now()
+    });
+    const linked = refs.find(ref => ref.calendarItemId);
+    if (linked && !target.calendarItemId) {
+      target.calendarId = linked.calendarId;
+      target.calendarItemId = linked.calendarItemId;
+      target.calendarItemType = linked.calendarItemType;
+    }
+    this._updateConversationReference(target, seedHeader);
+
+    let removed = 0;
+    for (const ref of refs) {
+      if (ref.stableKey === target.stableKey) continue;
+      if (this._removeReferenceByKey(ref.stableKey, {archiveAction: "merge-related", deleteCalendar: false})) removed++;
+    }
+    this._recordActivity("merge-related", target.stableKey, target.subject);
+    this._saveData("merge-related");
+    this._resolveCache?.clear();
+    this._conversationCache?.clear();
+    this._refreshAllStates(true);
+    this._showToastAll(`${removed + 1} épingle(s) regroupée(s) en une conversation.`, true);
+    return {
+      count: removed + 1,
+      removed,
+      stableKey: target.stableKey,
+      identity: sharedIdentities[0],
+      groupConflict: new Set(refs.map(ref => ref.groupId || "")).size > 1,
+      caseConflict: new Set(refs.map(ref => ref.caseId || "")).size > 1
     };
   }
 
@@ -3913,7 +4179,9 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       this._refreshAllStates(true);
       return {count: refs.length};
     }
-    if (normalizedAction === "snooze") return this._snoozeReminder(refs[0].stableKey, normalizedOptions.durationMs || 3_600_000);
+    if (normalizedAction === "snooze") return this._snoozeReferences(actionKeys, normalizedOptions);
+    if (normalizedAction === "wake") return this._wakeReferences(actionKeys);
+    if (normalizedAction === "dismissReminder") return this._acknowledgeReminders(actionKeys);
     if (normalizedAction === "trackNoReply") return this._setNoReplyTracking(actionKeys, {...normalizedOptions, enabled: true});
     if (normalizedAction === "cancelNoReply") return this._setNoReplyTracking(actionKeys, {...normalizedOptions, enabled: false});
     if (normalizedAction === "priority") {
@@ -4370,14 +4638,66 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     return{created:true,caseId:caseItem.id,calendarId:calendar.id,itemId:caseItem.calendarItemId,itemType:type};
   }
 
+  _snoozeReferences(stableKeys, options = {}) {
+    assertStructuredInput(options, "Options de mise en veille", {maxBytes: 64 * 1024, maxNodes: 1000});
+    const keys = normalizeStableKeyList(stableKeys).slice(0, MAX_BULK_KEYS);
+    const refs = keys.map(key => this._data.refs[key]).filter(Boolean);
+    if (!refs.length) return {count: 0, snoozed: false};
+    const now = Date.now();
+    const duration = clampNumber(options.durationMs, 60_000, 30 * DAY_MS, 3_600_000);
+    const requestedUntil = Number(options.until) || 0;
+    const until = requestedUntil > now ? Math.min(requestedUntil, now + 30 * DAY_MS) : now + duration;
+    this._pushUndo("Mise en veille");
+    for (const ref of refs) {
+      ref.snoozeUntil = until;
+      ref.reminderFiredAt = 0;
+      ref.reminderAcknowledgedAt = 0;
+      ref.updatedAt = now;
+      this._recordActivity("snooze", ref.stableKey, new Date(until).toISOString());
+    }
+    this._saveData("snooze");
+    this._refreshAllStates(true);
+    this._showToastAll(`${refs.length} message(s) mis en veille.`, true);
+    return {count: refs.length, snoozed: true, until};
+  }
+
+  _wakeReferences(stableKeys) {
+    const keys = normalizeStableKeyList(stableKeys).slice(0, MAX_BULK_KEYS);
+    const refs = keys.map(key => this._data.refs[key]).filter(Boolean);
+    if (!refs.length) return {count: 0, woken: false};
+    const now = Date.now();
+    this._pushUndo("Réveil des messages");
+    for (const ref of refs) {
+      ref.snoozeUntil = 0;
+      ref.reminderFiredAt = 0;
+      ref.reminderAcknowledgedAt = 0;
+      ref.updatedAt = now;
+      this._recordActivity("wake", ref.stableKey, ref.subject);
+    }
+    this._saveData("wake");
+    this._refreshAllStates(true);
+    this._showToastAll(`${refs.length} message(s) réveillé(s).`, true);
+    return {count: refs.length, woken: true};
+  }
+
+  _acknowledgeReminders(stableKeys) {
+    const keys = normalizeStableKeyList(stableKeys).slice(0, MAX_BULK_KEYS);
+    const refs = keys.map(key => this._data.refs[key]).filter(Boolean);
+    if (!refs.length) return {count: 0};
+    const now = Date.now();
+    for (const ref of refs) {
+      ref.reminderAcknowledgedAt = now;
+      ref.updatedAt = now;
+      this._recordActivity("reminder-acknowledged", ref.stableKey, ref.subject);
+    }
+    this._saveData("reminder-acknowledged");
+    this._refreshAllStates(true);
+    return {count: refs.length, acknowledged: true};
+  }
+
   _snoozeReminder(stableKey, durationMs) {
-    stableKey = boundedText(stableKey, 8192);
-    const ref = this._data.refs[String(stableKey || "")];
-    if (!ref) return {snoozed: false};
-    const duration = clampNumber(durationMs, 60_000, 30 * DAY_MS, 3600000);
-    this._pushUndo("Report du rappel"); ref.snoozeUntil = Date.now() + duration; ref.reminderFiredAt = 0;
-    this._recordActivity("snooze", ref.stableKey, `${Math.round(duration / 60000)} min`);
-    this._saveData("snooze"); this._refreshAllStates(true); return {snoozed: true, until: ref.snoozeUntil};
+    const result = this._snoozeReferences([boundedText(stableKey, 8192)], {durationMs});
+    return {snoozed: Boolean(result.count), until: result.until || 0, count: result.count || 0};
   }
 
   _applyCompletedRetention() {
@@ -5329,6 +5649,9 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       bulk.append(bulkCount, bulkButton("toggleRead", this._t("readUnread", "Lu/non lu")), bulkButton("complete", this._t("complete", "Terminer")), bulkButton("trackNoReply", this._t("noReply", "Relancer sans réponse")), bulkButton("archive", this._t("archive", "Archiver")), bulkButton("group", this._t("group", "Grouper")), bulkButton("unpin", this._t("unpin", "Désépingler")), bulkButton("delete", this._t("delete", "Supprimer")));
       tools.append(searchWrap, smartView, bulk);
 
+      const reminderCenter = createNode("section", "pin-mails-reminder-center");
+      reminderCenter.hidden = true;
+      reminderCenter.setAttribute("aria-label", this._t("pendingReminders", "Rappels à traiter"));
       const list = createNode("div", "pin-mails-panel-list"); list.setAttribute("role", "listbox"); list.setAttribute("aria-multiselectable", "true"); list.tabIndex = -1;
       const live = createNode("div", "pin-mails-live"); live.setAttribute("role", "status"); live.setAttribute("aria-live", "polite");
       const toast = createNode("div", "pin-mails-toast"); toast.id = TOAST_ID; toast.hidden = true; toast.setAttribute("role", "status"); toast.setAttribute("aria-live", "polite");
@@ -5364,7 +5687,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         item.setAttribute("data-context-action", action);
         contextMenu.appendChild(item);
       }
-      panel.append(header, tools, list, live, toast);
+      panel.append(header, tools, reminderCenter, list, live, toast);
       let popupSet = document.querySelector("popupset") || document.getElementById("mainPopupSet");
       if (!popupSet) {
         popupSet = document.createXULElement("popupset");
@@ -5414,6 +5737,31 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         }, 2500);
       });
       search.addEventListener("input", () => { searchText = search.value; renderLimit = this._settings.panelPageSize; renderPanel(); });
+      reminderCenter.addEventListener("click", event => {
+        const button = elementFromEvent(event)?.closest?.("[data-reminder-action]");
+        const key = button?.dataset.stableKey || "";
+        if (!button || !hasOwn(this._data.refs, key)) return;
+        const action = button.dataset.reminderAction;
+        try {
+          if (action === "open") {
+            this._openReference(key);
+          } else if (action === "complete") {
+            this._performReferenceAction([key], "complete", {});
+          } else if (action === "snooze") {
+            this._performReferenceAction([key], "snooze", {durationMs: 60 * 60_000});
+          } else if (action === "tomorrow") {
+            const target = new Date();
+            target.setDate(target.getDate() + 1);
+            target.setHours(9, 0, 0, 0);
+            this._performReferenceAction([key], "snooze", {until: target.getTime()});
+          } else if (action === "dismiss") {
+            this._performReferenceAction([key], "dismissReminder", {});
+          }
+          showToast(this._t("reminderUpdated", "Rappel mis à jour."), false, "success");
+        } catch (error) {
+          showToast(`Rappel impossible : ${error?.message || error}`, false, "error");
+        }
+      });
 
       bulk.addEventListener("click", event => {
         const button = event.target.closest("[data-bulk-action]");
@@ -5796,6 +6144,39 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       for (const old of document.querySelectorAll(".pin-mails-folder-badge")) old.remove();
     };
 
+    const renderPanelReminders = entries => {
+      const host = panel?.querySelector(".pin-mails-reminder-center");
+      if (!host) return;
+      const pending = PIN_MODULES.PinReview?.pendingReminders(entries.map(entry => entry.ref), {now: Date.now()}) || [];
+      host.replaceChildren();
+      host.hidden = panelCollapsed() || !pending.length;
+      if (!pending.length) return;
+      const heading = createNode("div", "pin-mails-reminder-heading");
+      heading.append(createNode("strong", "", this._t("pendingReminders", "Rappels à traiter")), createNode("span", "pin-mails-reminder-count", String(pending.length)));
+      host.appendChild(heading);
+      for (const ref of pending.slice(0, 5)) {
+        const row = createNode("article", "pin-mails-reminder-row");
+        const copy = createNode("div", "pin-mails-reminder-copy");
+        copy.append(createNode("strong", "", ref.subject || this._t("noSubject", "(sans objet)")), createNode("span", "", ref.author || ""));
+        const actions = createNode("div", "pin-mails-reminder-actions");
+        for (const [action, label] of [
+          ["open", this._t("open", "Ouvrir")],
+          ["complete", this._t("complete", "Terminer")],
+          ["snooze", this._t("snoozeOneHour", "+1 h")],
+          ["tomorrow", this._t("snoozeTomorrow", "Demain")],
+          ["dismiss", this._t("dismissReminder", "Ignorer")]
+        ]) {
+          const button = createNode("button", "pin-mails-reminder-action", label);
+          button.type = "button";
+          button.dataset.reminderAction = action;
+          button.dataset.stableKey = ref.stableKey;
+          actions.appendChild(button);
+        }
+        row.append(copy, actions);
+        host.appendChild(row);
+      }
+    };
+
     const renderPanel = () => {
       const renderStarted = about3Pane.performance.now();
       createPanel();
@@ -5824,6 +6205,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       panel.querySelector(".pin-mails-action-add-group").hidden = !this._settings.showGroups || this._settings.safeMode;
       this._syncInbox(about3Pane.gFolder);
       const allEntries = this._entriesForFolder(about3Pane.gFolder);
+      renderPanelReminders(allEntries);
       const stats = {
         total: allEntries.length,
         unread: allEntries.filter(entry => entry.hdr && !(entry.hdr.flags & Ci.nsMsgMessageFlags.Read)).length,
@@ -5881,9 +6263,9 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
           const id = PIN_MODULES.PinSmartViews?.sectionFor(entry.ref, {unread:Boolean(entry.hdr && !(entry.hdr.flags & Ci.nsMsgMessageFlags.Read)),missing:!entry.hdr,calendarError:Boolean(entry.ref.calendarSyncError)}) || smartSectionForRef(entry.ref);
           const bucket = buckets.get(id) || []; bucket.push(entry); buckets.set(id, bucket);
         }
-        for (const id of ["overdue", "today", "week", "waiting", "noReply", "calendarError", "missing", "later", "noDue", "recentCompleted", "completed"]) {
+        for (const id of ["overdue", "today", "week", "waiting", "noReply", "snoozed", "calendarError", "missing", "later", "noDue", "recentCompleted", "completed"]) {
           const bucket = buckets.get(id); if (!bucket?.length) continue;
-          const colors = {overdue: "#d13438", today: "#ca5010", week: "#0f6cbd", waiting: "#8a4b00", noReply: "#6264a7", calendarError: "#d13438", missing: "#777777", later: "#6264a7", noDue: "#777777", recentCompleted: "#107c10", completed: "#107c10"};
+          const colors = {overdue: "#d13438", today: "#ca5010", week: "#0f6cbd", waiting: "#8a4b00", noReply: "#6264a7", snoozed: "#0f6cbd", calendarError: "#d13438", missing: "#777777", later: "#6264a7", noDue: "#777777", recentCompleted: "#107c10", completed: "#107c10"};
           fragment.appendChild(createGroupSection(id, SMART_SECTION_LABELS[id], colors[id], bucket, "smart"));
         }
       } else if (this._settings.groupByCustomGroup && this._settings.showGroups) {
