@@ -1,17 +1,29 @@
 # Passage de relais Codex
 
-Lire d’abord [`../PROJECT_MEMORY.md`](../PROJECT_MEMORY.md). Ce fichier est volontairement
-court afin d’éviter de dupliquer le contexte.
+Lire d’abord [`IDENTITY_MIGRATION_REQUIRED.md`](IDENTITY_MIGRATION_REQUIRED.md), puis [`../PROJECT_MEMORY.md`](../PROJECT_MEMORY.md). Ce fichier est volontairement court afin d’éviter de dupliquer le contexte.
+
+En cas de contradiction sur l’identité de l’extension, le manifeste, `docs/PROJECT_STATE.json` et l’historique d’identité sont prioritaires sur les mentions anciennes de la mémoire.
 
 ## État courant
 
 - version publique : **1.1.0** ;
-- base GitHub : `main` au commit `a1e26bee9400279109b447cc80b90b24913b8bca` ;
-- ID source : `pin-mails@ussmarines.local` ;
-- **release bloquée** tant que la migration depuis l’identité précédente, la persistance des données, le redémarrage et la désinstallation n’ont pas été validés dans un profil Thunderbird jetable ;
+- base GitHub de référence avant intégration : `main` au commit `48d00fac37cb9f7efd1d5bff056149ba80c5d718` ;
+- ID canonique : `pin-mails@MailPerch.local` ;
+- décision d’identité résolue le 4 août 2026 avant toute publication, signature ou diffusion catalogue ;
+- une installation locale portant une ancienne identité doit être sauvegardée, réinstallée et restaurée selon `docs/IDENTITY_MIGRATION_REQUIRED.md` ;
 - productivité 1.1.0 : Aujourd’hui, Revue, veille, rappels interactifs, capture rapide, aperçu des règles, raccourcis et fusion prudente ;
 - schémas : SQLite 5, paramètres 6, données 6 ;
 - une modification de version fusionnée dans `main` déclenche la QA, le build et la release GitHub correspondante.
+
+## Décision d’identité du 4 août 2026
+
+- MailPerch est un projet personnel indépendant de Sibylla ;
+- le produit n’avait encore jamais été publié sur ATN, AMO ou un autre catalogue ;
+- l’identifiant intermédiaire de la branche de sécurité a été remplacé avant fusion ;
+- le nouvel identifiant doit conserver exactement sa casse dans le manifeste, le modèle de publication, l’état projet, les tests et les contrôles ;
+- ne jamais réintroduire les anciennes références nominatives ;
+- avant la première publication, vérifier la disponibilité de l’ID et les exigences de manifeste applicables ;
+- après la première signature ou publication, considérer l’ID comme immuable.
 
 ## Passe 3.2.4
 
@@ -39,7 +51,7 @@ court afin d’éviter de dupliquer le contexte.
 npm run ci
 ```
 
-Puis suivre `docs/MANUAL_TEST_PLAN.md`, particulièrement la section 3.2.4.
+Puis suivre `docs/MANUAL_TEST_PLAN.md`, particulièrement la section 3.2.4 et la procédure locale de changement d’identité.
 
 ## Identité Fluent 1.0.0
 
