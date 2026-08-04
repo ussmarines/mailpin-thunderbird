@@ -12,7 +12,7 @@
   "homepage_url": "https://github.com/ussmarines/mailperch-thunderbird",
   "browser_specific_settings": {
     "gecko": {
-      "id": "pin-mails@MailPerch.local",
+      "id": "pin-mails@ussmarines.local",
       "strict_min_version": "128.0",
       "strict_max_version": "153.*"
     }
