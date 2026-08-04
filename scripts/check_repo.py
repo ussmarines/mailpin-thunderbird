@@ -120,7 +120,7 @@ manifest = load_json(EXT / "manifest.json")
 check(manifest.get("manifest_version") == 3, "manifest_version doit être 3")
 check(manifest.get("permissions") == ["menus"], "permissions WebExtension inattendues")
 check(manifest.get("default_locale") == "fr", "default_locale doit être fr")
-check(manifest.get("browser_specific_settings", {}).get("gecko", {}).get("id") == "pin-mails@MailPerch.local", "ID public MailPerch modifié")
+check(manifest.get("browser_specific_settings", {}).get("gecko", {}).get("id") == "pin-mails@ussmarines.local", "ID public MailPerch modifié")
 check(manifest.get("content_security_policy", {}).get("extension_pages") == "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; connect-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'", "CSP inattendue")
 version = str(manifest.get("version", ""))
 check(bool(re.fullmatch(r"\d+\.\d+\.\d+", version)), "version SemVer invalide")
@@ -138,13 +138,13 @@ check(en_locale.get("brandSlogan", {}).get("message") == "Keep important mail wi
 
 required_root = [
     "AGENTS.md", "PROJECT_MEMORY.md", "BRANDING.md", "README.md", "README.en.md", "LICENSE", "NOTICE.md", "CHANGELOG.md",
-    "CONTRIBUTING.md", "CODE_OF_CONDUCT.md", "SECURITY.md", "SECURITY_AUDIT_1.0.0.md", "SECURITY_AUDIT_1.1.0.md", "PRIVACY.md", "ROADMAP.md", "SUPPORT.md", "docs/BUG_TRACKER.md",
+    "CONTRIBUTING.md", "CODE_OF_CONDUCT.md", "SECURITY.md", "SECURITY_PRODUCTION_RULES.md", "SECURITY_AUDIT_1.0.0.md", "SECURITY_AUDIT_1.1.0.md", "PRIVACY.md", "ROADMAP.md", "SUPPORT.md", "docs/BUG_TRACKER.md",
     "package.json", ".editorconfig", ".gitattributes", ".gitignore", "extension/AGENTS.md",
     "extension/api/pinInbox/AGENTS.md", "tests/AGENTS.md",
-    "docs/PROJECT_STATE.json", "docs/ARCHITECTURE.md", "docs/CODEX_HANDOFF.md", "docs/DATA_MODEL.md", "docs/DEBUGGING.md", "docs/SECURITY_BOUNDARY.md",
+    "docs/PROJECT_STATE.json", "docs/ARCHITECTURE.md", "docs/CODEX_HANDOFF.md", "docs/IDENTITY_MIGRATION_REQUIRED.md", "docs/DATA_MODEL.md", "docs/DEBUGGING.md", "docs/SECURITY_BOUNDARY.md",
     "docs/UI_SPEC.md", "docs/THREAT_MODEL.md", "docs/ATN_RELEASE_CHECKLIST.md",
     "docs/MANUAL_TEST_PLAN.md", "docs/SCREENSHOT_FINDINGS.md", "docs/DECISIONS.md",
-    "docs/KNOWN_LIMITATIONS.md", "scripts/build.py", "scripts/check_repo.py", "scripts/check_versions.py", "scripts/check_project_memory.py", "scripts/deep_audit.py", "scripts/scan_secrets.py",
+    "docs/KNOWN_LIMITATIONS.md", "scripts/build.py", "scripts/check_repo.py", "scripts/check_versions.py", "scripts/check_project_memory.py", "scripts/deep_audit.py", "scripts/scan_secrets.py", ".github/scripts/security_guard.py",
     "release/BUILD_INSTRUCTIONS.md", "release/ATN_REVIEW_NOTES_TEMPLATE.md", "release/manifest-store-template.json",
     "tests/test_build_reproducible.py", "tests/test_security_hardening_3_2_4.py", "tests/test_ui_regressions.py", "tests/test_api_schema_contract.py", "tests/test_data_integrity_guards.py", "tests/test_native_card_menu.py", "tests/test_accessibility_localization.py", "tests/test_ux_3_2_features.py", "tests/ux_3_2_model_tests.mjs"
 ]
@@ -287,7 +287,6 @@ check("MailPerch%20Source--Available%201.0" in readme, "badge licence incohéren
 check(not (ROOT / ".github/workflows/FUNDING.yml").exists(), "FUNDING.yml ne doit pas être placé dans workflows")
 release_workflow = (ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8")
 check("gh release create" in release_workflow and "npm run ci" in release_workflow, "workflow release incomplet")
-
 
 # Avoid symlink-based source exfiltration, accidental secret/config files and oversized sources.
 for candidate in ROOT.rglob("*"):
