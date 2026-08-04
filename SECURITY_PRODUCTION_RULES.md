@@ -29,12 +29,16 @@ Ces règles s’appliquent au développement, aux tests, à la CI, aux releases 
 - Interdire `pull_request_target` pour toute tâche qui checkout ou exécute le code d’une contribution.
 - Les secrets de CI sont référencés par leur nom uniquement et ne sont jamais affichés, exportés dans un artefact ou passés à un processus non nécessaire.
 - Les dépendances, actions et images de build sont revues avant mise à jour. Les releases ne contiennent aucun fichier local, cache, sauvegarde, base, log ou credential.
+- Les workflows `Manual secret and identity guard` et `Manual repository security audit` utilisent uniquement `workflow_dispatch`. Ne pas leur ajouter `push`, `pull_request` ou `schedule` sans ordre explicite du propriétaire.
+- zizmor est exécuté avec `--offline` et ne doit pas recevoir de jeton GitHub.
 
 ## 5. Identité publique
 
 - Utiliser uniquement le pseudonyme `ussmarines` et le profil GitHub `https://github.com/ussmarines` dans les métadonnées, exemples, identifiants mainteneur et documentation publique.
 - Ne pas introduire de prénom, nom civil, adresse personnelle ou identifiant local nominatif.
 - Le contrôle automatisé du dépôt recherche ces références sans afficher les valeurs interdites.
+- Toute obligation légale ou de publication exigeant une identité civile doit être signalée au propriétaire et validée explicitement avant ajout.
+- L’identifiant technique canonique de MailPerch reste `pin-mails@MailPerch.local` et ne doit pas être remplacé par une identité personnelle.
 
 ## 6. Réponse à incident
 
@@ -49,10 +53,10 @@ Dès qu’un secret apparaît dans Git, un log, une transcription ou un artefact
 
 La suppression d’une valeur dans un commit récent ne remplace jamais sa rotation.
 
-## 7. Validation avant commit et release
+## 7. Validation et rapports
 
-- Exécuter `.github/scripts/security_guard.py`.
-- Laisser le workflow `Security and secret guard` analyser le diff et périodiquement l’historique complet avec sortie expurgée.
-- Vérifier le contenu exact de l’artefact de release.
-- Confirmer qu’aucun fichier sensible n’est suivi avec `git ls-files` et qu’aucune valeur sensible n’apparaît dans le diff.
-- Une exception doit être explicite, minimale, documentée et ne peut jamais autoriser l’exposition d’un secret.
+- Lire `docs/security/SECURITY_SCANNING.md` avant de lancer ou interpréter un audit.
+- Exécuter localement `.\tools\security\security-scan.ps1 -Profile Full` ou lancer manuellement les workflows GitHub.
+- Les rapports GitHub sont conservés 30 jours et peuvent être téléchargés puis joints à ChatGPT ou placés dans le workspace Codex.
+- Un scanner produit des candidats à valider, pas une preuve automatique de vulnérabilité.
+- Aucune réécriture d’historique, suppression de branche distante ou force-push n’est automatique.
