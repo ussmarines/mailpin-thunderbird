@@ -7,7 +7,8 @@ court afin d’éviter de dupliquer le contexte.
 
 - version publique : **1.1.0** ;
 - base GitHub : `main` au commit `a1e26bee9400279109b447cc80b90b24913b8bca` ;
-- ID : `pin-mails@MailPerch.local` ;
+- ID source : `pin-mails@ussmarines.local` ;
+- **release bloquée** tant que la migration depuis l’identité précédente, la persistance des données, le redémarrage et la désinstallation n’ont pas été validés dans un profil Thunderbird jetable ;
 - productivité 1.1.0 : Aujourd’hui, Revue, veille, rappels interactifs, capture rapide, aperçu des règles, raccourcis et fusion prudente ;
 - schémas : SQLite 5, paramètres 6, données 6 ;
 - une modification de version fusionnée dans `main` déclenche la QA, le build et la release GitHub correspondante.
@@ -47,13 +48,13 @@ Puis suivre `docs/MANUAL_TEST_PLAN.md`, particulièrement la section 3.2.4.
 - Options et dashboard ont été réorganisés visuellement sans modifier leurs IDs, contrats DOM ni logique métier ;
 - le panneau natif consomme les mêmes tokens tout en conservant ses interactions et sa géométrie Thunderbird ;
 - les captures navigateur clair/sombre sont validées, mais les thèmes, le zoom 200 % et le panneau restent à confirmer dans Thunderbird 128–153.
+
 ## Passe 3.2.5
 
 - étoiles natives laissées intactes en mode indépendant ;
 - sauvegarde/annulation des paramètres basées sur les événements natifs du formulaire ;
 - audit Git Windows converti aux flux NUL-délimités binaires ;
 - registre permanent des bugs ajouté et contrôlé par la CI.
-
 
 ## Passe 3.2.7
 
