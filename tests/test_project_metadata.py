@@ -18,7 +18,7 @@ paypal_url = "https://paypal.me/ussmarinesdot"
 assert manifest["author"] == "ussmarines"
 assert manifest["developer"] == {"name": "ussmarines", "url": author_url}
 assert manifest["homepage_url"] == repository_url
-assert manifest["browser_specific_settings"]["gecko"]["id"] == "pin-mails@ussmarines.local"
+assert manifest["browser_specific_settings"]["gecko"]["id"] == "pin-mails@MailPerch.local"
 assert manifest["permissions"] == ["menus"]
 assert "paypal.me" not in json.dumps(manifest)
 assert "github.com" not in json.dumps(manifest["content_security_policy"])
