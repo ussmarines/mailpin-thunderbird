@@ -5,7 +5,7 @@
 > la carte du dépôt et les chemins exacts à ouvrir selon la tâche.
 >
 > Version publique : **1.1.0**
-> Base de travail vérifiée : branche `security/secret-hardening-2026-08-04`, destinée à être intégrée en fast-forward dans `main`
+> Base de travail vérifiée : `main`, après intégration fast-forward du durcissement et de la décision d’identité du 4 août 2026
 > Produit : **MailPerch — Email Pins & Follow-up**
 > Extension ID canonique : `pin-mails@MailPerch.local`
 > Publication : **jamais effectuée à ce jour**. La décision d’identité est résolue ; toute première publication reste soumise à la QA, à la validation locale et à l’accord explicite du propriétaire.
