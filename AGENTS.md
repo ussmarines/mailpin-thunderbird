@@ -21,13 +21,22 @@ Afficher des messages épinglés dans un panneau distinct au-dessus de la liste 
 4. Aucun réseau, télémétrie, publicité, code distant ou dépendance CDN.
 5. Aucun `eval`, `new Function`, `innerHTML`, `outerHTML` ou HTML construit avec des métadonnées de courrier.
 6. Ne jamais stocker le corps des messages ni le contenu des pièces jointes.
-7. Conserver l’ID `pin-mails@MailPerch.local` pendant les builds de développement afin de préserver les migrations.
+7. L’identifiant source est `pin-mails@ussmarines.local`. Toute release suivant un changement d’identifiant reste interdite avant validation manuelle de la migration et de la continuité des données Thunderbird.
 8. Le tableau de bord doit être ouvert par le background via `tabs.create`; l’Experiment émet `onDashboardRequested`.
 9. Les écritures SQLite doivent rester incrémentales, transactionnelles et sérialisées.
 10. Toute écoute, minuterie, feuille de style, menu et nœud injecté doit être nettoyé dans `onShutdown`/`cleanup`.
 11. Toute entrée de page ou de sauvegarde est non fiable : borne, valide et normalise avant un sink privilégié.
 12. Aucun rôle `admin`, secret client, chemin de fichier arbitraire ou autorisation fondée sur le DOM.
 13. Lire `docs/SECURITY_BOUNDARY.md` avant toute modification de l’API Experiment, des imports ou du stockage.
+
+## Secrets, identité et agents
+
+- Lire et appliquer `SECURITY_PRODUCTION_RULES.md` avant toute opération touchant la configuration, la CI, la production, une release ou des credentials.
+- Ne jamais ouvrir, afficher, copier ou résumer un `.env`, un fichier de credentials, un coffre, une clé privée ou `~/.codex/auth.json` sans nécessité exacte et autorisation explicite.
+- Vérifier les fichiers sensibles par leur chemin, leurs permissions ou leur schéma sans exposer les valeurs.
+- Les secrets restent dans un coffre et sont injectés uniquement à l’exécution. Ils ne passent ni dans les prompts, ni dans les arguments de commande, ni dans les logs, artefacts, captures ou rapports.
+- Tout secret exposé doit être révoqué ou tourné immédiatement, puis l’incident et sa cause doivent être examinés.
+- Utiliser uniquement l’identité publique `ussmarines` et le profil `https://github.com/ussmarines`.
 
 ## Carte rapide
 
