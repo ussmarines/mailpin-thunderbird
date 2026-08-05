@@ -87,9 +87,11 @@ workflow en lecture et active les alertes de vulnérabilités. La plateforme a r
 Secret Scanning, Push Protection et la configuration CodeQL par défaut pour ce
 dépôt privé ; ces indisponibilités ne sont pas présentées comme activées.
 
-La protection de `main` est configurée seulement après la réécriture de
-confidentialité afin de ne jamais contourner une règle existante. Si le plan GitHub
-la refuse, les étapes manuelles et l’erreur exacte seront consignées.
+Après la réécriture, GitHub a refusé la protection classique de `main` et les
+rulesets avec HTTP 403 : un dépôt privé doit passer à GitHub Pro ou devenir public
+pour activer ces fonctions. Aucun contournement n’a été présenté comme actif ; les
+contrôles QA obligatoires restent exécutés par workflow et sont verts sur le commit
+tagué.
 
 ## Risques résiduels
 

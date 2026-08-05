@@ -18,6 +18,7 @@
 - Les sauvegardes exportées manuellement hors des dossiers gérés par MailPerch ne peuvent ni ne doivent être effacées automatiquement lors de la désinstallation.
 - Une sécurité absolue ne peut pas être garantie ; toute nouvelle version de Thunderbird ou modification de l’API Experiment exige une nouvelle revue et des tests réels.
 - Les actions GitHub sont épinglées à des commits précis et suivies par Dependabot ; une mise à jour doit être relue avant fusion plutôt que suivie automatiquement par un tag mobile.
+- Les builds ZIP répétés sur un même environnement sont binaires identiques, mais Python `zipfile`/zlib encode des flux DEFLATE et des métadonnées d’hôte différents entre Windows et Linux. La release 1.1.1 contient les mêmes entrées et octets décompressés sur les deux systèmes ; ses SHA-256 Linux publiés sont autoritatifs. `MP-2026-018` suit une reproductibilité binaire réellement inter-plateforme.
 
 
 ## Validation des correctifs récents

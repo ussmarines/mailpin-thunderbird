@@ -14,6 +14,7 @@ En cas de contradiction sur l’identité de l’extension, le manifeste, `docs/
 - productivité 1.1.0 : Aujourd’hui, Revue, veille, rappels interactifs, capture rapide, aperçu des règles, raccourcis et fusion prudente ;
 - schémas : SQLite 5, paramètres 6, données 6 ;
 - la CI s’exécute sur les changements de `main` ; une release GitHub n’est déclenchée que par un tag `v*` cohérent avec la version ou par lancement manuel explicite.
+- release GitHub `v1.1.1` publiée et vérifiée ; les assets 1.0.0 et 1.1.0 ont été reconstruits depuis les tags assainis et remplacés.
 
 ## Passe 1.1.1
 
@@ -25,6 +26,8 @@ En cas de contradiction sur l’identité de l’extension, le manifeste, `docs/
 - catalogue FR/EN fermé de 237 libellés pour le panneau privilégié, son menu natif, l’éditeur, les rappels et Agenda ;
 - scénarios Playwright : 98 contrôles Options, 7 vues dashboard, responsive, thème sombre et mouvement réduit ;
 - validation Thunderbird 153.0.1 : compte local et quatre messages synthétiques, panneau séparé, invariants de lecture, géométrie native et 17 actions du menu anglais observés ; MP-2026-004 et MP-2026-017 sont corrigés.
+- historique accessible, tags, releases et métadonnées GitHub assainis ; GitHub Support doit encore purger 11 références internes de PR et les vues en cache depuis une session authentifiée.
+- `MP-2026-018` suit l’écart d’empreinte du conteneur ZIP entre Windows et Linux malgré des entrées et contenus décompressés identiques.
 
 ## Décision d’identité du 4 août 2026
 

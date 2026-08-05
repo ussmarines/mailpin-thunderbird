@@ -8,7 +8,7 @@
 > Base de travail vérifiée : `main`, synchronisée avant l’audit de publication du 5 août 2026
 > Produit : **MailPerch — Email Pins & Follow-up**
 > Extension ID canonique : `pin-mails@MailPerch.local`
-> Publication : releases GitHub `v1.0.0` et `v1.1.0` existantes ; aucune publication ATN connue. L’identifiant canonique a donc valeur d’identité publique immuable.
+> Publication : releases GitHub `v1.0.0`, `v1.1.0` et `v1.1.1` publiées ; aucune publication ATN connue. L’identifiant canonique a donc valeur d’identité publique immuable.
 
 ## 1. Résumé en 30 secondes
 

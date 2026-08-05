@@ -29,9 +29,10 @@ indiquée dans la colonne **Validation réelle**.
 
 MP-2026-010 reste à valider avec un calendrier local synthétique. MP-2026-011
 reste à valider sur toute la matrice Thunderbird 128–153, notamment à 200 % de
-zoom. MP-2026-004 et MP-2026-017 ont été confirmés dans Thunderbird 153.0.1 avec
-un compte local et quatre messages synthétiques, dans un profil jetable distinct
-du profil utilisateur.
+zoom. MP-2026-018 suit la reproductibilité binaire ZIP entre Windows et Linux.
+MP-2026-004 et MP-2026-017 ont été confirmés dans Thunderbird 153.0.1 avec un
+compte local et quatre messages synthétiques, dans un profil jetable distinct du
+profil utilisateur.
 
 ## Bugs corrigés ou en validation
 
@@ -54,6 +55,7 @@ du profil utilisateur.
 | MP-2026-015 | 1.1.0 | Une modification de version sur `main` peut publier une release avant le tag final et le workflow tente de supprimer silencieusement des branches de maintenance. | Le workflow de release était déclenché par les chemins de version sur `main` et contenait une étape de nettoyage distante non nécessaire à la publication. | `.github/workflows/release.yml` | `tests/test_cross_platform_ci.py` | CORRIGÉ | 1.1.1 | La release exige désormais un tag `v*` cohérent ou un lancement manuel ; aucune branche n’est supprimée par le workflow. |
 | MP-2026-016 | 1.1.0 | Le build reviewer peut accepter des fichiers additionnels non suivis via un fichier d’allowlist locale. | Le script de packaging fusionnait une liste additionnelle au lieu d’exiger exclusivement l’inventaire Git pour les sources publiées. | `scripts/build.py` | `tests/test_build_reproducible.py` | CORRIGÉ | 1.1.1 | Le test refuse le contournement et compare deux builds binaires reproductibles. |
 | MP-2026-017 | 1.1.0 | Dans un Thunderbird anglais, le panneau privilégié et son menu affichent un mélange de libellés anglais et français. | Les vues WebExtension avaient leur catalogue, mais 237 libellés de l’API Experiment utilisaient encore des chaînes françaises directes ou des jeux de clés incomplets. | `extension/api/pinInbox/implementation.js`, `extension/api/pinInbox/modules/localization.js` | `tests/test_accessibility_localization.py` | CORRIGÉ | 1.1.1 | Thunderbird 153.0.1 anglais, profil jetable avec compte local synthétique : panneau, compteur, groupe intelligent et 17 actions du menu natif exposés en anglais ; balayage UI Automation de 111 libellés accessibles sans libellé français MailPerch. |
+| MP-2026-018 | 1.1.1 | Un build Windows et le workflow Linux produisent des SHA-256 d’archives différents alors que les fichiers emballés sont identiques. | `zipfile` conserve une métadonnée d’hôte différente et les implémentations zlib génèrent des flux DEFLATE différents selon la plateforme. | `scripts/build.py`, `tests/test_build_reproducible.py`, `release/BUILD_INSTRUCTIONS.md` | À ajouter : comparaison binaire croisée Windows/Linux dans la CI. | OUVERT | — | Comparaison de la release 1.1.1 : 47/47 entrées XPI et 165/165 entrées source dans le même ordre, zéro différence de contenu décompressé ; seules compression et métadonnées ZIP diffèrent. |
 
 ## Modèle pour une nouvelle entrée
 

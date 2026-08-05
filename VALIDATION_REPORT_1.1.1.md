@@ -1,8 +1,7 @@
 # Rapport de validation MailPerch 1.1.1
 
 Date : 5 août 2026
-Statut : validation technique terminée ; le candidat est prêt pour le tag et la
-publication GitHub 1.1.1.
+Statut : validation technique et publication GitHub `v1.1.1` terminées.
 
 ## Environnement observé
 
@@ -45,8 +44,8 @@ langue, mais remplacent l’API privilégiée par des données synthétiques loc
 - terminé : installation du XPI 1.1.1 dans Thunderbird 153.0.1 avec profil jetable ;
 - terminé : recherche de confidentialité sur toutes les références et surfaces GitHub accessibles ;
 - terminé : remplacement, téléchargement et contrôle des assets 1.0.0 et 1.1.0 ;
-- restant au moment de ce rapport : pousser le tag 1.1.1, laisser le workflow
-  publier, puis vérifier les trois téléchargements distants.
+- terminé : tag `v1.1.1`, workflow Release, état public de la release et trois
+  téléchargements distants vérifiés.
 
 ## Validation graphique honnête
 
@@ -62,12 +61,16 @@ Cette observation ne couvre pas encore la matrice Thunderbird 128–152, le zoom
 restent explicitement suivies dans `docs/MANUAL_TEST_PLAN.md` et
 `docs/KNOWN_LIMITATIONS.md`.
 
-## Artefacts attendus
+## Artefacts publiés
 
-- `MailPerch_v1.1.1.xpi` ;
-- `MailPerch_GitHub_Repository_v1.1.1.zip` ;
-- `SHA256SUMS.txt`.
+| Fichier | Taille | SHA-256 |
+|---|---:|---|
+| [`MailPerch_v1.1.1.xpi`](https://github.com/ussmarines/mailperch-thunderbird/releases/download/v1.1.1/MailPerch_v1.1.1.xpi) | 232 053 octets | `20b0821bfd0e5f1e2457e3dc9148ba6ec0f553be6ccdfb98b1e56380435bf79f` |
+| [`MailPerch_GitHub_Repository_v1.1.1.zip`](https://github.com/ussmarines/mailperch-thunderbird/releases/download/v1.1.1/MailPerch_GitHub_Repository_v1.1.1.zip) | 457 774 octets | `2a2bc1c097ec6ceb49d1bd704c572febdf7da7280d043f3580c1b089dcdd7468` |
+| [`SHA256SUMS.txt`](https://github.com/ussmarines/mailperch-thunderbird/releases/download/v1.1.1/SHA256SUMS.txt) | 192 octets | `b0e61e9920c6d3f43e521efe4d1717663c06f599cb480663b67885b2cdeacadf` |
 
-Les tailles et empreintes finales sont publiées dans `SHA256SUMS.txt`, attaché à
-la release `v1.1.1`. Ce fichier reste la source autoritative afin d’éviter une
-empreinte autoréférentielle dans l’archive source qui le contient.
+Le fichier `SHA256SUMS.txt` téléchargé valide les deux archives publiées. Une
+comparaison Windows/Linux trouve les mêmes 47 entrées XPI et 165 entrées source,
+dans le même ordre, avec zéro différence de contenu décompressé. Les flux DEFLATE
+et les métadonnées d’hôte ZIP diffèrent néanmoins entre les implémentations ; les
+empreintes du workflow Linux ci-dessus sont donc les références de cette release.

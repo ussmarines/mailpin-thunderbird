@@ -1,8 +1,9 @@
 # Audit global MailPerch 1.1.1
 
 Date : 5 août 2026
-Statut : candidat de release ; la publication reste conditionnée à la CI finale,
-aux artefacts reconstruits depuis `main` et au nettoyage ciblé de l’historique.
+Statut : audit terminé et release GitHub `v1.1.1` publiée. La seule opération
+externe restante est la purge des références internes de PR et des vues en cache
+par GitHub Support.
 
 ## Périmètre
 
@@ -27,6 +28,12 @@ décrites dans `docs/SECURITY_BOUNDARY.md`.
 
 Le registre canonique et les validations associées sont dans
 `docs/BUG_TRACKER.md`.
+
+Une limite de reproductibilité inter-plateforme découverte lors du contrôle final
+est suivie sous `MP-2026-018` : Windows et Linux produisent des conteneurs ZIP aux
+empreintes différentes, mais avec exactement les mêmes entrées, le même ordre et
+le même contenu décompressé. Les sommes publiées par le workflow Linux restent
+autoritatives pour la release 1.1.1.
 
 ## Confidentialité
 
