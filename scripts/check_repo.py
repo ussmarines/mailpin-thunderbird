@@ -14,6 +14,14 @@ import xml.etree.ElementTree as ET
 ROOT = Path(__file__).resolve().parents[1]
 EXT = ROOT / "extension"
 errors: list[str] = []
+LOCAL_GENERATED_PARTS = {
+    ".git", ".pytest_cache", ".reports", ".security-reports",
+    "__pycache__", "dist", "node_modules",
+}
+
+
+def is_local_generated(path: Path) -> bool:
+    return any(part in LOCAL_GENERATED_PARTS for part in path.relative_to(ROOT).parts)
 
 
 class ResourceHTMLParser(HTMLParser):
@@ -138,7 +146,7 @@ check(en_locale.get("brandSlogan", {}).get("message") == "Keep important mail wi
 
 required_root = [
     "AGENTS.md", "PROJECT_MEMORY.md", "BRANDING.md", "README.md", "README.en.md", "LICENSE", "NOTICE.md", "CHANGELOG.md",
-    "CONTRIBUTING.md", "CODE_OF_CONDUCT.md", "SECURITY.md", "SECURITY_PRODUCTION_RULES.md", "SECURITY_AUDIT_1.0.0.md", "SECURITY_AUDIT_1.1.0.md", "PRIVACY.md", "ROADMAP.md", "SUPPORT.md", "docs/BUG_TRACKER.md",
+    "CONTRIBUTING.md", "CODE_OF_CONDUCT.md", "SECURITY.md", "SECURITY_PRODUCTION_RULES.md", "SECURITY_AUDIT_1.0.0.md", "SECURITY_AUDIT_1.1.0.md", "SECURITY_AUDIT_1.1.1.md", "PRIVACY.md", "ROADMAP.md", "SUPPORT.md", "docs/BUG_TRACKER.md",
     "package.json", ".editorconfig", ".gitattributes", ".gitignore", "extension/AGENTS.md",
     "extension/api/pinInbox/AGENTS.md", "tests/AGENTS.md",
     "docs/PROJECT_STATE.json", "docs/ARCHITECTURE.md", "docs/CODEX_HANDOFF.md", "docs/IDENTITY_MIGRATION_REQUIRED.md", "docs/DATA_MODEL.md", "docs/DEBUGGING.md", "docs/SECURITY_BOUNDARY.md",
@@ -154,7 +162,7 @@ for relative in required_root:
 # Text hygiene and local Markdown links.
 text_suffixes = {".md", ".js", ".mjs", ".json", ".css", ".html", ".py", ".yml", ".yaml", ".txt"}
 for path in ROOT.rglob("*"):
-    if not path.is_file() or any(part in {".git", "dist", "__pycache__"} for part in path.relative_to(ROOT).parts):
+    if not path.is_file() or is_local_generated(path):
         continue
     if path.suffix.lower() not in text_suffixes and path.name not in {"LICENSE", ".editorconfig", ".gitattributes", ".gitignore"}:
         continue
@@ -169,7 +177,7 @@ for path in ROOT.rglob("*"):
         check(line == line.rstrip(" \t"), f"espace final {path.relative_to(ROOT)}:{line_number}")
 
 for markdown in ROOT.rglob("*.md"):
-    if any(part in {".git", "dist"} for part in markdown.relative_to(ROOT).parts):
+    if is_local_generated(markdown):
         continue
     text = markdown.read_text(encoding="utf-8")
     for target in re.findall(r"(?<!!)\[[^\]]*\]\(([^)]+)\)", text):
@@ -210,7 +218,7 @@ for path in sorted(EXT.rglob("*.js")) + sorted(EXT.rglob("*.mjs")):
     check(not re.search(r"https?://", text), f"URL distante dans le code JS {path.relative_to(ROOT)}")
 
 for path in ROOT.rglob("*.json"):
-    if ".git" not in path.parts:
+    if not is_local_generated(path):
         load_json(path)
 
 for path in EXT.rglob("*.svg"):
@@ -294,7 +302,7 @@ for candidate in ROOT.rglob("*"):
         errors.append(f"lien symbolique interdit dans le dépôt: {candidate.relative_to(ROOT)}")
 
 for path in ROOT.rglob("*"):
-    if not path.is_file() or ".git" in path.parts:
+    if not path.is_file() or is_local_generated(path):
         continue
     relative = path.relative_to(ROOT)
     check(path.stat().st_size < 3_500_000, f"fichier source trop volumineux: {relative}")

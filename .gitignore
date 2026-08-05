@@ -31,6 +31,8 @@ __pycache__/
 Thumbs.db
 .vscode/
 .idea/
+.playwright-cli/
+output/playwright/
 
 CI_LOG_*.txt
 ROUNDTRIP_CI_LOG_*.txt

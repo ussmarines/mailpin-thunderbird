@@ -1,0 +1,12 @@
+title = "MailPerch secret scanning"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Historic detector-marker declaration, not private key material."
+targetRules = ["private-key"]
+condition = "AND"
+regexTarget = "line"
+paths = ['''^\.github/scripts/security_guard\.py$''']
+regexes = ['''^\s*PRIVATE_KEY_MARKERS\s*=\s*\(b"-----BEGIN PRIVAT[E] K[E]Y-----", b"-----BEGIN ENCRYPTED PRIVAT[E] K[E]Y-----", b"-----BEGIN RSA PRIVAT[E] K[E]Y-----", b"-----BEGIN OPENSSH PRIVAT[E] K[E]Y-----", b"-----BEGIN EC PRIVAT[E] K[E]Y-----"\)\s*$''']

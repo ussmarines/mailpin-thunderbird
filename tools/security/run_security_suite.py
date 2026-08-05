@@ -32,7 +32,7 @@ def main() -> int:
     gitleaks = [tools['gitleaks']['executable'], 'git' if args.profile == 'full' else 'dir']
     if args.profile == 'full': gitleaks += ['.', '--log-opts=--all']
     else: gitleaks += ['.']
-    gitleaks += ['--redact=100','--exit-code=2','--report-format=json',f"--report-path={reports/'gitleaks.json'}"]
+    gitleaks += ['--config',str(repo/'.gitleaks.toml'),'--redact=100','--exit-code=2','--report-format=json',f"--report-path={reports/'gitleaks.json'}"]
     run('gitleaks', gitleaks, results, repo)
     run('opengrep', [tools['opengrep']['executable'],'scan','--config',str(repo/'.security/opengrep/project-security.yml'),'--json-output',str(reports/'opengrep.json'),'--error','--exclude','node_modules','--exclude','vendor','--exclude','dist',str(repo)], results, repo)
     trivy = tools['trivy']['executable']

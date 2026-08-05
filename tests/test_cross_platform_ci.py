@@ -9,6 +9,7 @@ package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
 ci = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
 release = (ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8")
 dependabot = (ROOT / ".github/dependabot.yml").read_text(encoding="utf-8")
+gitleaks = (ROOT / ".gitleaks.toml").read_text(encoding="utf-8")
 check_repo = (ROOT / "scripts/check_repo.py").read_text(encoding="utf-8")
 deep_audit = (ROOT / "scripts/deep_audit.py").read_text(encoding="utf-8")
 
@@ -21,6 +22,11 @@ assert "runs-on: windows-latest" in ci
 assert "npm run check && npm test" in ci
 assert "npm run ci" in release
 assert "gh release create" in release
+assert 'tags:\n      - "v*"' in release
+assert 'test "${GITHUB_REF_NAME}" = "$TAG"' in release
+assert 'test "${GITHUB_REF_NAME}" = "main"' in release
+assert "git/refs/heads" not in release
+assert "Remove obsolete maintenance branches" not in release
 
 expected_actions = {
     "actions/checkout": "3d3c42e5aac5ba805825da76410c181273ba90b1",
@@ -48,6 +54,11 @@ assert "--latest" in release
 assert "include-hidden-files: false" in ci
 assert "MailPerch_GitHub_Repository_v${VERSION}.zip" in release
 assert "package-ecosystem: github-actions" in dependabot
+assert "default-days: 7" in dependabot
+assert 'targetRules = ["private-key"]' in gitleaks
+assert 'condition = "AND"' in gitleaks
+assert 'regexTarget = "line"' in gitleaks
+assert "PRIVATE_KEY_MARKERS" in gitleaks and "security_guard\\.py" in gitleaks
 assert "BeautifulSoup" not in check_repo
 assert "tinycss2" not in check_repo
 assert "from html.parser import HTMLParser" in check_repo
@@ -56,5 +67,10 @@ assert '["git", "check-ignore", "--no-index", "-z", "--stdin"]' in deep_audit
 assert 'input=b"\\0".join(tracked_names) + b"\\0"' in deep_audit
 assert 'text=False' in deep_audit
 assert '"\n".join(sorted(tracked_names))' not in deep_audit
+assert '".reports"' in check_repo
+assert '".reports"' in deep_audit
+assert '".playwright-cli"' in deep_audit
+assert 'path.relative_to(ROOT).parts[:2] != ("output", "playwright")' in deep_audit
+assert 'path.name != ".mailperch-source-files.json"' in deep_audit
 
 print("Cross-platform CI tooling guards: OK")
