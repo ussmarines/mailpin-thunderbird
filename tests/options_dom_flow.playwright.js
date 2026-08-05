@@ -1,26 +1,34 @@
 async page => {
   const baseUrl = "http://127.0.0.1:8765";
   const optionsUrl = `${baseUrl}/extension/options/options.html`;
+  const [englishResponse, frenchResponse] = await Promise.all([
+    page.request.get(`${baseUrl}/extension/_locales/en/messages.json`),
+    page.request.get(`${baseUrl}/extension/_locales/fr/messages.json`)
+  ]);
+  if (!englishResponse.ok() || !frenchResponse.ok()) {
+    throw new Error(`Unable to load locale catalogs: en=${englishResponse.status()} fr=${frenchResponse.status()}`);
+  }
+  const localeMessages = {en: await englishResponse.json(), fr: await frenchResponse.json()};
 
   await page.goto(baseUrl);
   await page.evaluate(() => localStorage.clear());
-  await page.addInitScript(() => {
+  await page.addInitScript(({localeMessages}) => {
     const STORAGE_KEY = "mailperch-options-dom-persisted";
     const META_KEY = "mailperch-options-dom-meta";
     const clone = value => JSON.parse(JSON.stringify(value));
     const accounts = [{
       key: "account-test",
-      name: "Compte synthétique",
+      name: "Synthetic account",
       email: "",
       color: "#0f6cbd",
       defaultColor: "#0f6cbd",
       protocol: "none",
       provider: "test",
-      inboxes: [{uri: "mailbox://synthetic/Inbox", name: "Boîte synthétique", enabled: true}]
+      inboxes: [{uri: "mailbox://synthetic/Inbox", name: "Synthetic inbox", enabled: true}]
     }];
     const initial = {
       settings: {},
-      groups: [{id: "group-test", name: "Groupe synthétique", color: "#6264a7", updatedAt: 1}],
+      groups: [{id: "group-test", name: "Synthetic group", color: "#6264a7", updatedAt: 1}],
       rules: [],
       cases: [],
       templates: []
@@ -102,7 +110,7 @@ async page => {
             if (initializationMode() === "calendar-never") return () => new Promise(() => {});
             return async () => [{
               id: "calendar-test",
-              name: "Agenda synthétique",
+              name: "Synthetic calendar",
               type: "memory",
               writable: true,
               taskCompatible: true,
@@ -120,10 +128,13 @@ async page => {
           return async () => ({});
         }
       });
-    const englishDynamicMessages = {
-      dynamicName: "Name", dynamicTitle: "Title", dynamicRuleEnabled: "Enabled",
-      dynamicMoveUp: "Move this item up", dynamicMoveDown: "Move this item down",
-      dynamicChooseCalendar: "Choose a compatible calendar before creating the Calendar item."
+    const localizedText = (key, substitutions = []) => {
+      const language = sessionStorage.getItem("mailperch-options-test-locale") === "en" ? "en" : "fr";
+      const source = localeMessages[language]?.[key]?.message || "";
+      const values = Array.isArray(substitutions) ? substitutions : [substitutions];
+      return values.length
+        ? source.replace(/\$(\d+)/g, (match, index) => values[Number(index) - 1] === undefined ? match : String(values[Number(index) - 1]))
+        : source;
     };
     globalThis.messenger = {
       commands: {
@@ -131,14 +142,12 @@ async page => {
         update: async () => {}
       },
       runtime: {
-        getManifest: () => ({version: "3.2.10"}),
+        getManifest: () => ({version: "1.1.1"}),
         getURL: path => path
       },
       i18n: {
         getUILanguage: () => sessionStorage.getItem("mailperch-options-test-locale") || "fr",
-        getMessage: key => (sessionStorage.getItem("mailperch-options-test-locale") === "en"
-          ? englishDynamicMessages[key] || `English ${key}`
-          : `Français ${key}`)
+        getMessage: localizedText
       },
       tabs: {create: async ({url}) => {
         globalThis.__mailperchExternalUrls.push(url);
@@ -151,7 +160,7 @@ async page => {
     } else if (initializationMode() !== "api-absent") {
       globalThis.messenger.pinInbox = pinInbox;
     }
-  });
+  }, {localeMessages});
 
   const assert = (condition, message) => {
     if (!condition) throw new Error(message);
@@ -259,7 +268,8 @@ async page => {
     "The PayPal support link must open only after an explicit click");
   await page.evaluate(() => { globalThis.__mailperchFailExternalOpen = true; });
   await page.locator("#support-author").click();
-  assert((await page.locator("#status-message").textContent()).includes("supportOpenFailed"),
+  const supportOpenFailure = await page.evaluate(() => messenger.i18n.getMessage("supportOpenFailed"));
+  assert((await page.locator("#status-message").textContent()).includes(supportOpenFailure),
     "A controlled external-open failure must leave an accessible localized error");
   await page.evaluate(() => { globalThis.__mailperchFailExternalOpen = false; });
 
@@ -286,7 +296,7 @@ async page => {
     return !labelled;
   }).map(control => control.outerHTML));
   assert(missingDynamicNames.length === 0, "Every generated model, rule and case field must have an accessible visible name");
-  const caseAgenda = page.locator(".case-editor-row button").filter({hasText: "Agenda"});
+  const caseAgenda = page.locator('.case-editor-row button[data-action="case-calendar"]');
   await caseAgenda.click();
   assert((await page.evaluate(() => globalThis.__mailperchCalendarCreates.length)) === 0,
     "A case without a due date must not call the Calendar API");
@@ -298,15 +308,31 @@ async page => {
       .map(node => node.getBoundingClientRect()).some(rect => overlaps(result, rect));
   });
   assert(!simulationGeometry, "The simulation result must not overlap its button, help or actions");
+  await page.locator("#discard-changes").click();
+  await page.waitForFunction(() => document.querySelector("#save-dock").hidden);
 
   // Dynamic labels must use a non-empty English translation, not a French
   // source literal, after the document is reconstructed in English.
   await page.evaluate(() => sessionStorage.setItem("mailperch-options-test-locale", "en"));
   await page.reload();
   await waitReady();
-  await page.locator("#add-template").click();
+  for (const selector of ["#add-group", "#add-case", "#add-template", "#add-rule"]) {
+    await page.locator(selector).click();
+  }
   assert(await page.locator(".template-row .entity-field > span").first().textContent() === "Name",
     "Generated fields must render their non-empty English translation");
+  const frenchLeaks = await page.locator("body *:not(noscript)").evaluateAll(elements => {
+    const pattern = /[éèêàùçœ]|\b(Aucun|Aucune|Choisir|Supprimer|Nom|Affaire|Groupe|Règle|Compte|Dossiers|Paramètres|Enregistrer|Annuler|Raccourci|Sauvegarde|Réparation|Vérification|Nouveau|Lecture|Archivage|Réponse|Déplacement|Conserver|Arrêter)\b/i;
+    return elements.filter(element => {
+      const style = getComputedStyle(element);
+      if (style.display === "none" || style.visibility === "hidden") return false;
+      const ownText = [...element.childNodes].filter(node => node.nodeType === Node.TEXT_NODE).map(node => node.textContent).join(" ");
+      return pattern.test([ownText, element.getAttribute("aria-label") || "", element.getAttribute("title") || "", element.getAttribute("placeholder") || ""].join(" "));
+    }).map(element => element.outerHTML.slice(0, 240));
+  });
+  assert(frenchLeaks.length === 0, `English UI must not expose French dynamic text: ${frenchLeaks.join(" | ")}`);
+  await page.locator("#discard-changes").click();
+  await page.waitForFunction(() => document.querySelector("#save-dock").hidden);
 
   // Use a real select interaction and a real save-button click. The visible
   // click path must issue one write, read it back and persist after reload.
@@ -333,7 +359,7 @@ async page => {
     local: [...document.querySelectorAll(".control-feedback[data-active='true']")].map(item => item.textContent),
     pointer: globalThis.__mailperchPointerEvents
   }));
-  assert(savedFeedback.toast === "Paramètres enregistrés.", "Save must show a truthful success notification");
+  assert(savedFeedback.toast === "Settings saved.", "Save must show a truthful localized success notification");
   assert(savedFeedback.pointer.pointerdown > 0 && savedFeedback.pointer.pointerup > 0 && savedFeedback.pointer.click > 0,
     "The test must exercise pointerdown, pointerup and click events");
 
@@ -427,14 +453,14 @@ async page => {
   await page.locator("#showSearch").uncheck();
   const beforeFailure = await meta();
   await page.locator("#save-all-floating").click();
-  await page.waitForFunction(() => document.querySelector("#status-message").textContent.includes("échec API synthétique"));
+  await page.waitForFunction(() => document.querySelector("#status-message").textContent === "Unable to save settings (Error)");
   state = await dockState();
   const afterFailure = await meta();
   assert(afterFailure.setAttempts - beforeFailure.setAttempts === 1 && afterFailure.writes === beforeFailure.writes,
     "A failed save must be attempted once and must not count as a write");
   assert(state.dirty && !state.hidden && !state.saveDisabled && !state.discardDisabled,
     "A failed save must keep an actionable draft");
-  assert(!(await page.locator("#status-message").textContent()).includes("Paramètres enregistrés"),
+  assert(!(await page.locator("#status-message").textContent()).includes("Settings saved"),
     "A failed save must never report success");
   await setMeta({failSave: false});
   await page.locator("#discard-changes").click();

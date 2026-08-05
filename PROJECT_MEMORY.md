@@ -4,11 +4,11 @@
 > Lire ce document avant tout autre fichier. Il donne l’état courant, les invariants,
 > la carte du dépôt et les chemins exacts à ouvrir selon la tâche.
 >
-> Version publique : **1.1.0**
-> Base de travail vérifiée : `main`, après intégration fast-forward du durcissement et de la décision d’identité du 4 août 2026
+> Version publique : **1.1.1**
+> Base de travail vérifiée : `main`, synchronisée avant l’audit de publication du 5 août 2026
 > Produit : **MailPerch — Email Pins & Follow-up**
 > Extension ID canonique : `pin-mails@MailPerch.local`
-> Publication : **jamais effectuée à ce jour**. La décision d’identité est résolue ; toute première publication reste soumise à la QA, à la validation locale et à l’accord explicite du propriétaire.
+> Publication : releases GitHub `v1.0.0` et `v1.1.0` existantes ; aucune publication ATN connue. L’identifiant canonique a donc valeur d’identité publique immuable.
 
 ## 1. Résumé en 30 secondes
 
@@ -41,7 +41,8 @@ HTML/JS/CSS et exerce 98 contrôles, Enregistrer, Annuler, les événements poin
 les erreurs et la reconstruction de page. Dans les cartes Thunderbird 153,
 `.thread-card-icon-info` devient un rail de grille couvrant toutes les lignes au
 lieu de rester dans la rangée basse native. MP-2026-004, MP-2026-005 et
-MP-2026-007 restent `À VALIDER` jusqu'à observation dans Thunderbird.
+MP-2026-007 restaient alors `À VALIDER` jusqu'à observation dans Thunderbird ;
+leurs validations ultérieures sont conservées dans `docs/BUG_TRACKER.md`.
 
 La version 3.2.9 borne l’initialisation de la page Paramètres : configuration,
 raccourcis et composants secondaires ont un délai maximal ; l’Agenda, la santé et
@@ -77,6 +78,16 @@ fusion prudente des conversations. Les décisions de revue et de fusion sont iso
 dans `modules/review.js` et `modules/related.js` ; une fusion exige une identité
 Thunderbird/Gmail forte et reste confirmée par l’utilisateur.
 
+La version publique 1.1.1 est une release corrective. Elle durcit la confidentialité
+des diagnostics et de l’historique, empêche les rapprochements de conversations sur
+le seul objet, retire un contournement de l’allowlist de build, sécurise les workflows
+de release et complète la localisation/accessibilité des Options, du dashboard et
+des 237 libellés privilégiés du panneau. Les scénarios navigateur réels utilisent
+les actifs de production et les catalogues FR/EN. Un XPI candidat a en outre été
+installé dans Thunderbird 153.0.1 avec un compte local et quatre messages
+synthétiques : panneau séparé, invariants de lecture, géométrie native et menu de
+17 actions anglais ont été observés sans ouvrir le profil utilisateur réel.
+
 ## 2. Invariants non négociables
 
 1. Ne jamais modifier les compteurs natifs de nouveaux messages, non-lus ou totaux.
@@ -105,9 +116,9 @@ Thunderbird/Gmail forte et reste confirmée par l’utilisateur.
 
 | Élément | Valeur |
 |---|---|
-| Version extension/package | `1.1.0` |
+| Version extension/package | `1.1.1` |
 | Identifiant extension | `pin-mails@MailPerch.local` |
-| Statut catalogue | Jamais publié |
+| Statut catalogue | Releases GitHub publiées ; ATN non publié |
 | Thunderbird déclaré | `128.0` à `153.*` |
 | Manifest | MV3 |
 | Permission WebExtension | `menus` uniquement |

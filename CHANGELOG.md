@@ -1,5 +1,17 @@
 # Journal des modifications
 
+## 1.1.1 — confidentialité, robustesse et qualité de publication
+
+- suppression des références personnelles de la branche courante et ajout d’un garde de confidentialité capable d’assainir les textes sans exposer les valeurs retirées ;
+- rapprochement de conversations limité aux identités fortes : un objet identique ne peut plus fusionner seul des conversations distinctes ;
+- diagnostics, journaux et erreurs privilégiées expurgés des chemins locaux, identifiants, URL à credentials et détails API non nécessaires ;
+- suppression du contournement de l’allowlist de build et durcissement des scripts d’installation, scans classiques, workflows et paramètres GitHub Actions ;
+- release déclenchée uniquement par un tag de version cohérent ou manuellement, sans suppression automatique de branches de maintenance ;
+- localisation anglaise complète des Options et du dashboard, libellés ARIA localisés et scénarios navigateur couvrant les 98 contrôles, les 7 vues, le responsive et les thèmes ;
+- localisation complète des 237 libellés privilégiés du panneau, du menu natif, de l’éditeur et des rappels, validée dans Thunderbird 153.0.1 anglais avec quatre messages synthétiques ;
+- validation réelle du panneau séparé, du clic de carte, des compteurs non lus et de l’alignement punaise/étoile/pièce jointe dans un profil Thunderbird jetable ;
+- nouveaux tests de sécurité, confidentialité, reproductibilité, compatibilité multiplateforme et contrats navigateur.
+
 ## 1.1.0 — suivi quotidien et productivité
 
 - suivi automatique des réponses sortantes et annulation du suivi lorsqu’une réponse entrante est détectée ;

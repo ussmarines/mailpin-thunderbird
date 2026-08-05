@@ -43,7 +43,8 @@ assert 'form.requestSubmit($("save-all-floating"));' not in OPTIONS_JS
 # has now completed its real Thunderbird validation.
 card_row = next(line for line in TRACKER.splitlines() if line.startswith("| MP-2026-004 |"))
 options_row = next(line for line in TRACKER.splitlines() if line.startswith("| MP-2026-005 |"))
-assert "| À VALIDER | 3.2.8 |" in card_row
+assert "| CORRIGÉ | 3.2.8 |" in card_row
+assert "Thunderbird 153.0.1" in card_row and "messages synthétiques" in card_row
 assert "| CORRIGÉ | 3.2.10 |" in options_row
 
 print("MailPerch 3.2.6/3.2.8 real-interaction regression guards: OK")

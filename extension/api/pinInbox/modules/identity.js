@@ -78,9 +78,19 @@
     } else if (threadId) {
       discriminator = `thread:${threadId}`;
     } else {
-      discriminator = `subject:${hash(normalizedSubject)}`;
+      // No subject-only conversation identity: unrelated mail routinely shares
+      // generic subjects. This local key identifies only the concrete header.
+      const folderURI = text(hdr?.folder?.URI);
+      const messageKey = Number(hdr?.messageKey || 0);
+      const date = Number(hdr?.date || 0);
+      const size = Number(hdr?.messageSize || 0);
+      discriminator = `local:${hash(`${folderURI}|${messageKey}|${date}|${size}|${normalizedSubject}`)}`;
     }
     return `${String(accountKey || "unknown")}|conv:${discriminator}`;
+  }
+
+  function strongConversationKey(value) {
+    return /\|conv:(?:gm|root|thread):/i.test(String(value || ""));
   }
 
   function signature(hdr, accountKey, subject, author) {
@@ -122,7 +132,7 @@
     if (left.rootMessageId && right.rootMessageId) {
       return false;
     }
-    return Boolean(left.normalizedSubject && left.normalizedSubject === right.normalizedSubject);
+    return false;
   }
 
   function fingerprint(hdr, accountKey, subject, author) {
@@ -145,6 +155,7 @@
     gmThreadId,
     normalizeSubject,
     conversationIdentity,
+    strongConversationKey,
     signature,
     sameConversation,
     fingerprint

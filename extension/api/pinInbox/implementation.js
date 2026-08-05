@@ -107,12 +107,16 @@ let MAILPERCH_UNINSTALLING = false;
 const ACTIVE_PIN_INBOX_INSTANCES = new Set();
 const MAILPERCH_LIFECYCLE_HANDLERS = new Map();
 
+function safeErrorName(error) {
+  return String(error?.name || "Error").replace(/[^a-z0-9_.-]/gi, "").slice(0, 64) || "Error";
+}
+
 async function removePathIfPresent(path, options = {}) {
   if (!path) return;
   try {
     if (await IOUtils.exists(path)) await IOUtils.remove(path, options);
   } catch (error) {
-    console.warn("MailPerch : suppression locale incomplète", path, error);
+    console.warn("MailPerch : suppression locale incomplète", safeErrorName(error));
   }
 }
 
@@ -147,7 +151,7 @@ async function removeMailPerchBackupFiles(directory, {removeDirectory = false} =
       }
     }
   } catch (error) {
-    console.warn("MailPerch : nettoyage des sauvegardes incomplet", error);
+    console.warn("MailPerch : nettoyage des sauvegardes incomplet", safeErrorName(error));
   }
 }
 
@@ -195,7 +199,7 @@ async function ensureMailPerchInstallationState(extensionId) {
     await lazy.ExtensionStorage.set(id, {[INSTALL_SENTINEL_KEY]: INSTALL_SENTINEL_VALUE});
     return {fresh: !preserveExisting, storageAvailable: true};
   } catch (error) {
-    console.warn("MailPerch : état d’installation impossible à vérifier", error);
+    console.warn("MailPerch : état d’installation impossible à vérifier", safeErrorName(error));
     return {fresh: false, storageAvailable: false};
   }
 }
@@ -346,7 +350,7 @@ function parseStored(prefName, fallback) {
     assertStructuredInput(parsed, `Préférence ${prefName}`, {maxBytes: MAX_IMPORT_BYTES});
     return parsed;
   } catch (error) {
-    console.warn(`Épingles : préférence invalide ${prefName}`, error);
+    console.warn(`Épingles : préférence invalide ${prefName}`, safeErrorName(error));
     return clone(fallback);
   }
 }
@@ -1048,6 +1052,11 @@ function conversationStableKey(hdr) {
   return `${accountKey}|conv:${hashString(normalized).toString(16)}`;
 }
 
+function isStrongConversationKey(value) {
+  return PIN_MODULES.PinIdentity?.strongConversationKey(value) ??
+    /\|conv:(?:gm|root|thread):/i.test(String(value || ""));
+}
+
 function messageIdentityFingerprint(hdr) {
   const accountKey = accountKeyForFolder(hdr?.folder);
   if (PIN_MODULES.PinIdentity) {
@@ -1114,22 +1123,6 @@ function smartSectionForRef(ref, now = Date.now()) {
   if (due < week.getTime()) return "week";
   return "later";
 }
-
-const SMART_SECTION_LABELS = Object.freeze({
-  overdue: "En retard",
-  today: "Aujourd’hui",
-  week: "Cette semaine",
-  waiting: "En attente",
-  noReply: "Sans réponse",
-  snoozed: "En veille",
-  later: "Plus tard",
-  noDue: "Sans échéance",
-  unread: "Non lus",
-  missing: "Messages introuvables",
-  calendarError: "Agenda à vérifier",
-  recentCompleted: "Récemment terminés",
-  completed: "Terminés"
-});
 
 class PinStructuredStore {
   constructor(owner) {
@@ -2077,8 +2070,10 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         changed = true;
         continue;
       }
-      const title = ref.workflowStatus === "waiting" && ref.followUpAt && ref.followUpAt <= now ? "Relance à effectuer" : (ref.dueAt && ref.dueAt < now ? "Message épinglé en retard" : "Rappel de message épinglé");
-      const text = `${ref.subject || "(sans objet)"} — ${ref.author || ref.accountName || ""}`;
+      const title = ref.workflowStatus === "waiting" && ref.followUpAt && ref.followUpAt <= now
+        ? this._t("reminderTitleFollowUp", "")
+        : (ref.dueAt && ref.dueAt < now ? this._t("reminderTitleOverdue", "") : this._t("reminderTitlePinned", ""));
+      const text = `${ref.subject || this._t("noSubject", "")} — ${ref.author || ref.accountName || ""}`;
       try {
         const listener = {
           observe: (_subject, topic) => {
@@ -2151,7 +2146,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         });
       }
     } catch (error) {
-      console.warn("Épingles : lecture des comptes incomplète", error);
+      console.warn("Épingles : lecture des comptes incomplète", safeErrorName(error));
     }
     return accounts;
   }
@@ -2376,7 +2371,8 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         normalizedSubject: PIN_MODULES.PinIdentity?.normalizeSubject(ref.subject) || sanitizeSearchText(ref.subject),
         author: sanitizeSearchText(ref.author)
       };
-      if (ref.trackingMode === "conversation" && (ref.stableKey === convKey || ref.conversationKey === convKey)) results.push(ref);
+      if (ref.trackingMode === "conversation" && isStrongConversationKey(convKey) &&
+          (ref.stableKey === convKey || ref.conversationKey === convKey)) results.push(ref);
       else if (ref.identityFingerprint && ref.identityFingerprint === messageIdentityFingerprint(hdr)) results.push(ref);
       else if (ref.headerMessageId && ref.headerMessageId === String(hdr.messageId || "")) results.push(ref);
       else if (signature && PIN_MODULES.PinIdentity?.sameConversation(refSignature, signature)) results.push(ref);
@@ -3824,7 +3820,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     for(const ref of Object.values(this._data.refs)){
       if(ref.trackingMode!=="conversation")continue;
       const seed=this._resolveReference(ref,false);const seedSignature=seed&&PIN_MODULES.PinIdentity?.signature(seed,ref.accountKey,formatSubject(seed),formatAuthor(seed));
-      const matches=ref.conversationKey===conversationStableKey(hdr)||(signature&&seedSignature&&PIN_MODULES.PinIdentity?.sameConversation(seedSignature,signature));
+      const matches=(isStrongConversationKey(ref.conversationKey)&&ref.conversationKey===conversationStableKey(hdr))||(signature&&seedSignature&&PIN_MODULES.PinIdentity?.sameConversation(seedSignature,signature));
       if(!matches)continue;
       this._conversationCache.delete(ref.stableKey);this._updateConversationReference(ref,hdr);conversationChanged=true;
       this._recordActivity("conversation-update",ref.stableKey,formatSubject(hdr));
@@ -3880,7 +3876,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   _conversationHeaders(seed) {
     if(!seed)return[];const key=conversationStableKey(seed);const cached=this._conversationCache.get(key);if(cached&&Date.now()-cached.time<CONVERSATION_CACHE_MS)return cached.headers;
     const account=getAccountForFolder(seed.folder);const headers=[];const seedSignature=PIN_MODULES.PinIdentity?.signature(seed,accountKeyForFolder(seed.folder),formatSubject(seed),formatAuthor(seed));
-    if(account?.incomingServer?.rootFolder){for(const folder of walkFolders(account.incomingServer.rootFolder)){try{let count=0;const messages=folder.messages;while(messages.hasMoreElements()&&count++<20000){const hdr=messages.getNext().QueryInterface(Ci.nsIMsgDBHdr);const candidate=PIN_MODULES.PinIdentity?.signature(hdr,accountKeyForFolder(hdr.folder),formatSubject(hdr),formatAuthor(hdr));if((seedSignature&&candidate&&PIN_MODULES.PinIdentity?.sameConversation(seedSignature,candidate))||conversationStableKey(hdr)===key)headers.push(hdr);}}catch{}}}
+    if(account?.incomingServer?.rootFolder){for(const folder of walkFolders(account.incomingServer.rootFolder)){try{let count=0;const messages=folder.messages;while(messages.hasMoreElements()&&count++<20000){const hdr=messages.getNext().QueryInterface(Ci.nsIMsgDBHdr);const candidate=PIN_MODULES.PinIdentity?.signature(hdr,accountKeyForFolder(hdr.folder),formatSubject(hdr),formatAuthor(hdr));if((seedSignature&&candidate&&PIN_MODULES.PinIdentity?.sameConversation(seedSignature,candidate))||(isStrongConversationKey(key)&&conversationStableKey(hdr)===key))headers.push(hdr);}}catch{}}}
     headers.sort((a,b)=>Number(b.date||0)-Number(a.date||0));this._conversationCache.set(key,{time:Date.now(),headers});return headers;
   }
 
@@ -4429,13 +4425,13 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     const eventSupported = this._calendarCapabilitySupported(calendar, "event");
     const writable = !readOnly && !disabled && aclWritable;
     const reasons = [];
-    if (disabled) reasons.push("calendrier désactivé");
-    if (readOnly) reasons.push("lecture seule");
-    if (!readOnly && !aclWritable) reasons.push("droits d’écriture refusés par l’ACL");
-    if (!taskSupported && !eventSupported) reasons.push("ni les tâches ni les événements ne sont pris en charge");
+    if (disabled) reasons.push(this._t("calendarDisabledReason", ""));
+    if (readOnly) reasons.push(this._t("calendarReadOnlyReason", ""));
+    if (!readOnly && !aclWritable) reasons.push(this._t("calendarAclDeniedReason", ""));
+    if (!taskSupported && !eventSupported) reasons.push(this._t("calendarItemsUnsupportedReason", ""));
     return {
       id: String(calendar?.id || ""),
-      name: String(calendar?.name || calendar?.id || "Calendrier sans nom"),
+      name: String(calendar?.name || calendar?.id || this._t("calendarUnnamed", "")),
       type: String(calendar?.type || ""),
       readOnly,
       disabled,
@@ -4862,6 +4858,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       if (text !== undefined) node.textContent = text;
       return node;
     };
+    const t = (key, variables = {}) => this._t(key, "", variables);
 
     const elementFromEvent = event => {
       const path = typeof event.composedPath === "function" ? event.composedPath() : [];
@@ -5016,7 +5013,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       panelToggle = createNode("button", "button collapsible-button icon-button check-button pin-mails-qfb-toggle");
       panelToggle.id = PANEL_TOGGLE_ID;
       panelToggle.type = "button";
-      panelToggle.appendChild(createNode("span", "", "Épinglés"));
+      panelToggle.appendChild(createNode("span", "", t("panelToggleLabel")));
       nativeStarButton.after(panelToggle);
       panelToggle.addEventListener("click", event => {
         if (!isEnabled()) return;
@@ -5032,7 +5029,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       ensurePanelToggle();
       const visible = panelVisible();
       panelToggle.hidden = !isEnabled();
-      panelToggle.setAttribute("aria-label", visible ? "Masquer la section Épinglés" : "Afficher la section Épinglés");
+      panelToggle.setAttribute("aria-label", t(visible ? "panelHideSection" : "panelShowSection"));
       panelToggle.setAttribute("title", panelToggle.getAttribute("aria-label"));
       panelToggle.setAttribute("aria-pressed", String(visible));
     };
@@ -5047,7 +5044,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       const text = createNode("span", "pin-mails-toast-text", message);
       toast.appendChild(text);
       if (allowUndo && this._settings.enableUndo && this._undoStack?.length) {
-        const undo = createNode("button", "pin-mails-toast-undo", "Annuler");
+        const undo = createNode("button", "pin-mails-toast-undo", t("panelUndo"));
         undo.type = "button";
         undo.addEventListener("click", () => this._undoLast(), {once: true});
         toast.appendChild(undo);
@@ -5063,48 +5060,48 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       if (editor?.isConnected) return editor;
       editor = createNode("dialog", "pin-mails-editor"); editor.id = EDITOR_ID;
       const form = createNode("form", "pin-mails-editor-form"); form.method = "dialog";
-      const title = createNode("h2", "pin-mails-editor-title", "Modifier le suivi");
+      const title = createNode("h2", "pin-mails-editor-title", t("panelEditFollowUpTitle"));
       const subject = createNode("p", "pin-mails-editor-subject");
-      const noteLabel = createNode("label", "", "Note personnelle");
+      const noteLabel = createNode("label", "", t("panelPersonalNote"));
       const note = createNode("textarea", "pin-mails-editor-note"); note.maxLength = MAX_NOTE_LENGTH; note.rows = 4; noteLabel.appendChild(note);
       const grid = createNode("div", "pin-mails-editor-grid");
       const field = (labelText, control) => { const label = createNode("label", "", labelText); label.appendChild(control); grid.appendChild(label); return control; };
-      const group = field("Groupe", createNode("select", "pin-mails-editor-group"));
-      const caseSelect = field("Affaire", createNode("select", "pin-mails-editor-case"));
-      const templateSelect = field("Modèle de suivi", createNode("select", "pin-mails-editor-template"));
+      const group = field(t("panelGroupLabel"), createNode("select", "pin-mails-editor-group"));
+      const caseSelect = field(t("panelCaseLabel"), createNode("select", "pin-mails-editor-case"));
+      const templateSelect = field(t("panelTemplateLabel"), createNode("select", "pin-mails-editor-template"));
       const workflow = createNode("select", "pin-mails-editor-workflow");
-      for (const [value, label] of [["active", "À traiter"], ["waiting", "En attente d’une réponse"], ["planned", "Planifié"], ["completed", "Terminé"]]) { const option = createNode("option", "", label); option.value = value; workflow.appendChild(option); }
-      field("Statut", workflow);
+      for (const [value, key] of [["active", "panelWorkflowActive"], ["waiting", "panelWorkflowWaiting"], ["planned", "panelWorkflowPlanned"], ["completed", "panelWorkflowCompleted"]]) { const option = createNode("option", "", t(key)); option.value = value; workflow.appendChild(option); }
+      field(t("panelStatusLabel"), workflow);
       const priority = createNode("select", "pin-mails-editor-priority");
-      for (const [value, label] of [["normal", "Normale"], ["high", "Haute"], ["urgent", "Urgente"]]) { const option = createNode("option", "", label); option.value = value; priority.appendChild(option); }
-      field("Priorité", priority);
-      const due = createNode("input", "pin-mails-editor-due"); due.type = "datetime-local"; field("Échéance", due);
-      const reminder = createNode("input", "pin-mails-editor-reminder"); reminder.type = "datetime-local"; field("Rappel", reminder);
-      const followUp = createNode("input", "pin-mails-editor-follow-up"); followUp.type = "datetime-local"; field("Relance / reprise", followUp);
+      for (const [value, key] of [["normal", "panelPriorityNormal"], ["high", "panelPriorityHigh"], ["urgent", "panelPriorityUrgent"]]) { const option = createNode("option", "", t(key)); option.value = value; priority.appendChild(option); }
+      field(t("panelPriorityLabel"), priority);
+      const due = createNode("input", "pin-mails-editor-due"); due.type = "datetime-local"; field(t("panelDeadlineLabel"), due);
+      const reminder = createNode("input", "pin-mails-editor-reminder"); reminder.type = "datetime-local"; field(t("panelReminderLabel"), reminder);
+      const followUp = createNode("input", "pin-mails-editor-follow-up"); followUp.type = "datetime-local"; field(t("panelFollowUpLabel"), followUp);
       const repeat = createNode("select", "pin-mails-editor-repeat");
-      for (const [value, label] of [["", "Aucune"], ["daily", "Chaque jour"], ["weekdays", "Jours ouvrés"], ["weekly", "Chaque semaine"], ["monthly", "Chaque mois"]]) { const option = createNode("option", "", label); option.value = value; repeat.appendChild(option); }
-      field("Répétition du rappel", repeat);
+      for (const [value, key] of [["", "panelNone"], ["daily", "panelRepeatDaily"], ["weekdays", "panelRepeatWeekdays"], ["weekly", "panelRepeatWeekly"], ["monthly", "panelRepeatMonthly"]]) { const option = createNode("option", "", t(key)); option.value = value; repeat.appendChild(option); }
+      field(t("panelReminderRepeatLabel"), repeat);
       const recurrence = createNode("select", "pin-mails-editor-recurrence");
-      for (const [value, label] of [["", "Aucune"], ["daily", "Quotidienne"], ["weekdays", "Jours ouvrés"], ["weekly", "Hebdomadaire"], ["monthly", "Mensuelle"], ["quarterly", "Trimestrielle"], ["yearly", "Annuelle"]]) { const option = createNode("option", "", label); option.value = value; recurrence.appendChild(option); }
-      field("Suivi récurrent", recurrence);
-      const recurrenceInterval = createNode("input", "pin-mails-editor-recurrence-interval"); recurrenceInterval.type = "number"; recurrenceInterval.min = "1"; recurrenceInterval.max = "100"; field("Intervalle de récurrence", recurrenceInterval);
-      const lead = createNode("input", "pin-mails-editor-lead"); lead.type = "number"; lead.min = "0"; lead.max = "10080"; field("Rappel anticipé (minutes)", lead);
+      for (const [value, key] of [["", "panelNone"], ["daily", "panelRecurrenceDaily"], ["weekdays", "panelRecurrenceWeekdays"], ["weekly", "panelRecurrenceWeekly"], ["monthly", "panelRecurrenceMonthly"], ["quarterly", "panelRecurrenceQuarterly"], ["yearly", "panelRecurrenceYearly"]]) { const option = createNode("option", "", t(key)); option.value = value; recurrence.appendChild(option); }
+      field(t("panelRecurringLabel"), recurrence);
+      const recurrenceInterval = createNode("input", "pin-mails-editor-recurrence-interval"); recurrenceInterval.type = "number"; recurrenceInterval.min = "1"; recurrenceInterval.max = "100"; field(t("panelRecurrenceIntervalLabel"), recurrenceInterval);
+      const lead = createNode("input", "pin-mails-editor-lead"); lead.type = "number"; lead.min = "0"; lead.max = "10080"; field(t("panelAdvanceReminderLabel"), lead);
       const calendarSelect = createNode("select", "pin-mails-editor-calendar");
-      field("Calendrier Agenda", calendarSelect);
+      field(t("panelCalendarLabel"), calendarSelect);
       const completedLabel = createNode("label", "pin-mails-editor-completed-label");
       const completed = createNode("input", "pin-mails-editor-completed"); completed.type = "checkbox";
-      completedLabel.append(completed, createNode("span", "", "Marqué comme terminé")); grid.appendChild(completedLabel);
+      completedLabel.append(completed, createNode("span", "", t("panelMarkedComplete"))); grid.appendChild(completedLabel);
       const calendarRow = createNode("div", "pin-mails-editor-calendar-row");
-      const applyTemplateButton = createNode("button", "secondary", "Appliquer le modèle"); applyTemplateButton.type = "button";
-      const task = createNode("button", "secondary", "Créer / synchroniser une tâche"); task.type = "button"; task.dataset.calendarAction = "true";
-      const eventButton = createNode("button", "secondary", "Créer / synchroniser un événement"); eventButton.type = "button"; eventButton.dataset.calendarAction = "true";
-      const snooze10 = createNode("button", "secondary", "Reporter 10 min"); snooze10.type = "button";
-      const snoozeHour = createNode("button", "secondary", "Reporter 1 h"); snoozeHour.type = "button";
-      const snoozeTomorrow = createNode("button", "secondary", "Reporter à demain"); snoozeTomorrow.type = "button";
+      const applyTemplateButton = createNode("button", "secondary", t("panelApplyTemplate")); applyTemplateButton.type = "button";
+      const task = createNode("button", "secondary", t("calendarTask")); task.type = "button"; task.dataset.calendarAction = "true";
+      const eventButton = createNode("button", "secondary", t("calendarEvent")); eventButton.type = "button"; eventButton.dataset.calendarAction = "true";
+      const snooze10 = createNode("button", "secondary", t("panelSnooze10")); snooze10.type = "button";
+      const snoozeHour = createNode("button", "secondary", t("panelSnoozeHour")); snoozeHour.type = "button";
+      const snoozeTomorrow = createNode("button", "secondary", t("panelSnoozeTomorrow")); snoozeTomorrow.type = "button";
       calendarRow.append(applyTemplateButton, task, eventButton, snooze10, snoozeHour, snoozeTomorrow);
       const actions = createNode("div", "pin-mails-editor-actions");
-      const cancel = createNode("button", "secondary", "Annuler"); cancel.type = "button";
-      const save = createNode("button", "primary", "Enregistrer"); save.type = "submit"; actions.append(cancel, save);
+      const cancel = createNode("button", "secondary", t("panelCancel")); cancel.type = "button";
+      const save = createNode("button", "primary", t("panelSave")); save.type = "submit"; actions.append(cancel, save);
       form.append(title, subject, noteLabel, grid, calendarRow, actions); editor.appendChild(form); document.body.appendChild(editor);
       cancel.addEventListener("click", () => editor.close());
       applyTemplateButton.addEventListener("click", () => {
@@ -5113,7 +5110,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         this._applyTemplate([stableKey], templateSelect.value);
         editor.close();
         about3Pane.setTimeout(() => openEditor(stableKey), 0);
-        showToast("Modèle de suivi appliqué.", true);
+        showToast(t("panelTemplateApplied"), true);
       });
       const runEditorCalendarAction = async (itemType, button) => {
         setActionBusy(button, true);
@@ -5126,10 +5123,10 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
             calendarSelect.value = calendarId;
           }
           await this._createCalendarItem(editor.dataset.stableKey, itemType, calendarId || ref?.calendarId || "");
-          showToast(itemType === "event" ? "Événement créé ou synchronisé dans l’Agenda." : "Tâche créée ou synchronisée dans l’Agenda.", false, "success");
+          showToast(t(itemType === "event" ? "panelEventSynced" : "panelTaskSynced"), false, "success");
         } catch (error) {
           this._recordDiagnostic("error", "Écriture Agenda depuis l’éditeur impossible", error);
-          showToast(`Agenda impossible : ${error?.message || error}`, false, "error");
+          showToast(t("panelCalendarFailed"), false, "error");
         } finally {
           setActionBusy(button, false);
         }
@@ -5158,18 +5155,18 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     const openEditor = stableKey => {
       const ref = this._data.refs[stableKey]; if (!ref) return;
       const dialog = createEditor(); dialog.dataset.stableKey = stableKey;
-      dialog.querySelector(".pin-mails-editor-subject").textContent = `${ref.trackingMode === "conversation" ? "Conversation · " : ""}${ref.subject || "(sans objet)"}`;
+      dialog.querySelector(".pin-mails-editor-subject").textContent = `${ref.trackingMode === "conversation" ? t("panelConversationPrefix") : ""}${ref.subject || t("panelNoSubject")}`;
       dialog.querySelector(".pin-mails-editor-note").value = ref.note || "";
       const groupSelect = dialog.querySelector(".pin-mails-editor-group"); groupSelect.replaceChildren();
-      const none = createNode("option", "", "Aucun groupe"); none.value = ""; groupSelect.appendChild(none);
+      const none = createNode("option", "", t("panelNoGroup")); none.value = ""; groupSelect.appendChild(none);
       for (const item of this._data.groups) { const option = createNode("option", "", item.name); option.value = item.id; groupSelect.appendChild(option); }
       groupSelect.value = ref.groupId || "";
       const caseSelect = dialog.querySelector(".pin-mails-editor-case"); caseSelect.replaceChildren();
-      const noCase = createNode("option", "", "Aucune affaire"); noCase.value = ""; caseSelect.appendChild(noCase);
+      const noCase = createNode("option", "", t("panelNoCase")); noCase.value = ""; caseSelect.appendChild(noCase);
       for (const item of this._data.cases || []) { const option = createNode("option", "", item.name); option.value = item.id; caseSelect.appendChild(option); }
       caseSelect.value = ref.caseId || "";
       const templateSelect = dialog.querySelector(".pin-mails-editor-template"); templateSelect.replaceChildren();
-      const noTemplate = createNode("option", "", "Aucun modèle"); noTemplate.value = ""; templateSelect.appendChild(noTemplate);
+      const noTemplate = createNode("option", "", t("panelNoTemplate")); noTemplate.value = ""; templateSelect.appendChild(noTemplate);
       for (const item of this._data.templates || []) { const option = createNode("option", "", item.name); option.value = item.id; templateSelect.appendChild(option); }
       templateSelect.value = ref.templateId || "";
       dialog.querySelector(".pin-mails-editor-workflow").value = ref.workflowStatus || (ref.completedAt ? "completed" : "active");
@@ -5186,7 +5183,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       calendarSelect.replaceChildren();
       const calendars = this._settings.enableCalendarIntegration ? this._getCalendars() : [];
       for (const calendar of calendars) {
-        const option = createNode("option", "", `${calendar.name} — tâches ${calendar.taskCompatible ? "✓" : "✕"} · événements ${calendar.eventCompatible ? "✓" : "✕"}${calendar.reason ? ` · ${calendar.reason}` : ""}`);
+        const option = createNode("option", "", `${calendar.name} — ${t("panelCalendarTasks")} ${calendar.taskCompatible ? "✓" : "✕"} · ${t("panelCalendarEvents")} ${calendar.eventCompatible ? "✓" : "✕"}${calendar.reason ? ` · ${calendar.reason}` : ""}`);
         option.value = calendar.id;
         option.dataset.taskCompatible = String(calendar.taskCompatible);
         option.dataset.eventCompatible = String(calendar.eventCompatible);
@@ -5216,24 +5213,24 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       groupDialog = createNode("dialog", "pin-mails-group-dialog");
       const form = createNode("form", "pin-mails-group-dialog-form");
       form.method = "dialog";
-      const title = createNode("h2", "pin-mails-group-dialog-title", "Créer un groupe");
+      const title = createNode("h2", "pin-mails-group-dialog-title", t("panelCreateGroupTitle"));
       title.id = "pin-mails-group-dialog-create-title";
       groupDialog.setAttribute("aria-labelledby", title.id);
-      const nameLabel = createNode("label", "", "Nom du groupe");
+      const nameLabel = createNode("label", "", t("panelGroupName"));
       const name = createNode("input", "pin-mails-group-dialog-name");
       name.type = "text";
       name.maxLength = 80;
       name.required = true;
       name.autocomplete = "off";
       nameLabel.appendChild(name);
-      const colorLabel = createNode("label", "", "Couleur");
+      const colorLabel = createNode("label", "", t("panelColor"));
       const color = createNode("input", "pin-mails-group-dialog-color");
       color.type = "color";
       colorLabel.appendChild(color);
       const actions = createNode("div", "pin-mails-editor-actions");
-      const cancel = createNode("button", "secondary", "Annuler");
+      const cancel = createNode("button", "secondary", t("panelCancel"));
       cancel.type = "button";
-      const save = createNode("button", "primary", "Créer");
+      const save = createNode("button", "primary", t("panelCreate"));
       save.type = "submit";
       actions.append(cancel, save);
       form.append(title, nameLabel, colorLabel, actions);
@@ -5248,26 +5245,26 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         let id = base.slice(0, 40);
         let index = 2;
         while (this._data.groups.some(group => group.id === id)) id = `${base.slice(0, 35)}-${index++}`;
-        this._pushUndo("Création du groupe");
+        this._pushUndo(t("panelUndoCreateGroup"));
         this._data.groups.push({id, name: label.slice(0, 80), color: COLOR_RE.test(color.value) ? color.value : "#6264a7"});
         this._data.groupOrder.push(id);
         this._saveData("group-create");
         this._refreshAllStates(true);
         groupDialog.close();
-        showToast("Groupe créé.", true);
+        showToast(t("panelGroupCreated"), true);
       });
       return groupDialog;
     };
 
     const addGroup = () => {
       if (this._data.groups.length >= MAX_GROUPS) {
-        showToast("Nombre maximal de groupes atteint.", false);
+        showToast(t("panelMaxGroups"), false);
         return;
       }
       const dialog = createGroupDialog();
       const name = dialog.querySelector(".pin-mails-group-dialog-name");
       const color = dialog.querySelector(".pin-mails-group-dialog-color");
-      name.value = "À traiter";
+      name.value = t("panelDefaultGroupName");
       color.value = DEFAULT_COLORS[this._data.groups.length % DEFAULT_COLORS.length];
       dialog.showModal();
       name.select();
@@ -5278,16 +5275,16 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         groupAssignmentDialog = createNode("dialog", "pin-mails-group-dialog");
         const form = createNode("form", "pin-mails-group-dialog-form");
         form.method = "dialog";
-        const title = createNode("h2", "pin-mails-group-dialog-title", "Classer les messages");
+        const title = createNode("h2", "pin-mails-group-dialog-title", t("panelAssignMessages"));
         title.id = "pin-mails-group-dialog-assign-title";
         groupAssignmentDialog.setAttribute("aria-labelledby", title.id);
         form.appendChild(title);
-        const label = createNode("label", "", "Groupe");
+        const label = createNode("label", "", t("panelGroupLabel"));
         const select = createNode("select", "pin-mails-group-assignment-select");
         label.appendChild(select);
         const actions = createNode("div", "pin-mails-editor-actions");
-        const cancel = createNode("button", "secondary", "Annuler"); cancel.type = "button";
-        const save = createNode("button", "primary", "Appliquer"); save.type = "submit";
+        const cancel = createNode("button", "secondary", t("panelCancel")); cancel.type = "button";
+        const save = createNode("button", "primary", t("panelApply")); save.type = "submit";
         actions.append(cancel, save);
         form.append(label, actions);
         groupAssignmentDialog.appendChild(form);
@@ -5297,7 +5294,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
           event.preventDefault();
           const activeKeys = JSON.parse(groupAssignmentDialog.dataset.stableKeys || "[]");
           const groupId = select.value;
-          this._pushUndo("Changement de groupe");
+          this._pushUndo(t("panelUndoChangeGroup"));
           let count = 0;
           for (const key of activeKeys) {
             const ref = this._data.refs[key];
@@ -5311,12 +5308,12 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
             this._refreshAllStates(true);
           }
           groupAssignmentDialog.close();
-          showToast(`${count} message(s) classé(s).`, true);
+          showToast(t("panelMessagesAssigned", {count}), true);
         });
       }
       const select = groupAssignmentDialog.querySelector(".pin-mails-group-assignment-select");
       select.replaceChildren();
-      const none = createNode("option", "", "Aucun groupe"); none.value = ""; select.appendChild(none);
+      const none = createNode("option", "", t("panelNoGroup")); none.value = ""; select.appendChild(none);
       for (const item of this._data.groups) { const option = createNode("option", "", item.name); option.value = item.id; select.appendChild(option); }
       groupAssignmentDialog.dataset.stableKeys = JSON.stringify(keys);
       groupAssignmentDialog.showModal();
@@ -5363,21 +5360,18 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       const type = itemType === "event" ? "event" : "task";
       const calendars = this._getCalendars();
       const compatible = calendars.filter(calendar => calendarCompatible(calendar, type));
-      if (!compatible.length) {
-        const label = type === "event" ? "événement" : "tâche";
-        throw new ExtensionError(`Aucun calendrier inscriptible compatible avec cet ${label} n’est disponible.`);
-      }
+      if (!compatible.length) throw new ExtensionError(t(type === "event" ? "panelNoCompatibleEventCalendar" : "panelNoCompatibleTaskCalendar"));
       return new Promise(resolve => {
         const dialog = createNode("dialog", "pin-mails-calendar-dialog");
         const form = createNode("form", "pin-mails-calendar-dialog-form");
         form.method = "dialog";
-        const title = createNode("h2", "pin-mails-calendar-dialog-title", type === "event" ? "Choisir le calendrier de l’événement" : "Choisir le calendrier de la tâche");
-        const explanation = createNode("p", "pin-mails-calendar-dialog-help", "Les calendriers incompatibles restent visibles pour expliquer pourquoi ils ne peuvent pas être utilisés.");
-        const label = createNode("label", "", "Calendrier cible");
+        const title = createNode("h2", "pin-mails-calendar-dialog-title", t(type === "event" ? "panelChooseEventCalendar" : "panelChooseTaskCalendar"));
+        const explanation = createNode("p", "pin-mails-calendar-dialog-help", t("panelCalendarChooserHelp"));
+        const label = createNode("label", "", t("panelTargetCalendar"));
         const select = createNode("select", "pin-mails-calendar-dialog-select");
         for (const calendar of calendars) {
           const supported = calendarCompatible(calendar, type);
-          const suffix = supported ? "compatible" : (calendar.reason || `${type === "event" ? "événements" : "tâches"} non pris en charge`);
+          const suffix = supported ? t("panelCalendarCompatible") : (calendar.reason || t(type === "event" ? "panelEventsUnsupported" : "panelTasksUnsupported"));
           const option = createNode("option", "", `${calendar.name} — ${suffix}`);
           option.value = calendar.id;
           option.disabled = !supported;
@@ -5388,9 +5382,9 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         select.value = preferred || compatible[0].id;
         label.appendChild(select);
         const actions = createNode("div", "pin-mails-editor-actions");
-        const cancel = createNode("button", "secondary", "Annuler");
+        const cancel = createNode("button", "secondary", t("panelCancel"));
         cancel.type = "button";
-        const confirm = createNode("button", "primary", "Continuer");
+        const confirm = createNode("button", "primary", t("continue"));
         confirm.type = "submit";
         actions.append(cancel, confirm);
         form.append(title, explanation, label, actions);
@@ -5431,16 +5425,16 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         if (button) button.disabled = Boolean(disabled);
       };
 
-      setLabel("toggleRead", hdr && hdr.flags & Ci.nsMsgMessageFlags.Read ? "Marquer comme non lu" : "Marquer comme lu");
-      setLabel("waiting", ref?.workflowStatus === "waiting" ? "Repasser à traiter" : "Mettre en attente");
-      setLabel("planned", ref?.workflowStatus === "planned" ? "Repasser à traiter" : "Planifier");
-      setLabel("complete", ref?.completedAt ? "Rouvrir" : "Marquer comme terminé");
-      setLabel("track-no-reply", ref?.noReplyTracking ? "Modifier la relance sans réponse" : "Me relancer si aucune réponse");
-      setLabel("cancel-no-reply", "Arrêter le suivi sans réponse");
+      setLabel("toggleRead", t(hdr && hdr.flags & Ci.nsMsgMessageFlags.Read ? "panelMarkUnread" : "panelMarkRead"));
+      setLabel("waiting", t(ref?.workflowStatus === "waiting" ? "panelReturnActive" : "panelSetWaiting"));
+      setLabel("planned", t(ref?.workflowStatus === "planned" ? "panelReturnActive" : "panelPlan"));
+      setLabel("complete", t(ref?.completedAt ? "panelReopen" : "panelMarkComplete"));
+      setLabel("track-no-reply", t(ref?.noReplyTracking ? "panelEditNoReply" : "panelTrackNoReply"));
+      setLabel("cancel-no-reply", t("panelCancelNoReply"));
       disable("cancel-no-reply", !ref?.noReplyTracking);
-      setLabel("unpin", hdr ? "Désépingler" : "Retirer la référence introuvable");
+      setLabel("unpin", hdr ? t("unpin") : t("panelRemoveMissingReference"));
       const group = this._groupForId(ref?.groupId);
-      setLabel("remove-group", group ? `Retirer du groupe « ${group.name} »` : "Retirer du groupe");
+      setLabel("remove-group", group ? t("panelRemoveFromNamedGroup", {group: group.name}) : t("panelRemoveFromGroup"));
 
       for (const action of ["open", "reply", "toggleRead", "archive", "delete"]) disable(action, !hdr);
       disable("group", !this._data.groups.length);
@@ -5475,7 +5469,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         } catch (error) {
           resetContextMenuState();
           this._recordDiagnostic("error", "Ouverture du menu des messages épinglés impossible", error);
-          showToast(`Menu d’actions indisponible : ${error?.message || error}`, false, "error");
+          showToast(t("panelMenuUnavailable"), false, "error");
         }
       };
 
@@ -5500,61 +5494,61 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       const card = findCardByStableKey(key);
       const hdr = card?._pinMessageHeader || (ref ? this._resolveReference(ref, false) : null);
       if (!ref) {
-        showToast("Cette épingle n’existe plus.", false, "error");
+        showToast(t("panelPinMissing"), false, "error");
         return;
       }
 
       setActionBusy(sourceButton, true);
       try {
         if (action === "open") {
-          if (!selectPanelMessage(ref, hdr, card)) showToast("Le message est introuvable.", false, "error");
+          if (!selectPanelMessage(ref, hdr, card)) showToast(t("panelMessageMissing"), false, "error");
           return;
         }
         if (action === "unpin") {
           if (selectedPanelKey === key) selectedPanelKey = null;
           selectedPanelKeys.delete(key);
           this._performReferenceAction([key], "unpin");
-          showToast(hdr ? "Message désépinglé." : "Référence introuvable retirée.", true, "success");
+          showToast(t(hdr ? "panelUnpinned" : "panelMissingRemoved"), true, "success");
           return;
         }
         if (action === "edit") { openEditor(key); return; }
         if (action === "group") { openGroupAssignmentDialog([key]); return; }
         if (action === "remove-group") {
           this._performReferenceAction([key], "group", {groupId: ""});
-          showToast("Message retiré du groupe.", true, "success");
+          showToast(t("panelRemovedGroup"), true, "success");
           return;
         }
         if (action === "waiting") {
           const waiting = ref.workflowStatus !== "waiting";
           this._setWorkflowStatus([key], waiting ? "waiting" : "active");
-          showToast(waiting ? "Message placé en attente." : "Message replacé à traiter.", true, "success");
+          showToast(t(waiting ? "panelWaitingSuccess" : "panelActiveSuccess"), true, "success");
           return;
         }
         if (action === "planned") {
           const planned = ref.workflowStatus !== "planned";
           this._setWorkflowStatus([key], planned ? "planned" : "active");
-          showToast(planned ? "Message planifié." : "Message replacé à traiter.", true, "success");
+          showToast(t(planned ? "panelPlannedSuccess" : "panelActiveSuccess"), true, "success");
           return;
         }
         if (action === "complete") {
           const completed = !ref.completedAt;
           this._performReferenceAction([key], completed ? "complete" : "uncomplete");
-          showToast(completed ? "Message marqué comme terminé." : "Message rouvert.", true, "success");
+          showToast(t(completed ? "panelCompletedSuccess" : "panelReopenedSuccess"), true, "success");
           return;
         }
         if (action === "track-no-reply") {
           this._setNoReplyTracking([key], {enabled:true});
-          showToast(`Relance sans réponse prévue dans ${this._settings.noReplyDefaultDays || 5} jour(s).`, true, "success");
+          showToast(t("panelNoReplyScheduled", {days: this._settings.noReplyDefaultDays || 5}), true, "success");
           return;
         }
         if (action === "cancel-no-reply") {
           this._setNoReplyTracking([key], {enabled:false});
-          showToast("Suivi sans réponse désactivé.", true, "success");
+          showToast(t("panelNoReplyDisabled"), true, "success");
           return;
         }
         if (action === "snooze") {
           this._snoozeReminder(key, 60 * 60_000);
-          showToast("Rappel reporté d’une heure.", true, "success");
+          showToast(t("panelReminderSnoozedHour"), true, "success");
           return;
         }
         if (action === "calendar-task" || action === "calendar-event") {
@@ -5563,23 +5557,23 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
             ? ref.calendarId
             : await chooseCalendarForType(type, ref.calendarId || this._settings.preferredCalendarId);
           if (!calendarId && !ref.calendarItemId) {
-            showToast("Création Agenda annulée.", false, "info");
+            showToast(t("panelCalendarCancelled"), false, "info");
             return;
           }
           await this._createCalendarItem(key, type, calendarId);
-          showToast(type === "event" ? "Événement synchronisé dans l’Agenda." : "Tâche synchronisée dans l’Agenda.", false, "success");
+          showToast(t(type === "event" ? "panelEventSynced" : "panelTaskSynced"), false, "success");
           return;
         }
 
         const result = this._performMessageAction(action, hdr ? [hdr] : [], about3Pane);
         if (!result?.count) {
-          if (!result?.cancelled) showToast("Cette action ne peut pas être exécutée sur ce message.", false, "error");
+          if (!result?.cancelled) showToast(t("panelActionUnavailable"), false, "error");
           return;
         }
-        if (action === "reply") showToast("Fenêtre de réponse ouverte.", false, "success");
+        if (action === "reply") showToast(t("panelReplyOpened"), false, "success");
       } catch (error) {
         this._recordDiagnostic("error", `Action de carte impossible : ${action}`, error);
-        showToast(`Action impossible : ${error?.message || error}`, false, "error");
+        showToast(t("panelActionFailed"), false, "error");
       } finally {
         setActionBusy(sourceButton, false);
       }
@@ -5640,18 +5634,18 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       searchWrap.appendChild(search);
       const smartView = createNode("select", "pin-mails-smart-view-select");
       smartView.setAttribute("aria-label", this._t("smartView", "Vue intelligente"));
-      for (const view of PIN_MODULES.PinSmartViews?.VIEWS || []) { const option=createNode("option","",view.fallback);option.value=view.id;smartView.appendChild(option); }
+      for (const view of PIN_MODULES.PinSmartViews?.VIEWS || []) { const option=createNode("option","",this._t(view.labelKey, view.fallback));option.value=view.id;smartView.appendChild(option); }
       smartView.value = panelSmartView;
       smartView.addEventListener("change", () => { panelSmartView = smartView.value || "all"; lastRenderSignature = ""; renderLimit = this._settings.panelPageSize; renderPanel(); });
       const bulk = createNode("div", "pin-mails-bulk-actions"); bulk.hidden = true;
-      const bulkCount = createNode("span", "pin-mails-bulk-count", "0 sélection");
+      const bulkCount = createNode("span", "pin-mails-bulk-count", t("panelSelectedCount", {count: 0}));
       const bulkButton = (action, label) => { const b = createNode("button", "pin-mails-quick-button", label); b.type = "button"; b.dataset.bulkAction = action; b.setAttribute("aria-label", label); return b; };
       bulk.append(bulkCount, bulkButton("toggleRead", this._t("readUnread", "Lu/non lu")), bulkButton("complete", this._t("complete", "Terminer")), bulkButton("trackNoReply", this._t("noReply", "Relancer sans réponse")), bulkButton("archive", this._t("archive", "Archiver")), bulkButton("group", this._t("group", "Grouper")), bulkButton("unpin", this._t("unpin", "Désépingler")), bulkButton("delete", this._t("delete", "Supprimer")));
       tools.append(searchWrap, smartView, bulk);
 
       const reminderCenter = createNode("section", "pin-mails-reminder-center");
       reminderCenter.hidden = true;
-      reminderCenter.setAttribute("aria-label", this._t("pendingReminders", "Rappels à traiter"));
+      reminderCenter.setAttribute("aria-label", t("panelReminderCenter"));
       const list = createNode("div", "pin-mails-panel-list"); list.setAttribute("role", "listbox"); list.setAttribute("aria-multiselectable", "true"); list.tabIndex = -1;
       const live = createNode("div", "pin-mails-live"); live.setAttribute("role", "status"); live.setAttribute("aria-live", "polite");
       const toast = createNode("div", "pin-mails-toast"); toast.id = TOAST_ID; toast.hidden = true; toast.setAttribute("role", "status"); toast.setAttribute("aria-live", "polite");
@@ -5711,7 +5705,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         const headers = this._getSelectedHeaders(about3Pane); if (!headers.length) return;
         const unique = [...new Map(headers.map(h => [conversationStableKey(h), h])).values()];
         const state = !unique.every(h => hasOwn(this._data.refs, conversationStableKey(h)));
-        this._setHeadersPinned(unique, state, currentFolderURI(), state ? "Épinglage de conversation" : "Désépinglage de conversation", "conversation");
+        this._setHeadersPinned(unique, state, currentFolderURI(), t(state ? "panelUndoPinConversation" : "panelUndoUnpinConversation"), "conversation");
         for (const hdr of unique) { const ref = this._data.refs[conversationStableKey(hdr)]; if (ref) this._updateConversationReference(ref, hdr); }
         this._saveData("conversation");
       });
@@ -5729,11 +5723,11 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
           return;
         }
         this._dashboardRequestPending = true;
-        showToast("Ouverture du tableau de bord…", false);
+        showToast(t("panelDashboardOpening"), false);
         about3Pane.setTimeout(() => {
           if (!this._dashboardRequestPending) return;
           this._dashboardRequestPending = false;
-          showToast("Le tableau de bord n’a pas pu être ouvert. Redémarrez Thunderbird puis réessayez.", false);
+          showToast(t("panelDashboardFailed"), false);
         }, 2500);
       });
       search.addEventListener("input", () => { searchText = search.value; renderLimit = this._settings.panelPageSize; renderPanel(); });
@@ -5757,9 +5751,9 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
           } else if (action === "dismiss") {
             this._performReferenceAction([key], "dismissReminder", {});
           }
-          showToast(this._t("reminderUpdated", "Rappel mis à jour."), false, "success");
+          showToast(t("panelReminderUpdated"), false, "success");
         } catch (error) {
-          showToast(`Rappel impossible : ${error?.message || error}`, false, "error");
+          showToast(t("panelReminderFailed"), false, "error");
         }
       });
 
@@ -5770,7 +5764,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         const keys = [...selectedPanelKeys];
         const headers = keys.map(key => findCardByStableKey(key)?._pinMessageHeader).filter(Boolean);
         if (action === "unpin") {
-          this._pushUndo("Désépinglage multiple", this._captureFlags(headers));
+          this._pushUndo(t("panelUndoBulkUnpin"), this._captureFlags(headers));
           if (this._settings.pinMode === "nativeStar") {
             const byFolder = new Map();
             for (const hdr of headers) { const bucket = byFolder.get(hdr.folder) || []; bucket.push(hdr); byFolder.set(hdr.folder, bucket); }
@@ -5779,13 +5773,13 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
           for (const key of keys) this._removeReferenceByKey(key);
           this._saveData();
           this._refreshAllStates(true);
-          showToast(`${keys.length} message(s) désépinglé(s).`, true);
+          showToast(t("panelBulkUnpinned", {count: keys.length}), true);
           selectedPanelKeys.clear();
         } else if (action === "complete") {
           this._performReferenceAction(keys, "complete"); selectedPanelKeys.clear();
         } else if (action === "trackNoReply") {
           this._setNoReplyTracking(keys, {enabled:true}); selectedPanelKeys.clear();
-          showToast(`${keys.length} suivi(s) sans réponse activé(s).`, true, "success");
+          showToast(t("panelBulkNoReply", {count: keys.length}), true, "success");
         } else if (action === "group") {
           openGroupAssignmentDialog(keys);
         } else {
@@ -5942,14 +5936,14 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         const groupContainer = event.target.closest("[data-group-id]");
         const groupId = groupContainer?.dataset.groupId || "";
         if (draggedInboxHeaders.length) {
-          this._setHeadersPinned(draggedInboxHeaders, true, currentFolderURI(), "Épinglage par glisser-déposer");
+          this._setHeadersPinned(draggedInboxHeaders, true, currentFolderURI(), t("panelUndoDragPin"));
           if (groupId) for (const hdr of draggedInboxHeaders) { const ref = this._data.refs[messageStableKey(hdr)]; if (ref) ref.groupId = groupId; }
           this._saveData(); this._refreshAllStates(true); return;
         }
         const target = event.target.closest(".pin-mails-card");
         if (!draggedCardKey) return;
         if (groupId && this._data.refs[draggedCardKey]) {
-          this._pushUndo("Changement de groupe");
+          this._pushUndo(t("panelUndoChangeGroup"));
           this._data.refs[draggedCardKey].groupId = groupId;
         }
         if (target && target.dataset.stableKey !== draggedCardKey) {
@@ -5980,7 +5974,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       const bulk = panel.querySelector(".pin-mails-bulk-actions");
       if (bulk) {
         bulk.hidden = selectedPanelKeys.size < 2 || !this._settings.enableBulkActions;
-        bulk.querySelector(".pin-mails-bulk-count").textContent = `${selectedPanelKeys.size} sélection(s)`;
+        bulk.querySelector(".pin-mails-bulk-count").textContent = t("panelSelectedCount", {count: selectedPanelKeys.size});
       }
     };
 
@@ -6049,8 +6043,8 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       if (!hdr) card.toggleAttribute("data-broken", true);
 
       const top = createNode("div", "pin-mails-card-top");
-      if (hdr && !(hdr.flags & Ci.nsMsgMessageFlags.Read)) { const dot = createNode("span", "pin-mails-unread-dot"); dot.title = "Non lu"; top.appendChild(dot); }
-      const author = createNode("span", "pin-mails-author", hdr ? formatAuthor(hdr) : ref.author || "Message introuvable"); author.title = author.textContent;
+      if (hdr && !(hdr.flags & Ci.nsMsgMessageFlags.Read)) { const dot = createNode("span", "pin-mails-unread-dot"); dot.title = t("panelUnread"); top.appendChild(dot); }
+      const author = createNode("span", "pin-mails-author", hdr ? formatAuthor(hdr) : ref.author || t("panelMissingAuthor")); author.title = author.textContent;
       const date = createNode("time", "pin-mails-date", this._formatDate(about3Pane, hdr, ref));
       const more = createQuickButton("more", this._t("moreActions", "Plus d’actions"), "⋯");
       more.classList.add("pin-mails-card-more");
@@ -6063,45 +6057,48 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         event.stopImmediatePropagation();
         dispatchCardAction(card, "more", more, event);
       }, true);
-      const pin = createQuickButton("unpin", "Désépingler", "");
+      const pin = createQuickButton("unpin", t("unpin"), "");
       pin.draggable = false;
       pin.classList.add("pin-mails-card-pin");
       top.append(author, date, more, pin);
-      const subject = createNode("div", "pin-mails-subject", hdr ? formatSubject(hdr) : ref.subject || "Message déplacé ou supprimé"); subject.title = subject.textContent;
-      card.setAttribute("aria-label", `${subject.textContent} — ${author.textContent}${ref.completedAt ? " — Terminé" : ""}${!hdr ? " — Message introuvable" : ""}`);
+      const subject = createNode("div", "pin-mails-subject", hdr ? formatSubject(hdr) : ref.subject || t("panelMovedOrDeleted")); subject.title = subject.textContent;
+      card.setAttribute("aria-label", `${subject.textContent} — ${author.textContent}${ref.completedAt ? ` — ${t("panelAriaCompleted")}` : ""}${!hdr ? ` — ${t("panelAriaMissing")}` : ""}`);
       card.append(top, subject);
 
       if (this._settings.showNotes && ref.note) card.appendChild(createNode("div", "pin-mails-note", ref.note));
       const statusLine = createNode("div", "pin-mails-status-line");
-      if (ref.trackingMode === "conversation") statusLine.appendChild(createNode("span", "pin-mails-conversation-chip", `${ref.conversationCount || 1} message(s)${ref.conversationUnread ? ` · ${ref.conversationUnread} non lu(s)` : ""}`));
-      if (ref.workflowStatus === "waiting") statusLine.appendChild(createNode("span", "pin-mails-workflow-chip waiting", ref.waitingSince ? `En attente depuis ${this._formatTimestamp(about3Pane, ref.waitingSince)}` : "En attente d’une réponse"));
-      else if (ref.workflowStatus === "planned") statusLine.appendChild(createNode("span", "pin-mails-workflow-chip planned", "Planifié"));
-      if (ref.completedAt || ref.workflowStatus === "completed") statusLine.appendChild(createNode("span", "pin-mails-completed-chip", "Terminé"));
-      if (ref.followUpAt && ref.workflowStatus !== "completed") statusLine.appendChild(createNode("span", `pin-mails-follow-up-chip${ref.followUpAt < Date.now() ? " overdue" : ""}`, `${ref.followUpAt < Date.now() ? "Relance en retard · " : "Relance · "}${this._formatTimestamp(about3Pane, ref.followUpAt)}`));
-      if (ref.noReplyTracking && ref.noReplyAt) statusLine.appendChild(createNode("span", `pin-mails-no-reply-chip${ref.noReplyAt < Date.now() ? " overdue" : ""}`, `${ref.noReplyAt < Date.now() ? "Sans réponse · à relancer" : "Sans réponse · " + this._formatTimestamp(about3Pane, ref.noReplyAt)}`));
-      if (ref.recurrenceRule) statusLine.appendChild(createNode("span", "pin-mails-recurrence-chip", `Récurrent · ${ref.recurrenceInterval > 1 ? `${ref.recurrenceInterval}× ` : ""}${({daily:"jour",weekdays:"jours ouvrés",weekly:"semaine",monthly:"mois",quarterly:"trimestre",yearly:"an"})[ref.recurrenceRule] || ref.recurrenceRule}`));
+      if (ref.trackingMode === "conversation") statusLine.appendChild(createNode("span", "pin-mails-conversation-chip", `${t("panelMessagesCount", {count: ref.conversationCount || 1})}${ref.conversationUnread ? ` · ${t("panelUnreadCount", {count: ref.conversationUnread})}` : ""}`));
+      if (ref.workflowStatus === "waiting") statusLine.appendChild(createNode("span", "pin-mails-workflow-chip waiting", ref.waitingSince ? t("panelWaitingSince", {date: this._formatTimestamp(about3Pane, ref.waitingSince)}) : t("panelWaitingForReply")));
+      else if (ref.workflowStatus === "planned") statusLine.appendChild(createNode("span", "pin-mails-workflow-chip planned", t("panelPlanned")));
+      if (ref.completedAt || ref.workflowStatus === "completed") statusLine.appendChild(createNode("span", "pin-mails-completed-chip", t("panelCompleted")));
+      if (ref.followUpAt && ref.workflowStatus !== "completed") statusLine.appendChild(createNode("span", `pin-mails-follow-up-chip${ref.followUpAt < Date.now() ? " overdue" : ""}`, t(ref.followUpAt < Date.now() ? "panelFollowUpOverdue" : "panelFollowUpAt", {date: this._formatTimestamp(about3Pane, ref.followUpAt)})));
+      if (ref.noReplyTracking && ref.noReplyAt) statusLine.appendChild(createNode("span", `pin-mails-no-reply-chip${ref.noReplyAt < Date.now() ? " overdue" : ""}`, ref.noReplyAt < Date.now() ? t("panelNoReplyOverdue") : t("panelNoReplyAt", {date: this._formatTimestamp(about3Pane, ref.noReplyAt)})));
+      if (ref.recurrenceRule) {
+        const recurrenceUnits = {daily:"panelUnitDay",weekdays:"panelUnitWeekdays",weekly:"panelUnitWeek",monthly:"panelUnitMonth",quarterly:"panelUnitQuarter",yearly:"panelUnitYear"};
+        statusLine.appendChild(createNode("span", "pin-mails-recurrence-chip", t("panelRecurring", {interval: ref.recurrenceInterval > 1 ? `${ref.recurrenceInterval}× ` : "", unit: t(recurrenceUnits[ref.recurrenceRule] || "panelUnitDay")})));
+      }
       const caseItem = (this._data.cases || []).find(item => item.id === ref.caseId);
-      if (caseItem) { const chip = createNode("span", "pin-mails-case-chip", `Affaire · ${caseItem.name}`); chip.style.setProperty("--pin-case-color", caseItem.color); statusLine.appendChild(chip); }
-      if (ref.calendarItemId) statusLine.appendChild(createNode("span", "pin-mails-calendar-chip", "Agenda synchronisé"));
+      if (caseItem) { const chip = createNode("span", "pin-mails-case-chip", t("panelCaseChip", {name: caseItem.name})); chip.style.setProperty("--pin-case-color", caseItem.color); statusLine.appendChild(chip); }
+      if (ref.calendarItemId) statusLine.appendChild(createNode("span", "pin-mails-calendar-chip", t("panelCalendarSynced")));
       if (this._settings.showDeadlines && ref.dueAt) {
-        const due = createNode("span", "pin-mails-due", `${ref.dueAt < Date.now() ? "En retard · " : "Échéance · "}${this._formatTimestamp(about3Pane, ref.dueAt)}`); statusLine.appendChild(due);
+        const due = createNode("span", "pin-mails-due", t(ref.dueAt < Date.now() ? "panelOverdueAt" : "panelDeadlineAt", {date: this._formatTimestamp(about3Pane, ref.dueAt)})); statusLine.appendChild(due);
       }
       const group = this._groupForId(ref.groupId);
       if (this._settings.showGroups && group) {
-        const chip = createQuickButton("remove-group", `Retirer du groupe « ${group.name} »`, `${group.name} ×`);
+        const chip = createQuickButton("remove-group", t("panelRemoveFromNamedGroup", {group: group.name}), `${group.name} ×`);
         chip.classList.add("pin-mails-group-chip", "pin-mails-group-remove");
         chip.style.setProperty("--pin-group-color", group.color);
         statusLine.appendChild(chip);
       }
-      if (ref.priorityLevel !== "normal") statusLine.appendChild(createNode("span", `pin-mails-priority-chip ${ref.priorityLevel}`, ref.priorityLevel === "urgent" ? "Urgent" : "Priorité haute"));
+      if (ref.priorityLevel !== "normal") statusLine.appendChild(createNode("span", `pin-mails-priority-chip ${ref.priorityLevel}`, ref.priorityLevel === "urgent" ? t("panelPriorityUrgent") : t("panelPriorityHighChip")));
       if (statusLine.childNodes.length) card.appendChild(statusLine);
 
       if (this._settings.cardLines >= 3) {
         const meta = createNode("div", "pin-mails-card-meta");
         const preview = !this._settings.safeMode && hdr ? getCachedPreview(hdr) : "";
         if (preview) { const node = createNode("span", "pin-mails-preview", preview); node.title = preview; meta.appendChild(node); }
-        if (this._settings.showPriority && hdr && isHighPriority(hdr)) { const node = createNode("span", "pin-mails-meta-icon pin-mails-priority", "!"); node.title = "Priorité élevée du message"; meta.appendChild(node); }
-        if (this._settings.showAttachments && hdr && hasAttachment(hdr)) { const node = createNode("span", "pin-mails-meta-icon", "PJ"); node.title = "Pièce jointe"; meta.appendChild(node); }
+        if (this._settings.showPriority && hdr && isHighPriority(hdr)) { const node = createNode("span", "pin-mails-meta-icon pin-mails-priority", "!"); node.title = t("panelMessagePriorityHigh"); meta.appendChild(node); }
+        if (this._settings.showAttachments && hdr && hasAttachment(hdr)) { const node = createNode("span", "pin-mails-meta-icon", "PJ"); node.title = t("panelAttachment"); meta.appendChild(node); }
         if (this._settings.showTags && !this._settings.safeMode && hdr) for (const tag of getTagMetadata(hdr)) { const node = createNode("span", "pin-mails-tag", tag.name); node.style.setProperty("--tag-color", tag.color); meta.appendChild(node); }
         if (this._settings.showFolder && ref.folderName) { const node = createNode("span", "pin-mails-folder", ref.folderName); node.title = ref.folderName; meta.appendChild(node); }
         if (meta.childNodes.length) card.appendChild(meta);
@@ -6110,14 +6107,14 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       if (this._settings.showQuickActions && !this._settings.safeMode && hdr) {
         const actions = createNode("div", "pin-mails-card-actions");
         actions.append(
-          createQuickButton("reply", "Répondre", "↩"),
-          createQuickButton("waiting", ref.workflowStatus === "waiting" ? "Repasser à traiter" : "Mettre en attente d’une réponse", ref.workflowStatus === "waiting" ? "▶" : "⌛"),
-          createQuickButton("complete", ref.completedAt ? "Rouvrir" : "Marquer terminé", ref.completedAt ? "↺" : "✓"),
-          createQuickButton("edit", "Note, affaire, modèle et échéance", "✎")
+          createQuickButton("reply", t("panelReply"), "↩"),
+          createQuickButton("waiting", t(ref.workflowStatus === "waiting" ? "panelReturnActive" : "panelSetWaitingForReply"), ref.workflowStatus === "waiting" ? "▶" : "⌛"),
+          createQuickButton("complete", t(ref.completedAt ? "panelReopen" : "panelMarkCompletedQuick"), ref.completedAt ? "↺" : "✓"),
+          createQuickButton("edit", t("panelEditMetadata"), "✎")
         );
         card.appendChild(actions);
       } else if (!this._settings.safeMode && (this._settings.showNotes || this._settings.showDeadlines || this._settings.showGroups)) {
-        const actions = createNode("div", "pin-mails-card-actions"); actions.appendChild(createQuickButton("edit", "Modifier le suivi", "✎")); card.appendChild(actions);
+        const actions = createNode("div", "pin-mails-card-actions"); actions.appendChild(createQuickButton("edit", t("panelEditFollowUpTitle"), "✎")); card.appendChild(actions);
       }
       cardCache.set(ref.stableKey, {token: renderToken, node: card});
       this._performance.createdCards = (this._performance.createdCards || 0) + 1;
@@ -6132,7 +6129,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       header.append(createNode("span", "pin-mails-account-dot"), createNode("span", "pin-mails-account-name", name));
       const unread = entries.filter(entry => entry.hdr && !(entry.hdr.flags & Ci.nsMsgMessageFlags.Read)).length;
       const overdue = entries.filter(entry => !entry.ref.completedAt && entry.ref.dueAt && entry.ref.dueAt < Date.now()).length;
-      header.appendChild(createNode("span", "pin-mails-group-count", `${entries.length}${unread ? ` · ${unread} non lu(s)` : ""}${overdue ? ` · ${overdue} en retard` : ""}`));
+      header.appendChild(createNode("span", "pin-mails-group-count", `${entries.length}${unread ? ` · ${t("panelUnreadCount", {count: unread})}` : ""}${overdue ? ` · ${t("panelOverdueCount", {count: overdue})}` : ""}`));
       section.appendChild(header);
       for (const entry of entries) section.appendChild(createCard(entry));
       return section;
@@ -6152,19 +6149,19 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       host.hidden = panelCollapsed() || !pending.length;
       if (!pending.length) return;
       const heading = createNode("div", "pin-mails-reminder-heading");
-      heading.append(createNode("strong", "", this._t("pendingReminders", "Rappels à traiter")), createNode("span", "pin-mails-reminder-count", String(pending.length)));
+      heading.append(createNode("strong", "", t("panelReminderCenter")), createNode("span", "pin-mails-reminder-count", String(pending.length)));
       host.appendChild(heading);
       for (const ref of pending.slice(0, 5)) {
         const row = createNode("article", "pin-mails-reminder-row");
         const copy = createNode("div", "pin-mails-reminder-copy");
-        copy.append(createNode("strong", "", ref.subject || this._t("noSubject", "(sans objet)")), createNode("span", "", ref.author || ""));
+        copy.append(createNode("strong", "", ref.subject || t("panelNoSubject")), createNode("span", "", ref.author || ""));
         const actions = createNode("div", "pin-mails-reminder-actions");
         for (const [action, label] of [
-          ["open", this._t("open", "Ouvrir")],
-          ["complete", this._t("complete", "Terminer")],
-          ["snooze", this._t("snoozeOneHour", "+1 h")],
-          ["tomorrow", this._t("snoozeTomorrow", "Demain")],
-          ["dismiss", this._t("dismissReminder", "Ignorer")]
+          ["open", t("panelOpen")],
+          ["complete", this._t("complete", "")],
+          ["snooze", this._t("snoozeOneHour", "")],
+          ["tomorrow", t("panelSnoozeTomorrow")],
+          ["dismiss", t("panelDismiss")]
         ]) {
           const button = createNode("button", "pin-mails-reminder-action", label);
           button.type = "button";
@@ -6213,7 +6210,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         completed: allEntries.filter(entry => entry.ref.completedAt).length
       };
       panel.querySelector(".pin-mails-count").textContent = String(stats.total);
-      panel.querySelector(".pin-mails-summary").textContent = this._settings.showCounters ? `${stats.unread} non lu(s) · ${stats.overdue} en retard${stats.completed ? ` · ${stats.completed} terminé(s)` : ""}` : "";
+      panel.querySelector(".pin-mails-summary").textContent = this._settings.showCounters ? `${t("panelUnreadCount", {count: stats.unread})} · ${t("panelOverdueCount", {count: stats.overdue})}${stats.completed ? ` · ${t("panelCompletedCount", {count: stats.completed})}` : ""}` : "";
       const healthButton = panel.querySelector(".pin-mails-health-indicator");
       if (healthButton) {
         const health = this._settings.enableHealthCenter ? PIN_MODULES.PinHealth?.build({
@@ -6225,9 +6222,9 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         }) : null;
         const visible = Boolean(this._settings.enableHealthNotifications && health && health.status !== "healthy");
         healthButton.hidden = !visible;
-        healthButton.textContent = visible ? `Santé ${health.score}/100` : "";
+        healthButton.textContent = visible ? t("panelHealthScore", {score: health.score}) : "";
         healthButton.dataset.status = health?.status || "healthy";
-        healthButton.title = visible ? `${health.issues?.length || 0} point(s) à vérifier dans le centre de santé` : this._t("healthHealthy", "Santé MailPerch correcte");
+        healthButton.title = visible ? t("panelHealthIssues", {count: health.issues?.length || 0}) : this._t("healthHealthy", "");
       }
       updateFolderBadge(stats);
       const query = sanitizeSearchText(searchText);
@@ -6250,7 +6247,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       if (renderSignature === lastRenderSignature && list.childElementCount) {
         this._performance.skippedRenders = (this._performance.skippedRenders || 0) + 1;
         updatePanelSelection();
-        panel.querySelector(".pin-mails-live").textContent = `${totalFiltered} message(s) affiché(s).`;
+        panel.querySelector(".pin-mails-live").textContent = t("panelDisplayedCount", {count: totalFiltered});
         return;
       }
       lastRenderSignature = renderSignature;
@@ -6266,7 +6263,9 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         for (const id of ["overdue", "today", "week", "waiting", "noReply", "snoozed", "calendarError", "missing", "later", "noDue", "recentCompleted", "completed"]) {
           const bucket = buckets.get(id); if (!bucket?.length) continue;
           const colors = {overdue: "#d13438", today: "#ca5010", week: "#0f6cbd", waiting: "#8a4b00", noReply: "#6264a7", snoozed: "#0f6cbd", calendarError: "#d13438", missing: "#777777", later: "#6264a7", noDue: "#777777", recentCompleted: "#107c10", completed: "#107c10"};
-          fragment.appendChild(createGroupSection(id, SMART_SECTION_LABELS[id], colors[id], bucket, "smart"));
+          const smartView = (PIN_MODULES.PinSmartViews?.VIEWS || []).find(view => view.id === id);
+          const label = smartView ? this._t(smartView.labelKey, smartView.fallback) : t(id === "later" ? "panelSmartLater" : "panelSmartCompleted");
+          fragment.appendChild(createGroupSection(id, label, colors[id], bucket, "smart"));
         }
       } else if (this._settings.groupByCustomGroup && this._settings.showGroups) {
         const buckets = new Map();
@@ -6274,7 +6273,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         const order = [...this._data.groupOrder, "__none"];
         for (const id of order) {
           const bucket = buckets.get(id); if (!bucket?.length) continue;
-          const group = this._groupForId(id); fragment.appendChild(createGroupSection(id === "__none" ? "" : id, group?.name || "Sans groupe", group?.color || "#777777", bucket, "custom"));
+          const group = this._groupForId(id); fragment.appendChild(createGroupSection(id === "__none" ? "" : id, group?.name || t("panelNoCustomGroup"), group?.color || "#777777", bucket, "custom"));
         }
       } else if (this._settings.groupByAccount) {
         const buckets = new Map();
@@ -6295,11 +6294,11 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         if (!visibleKeys.has(key)) { cached.node?.remove(); cardCache.delete(key); }
       }
       if (totalFiltered > entries.length) {
-        const more = createNode("button", "pin-mails-load-more", `Afficher ${Math.min(this._settings.panelPageSize, totalFiltered - entries.length)} message(s) de plus`); more.type = "button";
+        const more = createNode("button", "pin-mails-load-more", t("panelLoadMore", {count: Math.min(this._settings.panelPageSize, totalFiltered - entries.length)})); more.type = "button";
         more.addEventListener("click", () => { renderLimit += this._settings.panelPageSize; renderPanel(); }); list.appendChild(more);
       }
       updatePanelSelection();
-      panel.querySelector(".pin-mails-live").textContent = `${totalFiltered} message(s) affiché(s).`;
+      panel.querySelector(".pin-mails-live").textContent = t("panelDisplayedCount", {count: totalFiltered});
       if (this._settings.enablePerformanceMetrics) {
         const elapsed = about3Pane.performance.now() - renderStarted; this._performance.renders++; this._performance.totalRenderMs += elapsed;
         this._performance.lastRenderMs = elapsed; this._performance.maxRenderMs = Math.max(this._performance.maxRenderMs, elapsed);
@@ -6334,7 +6333,12 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       if (custom && isEnabled() && this._settings.pinMode === "independent") {
         event.preventDefault(); event.stopImmediatePropagation();
         const hdr = headerForRow(custom.closest("tr"));
-        if (hdr) this._setHeadersPinned([hdr], !this._isPinnedHeader(hdr), currentFolderURI(), this._isPinnedHeader(hdr) ? "Désépinglage" : "Épinglage");
+        if (hdr) this._setHeadersPinned(
+          [hdr],
+          !this._isPinnedHeader(hdr),
+          currentFolderURI(),
+          t(this._isPinnedHeader(hdr) ? "panelUndoUnpin" : "panelUndoPin")
+        );
       } else if (event.target?.closest?.(".tree-button-flag") && this._settings.pinMode === "nativeStar" && isEnabled()) {
         about3Pane.setTimeout(() => { this._syncInbox(about3Pane.gFolder); scheduleRefresh(true); }, 0);
       }
@@ -6418,7 +6422,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     this._pendingDeleteTimers?.clear();
     this._pendingDeleteKeys?.clear();
     for (const state of [...(this._states || [])]) {
-      try { state.cleanup(); } catch (error) { console.error("Épingles : nettoyage incomplet", error); }
+      try { state.cleanup(); } catch (error) { console.error("Épingles : nettoyage incomplet", safeErrorName(error)); }
     }
     this._dashboardRequestPending = false;
     this._dashboardRequestListeners?.clear();

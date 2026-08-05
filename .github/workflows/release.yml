@@ -2,13 +2,8 @@ name: Release
 
 on:
   push:
-    branches:
-      - main
-    paths:
-      - package.json
-      - extension/manifest.json
-      - CHANGELOG.md
-      - .github/workflows/release.yml
+    tags:
+      - "v*"
   workflow_dispatch:
 
 permissions:
@@ -44,6 +39,11 @@ jobs:
           VERSION="$(node -p "require('./package.json').version")"
           test "$(node -p "require('./extension/manifest.json').version")" = "$VERSION"
           TAG="v${VERSION}"
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            test "${GITHUB_REF_NAME}" = "$TAG"
+          else
+            test "${GITHUB_REF_NAME}" = "main"
+          fi
           awk -v version="$VERSION" '
             $0 ~ "^## " version "([[:space:]]|$)" {found=1; next}
             found && /^## / {exit}
@@ -72,29 +72,3 @@ jobs:
             --title "MailPerch ${VERSION}" \
             --notes-file release-notes.md \
             --latest
-      - name: Remove obsolete maintenance branches
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          branches=(
-            automation/release-1.0.0
-            automation/fluent-2-3213
-            automation/fluent-2-3213-apply
-            automation/fluent-2-3213-ci
-            automation/fluent-2-3213-final
-            automation/fluent-2-3213-pr
-            automation/fluent-2-3213-pr-trigger
-            automation/fluent-2-3213-run
-            automation/fluent-2-3213-trigger
-            automation/fluent-2-3213-workflow
-            dependabot/github_actions/actions/checkout-7.0.1
-            dependabot/github_actions/actions/setup-node-7.0.0
-            dependabot/github_actions/actions/setup-python-7.0.0
-            dependabot/github_actions/github-actions-c72aeaef1a
-          )
-          for branch in "${branches[@]}"; do
-            encoded="${branch//\//%2F}"
-            gh api --method DELETE "repos/${GITHUB_REPOSITORY}/git/refs/heads/${encoded}" >/dev/null 2>&1 || true
-          done

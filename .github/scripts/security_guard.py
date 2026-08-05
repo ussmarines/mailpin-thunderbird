@@ -25,15 +25,19 @@ FORBIDDEN_IDENTITY_HASHES = {
     "ec29e4a50ab3326b494e6126f3299ed436b1c24d3c508e364ee48345fc6c7a0b",
     "a6710e26418bd4c6d2ee839605cd40c313ac3b79e599c1be31aa2bd711c665e3",
 }
-PRIVATE_KEY_MARKERS = tuple(b"-----BEGIN " + value for value in (
-    b"PRIVATE KEY-----", b"ENCRYPTED PRIVATE KEY-----", b"RSA PRIVATE KEY-----",
-    b"OPENSSH PRIVATE KEY-----", b"EC PRIVATE KEY-----",
-))
+PRIVATE_KEY_MARKERS = tuple(
+    b"-----BEGIN " + prefix + b" KEY-----"
+    for prefix in (b"PRIVATE", b"ENCRYPTED PRIVATE", b"RSA PRIVATE", b"OPENSSH PRIVATE", b"EC PRIVATE")
+)
 SELF_PATH = ".github/scripts/security_guard.py"
 APPROVED_HISTORY_PATH = Path(".security/approved-historical-identity-findings.json")
 APPROVED_HISTORY_CATEGORY = "forbidden personal identifier in historical content"
 APPROVED_HISTORY_LOCATION_RE = re.compile(r"^blob:[0-9a-f]{12}:.+:[1-9][0-9]*$")
 TOKEN_RE = re.compile(r"[a-z0-9]+")
+RAW_TOKEN_RE = re.compile(r"[^\W_]+", re.UNICODE)
+EXTENSION_ID_RE = re.compile(r"pin-mails@[^\s`'\"<>]+\.local", re.IGNORECASE)
+PUBLIC_IDENTITY = "ussmarines"
+CANONICAL_EXTENSION_ID = "pin-mails@MailPerch.local"
 ASCII_TOKEN_RE = re.compile(rb"[A-Za-z0-9]{3,}")
 
 @dataclass(frozen=True)
@@ -60,6 +64,69 @@ def identity_match(items: list[str]) -> bool:
     candidates += ["".join(items[i:i + 2]) for i in range(max(0, len(items) - 1))]
     candidates += ["".join(items[i:i + 3]) for i in range(max(0, len(items) - 2))]
     return any(hashlib.sha256(item.encode()).hexdigest() in FORBIDDEN_IDENTITY_HASHES for item in candidates)
+
+def identity_spans(text: str) -> list[tuple[int, int]]:
+    """Locate forbidden identities without keeping their plaintext in the source."""
+    raw_tokens = list(RAW_TOKEN_RE.finditer(text))
+    result: list[tuple[int, int]] = []
+    for width in (3, 2, 1):
+        for index in range(len(raw_tokens) - width + 1):
+            start = raw_tokens[index].start()
+            end = raw_tokens[index + width - 1].end()
+            candidate = "".join(tokens(text[start:end]))
+            if not candidate:
+                continue
+            digest = hashlib.sha256(candidate.encode()).hexdigest()
+            if digest not in FORBIDDEN_IDENTITY_HASHES:
+                continue
+            if any(start < existing_end and end > existing_start for existing_start, existing_end in result):
+                continue
+            result.append((start, end))
+    return sorted(result)
+
+def sanitize_identity_text(text: str) -> tuple[str, int]:
+    """Replace forbidden civil identities while preserving the canonical add-on ID."""
+    replacements = 0
+
+    def canonicalize_extension_id(match: re.Match[str]) -> str:
+        nonlocal replacements
+        value = match.group(0)
+        if not identity_match(tokens(value)):
+            return value
+        replacements += 1
+        return CANONICAL_EXTENSION_ID
+
+    sanitized = EXTENSION_ID_RE.sub(canonicalize_extension_id, text)
+    for start, end in reversed(identity_spans(sanitized)):
+        sanitized = sanitized[:start] + PUBLIC_IDENTITY + sanitized[end:]
+        replacements += 1
+    return sanitized, replacements
+
+def sanitize_tree() -> int:
+    """Sanitize tracked UTF-8 text files without ever printing matched values."""
+    changed = 0
+    paths = [Path(os.fsdecode(item)) for item in git(["ls-files", "-z"]).split(b"\0") if item]
+    for path in paths:
+        if path.as_posix() == SELF_PATH:
+            continue
+        try:
+            data = path.read_bytes()
+        except OSError:
+            continue
+        if len(data) > MAX_SCAN_BYTES or b"\0" in data:
+            continue
+        try:
+            original = data.decode("utf-8")
+        except UnicodeDecodeError:
+            continue
+        sanitized, replacements = sanitize_identity_text(original)
+        if not replacements:
+            continue
+        path.write_bytes(sanitized.encode("utf-8"))
+        changed += 1
+        print(f"Sanitized personal identity: {path} ({replacements} replacement(s))")
+    print(f"Sanitized {changed} tracked file(s); matched values were not printed.")
+    return changed
 
 def path_categories(path: Path) -> list[str]:
     name = path.name.lower()
@@ -226,6 +293,7 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--history", action="store_true")
     parser.add_argument("--report", type=Path)
+    parser.add_argument("--sanitize-tree", action="store_true")
     args = parser.parse_args()
 
     try:
@@ -234,6 +302,8 @@ def main() -> int:
         print(f"Security guard configuration error: {exc}", file=sys.stderr)
         return 2
 
+    if args.sanitize_tree:
+        sanitize_tree()
     findings = scan_tree()
     if args.history:
         findings += scan_metadata() + scan_blobs()

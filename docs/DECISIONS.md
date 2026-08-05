@@ -1,8 +1,8 @@
 # Décisions techniques
 
-## D001 — ID public permanent conservé
+## D001 — ID produit canonique avant première publication
 
-`pin-mails@ussmarines.local` est figé comme identifiant public de MailPerch 1.x. Le modifier créerait une seconde installation et séparerait les données existantes ; toute évolution future devra donc conserver cet ID ou fournir une migration explicite.
+`pin-mails@MailPerch.local` remplace les identifiants utilisés uniquement dans des builds locales antérieures. MailPerch n’ayant jamais été publié avant cette décision, aucune continuité publique n’était à préserver ; cet ID propre au produit devient néanmoins immuable dès la première signature ou publication. Une installation locale antérieure doit passer par export, réinstallation et import contrôlé selon `docs/IDENTITY_MIGRATION_REQUIRED.md`.
 
 ## D002 — Dashboard ouvert par le background
 

@@ -12,6 +12,7 @@ dashboard = (EXT / "dashboard/dashboard.html").read_text(encoding="utf-8")
 dash_js = (EXT / "dashboard/dashboard.js").read_text(encoding="utf-8")
 options = (EXT / "options/options.js").read_text(encoding="utf-8")
 pin_css = (EXT / "styles/pin.css").read_text(encoding="utf-8")
+build = (ROOT / "scripts/build.py").read_text(encoding="utf-8")
 
 functions = {item["name"] for item in schema["functions"]}
 for name in ("quickCaptureSelected", "mergeRelatedReferences", "performReferenceAction", "simulateRules"):
@@ -42,17 +43,7 @@ assert "rules})," in options or "limit: 1000, rules" in options
 assert "getShortcuts" in options and "collectShortcuts" in options
 assert "pin-mails-reminder-center" in pin_css
 assert "connect-src 'none'" in json.dumps(manifest)
+assert "REVIEWED_ADDITIONAL_FILES" not in build
+assert '"git", "ls-files", "-z"' in build
+
 print("MailPerch productivity 1.1 feature guards: OK")
-
-
-def test_productivity_files_are_packaged_explicitly():
-    build = read("scripts/build.py")
-    for path in (
-        "SECURITY_AUDIT_1.1.0.md",
-        "VALIDATION_REPORT_1.1.0.md",
-        "extension/api/pinInbox/modules/related.js",
-        "extension/api/pinInbox/modules/review.js",
-        "tests/productivity_1_1_model_tests.mjs",
-        "tests/test_productivity_1_1_features.py",
-    ):
-        assert path in build, f"missing reviewed package entry: {path}"

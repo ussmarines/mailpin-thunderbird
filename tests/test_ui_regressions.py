@@ -40,7 +40,7 @@ assert "function setDirty" in options_js
 assert "function withBusy" in options_js
 assert "preserveEdits" in options_js
 assert "beforeunload" in options_js
-assert 'setStatus("Paramètres enregistrés."' in options_js
+assert 'setStatus(msg("settingsSaved"), "success")' in options_js
 
 # Pinned cards use Thunderbird's native popup layer and capture right-click early.
 assert 'about3Pane.addEventListener("contextmenu", onPanelContextMenu, true)' in impl

@@ -105,5 +105,6 @@ assert "source.is_symlink()" in build_source
 assert "resolved.is_relative_to(root.resolve())" in build_source
 assert '"git", "ls-files", "-z"' in build_source
 assert "SOURCE_FILE_MANIFEST" in build_source
+assert "REVIEWED_ADDITIONAL_FILES" not in build_source
 
 print("Reproducible XPI/source builds: OK")

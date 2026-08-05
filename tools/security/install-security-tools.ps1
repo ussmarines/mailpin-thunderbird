@@ -23,8 +23,19 @@ function Get-VerifiedFile([string]$Uri, [string]$Destination, [string]$Sha256) {
     }
     Assert-Hash -Path $Destination -Expected $Sha256
 }
+function Assert-ToolChildPath([string]$Path) {
+    $resolvedRoot = [IO.Path]::GetFullPath($ToolRoot).TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
+    $resolvedPath = [IO.Path]::GetFullPath($Path)
+    if (-not $resolvedPath.StartsWith($resolvedRoot, [StringComparison]::OrdinalIgnoreCase)) {
+        throw "Chemin d’outil hors racine refusé: $resolvedPath"
+    }
+}
+function Remove-ToolDirectory([string]$Path) {
+    Assert-ToolChildPath -Path $Path
+    if (Test-Path -LiteralPath $Path) { Remove-Item -LiteralPath $Path -Recurse -Force }
+}
 function Expand-CleanArchive([string]$Archive, [string]$Destination) {
-    if (Test-Path $Destination) { Remove-Item -Recurse -Force $Destination }
+    Remove-ToolDirectory -Path $Destination
     New-Item -ItemType Directory -Force -Path $Destination | Out-Null
     Expand-Archive -Path $Archive -DestinationPath $Destination -Force
 }
@@ -60,7 +71,7 @@ if (-not $TrivyExe) { throw 'Exécutable Trivy introuvable.' }
 $GitleaksVersion = '8.30.1'
 $GitleaksChecksumFile = Join-Path $DownloadRoot "gitleaks_${GitleaksVersion}_checksums.txt"
 Get-VerifiedFile -Uri "https://github.com/gitleaks/gitleaks/releases/download/v$GitleaksVersion/gitleaks_${GitleaksVersion}_checksums.txt" -Destination $GitleaksChecksumFile -Sha256 '061476c21adaf5441516f96f185c1a4706a83cd6329b9b38762271b3d4a52fae'
-$GitleaksPattern = if ($env:PROCESSOR_ARCHITECTURE -eq 'ARM64') { '(?i)windows_arm64\.zip$' } else { '(?i)windows_x32\.zip$' }
+$GitleaksPattern = if ($env:PROCESSOR_ARCHITECTURE -eq 'ARM64') { '(?i)windows_arm64\.zip$' } else { '(?i)windows_x64\.zip$' }
 $GitleaksLine = Get-Content $GitleaksChecksumFile | Where-Object { $_ -match $GitleaksPattern } | Select-Object -First 1
 if (-not $GitleaksLine) { throw 'Archive Windows compatible de Gitleaks introuvable.' }
 $GitleaksParts = $GitleaksLine -split '\s+', 2
@@ -82,13 +93,13 @@ if (-not (Get-Command py -ErrorAction SilentlyContinue)) {
 $ZizmorVersion = '1.26.1'
 $ZizmorRoot = Join-Path $ToolRoot "zizmor-$ZizmorVersion"
 $ZizmorWheelDir = Join-Path $DownloadRoot 'zizmor-wheel'
-if ($Force -and (Test-Path $ZizmorRoot)) { Remove-Item -Recurse -Force $ZizmorRoot }
+if ($Force) { Remove-ToolDirectory -Path $ZizmorRoot }
 if (-not (Test-Path $ZizmorRoot)) {
     & py -3.12 -m venv $ZizmorRoot
     if ($LASTEXITCODE -ne 0) { & py -3 -m venv $ZizmorRoot }
 }
 New-Item -ItemType Directory -Force -Path $ZizmorWheelDir | Out-Null
-Remove-Item -Force -ErrorAction SilentlyContinue (Join-Path $ZizmorWheelDir '*.whl')
+Get-ChildItem -LiteralPath $ZizmorWheelDir -File -Filter '*.whl' -ErrorAction SilentlyContinue | Remove-Item -Force
 & (Join-Path $ZizmorRoot 'Scripts\python.exe') -m pip download --disable-pip-version-check --no-deps --only-binary=:all: --dest $ZizmorWheelDir "zizmor==$ZizmorVersion"
 if ($LASTEXITCODE -ne 0) { throw 'Téléchargement de zizmor impossible.' }
 $ZizmorWheel = Get-ChildItem -Path $ZizmorWheelDir -File -Filter 'zizmor-1.26.1-py3-none-win_amd64.whl' | Select-Object -First 1

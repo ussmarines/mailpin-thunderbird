@@ -33,10 +33,18 @@ def run(*command: str) -> subprocess.CompletedProcess[str]:
 
 
 def repository_files() -> list[Path]:
-    excluded = {".git", "dist", "node_modules", "__pycache__", ".pytest_cache"}
+    excluded = {
+        ".git", ".playwright-cli", ".pytest_cache", ".reports", ".security-reports",
+        "__pycache__", "dist", "node_modules",
+    }
     files = [
         path for path in ROOT.rglob("*")
-        if path.is_file() and not any(part in excluded for part in path.relative_to(ROOT).parts)
+        if (
+            path.is_file()
+            and path.name != ".mailperch-source-files.json"
+            and path.relative_to(ROOT).parts[:2] != ("output", "playwright")
+            and not any(part in excluded for part in path.relative_to(ROOT).parts)
+        )
     ]
     return sorted(files, key=lambda path: path.relative_to(ROOT).as_posix())
 

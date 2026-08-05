@@ -7,13 +7,14 @@ import {fileURLToPath} from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const scope = {Date, Math, String, Number, Boolean, Object, Array, Set, Map, JSON};
 vm.createContext(scope);
-for (const name of ["identity.js", "storage.js", "workflow.js", "rules.js", "calendar.js"]) {
+for (const name of ["identity.js", "storage.js", "workflow.js", "rules.js", "calendar.js", "diagnostics.js"]) {
   vm.runInContext(fs.readFileSync(path.join(root, "extension/api/pinInbox/modules", name), "utf8"), scope, {filename: name});
 }
 
-function header({messageId="", refs=[], threadId=0, gmThread="", subject="", author="a@example.test", date=1, size=10}={}) {
+function header({messageId="", refs=[], threadId=0, gmThread="", subject="", author="a@example.test", date=1, size=10, messageKey=1, folderURI="mailbox://local/Inbox"}={}) {
   return {
-    messageId, numReferences: refs.length, threadId, date, messageSize: size,
+    messageId, numReferences: refs.length, threadId, date, messageSize: size, messageKey,
+    folder: {URI: folderURI},
     getStringReference(index){ return refs[index] || ""; },
     getStringProperty(name){
       if (name === "x-gm-thrid") return gmThread;
@@ -43,6 +44,29 @@ assert.equal(scope.PinIdentity.conversationIdentity(reply, "account1", reply.sub
 const gmailA = header({messageId:"a", gmThread:"999", subject:"A"});
 const gmailB = header({messageId:"b", gmThread:"999", subject:"B"});
 assert.equal(scope.PinIdentity.conversationIdentity(gmailA,"g",gmailA.subject), scope.PinIdentity.conversationIdentity(gmailB,"g",gmailB.subject));
+assert.equal(scope.PinIdentity.strongConversationKey(scope.PinIdentity.conversationIdentity(gmailA,"g",gmailA.subject)), true);
+
+const noIdentityA = header({messageId:"", threadId:0, subject:"Generic subject", messageKey:10});
+const noIdentityB = header({messageId:"", threadId:0, subject:"Generic subject", messageKey:11});
+const noIdentitySigA = scope.PinIdentity.signature(noIdentityA, "account1", noIdentityA.subject, noIdentityA.author);
+const noIdentitySigB = scope.PinIdentity.signature(noIdentityB, "account1", noIdentityB.subject, noIdentityB.author);
+assert.equal(scope.PinIdentity.sameConversation(noIdentitySigA, noIdentitySigB), false, "Subject alone must never link messages");
+assert.notEqual(scope.PinIdentity.conversationIdentity(noIdentityA, "account1", noIdentityA.subject), scope.PinIdentity.conversationIdentity(noIdentityB, "account1", noIdentityB.subject));
+assert.equal(scope.PinIdentity.strongConversationKey(scope.PinIdentity.conversationIdentity(noIdentityA, "account1", noIdentityA.subject)), false);
+
+const diagnosticInput = [
+  "person@example.test", "C:\\Users\\Person\\mail.txt", "\\\\server\\share\\mail.txt", "/tmp/private/mail.txt",
+  "github_" + "pat_" + "A".repeat(40), "sk-" + "proj-" + "B".repeat(24),
+  "https://" + "user:" + "password@" + "example.test/path"
+].join(" ");
+const diagnosticOutput = scope.PinDiagnostics.redact(diagnosticInput);
+for (const privateFragment of ["person@example.test", "Person", "server", "private", "github_pat_", "sk-proj-", "user:password"]) {
+  assert.equal(diagnosticOutput.includes(privateFragment), false, privateFragment);
+}
+assert.equal(diagnosticOutput.includes("<email>"), true);
+assert.equal(diagnosticOutput.includes("<local-path>"), true);
+assert.equal(diagnosticOutput.includes("<secret>"), true);
+assert.equal(diagnosticOutput.includes("<credential-url>"), true);
 
 const diff = scope.PinStorageHelpers.mapDiff({a:{x:1}, b:{x:2}}, {a:{x:1}, b:{x:3}, c:{x:4}});
 assert.deepEqual(JSON.parse(JSON.stringify(diff.upsert)), [["b",{x:3}],["c",{x:4}]]);

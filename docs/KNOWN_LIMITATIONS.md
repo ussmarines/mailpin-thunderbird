@@ -1,15 +1,15 @@
 # Limites connues
 
-- Les fonctions 1.1.0 (veille, Aujourd’hui/Revue, rappels interactifs, raccourcis et fusion) sont couvertes automatiquement mais doivent encore être validées dans une session Thunderbird graphique réelle avec messages et comptes.
-- La page Options 3.2.10 a été exécutée dans Thunderbird 153.0.1 avec un profil jetable sans compte ; les cartes `about:3pane` n’ont pas pu être validées sans jeu de messages.
-- Les gardes automatiques valident les contrats, la syntaxe, les modèles, les données et le build, mais ne remplacent pas un clic réel dans `about:3pane`.
+- Le panneau, les épingles, le clic de carte, le compteur non lu, la géométrie des icônes et le menu natif anglais ont été validés dans Thunderbird 153.0.1 avec un compte local et quatre messages synthétiques. Les fonctions de productivité qui dépendent d’un fournisseur réel, d’Agenda ou d’un cycle long restent à valider par environnement.
+- La page Options 3.2.10 et les cartes `about:3pane` ont été exécutées dans des profils Thunderbird 153.0.1 jetables distincts ; cette preuve ne couvre pas encore toute la plage 128–153 ni le zoom 200 %.
+- Les gardes automatiques valident les contrats, la syntaxe, les modèles, les données et le build, mais ne remplacent pas les clics réels restant dans `docs/MANUAL_TEST_PLAN.md`.
 - Les tests XPCShell/Mochitest fournis nécessitent un checkout de développement Thunderbird et ne sont pas exécutés par la CI générique.
 - Une API Experiment déclenche un avertissement d’accès complet et peut casser lors d’une évolution interne de Thunderbird.
-- Les pages déclaratives et les actions principales sont disponibles en français et en anglais ; quelques diagnostics techniques rares restent rédigés en français.
+- Les pages Options et dashboard ainsi que le panneau privilégié, leurs contenus dynamiques et leurs noms accessibles sont disponibles en français et en anglais ; les codes de diagnostic internes restent volontairement techniques et indépendants de la langue.
 - La matrice intégrée décrit les capacités détectées localement, mais ne garantit pas le comportement de chaque serveur sans test manuel.
 - Les actions supprimer/archiver, les dossiers virtuels et la synchronisation Agenda doivent être validés sur chaque fournisseur utilisé.
 - Le fichier principal de l’Experiment reste l’orchestrateur privilégié. Les logiques pures et stables sont séparées dans `modules/`, mais le découpage de l’intégration DOM doit rester progressif.
-- L’identifiant, le nom et la licence doivent être validés avant une publication ATN.
+- Le portail ATN doit encore accepter l’identifiant, le nom et la licence ; l’identifiant déjà utilisé par les releases GitHub ne doit pas être remplacé silencieusement.
 
 - La mémoire projet décrit le dépôt mais ne remplace pas une validation graphique réelle ;
   elle est contrôlée automatiquement pour la version et les points d’entrée.
@@ -22,4 +22,4 @@
 
 ## Validation des correctifs récents
 
-MP-2026-005, MP-2026-007 et MP-2026-008 ont été validés dans l’onglet Options de Thunderbird 153.0.1 avec un profil jetable. MP-2026-004 reste `À VALIDER` dans une liste de messages réelle : les mesures Playwright ne remplacent pas le rendu d’une liste virtualisée Thunderbird.
+MP-2026-004, MP-2026-005, MP-2026-007, MP-2026-008 et MP-2026-017 ont été validés dans Thunderbird 153.0.1 avec des profils jetables. MP-2026-010 reste à valider avec un calendrier synthétique ; MP-2026-011 conserve la matrice Thunderbird 128–153 et le zoom 200 % comme validations réelles restantes.

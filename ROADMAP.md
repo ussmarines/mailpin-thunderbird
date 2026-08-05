@@ -1,5 +1,14 @@
 # Feuille de route
 
+## 1.1.1 — confidentialité et durcissement de publication
+
+- [x] retirer les références personnelles de la branche courante et préparer le nettoyage ciblé de l’historique ;
+- [x] empêcher les rapprochements de conversations sur le seul objet ;
+- [x] expurger chemins, credentials et identifiants des diagnostics et journaux ;
+- [x] verrouiller le packaging, les workflows de release et les actions GitHub ;
+- [x] compléter l’anglais, les noms accessibles et les scénarios navigateur Options/dashboard ;
+- [ ] terminer la matrice Thunderbird réelle et la validation ATN sur les systèmes annoncés.
+
 ## 1.1.0 — productivité intégrée
 
 - [x] suivi automatique sans réponse et capture rapide ;
@@ -10,7 +19,7 @@
 - [x] aperçu des règles avant enregistrement ;
 - [x] personnalisation des dix raccourcis ;
 - [x] détection et fusion prudente des conversations associées ;
-- [ ] validation manuelle du XPI 1.1.0 dans une vraie liste de messages Thunderbird sur les systèmes annoncés.
+- [ ] validation manuelle des fonctions 1.1.0, reportée sur le XPI courant 1.1.1 dans une vraie liste de messages Thunderbird sur les systèmes annoncés.
 
 ## 3.2.10 — validation réelle de la page Options
 
@@ -77,4 +86,4 @@
 - fournir le code source lisible et les instructions de build reproductible ;
 - joindre la matrice de compatibilité réelle et les hashes SHA-256 ;
 - confirmer la conformité des marques, de la licence et des données personnelles ;
-- soumettre la version stable 1.0.0 après validation manuelle complète et traiter les retours reviewers sans modifications hors périmètre.
+- soumettre la version stable courante après validation manuelle complète et traiter les retours reviewers sans modifications hors périmètre.

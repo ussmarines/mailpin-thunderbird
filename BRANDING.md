@@ -23,15 +23,15 @@
 
 ## Identifiants techniques permanents
 
-Les éléments suivants sont historiques et ne doivent pas être renommés sans migration explicite :
+Les éléments suivants sont canoniques et ne doivent pas être renommés sans migration explicite :
 
-- ID public permanent : `pin-mails@ussmarines.local` ;
+- ID public permanent : `pin-mails@MailPerch.local` ;
 - base locale : `pin-mails-v2.sqlite` ;
 - formats d’import/export existants ;
 - préfixes DOM, classes CSS, topics et clés internes `pin-mails-*` ;
 - nom de l’API Experiment `pinInbox`.
 
-Les modifier sans migration pourrait créer une seconde installation, perdre l’accès aux données existantes ou casser les sauvegardes. L’ID historique est donc figé pour la ligne publique 1.x et ne doit plus être modifié.
+Les modifier sans migration pourrait créer une seconde installation, perdre l’accès aux données existantes ou casser les sauvegardes. MailPerch n’ayant jamais été publié avant cette décision, l’ID produit ci-dessus remplace les identifiants locaux antérieurs et devient immuable dès la première signature ou publication.
 
 ## Identité visuelle Fluent
 
