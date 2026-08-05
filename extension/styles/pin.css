@@ -146,6 +146,9 @@
   border-block-end: 1px solid color-mix(in srgb, var(--mp-color-warning-foreground) 28%, var(--pin-mails-border));
   background: color-mix(in srgb, var(--mp-color-warning-background) 68%, var(--pin-mails-panel-bg));
 }
+.pin-mails-reminder-center[hidden] {
+  display: none !important;
+}
 .pin-mails-reminder-heading,
 .pin-mails-reminder-row,
 .pin-mails-reminder-actions {
@@ -884,6 +887,8 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
 }
 @container threadPane (max-width: 700px) {
   .pin-mails-panel-tools { flex-direction: column; align-items: stretch; }
+  .pin-mails-search-wrap { flex: 0 0 auto; min-inline-size: 0; }
+  .pin-mails-smart-view-select { inline-size: 100%; max-inline-size: none; }
   .pin-mails-card-actions { opacity: 1; }
   .pin-mails-summary { display: none; }
 }

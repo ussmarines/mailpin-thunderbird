@@ -112,4 +112,16 @@ assert 'headerAction("pin-mails-action-dashboard"' in impl
 assert 'headerAction("pin-mails-action-add-group"' in impl
 assert 'createNode("button", "pin-mails-header-action", "C")' not in impl
 
+
+# Narrow thread panes must not turn the search control's horizontal flex basis
+# into a large vertical spacer. Empty reminder centers must stay invisible.
+responsive_start = css.index("@container threadPane (max-width: 700px)")
+responsive_end = css.index("/* 2.0", responsive_start)
+responsive_block = css[responsive_start:responsive_end]
+assert ".pin-mails-search-wrap { flex: 0 0 auto; min-inline-size: 0; }" in responsive_block
+assert ".pin-mails-smart-view-select { inline-size: 100%; max-inline-size: none; }" in responsive_block
+assert ".pin-mails-reminder-center[hidden]" in css
+hidden_rule = css[css.index(".pin-mails-reminder-center[hidden]"):]
+assert "display: none !important;" in hidden_rule
+
 print("UI regression guards: OK")
