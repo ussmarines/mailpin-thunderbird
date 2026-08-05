@@ -25,7 +25,7 @@ KEYS = {
     "dynamicTrigger", "dynamicAction", "dynamicTarget", "dynamicSenderContains",
     "dynamicSubjectContains", "dynamicTagKey", "dynamicAccount", "dynamicFolderHelp",
     "dynamicGroupTarget", "dynamicCaseTarget", "dynamicTemplateTarget", "dynamicStatusTarget",
-    "dynamicRuleLimit", "dynamicRuleLimitHelp", "dynamicNewCase", "dynamicNewTemplate",
+    "dynamicRuleLimit", "dynamicRuleLimitHelp", "dynamicNewGroup", "dynamicNewCase", "dynamicNewTemplate",
     "dynamicNewRule", "dynamicSimulationSummary", "dynamicSimulationBusy", "dynamicSimulationNoMatch",
     "calendarWriteAllowed", "calendarStateUnknown", "calendarWriteRefused", "calendarUnknown",
     "calendarWriteFailed", "caseCalendarTitleRequired", "caseCalendarDueRequired",
@@ -48,5 +48,6 @@ for source in (
 
 assert "function entityField(labelKey, control, helpKey" in OPTIONS
 assert "aria-describedby" in OPTIONS
+assert 'agenda.dataset.action = "case-calendar"' in OPTIONS
 assert "this._t(\"calendarWriteFailed\"" in IMPL
 print(f"Dynamic Options localization: {len(KEYS)} FR/EN keys, accessible fields: OK")

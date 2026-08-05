@@ -46,7 +46,7 @@ for required in (
     "withBusy",
     "preserveEdits",
     "beforeunload",
-    "setStatus(\"Paramètres enregistrés.\"",
+    "setStatus(msg(\"settingsSaved\"), \"success\")",
 ):
     assert required in HTML or required in JS, required
 
@@ -123,8 +123,8 @@ for required in (
     "dataset.enabled",
     "toggle-recommended-badge",
     "function entityField(labelKey, control, helpKey = \"\")",
-    "Échéance",
-    "Anticipation",
+    'entityField("deadline"',
+    'entityField("dynamicLead"',
     "dynamicRuleLimitHelp",
     "dynamicChooseCalendar",
     "dynamicCalendarDueRequired",

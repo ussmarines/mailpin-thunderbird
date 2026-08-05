@@ -14,18 +14,26 @@ let loading = false;
 let lastSelectedKey = "";
 
 const ACTION_MESSAGES = Object.freeze({
-  open: "Message ouvert.", reply: "Fenêtre de réponse ouverte.", active: "Message remis à traiter.",
-  waiting: "Message placé en attente.", planned: "Message planifié.", complete: "Message terminé.",
-  uncomplete: "Message rouvert.", read: "Message marqué comme lu.", unread: "Message marqué comme non lu.",
-  archive: "Message archivé.", delete: "Message supprimé.", unpin: "Message désépinglé.",
-  trackNoReply: "Suivi sans réponse activé.", cancelNoReply: "Suivi sans réponse arrêté.",
-  priority: "Priorité mise à jour.", deadline: "Échéance mise à jour.", group: "Groupe mis à jour.",
-  case: "Affaire mise à jour.", template: "Modèle appliqué.", calendar: "Élément Agenda créé.",
-  snooze: "Message mis en veille.", wake: "Message réveillé.", dismissReminder: "Rappel ignoré."
+  open: ["dashboardActionOpen", "Message ouvert."], reply: ["dashboardActionReply", "Fenêtre de réponse ouverte."], active: ["dashboardActionActive", "Message remis à traiter."],
+  waiting: ["dashboardActionWaiting", "Message placé en attente."], planned: ["dashboardActionPlanned", "Message planifié."], complete: ["dashboardActionComplete", "Message terminé."],
+  uncomplete: ["dashboardActionUncomplete", "Message rouvert."], read: ["dashboardActionRead", "Message marqué comme lu."], unread: ["dashboardActionUnread", "Message marqué comme non lu."],
+  archive: ["dashboardActionArchive", "Message archivé."], delete: ["dashboardActionDelete", "Message supprimé."], unpin: ["dashboardActionUnpin", "Message désépinglé."],
+  trackNoReply: ["dashboardActionTrackNoReply", "Suivi sans réponse activé."], cancelNoReply: ["dashboardActionCancelNoReply", "Suivi sans réponse arrêté."],
+  priority: ["dashboardActionPriority", "Priorité mise à jour."], deadline: ["dashboardActionDeadline", "Échéance mise à jour."], group: ["dashboardActionGroup", "Groupe mis à jour."],
+  case: ["dashboardActionCase", "Affaire mise à jour."], template: ["dashboardActionTemplate", "Modèle appliqué."], calendar: ["dashboardActionCalendar", "Élément Agenda créé."],
+  snooze: ["dashboardActionSnooze", "Message mis en veille."], wake: ["dashboardActionWake", "Message réveillé."], dismissReminder: ["dashboardActionDismissReminder", "Rappel ignoré."]
 });
 
 function msg(key, fallback) {
   try { return api.i18n.getMessage(key) || fallback; } catch { return fallback; }
+}
+
+function safeErrorName(error) {
+  return String(error?.name || "Error").replace(/[^a-z0-9_-]/gi, "").slice(0, 48) || "Error";
+}
+
+function failureMessage(key, fallback, error) {
+  return `${msg(key, fallback)} (${safeErrorName(error)})`;
 }
 
 function localize() {
@@ -37,6 +45,10 @@ function localize() {
   for (const element of document.querySelectorAll("[data-i18n-placeholder]")) {
     const value = msg(element.dataset.i18nPlaceholder, "");
     if (value) element.placeholder = value;
+  }
+  for (const element of document.querySelectorAll("[data-i18n-aria-label]")) {
+    const value = msg(element.getAttribute("data-i18n-aria-label"), "");
+    if (value) element.setAttribute("aria-label", value);
   }
 }
 
@@ -138,7 +150,7 @@ function setStatus(message, type = "", {persistent = false} = {}) {
 }
 
 function setFatal(error) {
-  $("fatal-message").textContent = String(error?.message || error || "Erreur inconnue");
+  $("fatal-message").textContent = failureMessage("dashboardLoadFailed", "Chargement impossible", error);
   $("fatal-error").hidden = false;
   setLoading(false);
 }
@@ -206,7 +218,7 @@ function badgesFor(item) {
 function updateSelectionBar() {
   const count = selected.size;
   $("selection-bar").hidden = count === 0 || configuration?.settings?.enableBulkActions === false;
-  $("selection-count").textContent = count === 1 ? "1 message sélectionné" : `${count} messages sélectionnés`;
+  $("selection-count").textContent = msg(count === 1 ? "selectedMessageOne" : "selectedMessageMany", count === 1 ? "1 message sélectionné" : "$1 messages sélectionnés").replace("$1", count);
   for (const input of document.querySelectorAll('.item input[type="checkbox"]')) {
     const card = input.closest(".item");
     input.checked = selected.has(card?.dataset.key || "");
@@ -224,7 +236,7 @@ function createCard(item, {compact = false, selectable = true} = {}) {
     const check = document.createElement("input");
     check.type = "checkbox";
     check.checked = selected.has(item.stableKey);
-    check.setAttribute("aria-label", `Sélectionner ${item.subject || "ce message"}`);
+    check.setAttribute("aria-label", msg("selectMessage", "Sélectionner $1").replace("$1", item.subject || msg("thisMessage", "ce message")));
     check.addEventListener("click", event => {
       const key = item.stableKey;
       if (event.shiftKey && lastSelectedKey && lastSelectedKey !== key) {
@@ -287,12 +299,12 @@ function renderSmartViews() {
   const host = $("smart-views");
   host.replaceChildren();
   const views = current?.smartViews?.length ? current.smartViews : [
-    {id: "all", fallback: "Toutes"}, {id: "today", fallback: "Aujourd’hui"},
-    {id: "overdue", fallback: "En retard"}, {id: "week", fallback: "Cette semaine"},
-    {id: "waiting", fallback: "En attente"}, {id: "noReply", fallback: "Relances sans réponse"},
-    {id: "snoozed", fallback: "En veille"}, {id: "noDue", fallback: "Sans échéance"}, {id: "unread", fallback: "Non lus"},
-    {id: "missing", fallback: "Messages introuvables"}, {id: "calendarError", fallback: "Agenda à vérifier"},
-    {id: "recentCompleted", fallback: "Récemment terminés"}
+    {id: "all", labelKey: "smartViewAll", fallback: "Toutes"}, {id: "today", labelKey: "smartViewToday", fallback: "Aujourd’hui"},
+    {id: "overdue", labelKey: "smartViewOverdue", fallback: "En retard"}, {id: "week", labelKey: "smartViewWeek", fallback: "Cette semaine"},
+    {id: "waiting", labelKey: "smartViewWaiting", fallback: "En attente"}, {id: "noReply", labelKey: "smartViewNoReply", fallback: "Relances sans réponse"},
+    {id: "snoozed", labelKey: "smartViewSnoozed", fallback: "En veille"}, {id: "noDue", labelKey: "smartViewNoDue", fallback: "Sans échéance"}, {id: "unread", labelKey: "smartViewUnread", fallback: "Non lus"},
+    {id: "missing", labelKey: "smartViewMissing", fallback: "Messages introuvables"}, {id: "calendarError", labelKey: "smartViewCalendarError", fallback: "Agenda à vérifier"},
+    {id: "recentCompleted", labelKey: "smartViewRecentCompleted", fallback: "Récemment terminés"}
   ];
   for (const view of views) {
     const button = node("button", "smart-view");
@@ -433,7 +445,7 @@ function clearKanbanDropState() {
 function renderKanban() {
   const host = $("kanban");
   host.replaceChildren();
-  const columns = [["active", "À traiter"], ["waiting", "En attente"], ["planned", "Planifié"], ["completed", "Terminé"]];
+  const columns = [["active", msg("statusActive", "À traiter")], ["waiting", msg("statusWaiting", "En attente")], ["planned", msg("statusPlanned", "Planifié")], ["completed", msg("statusComplete", "Terminé")]];
   for (const [status, label] of columns) {
     const items = (current.items || []).filter(item => (item.workflowStatus || "active") === status);
     const column = node("section", "kanban-column");
@@ -469,8 +481,8 @@ function renderCases() {
     const refs = (current.items || []).filter(item => item.caseId === caseItem.id);
     const card = node("article", "case-card");
     card.style.setProperty("--case-color", caseItem.color || "var(--accent)");
-    card.append(node("h2", "", caseItem.name || "Affaire"));
-    card.append(node("p", "case-meta", `${refs.length} message(s) · ${caseItem.status || "active"}${caseItem.dueAt ? ` · ${formatDate(caseItem.dueAt)}` : ""}`));
+    card.append(node("h2", "", caseItem.name || msg("case", "Affaire")));
+    card.append(node("p", "case-meta", `${msg("messageCount", "$1 message(s)").replace("$1", refs.length)} · ${caseItem.status || "active"}${caseItem.dueAt ? ` · ${formatDate(caseItem.dueAt)}` : ""}`));
     if (caseItem.note) card.append(node("p", "", caseItem.note));
     const actions = node("div", "item-actions");
     const selectCase = actionButton("select-case", msg("selectMessages", "Sélectionner les messages"));
@@ -487,7 +499,7 @@ function renderHistory() {
   if (!current.history?.length) { host.append(createEmpty(msg("noHistory", "Aucun élément dans l’historique."))); return; }
   for (const item of current.history) {
     const entry = node("article", "history-entry");
-    entry.append(node("strong", "", item.subject || "(sans objet)"));
+    entry.append(node("strong", "", item.subject || msg("noSubject", "(sans objet)")));
     entry.append(node("div", "history-meta", [item.author, item.accountName, item.action, formatDate(item.completedAt)].filter(Boolean).join(" · ")));
     host.append(entry);
   }
@@ -502,8 +514,8 @@ function renderHealth() {
   score.style.setProperty("--score", String(report.score || 0));
   score.append(node("strong", "", `${report.score || 0}/100`));
   const copy = node("div", "");
-  copy.append(node("h2", "", report.status === "healthy" ? "MailPerch est en bonne santé" : report.status === "attention" ? "Quelques points sont à surveiller" : "Une intervention est recommandée"));
-  copy.append(node("p", "", `${report.issues?.length || 0} point(s) détecté(s) · ${current.diagnostics?.total || 0} événement(s) diagnostic récent(s).`));
+  copy.append(node("h2", "", report.status === "healthy" ? msg("healthHealthy", "MailPerch est en bonne santé") : report.status === "attention" ? msg("healthAttention", "Quelques points sont à surveiller") : msg("healthCritical", "Une intervention est recommandée")));
+  copy.append(node("p", "", msg("healthSummary", "$1 point(s) détecté(s) · $2 événement(s) diagnostic récent(s).").replace("$1", report.issues?.length || 0).replace("$2", current.diagnostics?.total || 0)));
   const actions = node("div", "item-actions");
   actions.classList.add("health-tools");
   actions.append(actionButton("health-refresh", msg("runHealthCheck", "Analyser")), actionButton("health-repair", msg("repairSafeIssues", "Réparer les anomalies sûres")), actionButton("provider-check", msg("checkProviders", "Tester les fournisseurs")), actionButton("diagnostic-export", msg("exportDiagnostic", "Exporter le diagnostic")), actionButton("diagnostic-clear", msg("clearDiagnostics", "Vider le journal")));
@@ -511,27 +523,27 @@ function renderHealth() {
   host.append(hero);
 
   const issues = node("section", "health-card");
-  issues.append(node("h2", "", "Points à examiner"));
+  issues.append(node("h2", "", msg("healthIssuesHeading", "Points à examiner")));
   const issueList = node("div", "health-issues");
   for (const issue of report.issues || []) {
     const card = node("article", `health-issue ${issue.severity || "info"}`);
-    card.append(node("strong", "", issue.title || "Information"), node("span", "", issue.detail || ""));
+    card.append(node("strong", "", issue.title || msg("information", "Information")), node("span", "", issue.detail || ""));
     issueList.append(card);
   }
-  if (!issueList.childElementCount) issueList.append(node("p", "", "Aucune anomalie détectée par les contrôles locaux."));
+  if (!issueList.childElementCount) issueList.append(node("p", "", msg("healthNoIssues", "Aucune anomalie détectée par les contrôles locaux.")));
   issues.append(issueList);
   host.append(issues);
 
   const matrix = current.providerMatrix || {};
   const providers = node("section", "health-card");
-  providers.append(node("h2", "", "Compatibilité des comptes et calendriers"));
+  providers.append(node("h2", "", msg("providerCompatibilityHeading", "Compatibilité des comptes et calendriers")));
   const rows = node("div", "provider-matrix");
   for (const row of matrix.accounts || []) {
     const line = node("div", "provider-row");
-    line.append(node("strong", "", row.accountName || row.accountKey || "Compte"), node("span", "", row.provider || "inconnu"), node("span", "", (row.protocol || "inconnu").toUpperCase()), node("span", "", row.supportsFolders ? "Dossiers ✓" : "Dossiers limités"), node("span", "", row.offlineSupport ? "Hors ligne ✓" : "Hors ligne —"));
+    line.append(node("strong", "", row.accountName || row.accountKey || msg("account", "Compte")), node("span", "", row.provider || msg("unknown", "inconnu")), node("span", "", (row.protocol || msg("unknown", "inconnu")).toUpperCase()), node("span", "", row.supportsFolders ? msg("foldersSupported", "Dossiers ✓") : msg("foldersLimited", "Dossiers limités")), node("span", "", row.offlineSupport ? msg("offlineSupported", "Hors ligne ✓") : msg("offlineUnavailable", "Hors ligne —")));
     rows.append(line);
   }
-  if (!rows.childElementCount) rows.append(node("p", "", "La matrice n’a pas encore été exécutée."));
+  if (!rows.childElementCount) rows.append(node("p", "", msg("providerMatrixNotRun", "La matrice n’a pas encore été exécutée.")));
   providers.append(rows);
   host.append(providers);
 }
@@ -539,11 +551,11 @@ function renderHealth() {
 function renderActivity() {
   const renderEntries = (host, entries, formatter) => {
     host.replaceChildren();
-    if (!entries?.length) { host.append(node("p", "", "Aucune activité.")); return; }
+    if (!entries?.length) { host.append(node("p", "", msg("noActivity", "Aucune activité."))); return; }
     for (const entry of entries) host.append(node("div", "activity-entry", formatter(entry)));
   };
   renderEntries($("activity"), current.activity, item => `${formatDate(item.time)} · ${item.action || item.type || "action"} · ${item.subject || item.details || ""}`);
-  renderEntries($("rule-log"), current.ruleLog, item => `${formatDate(item.time)} · ${item.ruleName || "Règle"} · ${item.result || ""} · ${item.subject || ""}`);
+  renderEntries($("rule-log"), current.ruleLog, item => `${formatDate(item.time)} · ${item.ruleName || msg("rule", "Règle")} · ${item.result || ""} · ${item.subject || ""}`);
   $("technical").textContent = JSON.stringify({revision: current.revision, compatibility: current.compatibility, performance: current.performance, diagnostics: current.diagnostics, providerMatrix: current.providerMatrix}, null, 2);
 }
 
@@ -554,9 +566,9 @@ function populateBulkControls() {
     select.replaceChildren(option("", first), ...values.map(([value, label]) => option(value, label)));
     select.value = [...select.options].some(item => item.value === previous) ? previous : "";
   };
-  fill("bulk-group", "Sans groupe", (current.groups || []).map(item => [item.id, item.name]));
-  fill("bulk-case", "Sans affaire", (current.cases || []).map(item => [item.id, item.name]));
-  fill("bulk-template", "Choisir un modèle…", (current.templates || []).map(item => [item.id, item.name]));
+  fill("bulk-group", msg("withoutGroup", "Sans groupe"), (current.groups || []).map(item => [item.id, item.name]));
+  fill("bulk-case", msg("withoutCase", "Sans affaire"), (current.cases || []).map(item => [item.id, item.name]));
+  fill("bulk-template", msg("chooseTemplate", "Choisir un modèle…"), (current.templates || []).map(item => [item.id, item.name]));
 }
 
 const VIEW_SECTION_IDS = Object.freeze({
@@ -656,19 +668,21 @@ async function perform(keys, action, options = {}, {reload = true, control = nul
   const safeKeys = [...new Set((keys || []).map(String).filter(Boolean))];
   if (!safeKeys.length || !action) return null;
   if (destructive(action) && configuration?.settings?.confirmBulkDestructiveActions !== false) {
-    const label = action === "delete" ? "supprimer" : action === "archive" ? "archiver" : "désépingler";
-    if (!confirm(`${label[0].toUpperCase()}${label.slice(1)} ${safeKeys.length} message(s) ?`)) return null;
+    const promptKey = action === "delete" ? "confirmBulkDelete" : action === "archive" ? "confirmBulkArchive" : "confirmBulkUnpin";
+    const fallbackPrompt = action === "delete" ? "Supprimer ces $1 message(s) ?" : action === "archive" ? "Archiver ces $1 message(s) ?" : "Désépingler ces $1 message(s) ?";
+    if (!confirm(msg(promptKey, fallbackPrompt).replace("$1", safeKeys.length))) return null;
   }
   setButtonBusy(control, true);
-  setStatus("Action en cours…", "busy", {persistent: true});
+  setStatus(msg("actionInProgress", "Action en cours…"), "busy", {persistent: true});
   try {
     const result = await api.pinInbox.performReferenceAction(safeKeys, action, options);
     if (action !== "open" && action !== "reply") safeKeys.forEach(key => selected.delete(key));
     if (reload) await load({silent: true});
-    setStatus(ACTION_MESSAGES[action] || `${result?.count || safeKeys.length} élément(s) mis à jour.`, "success");
+    const actionMessage = ACTION_MESSAGES[action];
+    setStatus(actionMessage ? msg(...actionMessage) : msg("itemsUpdated", "$1 élément(s) mis à jour.").replace("$1", result?.count || safeKeys.length), "success");
     return result;
   } catch (error) {
-    setStatus(`Action impossible : ${error.message || error}`, "error", {persistent: true});
+    setStatus(failureMessage("actionFailed", "Action impossible", error), "error", {persistent: true});
     return null;
   } finally {
     setButtonBusy(control, false);
@@ -703,12 +717,12 @@ function openCalendarDialog(keys) {
 
 async function refreshHealth(control = null) {
   setButtonBusy(control, true);
-  setStatus("Analyse de la santé MailPerch…", "busy", {persistent: true});
+  setStatus(msg("healthCheckBusy", "Analyse de la santé MailPerch…"), "busy", {persistent: true});
   try {
     current.health = await api.pinInbox.getHealthReport();
     renderHealth();
-    setStatus(`Analyse terminée : score ${current.health.score}/100.`, "success");
-  } catch (error) { setStatus(`Analyse impossible : ${error.message || error}`, "error", {persistent: true}); }
+    setStatus(msg("healthCheckComplete", "Analyse terminée : score $1/100.").replace("$1", current.health.score), "success");
+  } catch (error) { setStatus(failureMessage("healthCheckFailed", "Analyse impossible", error), "error", {persistent: true}); }
   finally { setButtonBusy(control, false); }
 }
 
@@ -731,12 +745,12 @@ async function handleActionClick(event) {
     const prompt = msg("mergeRelatedConfirm", "Fusionner ces $1 épingles en une seule conversation ?").replace("$1", group.count);
     if (!confirm(prompt)) return;
     setButtonBusy(control, true);
-    setStatus("Fusion de la conversation…", "busy", {persistent: true});
+    setStatus(msg("mergeRelatedBusy", "Fusion de la conversation…"), "busy", {persistent: true});
     try {
       await api.pinInbox.mergeRelatedReferences(group.stableKeys);
       await load({silent: true});
       setStatus(msg("mergeRelated", "Conversation fusionnée."), "success");
-    } catch (error) { setStatus(`Fusion impossible : ${error.message || error}`, "error", {persistent: true}); }
+    } catch (error) { setStatus(failureMessage("mergeRelatedFailed", "Fusion impossible", error), "error", {persistent: true}); }
     finally { setButtonBusy(control, false); }
     return;
   }
@@ -774,7 +788,7 @@ function bindEvents() {
   $("bulk-action").addEventListener("change", updateBulkVisibility);
   $("apply").addEventListener("click", event => {
     const action = $("bulk-action").value;
-    if (!action) { setStatus("Choisissez une action groupée.", "error"); return; }
+    if (!action) { setStatus(msg("chooseBulkAction", "Choisissez une action groupée."), "error"); return; }
     perform([...selected], action, actionOptions(action), {control: event.currentTarget});
   });
   for (const button of document.querySelectorAll("[data-view]")) {
@@ -810,15 +824,15 @@ function bindEvents() {
     if (!action) return;
     if (action === "health-refresh") return refreshHealth(control);
     if (action === "health-repair") {
-      if (!confirm("Exécuter les réparations non destructives ?")) return;
+      if (!confirm(msg("healthRepairConfirm", "Exécuter les réparations non destructives ?"))) return;
       setButtonBusy(control, true);
-      setStatus("Réparation en cours…", "busy", {persistent: true});
+      setStatus(msg("healthRepairBusy", "Réparation en cours…"), "busy", {persistent: true});
       try {
         const result = await api.pinInbox.repairHealthIssues({actions: ["orphan-links", "repair-references"]});
         current.health = result.health;
         await load({silent: true});
-        setStatus(`${result.repaired || 0} élément(s) réparé(s).`, "success");
-      } catch (error) { setStatus(`Réparation impossible : ${error.message || error}`, "error", {persistent: true}); }
+        setStatus(msg("healthRepairComplete", "$1 élément(s) réparé(s).").replace("$1", result.repaired || 0), "success");
+      } catch (error) { setStatus(failureMessage("healthRepairFailed", "Réparation impossible", error), "error", {persistent: true}); }
       finally { setButtonBusy(control, false); }
     }
     if (action === "diagnostic-export") {
@@ -829,7 +843,7 @@ function bindEvents() {
         const date = new Date().toISOString().slice(0, 10);
         downloadJson(`mailperch-diagnostic-${date}.json`, bundle);
         setStatus(msg("diagnosticExported", "Diagnostic local exporté."), "success");
-      } catch (error) { setStatus(`${msg("diagnosticExportFailed", "Export impossible")} : ${error.message || error}`, "error", {persistent: true}); }
+      } catch (error) { setStatus(failureMessage("diagnosticExportFailed", "Export impossible", error), "error", {persistent: true}); }
       finally { setButtonBusy(control, false); }
       return;
     }
@@ -840,15 +854,15 @@ function bindEvents() {
         await api.pinInbox.clearDiagnostics();
         await load({silent: true});
         setStatus(msg("diagnosticCleared", "Journal diagnostic vidé."), "success");
-      } catch (error) { setStatus(`${msg("diagnosticClearFailed", "Nettoyage impossible")} : ${error.message || error}`, "error", {persistent: true}); }
+      } catch (error) { setStatus(failureMessage("diagnosticClearFailed", "Nettoyage impossible", error), "error", {persistent: true}); }
       finally { setButtonBusy(control, false); }
       return;
     }
     if (action === "provider-check") {
       setButtonBusy(control, true);
-      setStatus("Analyse des fournisseurs…", "busy", {persistent: true});
-      try { current.providerMatrix = await api.pinInbox.runProviderCompatibilityCheck(); renderHealth(); setStatus("Matrice de compatibilité actualisée.", "success"); }
-      catch (error) { setStatus(`Analyse impossible : ${error.message || error}`, "error", {persistent: true}); }
+      setStatus(msg("providerCheckBusy", "Analyse des fournisseurs…"), "busy", {persistent: true});
+      try { current.providerMatrix = await api.pinInbox.runProviderCompatibilityCheck(); renderHealth(); setStatus(msg("providerCheckComplete", "Matrice de compatibilité actualisée."), "success"); }
+      catch (error) { setStatus(failureMessage("providerCheckFailed", "Analyse impossible", error), "error", {persistent: true}); }
       finally { setButtonBusy(control, false); }
     }
   });

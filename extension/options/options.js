@@ -34,16 +34,16 @@ const INITIALIZATION_TIMEOUTS = Object.freeze({
   auxiliary: 7_000
 });
 const COMMANDS = Object.freeze([
-  ["toggle-pin-selected", "commandToggle", "Épingler ou désépingler la sélection"],
-  ["toggle-conversation-selected", "commandConversation", "Épingler ou désépingler la conversation"],
-  ["complete-selected-pin", "commandComplete", "Marquer la sélection comme terminée"],
-  ["wait-selected-pin", "commandWait", "Placer la sélection en attente"],
-  ["plan-selected-pin", "commandPlan", "Planifier la sélection"],
-  ["activate-selected-pin", "commandActivate", "Remettre la sélection à traiter"],
-  ["snooze-selected-pin", "commandSnooze", "Mettre la sélection en veille"],
-  ["track-no-reply-selected", "commandTrackNoReply", "Activer le suivi sans réponse"],
-  ["quick-today-selected", "commandQuickToday", "Ajouter la sélection à aujourd’hui"],
-  ["open-pin-dashboard", "commandDashboard", "Ouvrir le tableau de bord"]
+  ["toggle-pin-selected", "commandToggle"],
+  ["toggle-conversation-selected", "commandConversation"],
+  ["complete-selected-pin", "commandComplete"],
+  ["wait-selected-pin", "commandWait"],
+  ["plan-selected-pin", "commandPlan"],
+  ["activate-selected-pin", "commandActivate"],
+  ["snooze-selected-pin", "commandSnooze"],
+  ["track-no-reply-selected", "commandTrackNoReply"],
+  ["quick-today-selected", "commandQuickToday"],
+  ["open-pin-dashboard", "commandDashboard"]
 ]);
 const SETTINGS_REGISTRY_AVAILABLE = Boolean(
   globalThis.PinSettings?.DEFAULTS &&
@@ -91,12 +91,15 @@ async function waitForPinInbox() {
   throw new OptionsInitializationTimeout("api-namespace", INITIALIZATION_TIMEOUTS.apiNamespace);
 }
 
+function safeErrorName(error) {
+  return String(error?.name || "Error").replace(/[^a-z0-9_-]/gi, "").slice(0, 48) || "Error";
+}
+
 function initializationDiagnostic(error) {
   if (error instanceof OptionsInitializationTimeout) {
     return `options:init:timeout:${error.operation}`;
   }
-  const name = String(error?.name || "Error").replace(/[^a-z0-9_-]/gi, "").slice(0, 48) || "Error";
-  return `options:init:error:${name}`;
+  return `options:init:error:${safeErrorName(error)}`;
 }
 
 function setInitializationState(state, error = null) {
@@ -308,92 +311,96 @@ function validateSettingsControlRegistry() {
 
 
 const CONTROL_HELP = {
-  pinMode: "Le mode indépendant conserve les épingles dans le stockage local MailPerch sans modifier les étoiles Thunderbird.",
-  defaultPinTarget: "Détermine si une nouvelle épingle suit uniquement le message sélectionné ou toute sa conversation.",
-  compatibilityMode: "Automatique adapte l’intégration à votre version de Thunderbird. Le mode réduit désactive les fonctions DOM les plus sensibles.",
-  enableCounterRegressionGuard: "Vérifie que MailPerch ne modifie pas les compteurs natifs de messages lus, non lus ou nouveaux.",
-  enableConcurrentWriteProtection: "Sérialise les écritures locales lorsque plusieurs fenêtres Thunderbird utilisent MailPerch en même temps.",
-  safeMode: "Masque les fonctions avancées susceptibles de dépendre davantage de l’interface interne de Thunderbird.",
-  showQuickActions: "Affiche les boutons Répondre, Attente, Terminer et Modifier sur les cartes épinglées.",
-  enableMultiSelect: "Autorise Ctrl/Cmd, Maj et les actions groupées dans le panneau des épingles.",
-  confirmDelete: "Demande une confirmation avant toute suppression de message déclenchée depuis MailPerch.",
-  enableCalendarIntegration: "Autorise la création locale de tâches et d’événements dans les calendriers Thunderbird compatibles.",
-  enableBidirectionalCalendarSync: "Répercute les échéances et états terminés entre l’épingle et l’élément Agenda lié.",
-  calendarCompleteOnPinComplete: "Marque la tâche Agenda terminée lorsque l’épingle correspondante est terminée.",
-  calendarDeleteOnUnpin: "Supprime l’élément Agenda lié lors du désépinglage. Cette option peut être destructive.",
-  calendarItemType: "Type proposé par défaut. Le calendrier reste sélectionnable au moment de chaque création.",
-  preferredCalendarId: "Calendrier présélectionné. Laissez vide pour choisir le calendrier au moment de créer la tâche ou l’événement.",
-  enableAutomaticBackups: "Crée périodiquement des sauvegardes locales de la configuration et des références MailPerch.",
-  backupDirectory: "Dossier local utilisé pour les sauvegardes automatiques et manuelles.",
-  enableGlobalDashboard: "Active l’onglet global regroupant les épingles de tous les comptes.",
-  enablePerformanceMetrics: "Mesure uniquement les durées de rendu locales, sans télémétrie ni envoi réseau.",
-  shortcut: "Raccourci Thunderbird utilisé pour épingler ou désépingler la sélection courante."
+  pinMode: "controlHelpPinMode",
+  defaultPinTarget: "controlHelpDefaultPinTarget",
+  compatibilityMode: "controlHelpCompatibilityMode",
+  enableCounterRegressionGuard: "controlHelpCounterGuard",
+  enableConcurrentWriteProtection: "controlHelpConcurrentWrites",
+  safeMode: "controlHelpSafeMode",
+  showQuickActions: "controlHelpQuickActions",
+  enableMultiSelect: "controlHelpMultiSelect",
+  confirmDelete: "controlHelpConfirmDelete",
+  enableCalendarIntegration: "controlHelpCalendarIntegration",
+  enableBidirectionalCalendarSync: "controlHelpCalendarSync",
+  calendarCompleteOnPinComplete: "controlHelpCalendarComplete",
+  calendarDeleteOnUnpin: "controlHelpCalendarDelete",
+  calendarItemType: "controlHelpCalendarItemType",
+  preferredCalendarId: "controlHelpPreferredCalendar",
+  enableAutomaticBackups: "controlHelpAutomaticBackups",
+  backupDirectory: "controlHelpBackupDirectory",
+  enableGlobalDashboard: "controlHelpGlobalDashboard",
+  enablePerformanceMetrics: "controlHelpPerformanceMetrics",
+  shortcut: "controlHelpShortcut"
 };
 
 const BUTTON_HELP = {
-  "import-stars": "Copie les étoiles Thunderbird existantes vers les épingles MailPerch. Les messages ne sont ni déplacés ni marqués comme lus.",
-  "simulate-rules": "Analyse les règles sans modifier les messages ni les épingles.",
-  "clear-rule-log": "Efface seulement le journal local des règles, pas les messages ni les règles.",
-  "add-rule": "Ajoute une règle locale désactivable avant son enregistrement.",
-  "add-group": "Ajoute un groupe local pour organiser les cartes épinglées.",
-  "add-case": "Ajoute une affaire locale pouvant regrouper plusieurs messages.",
-  "add-template": "Ajoute un modèle de suivi réutilisable.",
-  "sync-calendar": "Relit et synchronise les liens Agenda existants. Aucun nouvel élément n’est créé sans action explicite.",
-  "choose-backup": "Choisit le dossier local des sauvegardes et enregistre immédiatement ce chemin.",
-  "run-backup": "Crée immédiatement une sauvegarde locale dans le dossier configuré.",
-  "integrity-check": "Vérifie la cohérence SQLite sans supprimer ni réparer automatiquement les données.",
-  "compat-check": "Contrôle la disponibilité des fonctions Thunderbird utilisées par MailPerch.",
-  dashboard: "Ouvre le tableau de bord global dans un nouvel onglet Thunderbird.",
-  undo: "Annule la dernière action MailPerch encore disponible dans l’historique local.",
-  repair: "Tente de retrouver les messages déplacés ou renommés sans modifier les compteurs Thunderbird.",
-  rescan: "Rescanne les références épinglées pour mettre à jour leur état local.",
-  cleanup: "Retire les références définitivement introuvables après le délai de sécurité configuré.",
-  "reset-interface": "Réinitialise uniquement la disposition et les préférences visuelles de l’interface.",
-  diagnostic: "Exporte un rapport technique local expurgé du corps des messages et des pièces jointes.",
-  export: "Télécharge une sauvegarde JSON locale de la configuration MailPerch.",
-  "save-shortcut": "Enregistre uniquement le raccourci Thunderbird indiqué.",
-  "save-all-floating": "Enregistre tous les champs, groupes, règles, affaires et modèles actuellement modifiés.",
-  reset: "Réinitialise les réglages, groupes, affaires, modèles et règles. Les épingles sont conservées."
+  "import-stars": "buttonHelpImportStars",
+  "simulate-rules": "buttonHelpSimulateRules",
+  "clear-rule-log": "buttonHelpClearRuleLog",
+  "add-rule": "buttonHelpAddRule",
+  "add-group": "buttonHelpAddGroup",
+  "add-case": "buttonHelpAddCase",
+  "add-template": "buttonHelpAddTemplate",
+  "sync-calendar": "buttonHelpSyncCalendar",
+  "choose-backup": "buttonHelpChooseBackup",
+  "run-backup": "buttonHelpRunBackup",
+  "integrity-check": "buttonHelpIntegrityCheck",
+  "compat-check": "buttonHelpCompatibilityCheck",
+  dashboard: "buttonHelpDashboard",
+  undo: "buttonHelpUndo",
+  repair: "buttonHelpRepair",
+  rescan: "buttonHelpRescan",
+  cleanup: "buttonHelpCleanup",
+  "reset-interface": "buttonHelpResetInterface",
+  diagnostic: "buttonHelpDiagnostic",
+  export: "buttonHelpExport",
+  "save-shortcut": "buttonHelpSaveShortcut",
+  "save-all-floating": "buttonHelpSaveAll",
+  reset: "buttonHelpReset"
 };
 
 Object.assign(CONTROL_HELP, {
-  settingsExperience: "Le mode Guidé masque les réglages avancés. Le mode Avancé affiche tous les réglages sans modifier leur valeur.",
-  uiPreset: "Ajuste uniquement l’espacement de la page des paramètres. Cette option ne modifie jamais la liste des messages ni le panneau principal.",
-  reduceMotion: "Réduit les animations pour plus de confort, sans désactiver les retours d’action.",
-  panelVirtualizationThreshold: "Au-delà de ce nombre d’épingles, MailPerch limite le rendu initial afin de préserver la fluidité.",
-  enableSmartViews: "Ajoute les vues Aujourd’hui, En retard, Sans réponse, Sans échéance et autres vues calculées localement.",
-  enableBulkActions: "Permet d’appliquer une action à plusieurs épingles sélectionnées dans le panneau ou le tableau de bord.",
-  confirmBulkDestructiveActions: "Demande une confirmation avant une suppression, un archivage ou un désépinglage groupé.",
-  enableAutomaticNoReplyTracking: "Après un message envoyé, crée localement une date de relance et l’annule lorsqu’une réponse arrive.",
-  noReplyCancelOnIncomingReply: "Désactive automatiquement le suivi sans réponse lorsque MailPerch détecte une réponse dans la conversation.",
-  noReplyDefaultDays: "Nombre de jours avant qu’une conversation sans réponse apparaisse dans la vue À relancer.",
-  defaultSmartView: "Vue sélectionnée lorsque le tableau de bord ou le panneau s’ouvre.",
-  enableHealthCenter: "Calcule un score local à partir de l’intégrité, des sauvegardes, des références, de l’Agenda et des performances.",
-  enableHealthNotifications: "N’affiche que les alertes utiles et évite les notifications répétitives.",
-  enableDiagnostics: "Conserve localement un journal technique expurgé des adresses, chemins et contenus de messages.",
-  diagnosticLevel: "Les niveaux plus élevés réduisent le nombre d’événements conservés.",
-  diagnosticMaxEntries: "Limite la taille du journal local entre 50 et 500 événements."
+  settingsExperience: "controlHelpSettingsExperience",
+  uiPreset: "controlHelpUiPreset",
+  reduceMotion: "controlHelpReduceMotion",
+  panelVirtualizationThreshold: "controlHelpVirtualization",
+  enableSmartViews: "controlHelpSmartViews",
+  enableBulkActions: "controlHelpBulkActions",
+  confirmBulkDestructiveActions: "controlHelpBulkConfirm",
+  enableAutomaticNoReplyTracking: "controlHelpAutomaticNoReply",
+  noReplyCancelOnIncomingReply: "controlHelpCancelNoReply",
+  noReplyDefaultDays: "controlHelpNoReplyDays",
+  defaultSmartView: "controlHelpDefaultSmartView",
+  enableHealthCenter: "controlHelpHealthCenter",
+  enableHealthNotifications: "controlHelpHealthNotifications",
+  enableDiagnostics: "controlHelpDiagnostics",
+  diagnosticLevel: "controlHelpDiagnosticLevel",
+  diagnosticMaxEntries: "controlHelpDiagnosticEntries"
 });
 
 Object.assign(BUTTON_HELP, {
-  "provider-check": "Analyse les types de comptes et les calendriers disponibles, sans connexion réseau supplémentaire.",
-  "health-check": "Contrôle la base locale, les références, l’Agenda, les sauvegardes et les performances.",
-  "health-repair": "Exécute uniquement les réparations considérées comme non destructives et crée une sauvegarde préalable.",
-  "clear-diagnostics": "Efface le journal technique local, sans toucher aux épingles ni à l’historique utilisateur."
+  "provider-check": "buttonHelpProviderCheck",
+  "health-check": "buttonHelpHealthCheck",
+  "health-repair": "buttonHelpHealthRepair",
+  "clear-diagnostics": "buttonHelpClearDiagnostics"
 });
 
 function genericControlHelp(control) {
-  if (control.type === "checkbox") return "Active ou désactive cette fonction après l’enregistrement des paramètres.";
-  if (control.tagName === "SELECT") return "Choisissez le comportement utilisé par MailPerch, puis enregistrez les paramètres.";
-  if (control.type === "number") return "Définit une limite ou une durée locale appliquée après l’enregistrement.";
-  if (control.tagName === "TEXTAREA") return "Une valeur par ligne. Les données restent stockées localement dans MailPerch.";
-  return "Cette valeur est appliquée après l’enregistrement des paramètres.";
+  if (control.type === "checkbox") return msg("genericCheckboxHelp");
+  if (control.tagName === "SELECT") return msg("genericSelectHelp");
+  if (control.type === "number") return msg("genericNumberHelp");
+  if (control.tagName === "TEXTAREA") return msg("genericTextareaHelp");
+  return msg("genericValueHelp");
 }
 
 function msg(key, substitutions = undefined) {
   const value = messenger.i18n.getMessage(key, substitutions);
   if (!value) throw new Error(`Traduction dynamique absente : ${key}`);
   return value;
+}
+
+function failureMessage(key, error) {
+  return `${msg(key)} (${safeErrorName(error)})`;
 }
 
 function syncToggleCards() {
@@ -453,7 +460,7 @@ function enhanceSettingsPage() {
     if (!heading) continue;
     section.id ||= `settings-${slugify(heading.textContent)}-${index + 1}`;
     section.dataset.searchText = section.textContent.toLowerCase();
-    const groupName = section.dataset.navGroup || "Autres";
+    const groupName = section.dataset.navGroupI18n ? msg(section.dataset.navGroupI18n) : (section.dataset.navGroup || msg("navOther"));
     let group = groups.get(groupName);
     if (!group) {
       group = node("section", "settings-nav-group");
@@ -499,7 +506,7 @@ function enhanceSettingsPage() {
   for (const label of document.querySelectorAll("#settings-form section label")) {
     const control = label.querySelector("input:not([type='file']), select, textarea");
     if (!control || label.querySelector(":scope > .control-help")) continue;
-    const help = node("small", "control-help", CONTROL_HELP[control.id] || genericControlHelp(control));
+    const help = node("small", "control-help", CONTROL_HELP[control.id] ? msg(CONTROL_HELP[control.id]) : genericControlHelp(control));
     const helpId = `help-${control.id || slugify(label.textContent)}`;
     help.id = helpId;
     control.setAttribute("aria-describedby", [control.getAttribute("aria-describedby"), helpId].filter(Boolean).join(" "));
@@ -511,7 +518,7 @@ function enhanceSettingsPage() {
     const wrapper = node("span", "button-help-wrap");
     button.before(wrapper);
     wrapper.appendChild(button);
-    const help = node("small", "button-help", BUTTON_HELP[button.id] || "Exécute cette action localement et affiche son résultat près du bouton.");
+    const help = node("small", "button-help", msg(BUTTON_HELP[button.id] || "genericButtonHelp"));
     wrapper.appendChild(help);
   }
 
@@ -612,8 +619,8 @@ function setDirty(value = false) {
   syncSaveControls();
   if ($("save-dock-message")) {
     $("save-dock-message").textContent = dirty
-      ? "Modifications non enregistrées — elles ne seront appliquées qu’après Enregistrer."
-      : "Paramètres enregistrés.";
+      ? msg("unsavedChanges")
+      : msg("settingsSaved");
   }
 }
 
@@ -626,7 +633,7 @@ function syncDirtyState() {
   } catch (error) {
     draftStateError = error;
     setDirty(true);
-    setStatus(`Impossible d’évaluer les modifications : ${error.message || error}`, "error", {persistent: true});
+    setStatus(failureMessage("draftEvaluationFailed", error), "error", {persistent: true});
   }
 }
 
@@ -702,17 +709,17 @@ function renderShortcuts(values = {}) {
   const host = $("shortcut-list");
   if (!host) return;
   host.replaceChildren();
-  for (const [name, labelKey, fallback] of COMMANDS) {
+  for (const [name, labelKey] of COMMANDS) {
     const label = node("label", "shortcut-item");
     const copy = node("span", "");
-    copy.append(node("strong", "", msg(labelKey) || fallback), node("small", "", name));
+    copy.append(node("strong", "", msg(labelKey)), node("small", "", name));
     const input = document.createElement("input");
     input.type = "text";
     input.dataset.commandName = name;
     input.value = String(values[name] || "");
     input.autocomplete = "off";
     input.spellcheck = false;
-    input.setAttribute("aria-label", msg(labelKey) || fallback);
+    input.setAttribute("aria-label", msg(labelKey));
     if (name === "toggle-pin-selected") input.id = "shortcut";
     label.append(copy, input);
     host.append(label);
@@ -758,7 +765,7 @@ function select(options, value, label) {
 }
 
 function removeButton(callback) {
-  const button = node("button", "danger compact", "Supprimer");
+  const button = node("button", "danger compact", msg("delete"));
   button.type = "button";
   button.addEventListener("click", () => {
     callback();
@@ -820,34 +827,34 @@ function calendarOptions(type, selectedId = "") {
 function renderGroups() {
   const host = $("groups-list");
   host.replaceChildren();
-  if (!groups.length) host.append(node("p", "hint", "Aucun groupe personnalisé."));
+  if (!groups.length) host.append(node("p", "hint", msg("noCustomGroups")));
   groups.forEach((group, index) => {
     const row = node("article", "group-row group-editor-row");
     row.style.setProperty("--group-color", group.color);
 
     const drag = node("span", "group-drag", "⋮⋮");
     drag.setAttribute("aria-hidden", "true");
-    drag.title = "Ordre du groupe";
+    drag.title = msg("groupOrder");
 
     const nameField = node("label", "entity-field");
-    nameField.append(node("span", "", "Nom du groupe"));
+    nameField.append(node("span", "", msg("groupName")));
     const name = document.createElement("input");
     name.value = group.name;
     name.maxLength = 80;
-    name.setAttribute("aria-label", "Nom du groupe");
+    name.setAttribute("aria-label", msg("groupName"));
     nameField.append(name);
 
     const colorField = node("label", "entity-field");
-    colorField.append(node("span", "", "Couleur"));
+    colorField.append(node("span", "", msg("dynamicColor")));
     const color = document.createElement("input");
     color.type = "color";
     color.value = group.color;
-    color.setAttribute("aria-label", `Couleur du groupe ${group.name || index + 1}`);
+    color.setAttribute("aria-label", msg("groupColorLabel", [group.name || index + 1]));
     colorField.append(color);
 
     name.addEventListener("input", () => {
       group.name = name.value.slice(0, 80);
-      color.setAttribute("aria-label", `Couleur du groupe ${group.name || index + 1}`);
+      color.setAttribute("aria-label", msg("groupColorLabel", [group.name || index + 1]));
     });
     color.addEventListener("input", () => {
       group.color = color.value;
@@ -872,10 +879,10 @@ function renderGroups() {
   });
   renderWaitingGroups();
 }
-function renderWaitingGroups(selected=configuration?.settings?.waitingGroupId||""){const el=$("waitingGroupId");el.replaceChildren();const none=node("option","","Aucun");none.value="";el.append(none);for(const group of groups){const option=node("option","",group.name);option.value=group.id;el.append(option);}el.value=groups.some(g=>g.id===selected)?selected:"";}
+function renderWaitingGroups(selected=configuration?.settings?.waitingGroupId||""){const el=$("waitingGroupId");el.replaceChildren();const none=node("option","",msg("none"));none.value="";el.append(none);for(const group of groups){const option=node("option","",group.name);option.value=group.id;el.append(option);}el.value=groups.some(g=>g.id===selected)?selected:"";}
 function renderCases(){
   const host=$("cases-list");host.replaceChildren();
-  if(!cases.length)host.append(node("p","hint","Aucune affaire."));
+  if(!cases.length)host.append(node("p","hint",msg("noCases")));
   cases.forEach((item,index)=>{
     const row=node("article","group-row case-editor-row");row.style.setProperty("--group-color",item.color);
     const name=document.createElement("input");name.value=item.name;name.maxLength=120;name.required=true;
@@ -896,6 +903,7 @@ function renderCases(){
     for(const control of[name,color,status,due,note,type,calendar])control.addEventListener("input",sync);
     const agenda = node("button", "secondary compact", item.calendarItemId ? msg("dynamicCalendarSync") : msg("calendarCreate"));
     agenda.type = "button";
+    agenda.dataset.action = "case-calendar";
     agenda.addEventListener("click", async event => {
       try {
         sync();
@@ -922,7 +930,7 @@ function renderCases(){
           "success"
         );
       } catch (error) {
-        setStatus(`Agenda impossible : ${error.message || error}`, "error");
+        setStatus(failureMessage("calendarWriteFailed", error), "error");
       }
     });
     const[up,down]=moveButtons(cases,index,renderCases);
@@ -931,20 +939,20 @@ function renderCases(){
 }
 function renderTemplates(){
   const host=$("templates-list");host.replaceChildren();
-  if(!templates.length)host.append(node("p","hint","Aucun modèle."));
+  if(!templates.length)host.append(node("p","hint",msg("noTemplates")));
   templates.forEach((item,index)=>{
     const row=node("article","rule-row template-row");
-    const name=document.createElement("input");name.value=item.name;name.placeholder="Nom du modèle";
-    const group=select([["","Aucun groupe"],...groups.map(g=>[g.id,g.name])],item.groupId||"","Groupe");
-    const caseSelect=select([["","Aucune affaire"],...cases.map(c=>[c.id,c.name])],item.caseId||"","Affaire");
-    const priority=select([["normal","Normale"],["high","Haute"],["urgent","Urgente"]],item.priorityLevel||"normal","Priorité");
-    const status=select([["active","À traiter"],["waiting","En attente"],["planned","Planifié"]],item.workflowStatus||"active","Statut");
-    const due=document.createElement("input");due.type="number";due.min="0";due.max="3650";due.value=item.dueOffsetDays||0;due.title="Échéance dans N jours";due.placeholder="Échéance J+";
-    const follow=document.createElement("input");follow.type="number";follow.min="0";follow.max="365";follow.value=item.followUpDelayDays||0;follow.title="Relance dans N jours";follow.placeholder="Relance J+";
-    const lead=document.createElement("input");lead.type="number";lead.min="0";lead.max="10080";lead.value=item.reminderLeadMinutes||0;lead.title="Rappel anticipé en minutes";lead.placeholder="Anticipation min";
-    const recurrence=select([["","Aucune"],["daily","Quotidienne"],["weekdays","Jours ouvrés"],["weekly","Hebdomadaire"],["monthly","Mensuelle"],["quarterly","Trimestrielle"],["yearly","Annuelle"]],item.recurrenceRule||"","Récurrence");
-    const interval=document.createElement("input");interval.type="number";interval.min="1";interval.max="100";interval.value=item.recurrenceInterval||1;interval.title="Intervalle de récurrence";
-    const note=document.createElement("input");note.value=item.notePrefix||"";note.placeholder="Préfixe de note";note.maxLength=500;
+    const name=document.createElement("input");name.value=item.name;name.placeholder=msg("templateNamePlaceholder");
+    const group=select([["",msg("withoutGroup")],...groups.map(g=>[g.id,g.name])],item.groupId||"",msg("group"));
+    const caseSelect=select([["",msg("withoutCase")],...cases.map(c=>[c.id,c.name])],item.caseId||"",msg("case"));
+    const priority=select([["normal",msg("priorityNormal")],["high",msg("priorityHigh")],["urgent",msg("priorityUrgent")]],item.priorityLevel||"normal",msg("priority"));
+    const status=select([["active",msg("statusActive")],["waiting",msg("statusWaiting")],["planned",msg("statusPlanned")]],item.workflowStatus||"active",msg("dynamicStatus"));
+    const due=document.createElement("input");due.type="number";due.min="0";due.max="3650";due.value=item.dueOffsetDays||0;due.title=msg("dynamicTemplateDeadlineHelp");due.placeholder=msg("deadlineOffsetPlaceholder");
+    const follow=document.createElement("input");follow.type="number";follow.min="0";follow.max="365";follow.value=item.followUpDelayDays||0;follow.title=msg("dynamicTemplateFollowUpHelp");follow.placeholder=msg("followUpOffsetPlaceholder");
+    const lead=document.createElement("input");lead.type="number";lead.min="0";lead.max="10080";lead.value=item.reminderLeadMinutes||0;lead.title=msg("dynamicTemplateLeadHelp");lead.placeholder=msg("leadMinutesPlaceholder");
+    const recurrence=select([["",msg("recurrenceNone")],["daily",msg("recurrenceDaily")],["weekdays",msg("recurrenceWeekdays")],["weekly",msg("recurrenceWeekly")],["monthly",msg("recurrenceMonthly")],["quarterly",msg("recurrenceQuarterly")],["yearly",msg("recurrenceYearly")]],item.recurrenceRule||"",msg("dynamicRecurrence"));
+    const interval=document.createElement("input");interval.type="number";interval.min="1";interval.max="100";interval.value=item.recurrenceInterval||1;interval.title=msg("dynamicTemplateIntervalHelp");
+    const note=document.createElement("input");note.value=item.notePrefix||"";note.placeholder=msg("dynamicNotePrefix");note.maxLength=500;
     const sync=()=>Object.assign(item,{name:name.value.slice(0,120),groupId:group.value,caseId:caseSelect.value,priorityLevel:priority.value,workflowStatus:status.value,dueOffsetDays:Number(due.value)||0,followUpDelayDays:Number(follow.value)||0,reminderLeadMinutes:Number(lead.value)||0,recurrenceRule:recurrence.value,recurrenceInterval:Number(interval.value)||1,notePrefix:note.value.slice(0,500)});
     for(const control of[name,group,caseSelect,priority,status,due,follow,lead,recurrence,interval,note])control.addEventListener("input",sync);
     const[up,down]=moveButtons(templates,index,renderTemplates);
@@ -962,13 +970,13 @@ function renderAccounts(accounts) {
     card.style.setProperty("--account-color", account.color);
     const header = node("div", "account-header");
     const title = node("div", "account-title");
-    const primaryLabel = String(account.name || account.email || "Compte Thunderbird").trim();
+    const primaryLabel = String(account.name || account.email || msg("thunderbirdAccount")).trim();
     const secondaryLabel = String(account.email || "").trim();
     title.append(node("div", "account-name", primaryLabel));
     if (secondaryLabel && secondaryLabel.localeCompare(primaryLabel, undefined, {sensitivity: "accent"}) !== 0) {
       title.append(node("div", "account-email", secondaryLabel));
     }
-    title.title = `Identifiant technique : ${account.key}`;
+    title.title = msg("technicalIdentifier", [account.key]);
     const color = document.createElement("input");
     color.type = "color";
     color.value = account.color;
@@ -979,7 +987,7 @@ function renderAccounts(accounts) {
     color.dataset.settingMigration = PinSettings.MIGRATION_STRATEGY;
     color.addEventListener("input", () => card.style.setProperty("--account-color", color.value));
     accountControls.set(account.key, color);
-    const reset = node("button", "secondary", "Défaut");
+    const reset = node("button", "secondary", msg("defaultButton"));
     reset.type = "button";
     reset.addEventListener("click", () => {
       color.value = account.defaultColor;
@@ -1009,26 +1017,26 @@ function renderAccounts(accounts) {
 }
 function renderRules(){
   const host=$("rules-list");host.replaceChildren();
-  if(!rules.length)host.append(node("p","hint","Aucune règle personnalisée."));
-  const accountOptions=[["","Tous les comptes"],...(configuration?.accounts||[]).map(account=>[account.key,account.name||account.email||account.key])];
+  if(!rules.length)host.append(node("p","hint",msg("noCustomRules")));
+  const accountOptions=[["",msg("allAccounts")],...(configuration?.accounts||[]).map(account=>[account.key,account.name||account.email||account.key])];
   rules.forEach((rule,index)=>{
     const row=node("article","rule-row");
-    const enabled=document.createElement("input");enabled.type="checkbox";enabled.checked=rule.enabled!==false;enabled.title="Activer la règle";enabled.setAttribute("aria-label","Activer la règle");
-    const name=document.createElement("input");name.value=rule.name||`Règle ${index+1}`;name.placeholder="Nom";
-    const priority=document.createElement("input");priority.type="number";priority.min="1";priority.max="10000";priority.value=rule.priority||((index+1)*100);priority.title="Priorité d’exécution";
-    const trigger=select([["messageAdded","Nouveau message"],["read","Lecture"],["archive","Archivage"],["reply","Réponse"],["move","Déplacement"],["delete","Suppression"],["complete","Terminé"],["calendar","Agenda"]],rule.trigger||"messageAdded","Déclencheur");
-    const action=select([["pin","Épingler"],["unpin","Désépingler"],["complete","Terminer"],["group","Groupe"],["case","Affaire"],["status","Statut"],["template","Modèle"],["keep","Conserver"]],rule.action||"pin","Action");
-    const target=select([["message","Message"],["conversation","Conversation"]],rule.trackingMode||"message","Cible");
-    const sender=document.createElement("input");sender.value=rule.senderContains||"";sender.placeholder="Expéditeur contient";sender.title="Filtre sur l’expéditeur";
-    const subject=document.createElement("input");subject.value=rule.subjectContains||"";subject.placeholder="Objet contient";subject.title="Filtre sur l’objet";
-    const tag=document.createElement("input");tag.value=rule.tagKey||"";tag.placeholder="Clé d’étiquette";tag.title="Clé interne d’une étiquette Thunderbird";
-    const account=select(accountOptions,rule.accountKey||"","Compte");
-    const folder=document.createElement("input");folder.value=rule.folderURI||"";folder.placeholder="URI du dossier (facultatif)";folder.title="Limiter à un dossier exact";
-    const group=select([["","Aucun groupe"],...groups.map(g=>[g.id,g.name])],rule.groupId||"","Groupe cible");
-    const caseSelect=select([["","Aucune affaire"],...cases.map(c=>[c.id,c.name])],rule.caseId||"","Affaire cible");
-    const template=select([["","Aucun modèle"],...templates.map(t=>[t.id,t.name])],rule.templateId||"","Modèle cible");
-    const status=select([["active","À traiter"],["waiting","En attente"],["planned","Planifié"],["completed","Terminé"]],rule.workflowStatus||"active","Statut cible");
-    const stopLabel=node("label","compact-check");const stop=document.createElement("input");stop.type="checkbox";stop.checked=rule.stopProcessing!==false;stopLabel.append(stop,document.createTextNode("Arrêter"));
+    const enabled=document.createElement("input");enabled.type="checkbox";enabled.checked=rule.enabled!==false;enabled.title=msg("dynamicRuleEnabledHelp");enabled.setAttribute("aria-label",msg("dynamicRuleEnabled"));
+    const name=document.createElement("input");name.value=rule.name||msg("ruleDefaultName", [index+1]);name.placeholder=msg("dynamicName");
+    const priority=document.createElement("input");priority.type="number";priority.min="1";priority.max="10000";priority.value=rule.priority||((index+1)*100);priority.title=msg("dynamicRulePriorityHelp");
+    const trigger=select([["messageAdded",msg("triggerMessageAdded")],["read",msg("triggerRead")],["archive",msg("triggerArchive")],["reply",msg("triggerReply")],["move",msg("triggerMove")],["delete",msg("triggerDelete")],["complete",msg("triggerComplete")],["calendar",msg("triggerCalendar")]],rule.trigger||"messageAdded",msg("dynamicTrigger"));
+    const action=select([["pin",msg("ruleActionPin")],["unpin",msg("unpin")],["complete",msg("ruleActionComplete")],["group",msg("group")],["case",msg("case")],["status",msg("dynamicStatus")],["template",msg("template")],["keep",msg("ruleActionKeep")]],rule.action||"pin",msg("dynamicAction"));
+    const target=select([["message",msg("ruleTargetMessage")],["conversation",msg("ruleTargetConversation")]],rule.trackingMode||"message",msg("dynamicTarget"));
+    const sender=document.createElement("input");sender.value=rule.senderContains||"";sender.placeholder=msg("dynamicSenderContains");sender.title=msg("senderFilterHelp");
+    const subject=document.createElement("input");subject.value=rule.subjectContains||"";subject.placeholder=msg("dynamicSubjectContains");subject.title=msg("subjectFilterHelp");
+    const tag=document.createElement("input");tag.value=rule.tagKey||"";tag.placeholder=msg("dynamicTagKey");tag.title=msg("tagFilterHelp");
+    const account=select(accountOptions,rule.accountKey||"",msg("dynamicAccount"));
+    const folder=document.createElement("input");folder.value=rule.folderURI||"";folder.placeholder=msg("folderUriPlaceholder");folder.title=msg("dynamicFolderHelp");
+    const group=select([["",msg("withoutGroup")],...groups.map(g=>[g.id,g.name])],rule.groupId||"",msg("dynamicGroupTarget"));
+    const caseSelect=select([["",msg("withoutCase")],...cases.map(c=>[c.id,c.name])],rule.caseId||"",msg("dynamicCaseTarget"));
+    const template=select([["",msg("withoutTemplate")],...templates.map(t=>[t.id,t.name])],rule.templateId||"",msg("dynamicTemplateTarget"));
+    const status=select([["active",msg("statusActive")],["waiting",msg("statusWaiting")],["planned",msg("statusPlanned")],["completed",msg("statusComplete")]],rule.workflowStatus||"active",msg("dynamicStatusTarget"));
+    const stopLabel=node("label","compact-check");const stop=document.createElement("input");stop.type="checkbox";stop.checked=rule.stopProcessing!==false;stopLabel.append(stop,document.createTextNode(msg("stopProcessing")));
     const rate=document.createElement("input");rate.type="number";rate.min="1";rate.max="1000";rate.value=rule.maxPerMinute||60;rate.title=msg("dynamicRuleLimitHelp");
     const sync=()=>Object.assign(rule,{
       enabled:enabled.checked,name:name.value.slice(0,100),priority:Number(priority.value)||100,
@@ -1050,7 +1058,7 @@ async function renderCalendars(selected) {
   const info = $("calendar-info");
   el.replaceChildren();
   info?.replaceChildren();
-  const ask = node("option", "", "Demander lors de la création");
+  const ask = node("option", "", msg("calendarAskOnCreate"));
   ask.value = "";
   el.append(ask);
   try {
@@ -1059,14 +1067,14 @@ async function renderCalendars(selected) {
       INITIALIZATION_TIMEOUTS.calendar,
       "calendars"
     );
-    if (!Array.isArray(calendars)) throw new Error("La liste des calendriers est invalide.");
+    if (!Array.isArray(calendars)) throw new TypeError("calendar-list-invalid");
     if (generation !== calendarRenderGeneration) return;
     availableCalendars = calendars.filter(calendar => calendar && typeof calendar.id === "string");
     for (const calendar of calendars) {
       const option = node(
         "option",
         "",
-        `${calendar.name} — tâches ${calendar.taskCompatible ? "✓" : "✕"} · événements ${calendar.eventCompatible ? "✓" : "✕"}${calendar.reason ? ` · ${calendar.reason}` : ""}`
+        `${calendar.name} — ${msg("tasksShort")} ${calendar.taskCompatible ? "✓" : "✕"} · ${msg("eventsShort")} ${calendar.eventCompatible ? "✓" : "✕"}${calendar.reason ? ` · ${calendar.reason}` : ""}`
       );
       option.value = calendar.id;
       option.disabled = !calendar.taskCompatible && !calendar.eventCompatible;
@@ -1080,38 +1088,42 @@ async function renderCalendars(selected) {
             ? "writable"
             : taskCompatible ? "tasks-only" : "events-only";
         const stateLabel = capabilityClass === "writable"
-          ? "Tâches et événements"
+          ? msg("calendarTasksAndEvents")
           : capabilityClass === "tasks-only"
-            ? "Tâches uniquement"
+            ? msg("calendarTasksOnly")
             : capabilityClass === "events-only"
-              ? "Événements uniquement"
-              : "Indisponible en écriture";
+              ? msg("calendarEventsOnly")
+              : msg("calendarReadOnly");
         const card = node("div", `calendar-capability ${capabilityClass}`);
         const title = node("strong", "", calendar.name);
         const state = node("span", "calendar-capability-state", stateLabel);
         const details = node(
           "small",
           "",
-          `Fournisseur : ${calendar.type || "inconnu"} · Tâches : ${taskCompatible ? "compatibles" : "non compatibles"} · Événements : ${eventCompatible ? "compatibles" : "non compatibles"}${calendar.reason ? ` · ${calendar.reason}` : ""}`
+          msg("calendarCapabilityDetails")
+            .replace("$1", calendar.type || msg("unknown"))
+            .replace("$2", taskCompatible ? msg("compatible") : msg("notCompatible"))
+            .replace("$3", eventCompatible ? msg("compatible") : msg("notCompatible")) +
+            (calendar.reason ? ` · ${calendar.reason}` : "")
         );
         card.append(title, state, details);
         info.appendChild(card);
       }
     }
     if (info && !calendars.length) {
-      info.appendChild(node("p", "hint", "Aucun calendrier Thunderbird n’est disponible ou l’intégration Agenda est désactivée."));
+      info.appendChild(node("p", "hint", msg("noCalendarAvailable")));
     }
   } catch (error) {
     availableCalendars = [];
     if (generation !== calendarRenderGeneration) return;
     console.warn("MailPerch : calendriers indisponibles", initializationDiagnostic(error));
-    setStatus("Les calendriers Thunderbird ne sont pas disponibles.", "error", {control: el});
+    setStatus(msg("calendarsUnavailable"), "error", {control: el});
     info?.appendChild(node(
       "p",
       "hint",
       error instanceof OptionsInitializationTimeout
-        ? "La liste des calendriers n’a pas répondu. Réessayez avec « Synchroniser maintenant » lorsque l’Agenda est disponible."
-        : "La liste des calendriers n’a pas pu être chargée."
+        ? msg("calendarListTimeout")
+        : msg("calendarListFailed")
     ));
   }
   el.value = [...el.options].some(option => option.value === selected && !option.disabled) ? selected : "";
@@ -1140,25 +1152,25 @@ function renderHealth(report) {
   if (!host) return;
   host.replaceChildren();
   if (!report) {
-    host.append(node("p", "hint", "Le centre de santé n’a pas encore été analysé."));
+    host.append(node("p", "hint", msg("healthNotAnalyzed")));
     $("health-score-badge").textContent = "—";
     $("overview-health").textContent = "—";
     return;
   }
   const score = Math.max(0, Math.min(100, Number(report.score) || 0));
-  const statusLabels = {healthy: "Sain", attention: "À surveiller", critical: "Action requise"};
+  const statusLabels = {healthy: msg("healthStatusHealthy"), attention: msg("healthStatusAttention"), critical: msg("healthStatusCritical")};
   const summary = node("div", "health-summary");
-  const title = node("strong", "", `${score}/100 · ${statusLabels[report.status] || "État inconnu"}`);
-  const meta = node("small", "", `${report.counts?.pinned || 0} épingle(s) · ${report.issues?.length || 0} point(s) à examiner`);
+  const title = node("strong", "", `${score}/100 · ${statusLabels[report.status] || msg("healthStatusUnknown")}`);
+  const meta = node("small", "", msg("healthOptionsSummary").replace("$1", report.counts?.pinned || 0).replace("$2", report.issues?.length || 0));
   summary.append(title, meta);
   host.append(summary);
   const issues = node("div", "health-issues");
   for (const issue of report.issues || []) {
     const card = node("article", `health-issue ${issue.severity || "info"}`);
-    card.append(node("strong", "", issue.title || "Information"), node("small", "", issue.detail || ""));
+    card.append(node("strong", "", issue.title || msg("information")), node("small", "", issue.detail || ""));
     issues.append(card);
   }
-  if (!issues.childElementCount) issues.append(node("p", "hint", "Aucune anomalie détectée par les contrôles locaux."));
+  if (!issues.childElementCount) issues.append(node("p", "hint", msg("healthNoIssues")));
   host.append(issues);
   $("health-score-badge").textContent = `${score}/100`;
   $("health-score-badge").dataset.status = report.status || "unknown";
@@ -1170,18 +1182,18 @@ function renderProviderMatrix(matrix) {
   if (!host) return;
   host.replaceChildren();
   if (!matrix?.checkedAt) {
-    host.append(node("p", "hint", "Lancez le test pour obtenir la matrice de vos comptes et calendriers."));
+    host.append(node("p", "hint", msg("providerRunPrompt")));
     return;
   }
-  host.append(node("p", "hint", `Dernier contrôle : ${humanTime(matrix.checkedAt)} · ${(matrix.accounts || []).length} compte(s) · ${(matrix.calendars || []).length} calendrier(s).`));
+  host.append(node("p", "hint", msg("providerLastCheck").replace("$1", humanTime(matrix.checkedAt)).replace("$2", (matrix.accounts || []).length).replace("$3", (matrix.calendars || []).length)));
   for (const row of matrix.accounts || []) {
     const card = node("div", "provider-row");
     card.append(
-      node("strong", "", row.accountName || row.accountKey || "Compte"),
-      node("span", "", row.provider || "inconnu"),
-      node("span", "", (row.protocol || "inconnu").toUpperCase()),
-      node("span", "", row.supportsFolders ? "Dossiers ✓" : "Dossiers limités"),
-      node("span", "", row.offlineSupport ? "Hors ligne ✓" : "Hors ligne —")
+      node("strong", "", row.accountName || row.accountKey || msg("account")),
+      node("span", "", row.provider || msg("unknown")),
+      node("span", "", (row.protocol || msg("unknown")).toUpperCase()),
+      node("span", "", row.supportsFolders ? msg("foldersSupported") : msg("foldersLimited")),
+      node("span", "", row.offlineSupport ? msg("offlineSupported") : msg("offlineUnavailable"))
     );
     if ((row.knownRisks || []).length) card.title = row.knownRisks.join(", ");
     host.append(card);
@@ -1195,22 +1207,22 @@ function renderImportPreview(preview, configurationData) {
   if (!preview) return;
   const incoming = preview.incoming || {};
   host.append(
-    node("h3", "", "Prévisualisation de la restauration"),
-    node("p", "", `Format : ${preview.format || "inconnu"} · version ${preview.version || "inconnue"}`),
-    node("p", "", `${incoming.refs || 0} épingle(s), ${incoming.groups || 0} groupe(s), ${incoming.rules || 0} règle(s), ${incoming.cases || 0} affaire(s), ${incoming.templates || 0} modèle(s).`),
-    node("p", preview.conflicts ? "warning-text" : "hint", `${preview.conflicts || 0} conflit(s) d’identifiant détecté(s).`)
+    node("h3", "", msg("restorePreviewTitle")),
+    node("p", "", msg("restorePreviewFormat").replace("$1", preview.format || msg("unknown")).replace("$2", preview.version || msg("unknown"))),
+    node("p", "", msg("restorePreviewCounts").replace("$1", incoming.refs || 0).replace("$2", incoming.groups || 0).replace("$3", incoming.rules || 0).replace("$4", incoming.cases || 0).replace("$5", incoming.templates || 0)),
+    node("p", preview.conflicts ? "warning-text" : "hint", msg("restorePreviewConflicts").replace("$1", preview.conflicts || 0))
   );
   const actions = node("div", "actions-row");
-  const merge = node("button", "secondary", "Fusionner avec les données actuelles");
+  const merge = node("button", "secondary", msg("restoreMerge"));
   merge.type = "button";
   merge.id = "restore-merge";
-  const replace = node("button", "danger", "Remplacer les données actuelles");
+  const replace = node("button", "danger", msg("restoreReplace"));
   replace.type = "button";
   replace.id = "restore-replace";
   const restore = async (strategy, control) => {
-    if (strategy === "replace" && !confirm("Remplacer les données MailPerch actuelles par cette sauvegarde ? Une sauvegarde de sécurité sera créée avant l’opération lorsque cette option est active.")) return;
+    if (strategy === "replace" && !confirm(msg("restoreReplaceConfirm"))) return;
     try {
-      await withBusy(control, "Restauration en cours…", async () => {
+      await withBusy(control, msg("restoreBusy"), async () => {
         await messenger.pinInbox.restoreConfiguration(configurationData, strategy);
         const restoredShortcuts = configurationData.shortcuts && typeof configurationData.shortcuts === "object"
           ? configurationData.shortcuts
@@ -1222,9 +1234,9 @@ function renderImportPreview(preview, configurationData) {
         await reload();
       });
       host.hidden = true;
-      setStatus(strategy === "merge" ? "Sauvegarde fusionnée avec succès." : "Sauvegarde restaurée avec succès.", "success", {control});
+      setStatus(msg(strategy === "merge" ? "restoreMerged" : "restoreCompleted"), "success", {control});
     } catch (error) {
-      setStatus(`Restauration impossible : ${error.message || error}`, "error", {control, persistent: true});
+      setStatus(failureMessage("restoreFailed", error), "error", {control, persistent: true});
     }
   };
   merge.addEventListener("click", event => restore("merge", event.currentTarget));
@@ -1236,26 +1248,18 @@ function renderImportPreview(preview, configurationData) {
 function updateRuntimeSummary(config, backup = null) {
   if (!config) return;
   const stats = config.stats || {};
-  $("stats").textContent =
-    `${stats.pinned || 0} épingle(s) · ${stats.waiting || 0} en attente · ` +
-    `${stats.overdue || 0} en retard · ${stats.history || 0} historique`;
-  $("storage-info").textContent =
-    `Stockage : ${config.storage?.backend || "inconnu"} · ` +
-    `${config.storage?.database || ""} · schéma ${config.storage?.schemaVersion || ""}`;
+  $("stats").textContent = msg("runtimeStats").replace("$1", stats.pinned || 0).replace("$2", stats.waiting || 0).replace("$3", stats.overdue || 0).replace("$4", stats.history || 0);
+  $("storage-info").textContent = msg("runtimeStorage").replace("$1", config.storage?.backend || msg("unknown")).replace("$2", config.storage?.database || "").replace("$3", config.storage?.schemaVersion || "");
   $("compat-info").textContent =
-    `Compatibilité : ${config.compatibility?.mode || "inconnue"}` +
+    msg("runtimeCompatibility").replace("$1", config.compatibility?.mode || msg("unknown")) +
     `${config.compatibility?.missing?.length ? ` · ${config.compatibility.missing.join(", ")}` : ""}`;
   const perf = config.performance || {};
-  $("performance-info").textContent =
-    `Rendu : ${perf.renders || 0} · moyenne ${perf.averageRenderMs || 0} ms · ` +
-    `max ${perf.maxRenderMs || 0} ms`;
+  $("performance-info").textContent = msg("runtimePerformance").replace("$1", perf.renders || 0).replace("$2", perf.averageRenderMs || 0).replace("$3", perf.maxRenderMs || 0);
   if ($("overview-pinned")) $("overview-pinned").textContent = String(stats.pinned || 0);
   if ($("overview-attention")) $("overview-attention").textContent = String((stats.overdue || 0) + (stats.waiting || 0));
   if (backup) {
-    $("backup-info").textContent =
-      `Dossier : ${backup.directory || "non défini"} · dernière sauvegarde : ` +
-      `${backup.lastBackupAt ? new Date(backup.lastBackupAt).toLocaleString() : "aucune"}`;
-    if ($("overview-backup")) $("overview-backup").textContent = backup.lastBackupAt ? humanTime(backup.lastBackupAt).split(" ")[0] : "Jamais";
+    $("backup-info").textContent = msg("runtimeBackup").replace("$1", backup.directory || msg("notDefined")).replace("$2", backup.lastBackupAt ? new Date(backup.lastBackupAt).toLocaleString() : msg("noneFeminine"));
+    if ($("overview-backup")) $("overview-backup").textContent = backup.lastBackupAt ? humanTime(backup.lastBackupAt).split(" ")[0] : msg("never");
   }
   if (config.providerMatrix) renderProviderMatrix(config.providerMatrix);
 }
@@ -1414,18 +1418,18 @@ async function saveAll(event = null) {
       ? event.currentTarget
       : $("save-all-floating");
   if (!configurationReady) {
-    setStatus("Les paramètres sont encore en cours de chargement.", "error", {control: submitter, persistent: true});
+    setStatus(msg("settingsStillLoading"), "error", {control: submitter, persistent: true});
     return;
   }
   if (saveInFlight) {
-    setStatus("Une opération sur les paramètres est déjà en cours.", "busy", {control: submitter, persistent: true});
+    setStatus(msg("settingsOperationBusy"), "busy", {control: submitter, persistent: true});
     return;
   }
   saveInFlight = true;
   syncSaveControls();
   try {
     if (!configuration?.settings) await reload();
-    const config = await withBusy(submitter, "Enregistrement des paramètres…", async () => {
+    const config = await withBusy(submitter, msg("settingsSaveBusy"), async () => {
       const requested = {
         settings: collectSettings(),
         groups,
@@ -1459,9 +1463,9 @@ async function saveAll(event = null) {
       };
     });
     await applyConfiguration(config);
-    setStatus("Paramètres enregistrés.", "success");
+    setStatus(msg("settingsSaved"), "success");
   } catch (error) {
-    setStatus(`Erreur : ${error.message || error}`, "error");
+    setStatus(failureMessage("settingsSaveFailed", error), "error");
   } finally {
     saveInFlight = false;
     syncSaveControls();
@@ -1477,21 +1481,21 @@ async function discardChanges(event = null) {
       ? event.currentTarget
       : $("discard-changes");
   if (!configurationReady) {
-    setStatus("Les paramètres sont encore en cours de chargement.", "error", {control, persistent: true});
+    setStatus(msg("settingsStillLoading"), "error", {control, persistent: true});
     return;
   }
   if (saveInFlight) {
-    setStatus("Une opération sur les paramètres est déjà en cours.", "busy", {control, persistent: true});
+    setStatus(msg("settingsOperationBusy"), "busy", {control, persistent: true});
     return;
   }
   saveInFlight = true;
   syncSaveControls();
   try {
-    await withBusy(control, "Restauration des paramètres enregistrés…", () => reload());
+    await withBusy(control, msg("settingsDiscardBusy"), () => reload());
     setDirty(false);
-    setStatus("Modifications annulées.", "success", {control});
+    setStatus(msg("settingsDiscarded"), "success", {control});
   } catch (error) {
-    setStatus(`Annulation impossible : ${error.message || error}`, "error", {control, persistent: true});
+    setStatus(failureMessage("settingsDiscardFailed", error), "error", {control, persistent: true});
   } finally {
     saveInFlight = false;
     syncSaveControls();
@@ -1500,16 +1504,16 @@ async function discardChanges(event = null) {
 
 async function saveShortcut(event) {
   try {
-    await withBusy(event?.currentTarget || $("save-shortcut"), "Enregistrement des raccourcis…", async () => {
+    await withBusy(event?.currentTarget || $("save-shortcut"), msg("shortcutSaveBusy"), async () => {
       const requested = collectShortcuts();
       for (const [name, shortcut] of Object.entries(requested)) {
         await messenger.commands.update({name, shortcut});
       }
       renderShortcuts(await getShortcuts());
     });
-    setStatus("Raccourcis enregistrés.", "success");
+    setStatus(msg("shortcutsSaved"), "success");
   } catch (error) {
-    setStatus(`Raccourci refusé : ${error.message || error}`, "error");
+    setStatus(failureMessage("shortcutSaveFailed", error), "error");
   }
 }
 
@@ -1528,7 +1532,7 @@ function downloadJson(filename, data) {
 
 async function run(action, message, {
   control = null,
-  busyMessage = "Opération en cours…",
+  busyMessage = msg("operationBusy"),
   reloadAfter = true
 } = {}) {
   try {
@@ -1537,7 +1541,7 @@ async function run(action, message, {
     setStatus(typeof message === "function" ? message(result) : message, "success");
     return result;
   } catch (error) {
-    setStatus(`Opération impossible : ${error.message || error}`, "error");
+    setStatus(failureMessage("operationFailed", error), "error");
     return null;
   }
 }
@@ -1548,18 +1552,18 @@ async function importFile(event) {
   input.value = "";
   if (!file) return;
   if (file.size > 10 * 1024 * 1024) {
-    setStatus("Fichier trop volumineux.", "error", {control: input, persistent: true});
+    setStatus(msg("importFileTooLarge"), "error", {control: input, persistent: true});
     return;
   }
   try {
     const parsed = JSON.parse(await file.text());
-    const preview = await withBusy(null, "Analyse de la sauvegarde…", () => messenger.pinInbox.previewImport(parsed));
-    if (!preview?.valid) throw new Error("Format de sauvegarde non reconnu");
+    const preview = await withBusy(null, msg("importAnalyzeBusy"), () => messenger.pinInbox.previewImport(parsed));
+    if (!preview?.valid) throw new TypeError("backup-format-invalid");
     renderImportPreview(preview, parsed);
-    setStatus("Sauvegarde analysée. Choisissez Fusionner ou Remplacer dans cette section.", "success", {control: $("import-preview")});
+    setStatus(msg("importAnalyzed"), "success", {control: $("import-preview")});
   } catch (error) {
     renderImportPreview(null, null);
-    setStatus(`Prévisualisation impossible : ${error.message || error}`, "error", {persistent: true});
+    setStatus(failureMessage("importPreviewFailed", error), "error", {persistent: true});
   }
 }
 
@@ -1580,6 +1584,10 @@ function localize() {
   for (const element of document.querySelectorAll("[data-i18n-title]")) {
     const value = messenger.i18n.getMessage(element.dataset.i18nTitle);
     if (value) element.title = value;
+  }
+  for (const element of document.querySelectorAll("[data-i18n-aria-label]")) {
+    const value = messenger.i18n.getMessage(element.getAttribute("data-i18n-aria-label"));
+    if (value) element.setAttribute("aria-label", value);
   }
 }
 
@@ -1673,7 +1681,7 @@ async function startOptions() {
   $("add-group").addEventListener("click", () => {
     groups.push({
       id: uniqueEntityId("group", groups),
-      name: "Nouveau groupe",
+      name: msg("dynamicNewGroup"),
       color: "#6264a7"
     });
     renderGroups();
@@ -1739,13 +1747,13 @@ async function startOptions() {
     if (result) {
       const counts = new Map();
       for (const item of result.matches) counts.set(item.ruleName, (counts.get(item.ruleName) || 0) + 1);
-      const summary = [...counts].map(([name, count]) => `${name} : ${count} correspondance(s)`).join("\n");
+      const summary = [...counts].map(([name, count]) => msg("simulationRuleMatches", [name, count])).join("\n");
       const examples = result.matches.slice(0, 20).map(item => `• ${item.ruleName} → ${item.action} · ${item.subject}`).join("\n");
       $("rule-simulation").textContent = [
-        `${result.rules || rules.length} règle(s) testée(s) sur ${result.scanned} message(s).`,
+        msg("simulationTotals", [result.rules || rules.length, result.scanned]),
         summary,
         examples,
-        result.truncated ? "Résultat tronqué : affinez les conditions avant activation." : ""
+        result.truncated ? msg("simulationTruncated") : ""
       ].filter(Boolean).join("\n\n") || msg("dynamicSimulationNoMatch");
     }
   });
@@ -1765,8 +1773,8 @@ async function startOptions() {
   $("provider-check").addEventListener("click", async event => {
     const matrix = await run(
       () => messenger.pinInbox.runProviderCompatibilityCheck(),
-      value => `${value.accounts?.length || 0} compte(s) et ${value.calendars?.length || 0} calendrier(s) analysé(s).`,
-      {control: event.currentTarget, busyMessage: "Analyse des fournisseurs…", reloadAfter: false}
+      value => msg("providerAnalysisResult", [value.accounts?.length || 0, value.calendars?.length || 0]),
+      {control: event.currentTarget, busyMessage: msg("providerCheckBusy"), reloadAfter: false}
     );
     if (matrix) {
       renderProviderMatrix(matrix);
@@ -1776,31 +1784,31 @@ async function startOptions() {
 
   $("health-check").addEventListener("click", async event => {
     try {
-      const health = await withBusy(event.currentTarget, "Analyse de la santé MailPerch…", () => messenger.pinInbox.getHealthReport());
+      const health = await withBusy(event.currentTarget, msg("healthCheckBusy"), () => messenger.pinInbox.getHealthReport());
       renderHealth(health);
-      setStatus(`Analyse terminée : score ${health.score}/100.`, health.status === "critical" ? "error" : "success", {control: event.currentTarget});
+      setStatus(msg("healthCheckComplete").replace("$1", health.score), health.status === "critical" ? "error" : "success", {control: event.currentTarget});
     } catch (error) {
-      setStatus(`Analyse impossible : ${error.message || error}`, "error", {control: event.currentTarget, persistent: true});
+      setStatus(failureMessage("healthCheckFailed", error), "error", {control: event.currentTarget, persistent: true});
     }
   });
 
   $("health-repair").addEventListener("click", async event => {
-    if (!confirm("Exécuter les réparations non destructives ? MailPerch créera une sauvegarde avant la restauration lorsque cette option est active.")) return;
+    if (!confirm(msg("healthRepairConfirmWithBackup"))) return;
     try {
-      const result = await withBusy(event.currentTarget, "Réparation des anomalies sûres…", () => messenger.pinInbox.repairHealthIssues({actions: ["orphan-links", "repair-references"]}));
+      const result = await withBusy(event.currentTarget, msg("healthRepairBusy"), () => messenger.pinInbox.repairHealthIssues({actions: ["orphan-links", "repair-references"]}));
       renderHealth(result.health);
       await reload({preserveEdits: dirty});
-      setStatus(`${result.repaired || 0} élément(s) réparé(s).`, "success", {control: event.currentTarget});
+      setStatus(msg("healthRepairComplete").replace("$1", result.repaired || 0), "success", {control: event.currentTarget});
     } catch (error) {
-      setStatus(`Réparation impossible : ${error.message || error}`, "error", {control: event.currentTarget, persistent: true});
+      setStatus(failureMessage("healthRepairFailed", error), "error", {control: event.currentTarget, persistent: true});
     }
   });
 
   $("clear-diagnostics").addEventListener("click", async event => {
     const result = await run(
       () => messenger.pinInbox.clearDiagnostics(),
-      value => `${value.cleared || 0} événement(s) diagnostic supprimé(s).`,
-      {control: event.currentTarget, busyMessage: "Suppression du journal diagnostic…", reloadAfter: false}
+      value => msg("diagnosticsClearedCount", [value.cleared || 0]),
+      {control: event.currentTarget, busyMessage: msg("diagnosticsClearBusy"), reloadAfter: false}
     );
     if (result) renderHealth(await messenger.pinInbox.getHealthReport().catch(() => null));
   });
@@ -1808,56 +1816,56 @@ async function startOptions() {
   bindRun(
     "clear-rule-log",
     () => messenger.pinInbox.clearRuleLog(),
-    result => `${result.cleared} entrée(s) supprimée(s).`,
-    "Suppression du journal des règles…"
+    result => msg("ruleLogCleared", [result.cleared]),
+    msg("ruleLogClearBusy")
   );
   bindRun(
     "import-stars",
     () => messenger.pinInbox.importNativeStars($("clear-stars-after-import").checked),
-    result => `${result.imported} étoile(s) importée(s).`,
-    "Import des étoiles Thunderbird…"
+    result => msg("starsImported", [result.imported]),
+    msg("starsImportBusy")
   );
-  bindRun("undo", () => messenger.pinInbox.undoLast(), result => result.message, "Annulation de la dernière action…");
+  bindRun("undo", () => messenger.pinInbox.undoLast(), msg("undoComplete"), msg("undoBusy"));
   bindRun(
     "repair",
     () => messenger.pinInbox.repairReferences(),
-    result => `${result.repaired} réparée(s), ${result.missing} introuvable(s).`,
-    "Réparation des références…"
+    result => msg("referencesRepaired", [result.repaired, result.missing]),
+    msg("referencesRepairBusy")
   );
-  bindRun("rescan", () => messenger.pinInbox.rescanPinned(), "Rescan terminé.", "Analyse des messages épinglés…");
-  bindRun("cleanup", () => messenger.pinInbox.cleanupBroken(), "Nettoyage terminé.", "Nettoyage des références introuvables…");
+  bindRun("rescan", () => messenger.pinInbox.rescanPinned(), msg("rescanComplete"), msg("rescanBusy"));
+  bindRun("cleanup", () => messenger.pinInbox.cleanupBroken(), msg("cleanupComplete"), msg("cleanupBusy"));
   bindRun(
     "reset-interface",
     () => messenger.pinInbox.resetInterface(),
-    "Interface réinitialisée.",
-    "Réinitialisation de l’interface…"
+    msg("interfaceReset"),
+    msg("interfaceResetBusy")
   );
   bindRun(
     "compat-check",
     () => messenger.pinInbox.runCompatibilityCheck(),
-    "Vérification terminée.",
-    "Vérification de la compatibilité Thunderbird…"
+    msg("compatibilityCheckComplete"),
+    msg("compatibilityCheckBusy")
   );
   bindRun(
     "sync-calendar",
     () => messenger.pinInbox.syncCalendarLinks(),
-    result => `${result.synced || 0} élément(s) synchronisé(s).`,
-    "Synchronisation avec l’Agenda…"
+    result => msg("calendarSyncComplete", [result.synced || 0]),
+    msg("calendarSyncBusy")
   );
   bindRun(
     "run-backup",
     () => messenger.pinInbox.runBackup("manual"),
-    result => `Sauvegarde créée : ${result.path}`,
-    "Création de la sauvegarde locale…"
+    result => msg("backupCreated", [result.path]),
+    msg("backupCreateBusy")
   );
 
   $("integrity-check").addEventListener("click", async event => {
     const result = await run(
       () => messenger.pinInbox.checkStorageIntegrity(),
-      value => value.ok ? "Base SQLite intègre." : "Anomalie SQLite détectée.",
+      value => msg(value.ok ? "sqliteHealthy" : "sqliteIssue"),
       {
         control: event.currentTarget,
-        busyMessage: "Vérification de la base SQLite…"
+        busyMessage: msg("sqliteCheckBusy")
       }
     );
     if (result) $("integrity-info").textContent = JSON.stringify(result, null, 2);
@@ -1867,11 +1875,11 @@ async function startOptions() {
     try {
       const result = await withBusy(
         event.currentTarget,
-        "Sélection du dossier de sauvegarde…",
+        msg("backupFolderBusy"),
         () => messenger.pinInbox.chooseBackupDirectory()
       );
       if (!result.selected) {
-        setStatus("Sélection du dossier annulée.", "success");
+        setStatus(msg("backupFolderCancelled"), "success");
         return;
       }
       $("backupDirectory").value = result.path;
@@ -1879,20 +1887,20 @@ async function startOptions() {
       requireConfiguration().settings.backupDirectory = result.path;
       const backup = await messenger.pinInbox.getBackupStatus().catch(() => null);
       updateRuntimeSummary(configuration, backup);
-      setStatus("Dossier de sauvegarde enregistré.", "success");
+      setStatus(msg("backupFolderSaved"), "success");
     } catch (error) {
-      setStatus(`Sélection impossible : ${error.message || error}`, "error");
+      setStatus(failureMessage("backupFolderFailed", error), "error");
     }
   });
 
   $("dashboard").addEventListener("click", async event => {
     try {
-      await withBusy(event.currentTarget, "Ouverture du tableau de bord…", () =>
+      await withBusy(event.currentTarget, msg("dashboardOpenBusy"), () =>
         messenger.tabs.create({url: messenger.runtime.getURL("dashboard/dashboard.html")})
       );
-      setStatus("Tableau de bord ouvert dans un nouvel onglet.", "success");
+      setStatus(msg("dashboardOpened"), "success");
     } catch (error) {
-      setStatus(`Ouverture impossible : ${error.message || error}`, "error");
+      setStatus(failureMessage("dashboardOpenFailed", error), "error");
     }
   });
 
@@ -1900,46 +1908,46 @@ async function startOptions() {
     try {
       const report = await withBusy(
         event.currentTarget,
-        "Préparation du diagnostic…",
+        msg("diagnosticExportBusy"),
         () => messenger.pinInbox.exportDiagnosticBundle()
       );
       downloadJson(
         `mailperch-diagnostic-${new Date().toISOString().slice(0, 10)}.json`,
         report
       );
-      setStatus("Diagnostic exporté.", "success");
+      setStatus(msg("diagnosticExported"), "success");
     } catch (error) {
-      setStatus(`Export impossible : ${error.message || error}`, "error");
+      setStatus(failureMessage("diagnosticExportFailed", error), "error");
     }
   });
 
   $("export").addEventListener("click", async event => {
     try {
-      const data = await withBusy(event.currentTarget, "Préparation de la sauvegarde…", async () => {
+      const data = await withBusy(event.currentTarget, msg("backupExportBusy"), async () => {
         const value = await messenger.pinInbox.exportConfiguration();
         value.shortcuts = await getShortcuts();
         value.shortcut = value.shortcuts["toggle-pin-selected"] || "";
         return value;
       });
       downloadJson(`mailperch-${new Date().toISOString().slice(0, 10)}.json`, data);
-      setStatus("Sauvegarde exportée.", "success");
+      setStatus(msg("backupExported"), "success");
     } catch (error) {
-      setStatus(`Export impossible : ${error.message || error}`, "error");
+      setStatus(failureMessage("backupExportFailed", error), "error");
     }
   });
 
   $("import-file").addEventListener("change", importFile);
 
   $("reset").addEventListener("click", async event => {
-    if (!confirm("Réinitialiser les réglages, groupes, affaires, modèles et règles ? Les épingles sont conservées.")) {
+    if (!confirm(msg("settingsResetConfirm"))) {
       return;
     }
     const result = await run(
       () => messenger.pinInbox.resetConfiguration(),
-      "Réglages réinitialisés.",
+      msg("settingsReset"),
       {
         control: event.currentTarget,
-        busyMessage: "Réinitialisation des réglages…"
+        busyMessage: msg("settingsResetBusy")
       }
     );
     if (result) setDirty(false);

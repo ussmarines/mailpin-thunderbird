@@ -28,10 +28,10 @@
       </div>
     </header>
 
-    <section id="stats" class="stats-grid" aria-label="Résumé MailPerch"></section>
+    <section id="stats" class="stats-grid" aria-label="Résumé MailPerch" data-i18n-aria-label="ariaMailPerchSummary"></section>
     <section id="reminder-center" class="reminder-center" aria-labelledby="reminder-center-title" hidden></section>
 
-    <nav class="view-tabs" aria-label="Vues principales">
+    <nav class="view-tabs" aria-label="Vues principales" data-i18n-aria-label="ariaMainViews">
       <button type="button" data-view="today" aria-pressed="true" data-i18n="viewToday">Aujourd’hui</button>
       <button type="button" data-view="list" aria-pressed="false" data-i18n="viewList">Liste</button>
       <button type="button" data-view="kanban" aria-pressed="false" data-i18n="viewKanban">Kanban</button>
@@ -58,7 +58,7 @@
       </aside>
 
       <div class="dashboard-content">
-        <section id="selection-bar" class="selection-bar" hidden aria-label="Actions groupées">
+        <section id="selection-bar" class="selection-bar" hidden aria-label="Actions groupées" data-i18n-aria-label="bulkActions">
           <div><strong id="selection-count">0 message sélectionné</strong><button id="select-visible" type="button" class="text-button" data-i18n="selectVisible">Tout sélectionner dans la vue</button><button id="clear-selection" type="button" class="text-button" data-i18n="clearSelection">Effacer la sélection</button></div>
           <div class="bulk-controls">
             <label><span class="visually-hidden" data-i18n="bulkAction">Action groupée</span><select id="bulk-action">
@@ -86,13 +86,13 @@
           </div>
         </section>
 
-        <section id="today" class="focus-board" aria-label="Aujourd’hui"></section>
-        <section id="items" class="items" aria-label="Messages épinglés" hidden></section>
-        <section id="kanban" class="kanban" aria-label="Vue Kanban" hidden></section>
-        <section id="cases" class="case-board" aria-label="Affaires" hidden></section>
-        <section id="review" class="review-board" aria-label="Revue de suivi" hidden></section>
-        <section id="history" class="history-board" aria-label="Historique" hidden></section>
-        <section id="health" class="health-board" aria-label="Centre de santé" hidden></section>
+        <section id="today" class="focus-board" aria-label="Aujourd’hui" data-i18n-aria-label="viewToday"></section>
+        <section id="items" class="items" aria-label="Messages épinglés" data-i18n-aria-label="ariaPinnedMessages" hidden></section>
+        <section id="kanban" class="kanban" aria-label="Vue Kanban" data-i18n-aria-label="viewKanban" hidden></section>
+        <section id="cases" class="case-board" aria-label="Affaires" data-i18n-aria-label="viewCases" hidden></section>
+        <section id="review" class="review-board" aria-label="Revue de suivi" data-i18n-aria-label="reviewHeading" hidden></section>
+        <section id="history" class="history-board" aria-label="Historique" data-i18n-aria-label="viewHistory" hidden></section>
+        <section id="health" class="health-board" aria-label="Centre de santé" data-i18n-aria-label="viewHealth" hidden></section>
       </div>
     </div>
 
@@ -103,11 +103,11 @@
     </aside>
   </main>
 
-  <div id="status" class="status" role="status" aria-live="polite" aria-atomic="true" hidden><span id="status-message"></span><button id="status-close" type="button" aria-label="Fermer">×</button></div>
+  <div id="status" class="status" role="status" aria-live="polite" aria-atomic="true" hidden><span id="status-message"></span><button id="status-close" type="button" aria-label="Fermer" data-i18n-aria-label="close">×</button></div>
 
   <dialog id="calendar-dialog" class="calendar-dialog">
     <form method="dialog">
-      <header><div><h2 data-i18n="calendarCreate">Créer dans l’Agenda</h2><p data-i18n="calendarCreateHelp">Seuls les calendriers compatibles et inscriptibles peuvent être sélectionnés.</p></div><button value="cancel" class="icon-button" aria-label="Fermer">×</button></header>
+      <header><div><h2 data-i18n="calendarCreate">Créer dans l’Agenda</h2><p data-i18n="calendarCreateHelp">Seuls les calendriers compatibles et inscriptibles peuvent être sélectionnés.</p></div><button value="cancel" class="icon-button" aria-label="Fermer" data-i18n-aria-label="close">×</button></header>
       <label><span data-i18n="calendarItemType">Type</span><select id="calendar-item-type"><option value="task" data-i18n="task">Tâche</option><option value="event" data-i18n="event">Événement</option></select></label>
       <label><span data-i18n="calendarTarget">Calendrier</span><select id="calendar-target"></select></label>
       <footer><button value="cancel" class="button secondary" data-i18n="cancel">Annuler</button><button id="calendar-confirm" value="default" class="button primary" data-i18n="create">Créer</button></footer>

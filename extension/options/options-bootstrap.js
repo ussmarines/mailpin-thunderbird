@@ -57,6 +57,16 @@
       const value = i18n.getMessage(element.dataset.i18n);
       if (value) element.textContent = value;
     }
+    for (const [selector, dataAttribute, targetAttribute] of [
+      ["[data-i18n-placeholder]", "data-i18n-placeholder", "placeholder"],
+      ["[data-i18n-title]", "data-i18n-title", "title"],
+      ["[data-i18n-aria-label]", "data-i18n-aria-label", "aria-label"],
+    ]) {
+      for (const element of document.querySelectorAll(selector)) {
+        const value = i18n.getMessage(element.getAttribute(dataAttribute));
+        if (value) element.setAttribute(targetAttribute, value);
+      }
+    }
   }
 
   function fail(stage, error = null, diagnostic = "") {

@@ -16,8 +16,12 @@ const MENU_IDS = Object.freeze({
 
 const translate = (key, fallback) => messenger.i18n.getMessage(key) || fallback;
 
+function errorName(error) {
+  return String(error?.name || "Error").replace(/[^a-z0-9_.-]/gi, "").slice(0, 64) || "Error";
+}
+
 function logError(context, error) {
-  console.error(`MailPerch : ${context}`, error);
+  console.error(`MailPerch : ${context}`, errorName(error));
 }
 
 async function setupTab(tabId) {
@@ -25,7 +29,7 @@ async function setupTab(tabId) {
   try {
     await messenger.pinInbox.setup(tabId);
   } catch (error) {
-    console.debug("MailPerch : onglet non initialisé", error);
+    console.debug("MailPerch : onglet non initialisé", errorName(error));
   }
 }
 
@@ -145,7 +149,7 @@ messenger.menus.onShown.addListener(async (_info, tab) => {
     ]);
     await messenger.menus.refresh();
   } catch (error) {
-    console.debug("MailPerch : menu contextuel non actualisé", error);
+    console.debug("MailPerch : menu contextuel non actualisé", errorName(error));
   }
 });
 

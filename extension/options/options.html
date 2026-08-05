@@ -26,7 +26,7 @@
       </div>
     </header>
 
-    <section class="quick-overview" aria-label="Résumé MailPerch">
+    <section class="quick-overview" aria-label="Résumé MailPerch" data-i18n-aria-label="ariaMailPerchSummary">
       <article data-tone="brand"><span class="overview-label" data-i18n="overviewPinned">Épingles</span><strong id="overview-pinned">—</strong><small data-i18n="overviewPinnedHelp">messages suivis</small></article>
       <article data-tone="warning"><span class="overview-label" data-i18n="overviewAttention">À traiter</span><strong id="overview-attention">—</strong><small data-i18n="overviewAttentionHelp">retards et relances</small></article>
       <article data-tone="success"><span class="overview-label" data-i18n="overviewHealth">Santé</span><strong id="overview-health">—</strong><small data-i18n="overviewHealthHelp">état local de MailPerch</small></article>
@@ -34,12 +34,12 @@
     </section>
 
     <div class="settings-layout">
-      <aside class="settings-sidebar" aria-label="Navigation des paramètres">
+      <aside class="settings-sidebar" aria-label="Navigation des paramètres" data-i18n-aria-label="ariaSettingsNavigation">
         <label class="settings-search">
           <span class="visually-hidden" data-i18n="searchSettings">Rechercher un réglage</span>
           <input id="settings-search" type="search" placeholder="Rechercher un réglage…" data-i18n-placeholder="searchSettingsPlaceholder" autocomplete="off">
         </label>
-        <nav id="settings-nav" class="settings-nav" aria-label="Sections des paramètres"></nav>
+        <nav id="settings-nav" class="settings-nav" aria-label="Sections des paramètres" data-i18n-aria-label="ariaSettingsSections"></nav>
         <p id="settings-search-summary" class="settings-search-summary" role="status" aria-live="polite"></p>
         <div class="sidebar-tip">
           <strong data-i18n="guidedTipTitle">Conseil</strong>
@@ -61,7 +61,7 @@
         </div>
       </section>
       <form id="settings-form" class="settings-content" aria-busy="true" hidden>
-        <section class="settings-section feature-access-guide" data-nav-icon="⌂" data-nav-group="Essentiel">
+        <section class="settings-section feature-access-guide" data-nav-icon="⌂" data-nav-group="Essentiel" data-nav-group-i18n="navEssential">
           <div class="section-header">
             <div><p class="eyebrow" data-i18n="sectionStartEyebrow">Démarrage</p><h2 id="feature-access-title" data-i18n="sectionStart">Bien démarrer</h2><p data-i18n="sectionStartIntro">Choisissez une expérience simple ou avancée, puis laissez MailPerch adapter la densité et les animations.</p></div>
           </div>
@@ -77,7 +77,7 @@
           </div>
         </section>
 
-        <section class="settings-section" data-nav-icon="⌖" data-nav-group="Essentiel">
+        <section class="settings-section" data-nav-icon="⌖" data-nav-group="Essentiel" data-nav-group-i18n="navEssential">
           <div class="section-header"><div><p class="eyebrow" data-i18n="sectionPinsEyebrow">Fondations</p><h2 data-i18n="sectionPins">Épinglage et compatibilité</h2><p data-i18n="sectionPinsIntro">Définissez ce qu’est une épingle et la manière dont MailPerch s’intègre à Thunderbird.</p></div><span class="recommended-badge" data-i18n="recommended">Recommandé</span></div>
           <div class="setting-grid two-columns">
             <label class="setting-field"><span data-i18n="pinStorage">Stockage des épingles</span><select id="pinMode"><option value="independent" data-i18n="pinIndependent">Indépendant des étoiles — recommandé</option><option value="nativeStar" data-i18n="pinNative">Étoiles natives Thunderbird</option></select></label>
@@ -94,7 +94,7 @@
           <details class="advanced-group"><summary data-i18n="importStarsTitle">Importer les étoiles Thunderbird</summary><div class="advanced-content"><label class="setting-toggle"><input id="clear-stars-after-import" type="checkbox"><span data-i18n="clearStarsAfterImport">Retirer les étoiles après import</span></label><button id="import-stars" type="button" class="secondary" data-i18n="importStars">Importer les étoiles</button></div></details>
         </section>
 
-        <section class="settings-section" data-nav-icon="▦" data-nav-group="Essentiel">
+        <section class="settings-section" data-nav-icon="▦" data-nav-group="Essentiel" data-nav-group-i18n="navEssential">
           <div class="section-header"><div><p class="eyebrow" data-i18n="sectionPanelEyebrow">Interface</p><h2 data-i18n="sectionPanel">Panneau et cartes</h2><p data-i18n="sectionPanelIntro">Gardez les informations utiles visibles et masquez le reste.</p></div></div>
           <div class="setting-grid three-columns">
             <label class="setting-field"><span data-i18n="panelScope">Portée</span><select id="panelScope"><option value="currentInbox" data-i18n="scopeInbox">Dossier actuel</option><option value="currentAccount" data-i18n="scopeAccount">Compte actuel</option><option value="global" data-i18n="scopeGlobal">Tous les comptes</option></select></label>
@@ -121,7 +121,7 @@
           <details class="advanced-group"><summary data-i18n="interactionSettings">Interactions et sécurité</summary><div class="advanced-content"><div class="toggle-grid"><label class="setting-toggle"><input id="enableDragFromInbox" type="checkbox"><span data-i18n="dragDrop">Glisser-déposer</span></label><label class="setting-toggle"><input id="enableMultiSelect" type="checkbox"><span data-i18n="multiSelect">Sélection multiple</span></label><label class="setting-toggle"><input id="enableBulkActions" type="checkbox"><span data-i18n="bulkActions">Actions groupées</span></label><label class="setting-toggle"><input id="confirmBulkDestructiveActions" type="checkbox"><span data-i18n="confirmBulk">Confirmer les actions groupées destructives</span></label><label class="setting-toggle"><input id="enableUndo" type="checkbox"><span data-i18n="undo">Annulation</span></label><label class="setting-toggle"><input id="confirmDelete" type="checkbox"><span data-i18n="confirmDelete">Confirmer la suppression</span></label><label class="setting-toggle"><input id="animateChanges" type="checkbox"><span data-i18n="animate">Animations</span></label></div><div class="setting-grid two-columns"><label class="setting-field"><span data-i18n="undoDuration">Durée du bouton Annuler</span><span class="input-with-unit"><input id="undoTimeoutMs" type="number" min="3000" max="20000"><span>ms</span></span></label><label class="setting-field"><span data-i18n="completedRetention">Conserver les terminés</span><span class="input-with-unit"><input id="completedRetentionDays" type="number" min="0" max="3650"><span data-i18n="days">jours</span></span></label></div><label class="setting-toggle"><input id="autoRemoveCompleted" type="checkbox"><span data-i18n="removeCompleted">Retirer immédiatement les terminés</span></label></div></details>
         </section>
 
-        <section class="settings-section" data-nav-icon="◷" data-nav-group="Suivi">
+        <section class="settings-section" data-nav-icon="◷" data-nav-group="Suivi" data-nav-group-i18n="navFollowUp">
           <div class="section-header"><div><p class="eyebrow" data-i18n="sectionFollowUpEyebrow">Suivi</p><h2 data-i18n="sectionFollowUp">Relances et absence de réponse</h2><p data-i18n="sectionFollowUpIntro">MailPerch peut vous rappeler automatiquement lorsqu’une conversation reste sans réponse.</p></div></div>
           <div class="toggle-grid">
             <label class="setting-toggle featured"><input id="enableAutomaticNoReplyTracking" type="checkbox"><span><strong data-i18n="autoNoReply">Suivi automatique sans réponse</strong><small data-i18n="autoNoReplyHelp">Après un message envoyé, crée une relance locale qui s’annule dès qu’une réponse arrive.</small></span></label>
@@ -139,7 +139,7 @@
           <details class="advanced-group"><summary data-i18n="reminderSettings">Rappels avancés</summary><div class="advanced-content"><div class="toggle-grid"><label class="setting-toggle"><input id="enableReminders" type="checkbox"><span data-i18n="enableReminders">Activer les rappels locaux</span></label><label class="setting-toggle"><input id="enableAdvancedReminders" type="checkbox"><span data-i18n="advancedReminders">Répétition et report</span></label></div><div class="setting-grid two-columns"><label class="setting-field"><span data-i18n="reminderLead">Anticipation par défaut</span><span class="input-with-unit"><input id="reminderLeadMinutes" type="number" min="0" max="10080"><span>min</span></span></label><label class="setting-field"><span data-i18n="missedReminders">Rappels manqués</span><select id="missedReminderPolicy"><option value="notify" data-i18n="missedNotify">Notifier au prochain démarrage</option><option value="nextStart" data-i18n="missedNext">Reporter au prochain démarrage</option><option value="ignore" data-i18n="missedIgnore">Ignorer les anciens</option></select></label></div></div></details>
         </section>
 
-        <section class="settings-section" data-nav-icon="⚙" data-nav-group="Suivi">
+        <section class="settings-section" data-nav-icon="⚙" data-nav-group="Suivi" data-nav-group-i18n="navFollowUp">
           <div class="section-header"><div><p class="eyebrow" data-i18n="sectionAutomationEyebrow">Automatisation</p><h2 data-i18n="sectionAutomation">Règles et actions automatiques</h2><p data-i18n="sectionAutomationIntro">Commencez par simuler une règle. Activez-la seulement lorsque le résultat vous convient.</p></div></div>
           <div class="toggle-grid"><label class="setting-toggle featured"><input id="enableAutomaticRules" type="checkbox"><span><strong data-i18n="enableRules">Activer les règles</strong><small data-i18n="enableRulesHelp">Les règles restent locales et sont limitées pour éviter les boucles.</small></span></label><label class="setting-toggle"><input id="enableRuleSimulation" type="checkbox"><span data-i18n="allowSimulation">Autoriser la simulation</span></label><label class="setting-toggle"><input id="keepPinOnMove" type="checkbox"><span data-i18n="keepOnMove">Conserver l’épingle lors d’un déplacement</span></label><label class="setting-toggle"><input id="moveToWaitingOnReply" type="checkbox"><span data-i18n="moveWaitingReply">Passer en attente après une réponse envoyée</span></label></div>
           <details class="advanced-group"><summary data-i18n="builtInActions">Actions automatiques intégrées</summary><div class="advanced-content toggle-grid"><label class="setting-toggle"><input id="autoUnpinOnArchive" type="checkbox"><span data-i18n="unpinArchive">Désépingler après archivage</span></label><label class="setting-toggle"><input id="autoCompleteOnArchive" type="checkbox"><span data-i18n="completeArchive">Terminer après archivage</span></label><label class="setting-toggle"><input id="autoUnpinOnDelete" type="checkbox"><span data-i18n="unpinDelete">Désépingler après suppression</span></label><label class="setting-toggle"><input id="autoUnpinOnRead" type="checkbox"><span data-i18n="unpinRead">Désépingler après lecture</span></label><label class="setting-toggle"><input id="autoUnpinOnReply" type="checkbox"><span data-i18n="unpinReply">Désépingler après réponse</span></label></div></details>
@@ -149,20 +149,20 @@
           <div id="rule-simulation" class="info-box" aria-live="polite"></div><div id="rules-list" class="entity-list"></div>
         </section>
 
-        <section class="settings-section" data-nav-icon="◫" data-nav-group="Organisation">
+        <section class="settings-section" data-nav-icon="◫" data-nav-group="Organisation" data-nav-group-i18n="navOrganization">
           <div class="section-header"><div><p class="eyebrow" data-i18n="sectionOrganizationEyebrow">Organisation</p><h2 data-i18n="sectionOrganization">Groupes, affaires et modèles</h2><p data-i18n="sectionOrganizationIntro">Structurez vos suivis sans surcharger le panneau principal.</p></div></div>
           <div class="organization-block"><div class="subsection-header"><div><h3 data-i18n="customGroups">Groupes personnalisés</h3><p data-i18n="customGroupsHelp">Catégories simples avec couleur.</p></div><button id="add-group" type="button" class="secondary" data-i18n="addGroup">Ajouter un groupe</button></div><div id="groups-list" class="entity-list"></div></div>
           <div class="organization-block"><div class="subsection-header"><div><h3 data-i18n="cases">Affaires multi-messages</h3><p data-i18n="casesHelp">Regroupez plusieurs messages dans un même dossier de suivi.</p></div><button id="add-case" type="button" class="secondary" data-i18n="addCase">Ajouter une affaire</button></div><div class="toggle-grid"><label class="setting-toggle"><input id="enableCases" type="checkbox"><span data-i18n="enableCases">Activer les affaires</span></label><label class="setting-toggle"><input id="enableKanban" type="checkbox"><span data-i18n="enableKanban">Vue Kanban</span></label></div><div id="cases-list" class="entity-list"></div></div>
           <div class="organization-block"><div class="subsection-header"><div><h3 data-i18n="templates">Modèles de suivi</h3><p data-i18n="templatesHelp">Appliquez en un clic une priorité, un statut, une échéance ou une récurrence.</p></div><button id="add-template" type="button" class="secondary" data-i18n="addTemplate">Ajouter un modèle</button></div><label class="setting-toggle"><input id="enableTemplates" type="checkbox"><span data-i18n="enableTemplates">Activer les modèles</span></label><div id="templates-list" class="entity-list"></div></div>
         </section>
 
-        <section class="settings-section" data-nav-icon="▣" data-nav-group="Intégrations">
+        <section class="settings-section" data-nav-icon="▣" data-nav-group="Intégrations" data-nav-group-i18n="navIntegrations">
           <div class="section-header"><div><p class="eyebrow" data-i18n="sectionIntegrationsEyebrow">Intégrations</p><h2 data-i18n="sectionIntegrations">Comptes et Agenda</h2><p data-i18n="sectionIntegrationsIntro">Vérifiez la compatibilité de chaque compte et choisissez les calendriers réellement inscriptibles.</p></div></div>
           <div class="subsection-header"><div><h3 data-i18n="accountsColors">Comptes et couleurs</h3><p data-i18n="accountsColorsHelp">Les couleurs servent uniquement à distinguer visuellement les comptes.</p></div><button id="provider-check" type="button" class="secondary" data-i18n="checkProviders">Tester les fournisseurs</button></div><div id="accounts-list" class="account-list"></div><div id="provider-info" class="info-box" aria-live="polite"></div>
           <div class="organization-block"><div class="subsection-header"><div><h3 data-i18n="calendarTitle">Agenda Thunderbird</h3><p data-i18n="calendarIntro">MailPerch contrôle l’écriture, les ACL et les capacités tâches/événements avant chaque création.</p></div><button id="sync-calendar" type="button" class="secondary" data-i18n="syncNow">Synchroniser maintenant</button></div><div class="toggle-grid"><label class="setting-toggle"><input id="enableCalendarIntegration" type="checkbox"><span data-i18n="enableCalendar">Activer Agenda/Tâches</span></label><label class="setting-toggle"><input id="enableBidirectionalCalendarSync" type="checkbox"><span data-i18n="bidirectionalCalendar">Synchronisation bidirectionnelle</span></label><label class="setting-toggle"><input id="calendarCompleteOnPinComplete" type="checkbox"><span data-i18n="completeCalendar">Terminer la tâche avec l’épingle</span></label><label class="setting-toggle"><input id="calendarDeleteOnUnpin" type="checkbox"><span data-i18n="deleteCalendarOnUnpin">Supprimer l’élément au désépinglage</span></label></div><div class="setting-grid two-columns"><label class="setting-field"><span data-i18n="defaultCalendarType">Type par défaut</span><select id="calendarItemType"><option value="task" data-i18n="task">Tâche</option><option value="event" data-i18n="event">Événement</option></select></label><label class="setting-field"><span data-i18n="preferredCalendar">Calendrier préféré</span><select id="preferredCalendarId"><option value="" data-i18n="askWhenCreating">Demander lors de la création</option></select></label></div><div id="calendar-info" class="capability-list" aria-live="polite"></div></div>
         </section>
 
-        <section class="settings-section" data-nav-icon="♥" data-nav-group="Maintenance">
+        <section class="settings-section" data-nav-icon="♥" data-nav-group="Maintenance" data-nav-group-i18n="navMaintenance">
           <div class="section-header"><div><p class="eyebrow" data-i18n="sectionHealthEyebrow">Fiabilité</p><h2 data-i18n="sectionHealth">Centre de santé et diagnostic</h2><p data-i18n="sectionHealthIntro">Un résumé clair de la base locale, des messages introuvables, de l’Agenda, des sauvegardes et des performances.</p></div><span id="health-score-badge" class="health-score-badge">—</span></div>
           <div class="toggle-grid"><label class="setting-toggle"><input id="enableHealthCenter" type="checkbox"><span data-i18n="enableHealthCenter">Activer le centre de santé</span></label><label class="setting-toggle"><input id="enableHealthNotifications" type="checkbox"><span data-i18n="healthNotifications">Afficher uniquement les alertes importantes</span></label><label class="setting-toggle"><input id="enableDiagnostics" type="checkbox"><span data-i18n="enableDiagnostics">Journal diagnostic local</span></label><label class="setting-toggle"><input id="enablePerformanceMetrics" type="checkbox"><span data-i18n="performanceMetrics">Mesures de performance locales</span></label></div>
           <div class="setting-grid two-columns"><label class="setting-field"><span data-i18n="diagnosticLevel">Niveau minimal du journal</span><select id="diagnosticLevel"><option value="debug">Debug</option><option value="info">Info</option><option value="warning" data-i18n="warning">Avertissement</option><option value="error" data-i18n="error">Erreur</option></select></label><label class="setting-field"><span data-i18n="diagnosticLimit">Événements conservés</span><input id="diagnosticMaxEntries" type="number" min="50" max="500"></label></div>
@@ -171,7 +171,7 @@
           <details class="advanced-group"><summary data-i18n="technicalDetails">Détails techniques</summary><div class="advanced-content"><div id="storage-info" class="info-box"></div><div id="compat-info" class="info-box"></div><div id="performance-info" class="info-box"></div><div id="integrity-info" class="info-box"></div><div class="button-row"><button id="integrity-check" type="button" class="secondary" data-i18n="checkStorage">Vérifier la base</button><button id="compat-check" type="button" class="secondary" data-i18n="checkThunderbird">Vérifier Thunderbird</button><button id="repair" type="button" class="secondary" data-i18n="repairReferences">Réparer les références</button><button id="rescan" type="button" class="secondary" data-i18n="rescanPins">Rescanner les épingles</button><button id="cleanup" type="button" class="danger-quiet" data-i18n="cleanupMissing">Nettoyer les introuvables</button></div></div></details>
         </section>
 
-        <section class="settings-section" data-nav-icon="⇩" data-nav-group="Maintenance">
+        <section class="settings-section" data-nav-icon="⇩" data-nav-group="Maintenance" data-nav-group-i18n="navMaintenance">
           <div class="section-header"><div><p class="eyebrow" data-i18n="sectionDataEyebrow">Données locales</p><h2 data-i18n="sectionData">Sauvegarde, restauration et maintenance</h2><p data-i18n="sectionDataIntro">Prévisualisez chaque import avant d’écrire et créez automatiquement une sauvegarde avant les migrations.</p></div></div>
           <div class="toggle-grid"><label class="setting-toggle"><input id="enableAutomaticBackups" type="checkbox"><span data-i18n="automaticBackups">Sauvegardes automatiques</span></label><label class="setting-toggle"><input id="backupBeforeMigration" type="checkbox"><span data-i18n="backupMigration">Sauvegarder avant migration ou restauration</span></label><label class="setting-toggle"><input id="backupIncludeHistory" type="checkbox"><span data-i18n="backupHistory">Inclure l’historique</span></label><label class="setting-toggle"><input id="autoCleanup" type="checkbox"><span data-i18n="automaticCleanup">Nettoyage automatique</span></label><label class="setting-toggle"><input id="enableGlobalDashboard" type="checkbox"><span data-i18n="globalDashboard">Tableau de bord global</span></label></div>
           <div class="setting-grid three-columns"><label class="setting-field"><span data-i18n="backupInterval">Intervalle</span><span class="input-with-unit"><input id="backupIntervalHours" type="number" min="1" max="8760"><span data-i18n="hours">heures</span></span></label><label class="setting-field"><span data-i18n="backupRetention">Conservation</span><span class="input-with-unit"><input id="backupRetention" type="number" min="1" max="100"><span data-i18n="files">fichiers</span></span></label><label class="setting-field"><span data-i18n="cleanupDelay">Délai avant nettoyage</span><span class="input-with-unit"><input id="cleanupGraceDays" type="number" min="0" max="90"><span data-i18n="days">jours</span></span></label></div>
@@ -180,12 +180,12 @@
           <details class="advanced-group"><summary data-i18n="resetMaintenance">Réinitialisation et maintenance</summary><div class="advanced-content"><div class="button-row"><button id="undo" type="button" class="secondary" data-i18n="undoLast">Annuler la dernière action</button><button id="reset-interface" type="button" class="secondary" data-i18n="resetInterface">Réinitialiser l’interface</button><button id="reset" type="button" class="danger-quiet" data-i18n="resetSettings">Réinitialiser les réglages</button></div></div></details>
         </section>
 
-        <section class="settings-section" data-nav-icon="⌨" data-nav-group="Accès rapide">
+        <section class="settings-section" data-nav-icon="⌨" data-nav-group="Accès rapide" data-nav-group-i18n="navQuickAccess">
           <div class="section-header"><div><p class="eyebrow" data-i18n="sectionShortcutEyebrow">Accès rapide</p><h2 data-i18n="sectionShortcut">Raccourci clavier</h2><p data-i18n="sectionShortcutIntro">Épinglez ou désépinglez la sélection sans quitter le clavier.</p></div></div>
-          <div id="shortcut-list" class="shortcut-list" aria-label="Raccourcis MailPerch"></div><div class="shortcut-row"><button id="save-shortcut" type="button" class="secondary" data-i18n="saveShortcut">Enregistrer les raccourcis</button></div>
+          <div id="shortcut-list" class="shortcut-list" aria-label="Raccourcis MailPerch" data-i18n-aria-label="ariaMailPerchShortcuts"></div><div class="shortcut-row"><button id="save-shortcut" type="button" class="secondary" data-i18n="saveShortcut">Enregistrer les raccourcis</button></div>
         </section>
 
-        <footer class="form-footer"><div><strong data-i18n="readyToSave">Résumé local</strong><span id="stats"></span></div><span class="hint">Utilisez la barre Enregistrer/Annuler qui apparaît uniquement après une modification.</span></footer>
+        <footer class="form-footer"><div><strong data-i18n="readyToSave">Résumé local</strong><span id="stats"></span></div><span class="hint" data-i18n="saveDockHint">Utilisez la barre Enregistrer/Annuler qui apparaît uniquement après une modification.</span></footer>
         <aside class="support-panel" aria-labelledby="support-title">
           <div><h3 id="support-title" data-i18n="supportTitle"></h3><p data-i18n="supportIntro"></p></div>
           <div class="support-links"><a id="support-paypal" class="primary" href="https://paypal.me/ussmarinesdot" target="_blank" rel="noopener noreferrer" data-support-link data-i18n="supportPayPal"></a><a id="support-author" href="https://github.com/ussmarines" target="_blank" rel="noopener noreferrer" data-support-link data-i18n="supportAuthor"></a><a id="support-repository" href="https://github.com/ussmarines/mailperch-thunderbird" target="_blank" rel="noopener noreferrer" data-support-link data-i18n="supportRepository"></a></div>
@@ -194,7 +194,7 @@
       </form>
     </div>
   </main>
-  <aside id="status" class="status-toast" role="status" aria-live="polite" aria-atomic="true" hidden><span class="status-icon" aria-hidden="true"></span><span id="status-message"></span><button id="status-close" class="status-close" type="button" aria-label="Fermer">×</button></aside>
+  <aside id="status" class="status-toast" role="status" aria-live="polite" aria-atomic="true" hidden><span class="status-icon" aria-hidden="true"></span><span id="status-message"></span><button id="status-close" class="status-close" type="button" aria-label="Fermer" data-i18n-aria-label="close">×</button></aside>
   <noscript>JavaScript doit être activé pour configurer MailPerch.</noscript>
 </body>
 </html>

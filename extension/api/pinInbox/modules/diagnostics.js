@@ -1,14 +1,20 @@
 (function(scope) {
   "use strict";
   const ADDRESS_RE = /(?:[a-z0-9.!#$%&'*+/=?^_`{|}~-]+)@(?:[a-z0-9-]+\.)+[a-z]{2,}/gi;
-  const PATH_RE = /(?:[a-z]:\\|\/Users\/|\/home\/|\/var\/folders\/)[^\s"']+/gi;
+  const PATH_RE = /(?:[a-z]:\\|\\\\[^\\\s]+\\|\/(?:Users|home|tmp|private\/var|var\/folders)\/)[^\s"']+/gi;
 
   function redact(value, maxLength = 900) {
     return String(value ?? "")
+      .replace(/\b(?:https?|ssh|git):\/\/[^\s/:]+:[^\s/@]+@/gi, "<credential-url>")
       .replace(ADDRESS_RE, "<email>")
       .replace(PATH_RE, "<local-path>")
       .replace(/\b(?:imap|mailbox|news|moz-extension):\/\/[^\s"']+/gi, "<internal-uri>")
+      .replace(/\b(?:gh[pousr]_[a-z0-9_]{30,}|github_pat_[a-z0-9_]{40,})\b/gi, "<secret>")
+      .replace(/\b(?:AKIA|ASIA)[A-Z0-9]{16}\b/g, "<secret>")
+      .replace(/\bAIza[0-9a-z_-]{30,}\b/gi, "<secret>")
+      .replace(/\bsk-(?:proj-)?[a-z0-9_-]{20,}\b/gi, "<secret>")
       .replace(/\b(?:sk|pk|rk)_(?:live|test)_[a-z0-9_-]{12,}\b/gi, "<secret>")
+      .replace(/\bxox[baprs]-[a-z0-9-]{20,}\b/gi, "<secret>")
       .replace(/\beyJ[a-z0-9_-]{8,}\.[a-z0-9_-]{8,}\.[a-z0-9_-]{8,}\b/gi, "<token>")
       .slice(0, maxLength);
   }
