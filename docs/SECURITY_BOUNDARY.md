@@ -86,4 +86,4 @@ Les exports téléchargés manuellement par l’utilisateur ne sont pas suivis e
 - aucun secret ne doit être nécessaire au fonctionnement ;
 - toute action automatique importée doit rester désactivée jusqu’à validation ;
 - toute nouvelle donnée persistante doit être incluse dans la purge de désinstallation ;
-- les tests de sécurité 3.2.4 et les contrôles de release 1.1.1 doivent rester verts.
+- les tests de sécurité 3.2.4 et les contrôles de release 1.1.2 doivent rester verts.

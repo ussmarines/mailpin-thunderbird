@@ -6,7 +6,7 @@ En cas de contradiction sur l’identité de l’extension, le manifeste, `docs/
 
 ## État courant
 
-- version publique : **1.1.1** ;
+- version publique : **1.1.2** ;
 - base GitHub de référence avant audit : `main`, synchronisée le 5 août 2026 ;
 - ID canonique : `pin-mails@MailPerch.local` ;
 - décision d’identité résolue le 4 août 2026 avant toute publication, signature ou diffusion catalogue ;
@@ -14,7 +14,15 @@ En cas de contradiction sur l’identité de l’extension, le manifeste, `docs/
 - productivité 1.1.0 : Aujourd’hui, Revue, veille, rappels interactifs, capture rapide, aperçu des règles, raccourcis et fusion prudente ;
 - schémas : SQLite 5, paramètres 6, données 6 ;
 - la CI s’exécute sur les changements de `main` ; une release GitHub n’est déclenchée que par un tag `v*` cohérent avec la version ou par lancement manuel explicite.
-- release GitHub `v1.1.1` publiée et vérifiée ; les assets 1.0.0 et 1.1.0 ont été reconstruits depuis les tags assainis et remplacés.
+- historique GitHub publié et vérifié jusqu’à `v1.1.1` ; la version courante 1.1.2 doit être publiée par le workflow de release avec un tag cohérent.
+
+## Passe 1.1.2
+
+- correction du grand espace vide créé par le passage responsive des outils du panneau en colonne ;
+- base flexible du champ de recherche neutralisée dans les panneaux étroits et sélecteur de vue étendu à la largeur disponible ;
+- centre de rappels totalement masqué lorsqu’il porte `hidden`, sans supprimer sa fonction lorsqu’un rappel existe ;
+- `MP-2026-019` ajouté au registre et scénario manuel dédié ajouté au plan de test ;
+- version, README, changelog, métadonnées de build et documents de publication synchronisés sur 1.1.2.
 
 ## Passe 1.1.1
 

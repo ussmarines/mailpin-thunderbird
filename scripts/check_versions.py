@@ -17,7 +17,6 @@ checks = {
     "README.en.md": [f"**MailPerch:** `{version}`", f"MailPerch_v{version}.xpi"],
     "CHANGELOG.md": [f"## {version}"],
     "THIRD_PARTY_NOTICES.md": [f"MailPerch {version}"],
-    "extension/styles/pin.css": [version],
     "PROJECT_MEMORY.md": [f"Version publique : **{version}**"],
     "docs/PROJECT_STATE.json": [f'"extensionVersion": "{version}"'],
     "docs/BUG_TRACKER.md": [f"Version publique : **{version}**"],

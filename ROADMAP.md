@@ -1,5 +1,13 @@
 # Feuille de route
 
+## 1.1.2 — stabilité responsive du panneau
+
+- [x] supprimer l’espace vide créé par la base flexible de la recherche en disposition verticale ;
+- [x] masquer totalement le centre de rappels lorsqu’il ne contient aucun rappel ;
+- [x] adapter le sélecteur de vue à la largeur des panneaux étroits ;
+- [x] ajouter une garde de non-régression et synchroniser la documentation de release ;
+- [ ] confirmer le correctif dans Thunderbird réel avec plusieurs redimensionnements et un rappel actif.
+
 ## 1.1.1 — confidentialité et durcissement de publication
 
 - [x] retirer les références personnelles de la branche courante et préparer le nettoyage ciblé de l’historique ;
@@ -19,7 +27,7 @@
 - [x] aperçu des règles avant enregistrement ;
 - [x] personnalisation des dix raccourcis ;
 - [x] détection et fusion prudente des conversations associées ;
-- [ ] validation manuelle des fonctions 1.1.0, reportée sur le XPI courant 1.1.1 dans une vraie liste de messages Thunderbird sur les systèmes annoncés.
+- [ ] validation manuelle des fonctions 1.1.0, reportée sur le XPI courant 1.1.2 dans une vraie liste de messages Thunderbird sur les systèmes annoncés.
 
 ## 3.2.10 — validation réelle de la page Options
 
