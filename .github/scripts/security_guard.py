@@ -30,6 +30,9 @@ PRIVATE_KEY_MARKERS = tuple(b"-----BEGIN " + value for value in (
     b"OPENSSH PRIVATE KEY-----", b"EC PRIVATE KEY-----",
 ))
 SELF_PATH = ".github/scripts/security_guard.py"
+APPROVED_HISTORY_PATH = Path(".security/approved-historical-identity-findings.json")
+APPROVED_HISTORY_CATEGORY = "forbidden personal identifier in historical content"
+APPROVED_HISTORY_LOCATION_RE = re.compile(r"^blob:[0-9a-f]{12}:.+:[1-9][0-9]*$")
 TOKEN_RE = re.compile(r"[a-z0-9]+")
 ASCII_TOKEN_RE = re.compile(rb"[A-Za-z0-9]{3,}")
 
@@ -40,7 +43,13 @@ class Finding:
     category: str
 
 def git(args: list[str], data: bytes | None = None) -> bytes:
-    return subprocess.run(["git", *args], input=data, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout
+    return subprocess.run(
+        ["git", *args],
+        input=data,
+        check=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    ).stdout
 
 def tokens(text: str) -> list[str]:
     normalized = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode("ascii").lower()
@@ -112,39 +121,104 @@ def scan_blobs() -> list[Finding]:
     for line in git(["rev-list", "--objects", "--all"]).decode("utf-8", "replace").splitlines():
         oid, _, path = line.partition(" ")
         objects.setdefault(oid, path)
-    checks = git(["cat-file", "--batch-check=%(objectname) %(objecttype) %(objectsize)"], ("\n".join(objects) + "\n").encode()).decode()
+    checks = git(
+        ["cat-file", "--batch-check=%(objectname) %(objecttype) %(objectsize)"],
+        ("\n".join(objects) + "\n").encode(),
+    ).decode()
     eligible = []
     for line in checks.splitlines():
         parts = line.split()
         if len(parts) == 3 and parts[1] == "blob" and int(parts[2]) <= MAX_SCAN_BYTES:
             eligible.append(parts[0])
-    process = subprocess.Popen(["git", "cat-file", "--batch"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    process = subprocess.Popen(
+        ["git", "cat-file", "--batch"],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+    )
     assert process.stdin and process.stdout
     findings: list[Finding] = []
     for oid in eligible:
-        process.stdin.write((oid + "\n").encode()); process.stdin.flush()
+        process.stdin.write((oid + "\n").encode())
+        process.stdin.flush()
         header = process.stdout.readline().decode("ascii", "replace").split()
         if len(header) != 3:
             continue
-        data = process.stdout.read(int(header[2])); process.stdout.read(1)
+        data = process.stdout.read(int(header[2]))
+        process.stdout.read(1)
         path = objects.get(oid) or "<unknown-path>"
         for line, category in content_categories(data, path != SELF_PATH):
             suffix = f":{line}" if line else ""
-            findings.append(Finding("git-history", f"blob:{oid[:12]}:{path}{suffix}", category.replace("forbidden personal identifier", "forbidden personal identifier in historical content")))
-    process.stdin.close(); process.wait(timeout=30)
+            findings.append(Finding(
+                "git-history",
+                f"blob:{oid[:12]}:{path}{suffix}",
+                category.replace(
+                    "forbidden personal identifier",
+                    "forbidden personal identifier in historical content",
+                ),
+            ))
+    process.stdin.close()
+    process.wait(timeout=30)
     return findings
 
-def write_report(path: Path, findings: list[Finding], history: bool) -> None:
+def load_approved_history(path: Path = APPROVED_HISTORY_PATH) -> set[Finding]:
+    if not path.exists():
+        return set()
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError(f"invalid approved-history manifest: {exc}") from exc
+    if not isinstance(payload, dict) or set(payload) != {"schema_version", "findings"}:
+        raise ValueError("approved-history manifest must contain only schema_version and findings")
+    if payload["schema_version"] != 1 or not isinstance(payload["findings"], list):
+        raise ValueError("approved-history manifest has an unsupported schema")
+    approved: set[Finding] = set()
+    for entry in payload["findings"]:
+        if not isinstance(entry, dict) or set(entry) != {"location", "category"}:
+            raise ValueError("approved-history entry must contain only location and category")
+        location = entry["location"]
+        category = entry["category"]
+        if not isinstance(location, str) or not APPROVED_HISTORY_LOCATION_RE.fullmatch(location):
+            raise ValueError("approved-history location must identify an exact historical blob line")
+        if category != APPROVED_HISTORY_CATEGORY:
+            raise ValueError("approved-history category is not permitted")
+        finding = Finding("git-history", location, category)
+        if finding in approved:
+            raise ValueError("approved-history manifest contains a duplicate entry")
+        approved.add(finding)
+    return approved
+
+def partition_findings(
+    findings: list[Finding],
+    approved: set[Finding],
+) -> tuple[list[Finding], list[Finding], list[Finding]]:
+    discovered = set(findings)
+    matched = sorted(discovered & approved, key=lambda item: (item.location, item.category))
+    active = sorted(discovered - approved, key=lambda item: (item.scope, item.location, item.category))
+    stale = sorted(approved - discovered, key=lambda item: (item.location, item.category))
+    return active, matched, stale
+
+def write_report(
+    path: Path,
+    active: list[Finding],
+    approved: list[Finding],
+    stale: list[Finding],
+    history: bool,
+) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     payload = {
-        "schema_version": 1,
+        "schema_version": 2,
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "history_enabled": history,
         "safe_output": True,
         "matched_values_included": False,
-        "status": "findings" if findings else "passed",
-        "finding_count": len(findings),
-        "findings": [asdict(item) for item in findings],
+        "status": "findings" if active or stale else "passed",
+        "finding_count": len(active),
+        "approved_history_count": len(approved),
+        "stale_approval_count": len(stale),
+        "findings": [asdict(item) for item in active],
+        "approved_history_findings": [asdict(item) for item in approved],
+        "stale_approvals": [asdict(item) for item in stale],
     }
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
@@ -153,18 +227,36 @@ def main() -> int:
     parser.add_argument("--history", action="store_true")
     parser.add_argument("--report", type=Path)
     args = parser.parse_args()
+
+    try:
+        approved = load_approved_history()
+    except ValueError as exc:
+        print(f"Security guard configuration error: {exc}", file=sys.stderr)
+        return 2
+
     findings = scan_tree()
     if args.history:
         findings += scan_metadata() + scan_blobs()
     findings = sorted(set(findings), key=lambda item: (item.scope, item.location, item.category))
+    active, matched, stale = partition_findings(findings, approved if args.history else set())
+
     if args.report:
-        write_report(args.report, findings, args.history)
-    if findings:
-        for item in findings:
+        write_report(args.report, active, matched, stale, args.history)
+
+    if active:
+        for item in active:
             print(f"- {item.location}: {item.category} [{item.scope}]")
+    if stale:
+        for item in stale:
+            print(f"- {item.location}: stale approved historical finding [git-history]")
+    if active or stale:
         print("No matched value was printed. Review the sanitized report and rotate any exposed secret.")
         return 1
-    print("Security guard passed without exposing matched values.")
+
+    if matched:
+        print(f"Security guard passed with {len(matched)} approved historical findings.")
+    else:
+        print("Security guard passed without exposing matched values.")
     return 0
 
 if __name__ == "__main__":

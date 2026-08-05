@@ -5,7 +5,7 @@
 - **Nom :** MailPerch — Email Pins & Follow-up
 - **Nom court :** MailPerch
 - **Version :** 1.1.0
-- **ID :** `pin-mails@MailPerch.local`
+- **ID :** `pin-mails@ussmarines.local`
 - **Compatibilité :** Thunderbird 128.0 à 153.*
 - **Langues :** français et anglais
 

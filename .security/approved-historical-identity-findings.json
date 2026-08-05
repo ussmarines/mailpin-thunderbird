@@ -1,0 +1,761 @@
+{
+  "schema_version": 1,
+  "findings": [
+    {
+      "location": "blob:01dc7fb29a99:docs/CODEX_HANDOFF.md:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:035e5ec49d18:docs/CODEX_HANDOFF.md:5",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:035e5ec49d18:docs/CODEX_HANDOFF.md:52",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:039b20ef94fe:PROJECT_MEMORY.md:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:039b20ef94fe:PROJECT_MEMORY.md:61",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:03cecbbbf4fc:tests/static_checks.py:15",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:09006a290c13:docs/DECISIONS.md:5",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:0ef1da069a52:PROJECT_MEMORY.md:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:0ef1da069a52:PROJECT_MEMORY.md:67",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:0fc76f9908ba:AGENTS.md:17",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:11c305ed3bf5:extension/manifest.json:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:11c305ed3bf5:extension/manifest.json:7",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:129d22e0d108:extension/manifest.json:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:129d22e0d108:extension/manifest.json:7",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:12c0762019fa:docs/PROJECT_STATE.json:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:12c145889cd8:extension/manifest.json:15",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:189a1475d4ba:BRANDING.md:28",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:1c814a92b8e0:PROJECT_MEMORY.md:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:1c814a92b8e0:PROJECT_MEMORY.md:40",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:1e54c2e30c77:AGENTS.md:17",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:1efa4ae20c0b:extension/manifest.json:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:1efa4ae20c0b:extension/manifest.json:7",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:1fbd7ca44874:tests/static_checks.py:15",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:1fc0fb902978:extension/manifest.json:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:1fc0fb902978:extension/manifest.json:7",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:2021123df4aa:docs/CODEX_HANDOFF.md:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:2395d11a7b01:extension/manifest.json:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:2395d11a7b01:extension/manifest.json:7",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:23f04b775782:PROJECT_MEMORY.md:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:23f04b775782:PROJECT_MEMORY.md:40",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:2620f92bb355:docs/CODEX_HANDOFF.md:47",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:2620f92bb355:docs/CODEX_HANDOFF.md:5",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:26b8784592d4:docs/CODEX_HANDOFF.md:47",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:26b8784592d4:docs/CODEX_HANDOFF.md:5",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:26eec7014056:extension/manifest.json:15",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:280a91fff941:docs/DECISIONS.md:5",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:280dd14c7a0d:docs/CODEX_HANDOFF.md:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:28f04517d106:LICENSE:1",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:28f04517d106:LICENSE:2",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:28f04517d106:LICENSE:5",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:29d4a4a3f2d8:docs/DECISIONS.md:5",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:2a801540c79a:tests/static_checks.py:15",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:2b6696215236:PROJECT_MEMORY.md:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:2b6696215236:PROJECT_MEMORY.md:48",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:2cd753dd076d:tests/static_checks.py:15",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:2e5135af81db:tests/test_project_metadata.py:21",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:335636d3ccce:scripts/check_repo.py:37",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:337a99ba62ff:scripts/check_repo.py:38",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:3448d32c84ba:docs/PROJECT_STATE.json:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:35e6815f2940:tests/static_checks.py:15",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:35ed637d3708:release/ATN_REVIEW_NOTES_TEMPLATE.md:8",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:368561b99aac:extension/manifest.json:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:368561b99aac:extension/manifest.json:7",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:3a7b77642be2:docs/CODEX_HANDOFF.md:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:3b03f9803b02:PROJECT_MEMORY.md:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:3b03f9803b02:PROJECT_MEMORY.md:40",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:3c0be506d185:AUDIT_REPORT_3.1.0.md:135",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:3dde64e83cd0:AUDIT_REPORT_3.1.0.md:135",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:3f95027ca507:tests/static_checks.py:15",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:3f9d4b971114:docs/CODEX_HANDOFF.md:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:431603c554ea:release/manifest-store-template.json:5",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:43716632286b:extension/manifest.json:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:43716632286b:extension/manifest.json:7",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:445cfff2e1dc:tests/test_project_metadata.py:21",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:4536628e71b0:docs/PROJECT_STATE.json:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:45a90e412345:docs/PROJECT_STATE.json:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:4661346ed905:extension/manifest.json:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:4661346ed905:extension/manifest.json:7",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:468bf5273811:scripts/check_repo.py:123",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:489bd5876bea:extension/manifest.json:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:489bd5876bea:extension/manifest.json:7",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:49b870f9c49f:tests/static_checks.py:15",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:4b57371cb2d5:tests/static_checks.py:15",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:4c708c68188c:docs/CODEX_HANDOFF.md:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:4d5f2e65185b:extension/manifest.json:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:4d5f2e65185b:extension/manifest.json:7",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:514103d3d127:docs/PROJECT_STATE.json:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:52206021e3ab:release/ATN_REVIEW_NOTES_TEMPLATE.md:8",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:54caee6a1c96:tests/static_checks.py:15",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:56280e81c507:PROJECT_MEMORY.md:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:56280e81c507:PROJECT_MEMORY.md:74",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:5777dcd1cd62:docs/DECISIONS.md:5",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:57edf5f69014:PROJECT_MEMORY.md:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:57edf5f69014:PROJECT_MEMORY.md:74",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:58d01652ea4a:docs/CODEX_HANDOFF.md:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:59833e4de165:docs/CODEX_HANDOFF.md:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:5c31d5333157:AGENTS.md:23",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:5d0f3311bf18:NOTICE.md:3",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:5deac29feed8:PROJECT_MEMORY.md:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:5deac29feed8:PROJECT_MEMORY.md:53",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:5f14deda267c:docs/CODEX_HANDOFF.md:5",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:62a2431cabb1:tests/static_checks.py:15",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:66d36e870d8a:scripts/check_repo.py:37",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:66dd12766d20:docs/PROJECT_STATE.json:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:679eb25d207a:NOTICE.md:3",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:68cb71d73145:scripts/check_repo.py:38",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:6a3168024478:docs/PROJECT_STATE.json:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:6daa26c3eff4:docs/CODEX_HANDOFF.md:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:6dd8d1a11f49:docs/CODEX_HANDOFF.md:5",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:6fcee3fc0da5:tests/static_checks.py:15",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:74e349bcd216:tests/static_checks.py:15",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:7a72d5690c47:PROJECT_MEMORY.md:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:7a72d5690c47:PROJECT_MEMORY.md:38",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:7afadb9ddbb9:extension/manifest.json:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:7afadb9ddbb9:extension/manifest.json:7",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:7bcc215526e2:docs/PROJECT_STATE.json:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:7c7b8012f7f4:tests/static_checks.py:15",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:7e615c4b12dc:PROJECT_MEMORY.md:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:7e615c4b12dc:PROJECT_MEMORY.md:67",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:80f493b1fcde:scripts/check_repo.py:123",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:81aa2686e17f:README.md:80",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:81f0356a7b0a:extension/manifest.json:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:81f0356a7b0a:extension/manifest.json:7",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:8760690f4761:docs/CODEX_HANDOFF.md:5",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:8760690f4761:docs/CODEX_HANDOFF.md:51",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:8a52ebcdb2bb:tests/static_checks.py:15",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:8ed5c83ff0d7:scripts/check_repo.py:38",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:9056c97c8557:PROJECT_MEMORY.md:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:9056c97c8557:PROJECT_MEMORY.md:72",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:960177e5e603:tests/static_checks.py:15",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:96171a56caae:docs/DECISIONS.md:5",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:96a86ccf512d:STORE_RELEASE.md:11",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:97754d0ab850:docs/DECISIONS.md:5",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:97edb62342f3:docs/CODEX_HANDOFF.md:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:9b9ad499eadb:release/manifest-store-template.json:5",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:a0bf9a4e8466:scripts/check_repo.py:37",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:a1199ccf3bfb:PROJECT_MEMORY.md:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:a1199ccf3bfb:PROJECT_MEMORY.md:38",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:a2ac51c7dd1c:PROJECT_MEMORY.md:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:a2ac51c7dd1c:PROJECT_MEMORY.md:40",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:a2e188d27f31:BRANDING.md:28",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:a38d3770b534:docs/CODEX_HANDOFF.md:5",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:a38d3770b534:docs/CODEX_HANDOFF.md:59",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:a4bfdc73dbf2:tests/static_checks.py:15",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:a5159d5fde76:tests/static_checks.py:15",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:a81b9381caeb:tests/test_project_metadata.py:21",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:a82476950358:tests/static_checks.py:15",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:a8bb14b8214b:AGENTS.md:23",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:ab3af81950a9:STORE_RELEASE.md:11",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:ac6b73553357:tests/static_checks.py:15",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:aebfe02f75dd:scripts/check_repo.py:123",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:b0580b0c5eb2:docs/PROJECT_STATE.json:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:b2af8d18ea4e:AGENTS.md:17",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:b5ac81ce6851:extension/manifest.json:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:b5ac81ce6851:extension/manifest.json:7",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:bcfcd3427c4e:extension/manifest.json:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:bcfcd3427c4e:extension/manifest.json:7",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:bd97f87e0377:docs/CODEX_HANDOFF.md:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:c0eef1f791aa:tests/static_checks.py:15",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:c0f0ec2df40d:scripts/check_repo.py:37",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:c1b78ee540b2:extension/manifest.json:15",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:c64f3a733a33:tests/static_checks.py:15",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:ca54aff5a0f9:docs/CODEX_HANDOFF.md:5",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:ca78530436a6:docs/PROJECT_STATE.json:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:ce7e4ee9fbc8:extension/manifest.json:15",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:cf18e5fa464c:tests/static_checks.py:15",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:d4879a566883:docs/DECISIONS.md:5",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:d8916bd78c4f:scripts/check_repo.py:37",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:da0e31f75f1c:docs/PROJECT_STATE.json:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:e121b32c1f26:BRANDING.md:28",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:e47d2fa51142:NOTICE.md:3",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:e4d64325a5a4:scripts/check_repo.py:123",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:e57e69fde8e8:docs/CODEX_HANDOFF.md:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:e69a54733108:PROJECT_MEMORY.md:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:e69a54733108:PROJECT_MEMORY.md:36",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:e79905ed060b:README.en.md:56",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:eb43604c60e8:PROJECT_STATE.json:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:ebfbca78fc48:tests/static_checks.py:15",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:ef938bc80b1d:docs/CODEX_HANDOFF.md:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:f21186414c93:AGENTS.md:24",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:f3794876da7e:tests/static_checks.py:15",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:f3edd63a42dd:docs/PROJECT_STATE.json:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:f46888ee37a0:PROJECT_MEMORY.md:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:f46888ee37a0:PROJECT_MEMORY.md:82",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:f5355771eaf8:extension/manifest.json:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:f5355771eaf8:extension/manifest.json:7",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:f644a2f384aa:tests/static_checks.py:15",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:f7572ea6bb5e:docs/CODEX_HANDOFF.md:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:f77a96b3e483:LICENSE:2",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:f77a96b3e483:LICENSE:5",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:f79fe709ff9b:docs/CODEX_HANDOFF.md:5",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:f7dc8c28ce27:extension/manifest.json:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:f7dc8c28ce27:extension/manifest.json:7",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:f7e0463e83c3:scripts/check_repo.py:37",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:f89ddf82c949:extension/manifest.json:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:f89ddf82c949:extension/manifest.json:7",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:fc139bf20a5a:extension/manifest.json:10",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:fc139bf20a5a:extension/manifest.json:7",
+      "category": "forbidden personal identifier in historical content"
+    },
+    {
+      "location": "blob:feeef097ac84:extension/manifest.json:15",
+      "category": "forbidden personal identifier in historical content"
+    }
+  ]
+}

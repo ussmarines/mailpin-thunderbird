@@ -2,7 +2,7 @@
 
 ## D001 — ID public permanent conservé
 
-`pin-mails@MailPerch.local` est figé comme identifiant public de MailPerch 1.x. Le modifier créerait une seconde installation et séparerait les données existantes ; toute évolution future devra donc conserver cet ID ou fournir une migration explicite.
+`pin-mails@ussmarines.local` est figé comme identifiant public de MailPerch 1.x. Le modifier créerait une seconde installation et séparerait les données existantes ; toute évolution future devra donc conserver cet ID ou fournir une migration explicite.
 
 ## D002 — Dashboard ouvert par le background
 

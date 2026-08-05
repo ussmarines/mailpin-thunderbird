@@ -41,7 +41,7 @@ for workflow in (ci, release):
     assert "beautifulsoup4" not in workflow
     assert "tinycss2" not in workflow
 
-assert ci.count("persist-credentials: false") == 2
+assert ci.count("persist-credentials: false") == 3
 assert release.count("persist-credentials: false") == 1
 assert "retention-days: 14" in ci
 assert "--latest" in release

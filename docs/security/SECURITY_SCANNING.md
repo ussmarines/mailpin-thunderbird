@@ -6,6 +6,8 @@ Les audits de sécurité sont indépendants de Codex et ne consomment aucun toke
 
 L’identité publique autorisée est `ussmarines` avec le profil `https://github.com/ussmarines`. Le garde recherche dans l’arbre courant, les métadonnées de commits et les blobs historiques des empreintes SHA-256 correspondant aux identifiants civils interdits. Les valeurs recherchées et détectées ne sont jamais affichées dans les rapports. Toute nécessité légale ou opérationnelle d’utiliser une identité civile doit être soumise au propriétaire avant modification.
 
+Les occurrences présentes dans l’arbre courant ne peuvent jamais être approuvées. Les occurrences historiques déjà triées sont enregistrées dans `.security/approved-historical-identity-findings.json` uniquement par emplacement exact `blob/chemin/ligne` et catégorie. Toute nouvelle occurrence, toute entrée dupliquée, toute catégorie différente ou toute approbation devenue obsolète bloque le garde et impose un nouveau triage. Cette procédure ne réécrit pas l’historique Git.
+
 ## GitHub
 
 1. Ouvrir **Actions**.
@@ -17,6 +19,8 @@ L’identité publique autorisée est `ussmarines` avec le profil `https://githu
 ## Windows local
 
 Exécuter une seule fois `tools/security/install-security-tools.ps1`. Les outils sont partagés dans `%LOCALAPPDATA%\ussmarines-security-tools`. Lancer ensuite `tools/security/security-scan.ps1 -Profile Full` dans chaque dépôt. Les rapports restent sous `tools/security/.reports/` et ne sont pas suivis par Git.
+
+Le dépôt ne contient actuellement aucun `package-lock.json`. `npm ci` n’est donc pas une commande applicable tant qu’un lockfile n’est pas introduit intentionnellement avec des dépendances gérées. La validation native reste `npm run ci`.
 
 ## Réponse à incident
 

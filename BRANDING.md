@@ -25,7 +25,7 @@
 
 Les éléments suivants sont historiques et ne doivent pas être renommés sans migration explicite :
 
-- ID public permanent : `pin-mails@MailPerch.local` ;
+- ID public permanent : `pin-mails@ussmarines.local` ;
 - base locale : `pin-mails-v2.sqlite` ;
 - formats d’import/export existants ;
 - préfixes DOM, classes CSS, topics et clés internes `pin-mails-*` ;

@@ -8,7 +8,7 @@
 - **Sous-titre FR :** Épinglez, organisez et suivez vos e-mails dans Thunderbird.
 - **Subtitle EN:** Pin, organize and follow up on your emails in Thunderbird.
 - **Auteur public :** ussmarines
-- **Identifiant permanent :** `pin-mails@MailPerch.local`
+- **Identifiant permanent :** `pin-mails@ussmarines.local`
 - **Compatibilité déclarée :** Thunderbird 128.0 à 153.*
 - **Licence :** MailPerch Source-Available License 1.0
 
