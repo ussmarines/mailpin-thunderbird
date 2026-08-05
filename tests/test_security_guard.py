@@ -36,8 +36,11 @@ assert GUARD.content_categories(GUARD.PRIVATE_KEY_MARKERS[0]) == [
 
 security_workflow = (ROOT / ".github/workflows/security-audit.yml").read_text(encoding="utf-8")
 installer = (ROOT / "tools/security/install-security-tools.ps1").read_text(encoding="utf-8")
-assert "6a958d8a0941d7e1d0de8436670b5cb7fc64c8028b4d16e3f519ccc77f953cef" in security_workflow
-assert "--no-index --force-reinstall" in security_workflow
+assert "8556289a64e7aaf2400cd516f61a471aa91c5902cc56ad96a82fd12f90c2ef73" in security_workflow
+assert "zizmor/releases/download/v${version}" in security_workflow
+assert "sha256sum -c --strict" in security_workflow
+assert '"$RUNNER_TEMP/zizmor" --offline --format json' in security_workflow
+assert "pip install" not in security_workflow
 assert "windows_x64\\.zip$" in installer
 assert "windows_x32\\.zip$" not in installer
 assert "Assert-ToolChildPath" in installer
