@@ -1,5 +1,5 @@
 {
-  "note": "Référence de métadonnées pour la publication 1.1.0. Les valeurs doivent rester synchronisées avec extension/manifest.json.",
+  "note": "Référence de métadonnées pour la publication 1.1.1. Les valeurs doivent rester synchronisées avec extension/manifest.json.",
   "browser_specific_settings": {
     "gecko": {
       "id": "pin-mails@MailPerch.local",

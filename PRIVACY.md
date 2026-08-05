@@ -1,6 +1,6 @@
 # Confidentialité / Privacy
 
-Dernière mise à jour / Last updated: 2 août 2026 / August 2, 2026
+Dernière mise à jour / Last updated: 5 août 2026 / August 5, 2026
 
 ## Français
 
@@ -16,7 +16,7 @@ L’extension ne copie pas dans sa base :
 
 ### Transmission
 
-MailPerch 1.1.0 ne contient aucun appel réseau, télémétrie, publicité, service de licence ni chargement de code distant. Les données restent dans le profil Thunderbird ou dans un fichier de sauvegarde choisi explicitement par l’utilisateur.
+MailPerch 1.1.1 ne contient aucun appel réseau, télémétrie, publicité, service de licence ni chargement de code distant. Les données restent dans le profil Thunderbird ou dans un fichier de sauvegarde choisi explicitement par l’utilisateur.
 
 ### Sauvegardes et diagnostics
 
@@ -46,7 +46,7 @@ The extension does not copy into its database:
 
 ### Transmission
 
-MailPerch 1.1.0 contains no network call, telemetry, advertising, license service, or remotely loaded code. Data remains in the Thunderbird profile or in a backup file explicitly selected by the user.
+MailPerch 1.1.1 contains no network call, telemetry, advertising, license service, or remotely loaded code. Data remains in the Thunderbird profile or in a backup file explicitly selected by the user.
 
 ### Backups and diagnostics
 

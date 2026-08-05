@@ -6,14 +6,25 @@ En cas de contradiction sur l’identité de l’extension, le manifeste, `docs/
 
 ## État courant
 
-- version publique : **1.1.0** ;
-- base GitHub de référence avant intégration : `main` au commit `48d00fac37cb9f7efd1d5bff056149ba80c5d718` ;
+- version publique : **1.1.1** ;
+- base GitHub de référence avant audit : `main`, synchronisée le 5 août 2026 ;
 - ID canonique : `pin-mails@MailPerch.local` ;
 - décision d’identité résolue le 4 août 2026 avant toute publication, signature ou diffusion catalogue ;
 - une installation locale portant une ancienne identité doit être sauvegardée, réinstallée et restaurée selon `docs/IDENTITY_MIGRATION_REQUIRED.md` ;
 - productivité 1.1.0 : Aujourd’hui, Revue, veille, rappels interactifs, capture rapide, aperçu des règles, raccourcis et fusion prudente ;
 - schémas : SQLite 5, paramètres 6, données 6 ;
-- une modification de version fusionnée dans `main` déclenche la QA, le build et la release GitHub correspondante.
+- la CI s’exécute sur les changements de `main` ; une release GitHub n’est déclenchée que par un tag `v*` cohérent avec la version ou par lancement manuel explicite.
+
+## Passe 1.1.1
+
+- rapprochement de conversations limité à une identité forte, jamais au seul objet ;
+- diagnostics et erreurs privilégiées expurgés des chemins, credentials et identifiants privés ;
+- packaging limité aux fichiers suivis, sans ajout arbitraire à l’allowlist reviewer ;
+- workflows de scan/release durcis, actions limitées aux éditeurs autorisés et SHA obligatoires côté dépôt ;
+- catalogues FR/EN complets pour Options et dashboard, y compris ARIA et contenu dynamique ;
+- catalogue FR/EN fermé de 237 libellés pour le panneau privilégié, son menu natif, l’éditeur, les rappels et Agenda ;
+- scénarios Playwright : 98 contrôles Options, 7 vues dashboard, responsive, thème sombre et mouvement réduit ;
+- validation Thunderbird 153.0.1 : compte local et quatre messages synthétiques, panneau séparé, invariants de lecture, géométrie native et 17 actions du menu anglais observés ; MP-2026-004 et MP-2026-017 sont corrigés.
 
 ## Décision d’identité du 4 août 2026
 
@@ -79,7 +90,7 @@ Priorité absolue : MP-2026-004 et MP-2026-005. Ne pas les déclarer corrigés s
 - les tests Playwright chargent les vrais actifs mais utilisent une API synthétique locale ; ils ne constituent pas une validation de l'onglet Thunderbird ;
 - le rail d'actions repose sur la structure réelle de ThreadCard 153 et ne doit pas être remplacé par un offset de capture ;
 - le lancement Thunderbird temporaire a réussi, mais WebDriver BiDi n'a exposé aucun contexte d'onglet ;
-- MP-2026-004, MP-2026-005 et MP-2026-007 restent `À VALIDER`.
+- À cette date, MP-2026-004, MP-2026-005 et MP-2026-007 restaient `À VALIDER` ; leurs validations ultérieures sont consignées dans `docs/BUG_TRACKER.md`.
 
 ## Passe 3.2.9
 
@@ -100,4 +111,4 @@ Priorité absolue : MP-2026-004 et MP-2026-005. Ne pas les déclarer corrigés s
   les 98 contrôles, une sauvegarde unique et Réessayer sans écouteur dupliqué ;
 - Thunderbird 153.0.1, profil jetable sans compte, a validé recommandations,
   Enregistrer, Annuler, réouverture et persistance après redémarrage ;
-- MP-2026-004 reste à valider dans une vraie liste de messages.
+- MP-2026-004 restait alors à valider ; il a été confirmé le 5 août 2026 dans une vraie liste de messages synthétiques avec le XPI 1.1.1.

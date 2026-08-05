@@ -22,7 +22,7 @@ Cet identifiant est propre au projet personnel MailPerch et ne crée aucun lien 
 
 Thunderbird utilise l’identifiant comme identité stable de l’extension. Une installation locale qui portait un autre identifiant peut donc être traitée comme une extension distincte. Le nouvel identifiant ne récupère pas automatiquement le stockage privé associé à l’ancienne identité.
 
-Ce comportement est accepté parce que le projet n’a pas encore été publié. Il ne s’agit pas d’une migration distribuée à des utilisateurs externes.
+Ce comportement a été accepté avant les premières releases GitHub, qui utilisent toutes l’identifiant canonique. Toute modification ultérieure casserait désormais la continuité des mises à jour et n’est pas autorisée sans une migration distribuée complète.
 
 ## Procédure pour le profil local existant
 
@@ -51,15 +51,15 @@ Ne jamais supposer qu’une installation avec un ancien identifiant sera mise à
 
 Toute modification future de l’identifiant doit mettre à jour cette liste dans le même changement Git.
 
-## Publication future
+## Publication et immutabilité
 
-Avant la première publication :
+Depuis la première release GitHub :
 
-- vérifier que l’identifiant est encore disponible auprès du catalogue ciblé ;
 - conserver exactement la même casse et la même chaîne dans toutes les builds ;
 - vérifier les exigences de manifeste et de déclaration de collecte de données applicables au moment de la soumission ;
-- considérer l’identifiant comme immuable dès la première signature ou publication.
+- considérer l’identifiant comme immuable pour GitHub et toute future soumission ATN ;
+- vérifier avec le portail ATN que l’identifiant est accepté avant la première soumission au catalogue, sans le remplacer silencieusement.
 
 ## Retour arrière
 
-En cas de problème avant publication, ne pas improviser une troisième identité. Utiliser l’historique Git pour revenir au commit précédant le changement, restaurer le profil de test et documenter le résultat dans `docs/BUG_TRACKER.md` et `docs/CODEX_HANDOFF.md`.
+En cas de problème de migration locale, ne pas improviser une nouvelle identité. Restaurer le profil de test et documenter le résultat dans `docs/BUG_TRACKER.md` et `docs/CODEX_HANDOFF.md`. Une release déjà publiée ne doit jamais être remplacée par une build portant un autre identifiant.

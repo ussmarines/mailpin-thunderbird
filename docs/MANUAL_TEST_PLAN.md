@@ -417,7 +417,7 @@ Attendu : `centerDelta ≤ 1`, cibles entièrement dans la carte, espace inféri
 `≥ 8` quand la hauteur le permet, aucun recouvrement avec le menu ou la pièce
 jointe, et une cible correcte pour `pinHit`/`starHit`. Joindre les résultats à
 MP-2026-004/005/007 avant de modifier leur statut.
-## Validation manuelle 1.1.0 — productivité
+## Validation manuelle 1.1.1 — productivité et durcissement
 
 Utiliser un profil de test avec au moins deux comptes, plusieurs conversations, un
 calendrier inscriptible et des messages envoyés/reçus réels.
@@ -442,3 +442,20 @@ calendrier inscriptible et des messages envoyés/reçus réels.
    Agenda et historique. Confirmer qu’aucune suggestion n’est faite sur le seul objet.
 10. **Régression** — clic droit, désépinglage, Agenda, paramètres, thèmes, zoom 200 %,
     lecteur d’écran, clavier seul, comptes IMAP/POP et dossiers virtuels.
+11. **Confidentialité** — exporter un diagnostic synthétique et confirmer l’absence
+    d’adresse brute, de chemin de profil, de credentials dans une URL et de détail
+    d’exception ; ne jamais utiliser de données personnelles réelles pour ce contrôle.
+12. **Langues** — basculer Thunderbird en français puis en anglais et parcourir Options,
+    dashboard, vues intelligentes, rappels, erreurs et dialogues Agenda ; aucune chaîne
+    de la langue précédente ne doit rester visible ou exposée comme nom accessible.
+
+### Résultat partiel exécuté le 5 août 2026
+
+- Thunderbird 153.0.1 anglais, thème sombre, profil et compte local jetables,
+  quatre messages synthétiques : panneau séparé, clic de carte, épinglage direct,
+  compteur non lu, cartes normale/sélectionnée/épinglée/avec pièce jointe et menu
+  natif validés.
+- Les 17 actions visibles du menu privilégié étaient en anglais ; un balayage de
+  111 libellés accessibles visibles n’a trouvé aucun libellé français MailPerch.
+- MP-2026-004 et MP-2026-017 sont passés à `CORRIGÉ`. Les scénarios fournisseur,
+  Agenda, zoom 200 %, français réel et Thunderbird 128–152 restent à exécuter.

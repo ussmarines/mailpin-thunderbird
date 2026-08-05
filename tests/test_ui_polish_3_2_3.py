@@ -19,18 +19,18 @@ options_css = (ROOT / "extension/options/options.css").read_text(encoding="utf-8
 tokens_css = (ROOT / "extension/styles/tokens.css").read_text(encoding="utf-8")
 deep_audit = (ROOT / "scripts/deep_audit.py").read_text(encoding="utf-8")
 
-VERSION = "1.1.0"
+VERSION = "1.1.1"
 assert package["version"] == VERSION
 assert manifest["version"] == VERSION
 assert state["extensionVersion"] == VERSION
-assert state["baseGitHub"]["commit"] == "a1e26bee9400279109b447cc80b90b24913b8bca"
+assert state["baseGitHub"]["commit"] == "8c3aba26c90b699bbe74af9a2d451afe20212363"
 assert f"Version publique : **{VERSION}**" in memory
 
 # Settings spacing must stay scoped to the settings page. Stale attributes are
 # removed from about:3pane so presets can never compress native message rows.
 assert 'setAttribute("pin-mails-ui-preset"' not in impl
 assert 'removeAttribute("pin-mails-ui-preset")' in impl
-assert 'uiPreset: "Ajuste uniquement l’espacement de la page des paramètres.' in options_js
+assert 'uiPreset: "controlHelpUiPreset"' in options_js
 for selector in (
     ':root[pin-mails-ui-preset="compact"] #pin-mails-panel',
     ':root[pin-mails-ui-preset="balanced"] #pin-mails-panel',

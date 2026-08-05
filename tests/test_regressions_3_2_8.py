@@ -49,7 +49,8 @@ assert "void renderCalendars(settings.preferredCalendarId);" in OPTIONS
 assert 'id="settings-error"' in (ROOT / "extension/options/options.html").read_text(encoding="utf-8")
 
 card_row = next(line for line in TRACKER.splitlines() if line.startswith("| MP-2026-004 |"))
-assert "| À VALIDER | 3.2.8 |" in card_row
+assert "| CORRIGÉ | 3.2.8 |" in card_row
+assert "Thunderbird 153.0.1" in card_row and "messages synthétiques" in card_row
 for bug_id in ("MP-2026-005", "MP-2026-007"):
     row = next(line for line in TRACKER.splitlines() if line.startswith(f"| {bug_id} |"))
     assert "| CORRIGÉ | 3.2.10 |" in row
