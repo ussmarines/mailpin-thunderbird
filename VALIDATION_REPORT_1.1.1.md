@@ -1,8 +1,8 @@
 # Rapport de validation MailPerch 1.1.1
 
 Date : 5 août 2026
-Statut : validation de candidat en cours ; ce document ne préjuge pas de la
-publication finale.
+Statut : validation technique terminée ; le candidat est prêt pour le tag et la
+publication GitHub 1.1.1.
 
 ## Environnement observé
 
@@ -33,18 +33,20 @@ publication finale.
 | `npm run ci` sur le candidat courant | Réussi — contrôles, tests, reproductibilité et build 1.1.1 |
 | Suite classique rapide `--enforce` | Réussi — identité courante, Gitleaks, OpenGrep, Trivy, SBOM et Zizmor |
 | Suite classique complète `--enforce` | Réussi — identité courante et historique, Gitleaks, OpenGrep, Trivy, SBOM et Zizmor ; zéro occurrence d’identité privée après réécriture |
+| Assets GitHub 1.0.0 et 1.1.0 | Réussi — reconstruits depuis les tags assainis, remplacés, retéléchargés, empreintes concordantes et zéro occurrence résiduelle |
 
 Les tests navigateur chargent les actifs de production et de vrais catalogues de
 langue, mais remplacent l’API privilégiée par des données synthétiques locales.
 
-## Contrôles finaux requis avant publication
+## Contrôles finaux de publication
 
-- `npm run ci` depuis le commit final après remplacement des anciennes archives ;
-- vérification des sommes et liens des assets des releases 1.0.0, 1.1.0 et 1.1.1 ;
-- deux builds binaires comparés, inspection XPI/source et SHA-256 ;
-- installation du XPI final dans Thunderbird 153.0.1 avec profil jetable ;
-- recherche de confidentialité dans toutes les références après réécriture ;
-- vérification de la CI GitHub, du tag et des téléchargements de release.
+- terminé : `npm run ci` depuis l’historique assaini ;
+- terminé : deux builds binaires comparés, inspection XPI/source et SHA-256 ;
+- terminé : installation du XPI 1.1.1 dans Thunderbird 153.0.1 avec profil jetable ;
+- terminé : recherche de confidentialité sur toutes les références et surfaces GitHub accessibles ;
+- terminé : remplacement, téléchargement et contrôle des assets 1.0.0 et 1.1.0 ;
+- restant au moment de ce rapport : pousser le tag 1.1.1, laisser le workflow
+  publier, puis vérifier les trois téléchargements distants.
 
 ## Validation graphique honnête
 
@@ -60,7 +62,12 @@ Cette observation ne couvre pas encore la matrice Thunderbird 128–152, le zoom
 restent explicitement suivies dans `docs/MANUAL_TEST_PLAN.md` et
 `docs/KNOWN_LIMITATIONS.md`.
 
-## Artefacts
+## Artefacts attendus
 
-Les noms, tailles, SHA-256 et liens seront ajoutés uniquement après construction
-depuis le commit final de `main`, après nettoyage de l’historique.
+- `MailPerch_v1.1.1.xpi` ;
+- `MailPerch_GitHub_Repository_v1.1.1.zip` ;
+- `SHA256SUMS.txt`.
+
+Les tailles et empreintes finales sont publiées dans `SHA256SUMS.txt`, attaché à
+la release `v1.1.1`. Ce fichier reste la source autoritative afin d’éviter une
+empreinte autoréférentielle dans l’archive source qui le contient.

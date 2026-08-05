@@ -232,7 +232,7 @@ synthétiques : panneau séparé, invariants de lecture, géométrie native et m
 - `PULL_REQUEST_TEMPLATE.md` : checklist PR.
 - `workflows/ci.yml` : CI Linux/Windows.
 - `workflows/security-secrets.yml` : scan expurgé des secrets et références personnelles.
-- `workflows/release.yml` : build reproductible et release GitHub automatique lors d’un changement de version fusionné dans `main`.
+- `workflows/release.yml` : build reproductible et release GitHub uniquement sur tag `v*` cohérent ou lancement manuel explicite depuis `main`.
 - `dependabot.yml` : suivi hebdomadaire des GitHub Actions épinglées.
 
 ### `extension/`

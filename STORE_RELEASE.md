@@ -16,7 +16,7 @@ MailPerch n’ayant jamais été publié avant la migration d’identité, cet i
 
 ## État de préparation
 
-La release candidate 1.1.1 est construite de manière reproductible et les contrôles automatisés du dépôt couvrent la syntaxe, les ressources, les permissions, la CSP, l’absence de réseau, les contrats API, les migrations, les compteurs natifs, l’accessibilité, les modèles JavaScript/SQLite, le scan de secrets et le packaging.
+La version 1.1.1 est construite de manière reproductible et les contrôles automatisés du dépôt couvrent la syntaxe, les ressources, les permissions, la CSP, l’absence de réseau, les contrats API, les migrations, les compteurs natifs, l’accessibilité, les modèles JavaScript/SQLite, le scan de secrets et le packaging.
 
 La soumission Add-ons for Thunderbird reste une action manuelle : seul le portail ATN et ses reviewers peuvent valider ou refuser la publication. Avant l’envoi, le propriétaire doit terminer les cases manuelles de `docs/ATN_RELEASE_CHECKLIST.md`, rendre accessibles publiquement la page de support et la politique de confidentialité, puis tester le XPI dans les versions et systèmes annoncés.
 

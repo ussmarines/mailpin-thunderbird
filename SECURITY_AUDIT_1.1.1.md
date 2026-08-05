@@ -74,6 +74,11 @@ historiques. Les 189 approbations exactes devenues obsolètes et l’ancien fing
 Gitleaks ont été supprimés. Les rapports restent expurgés et confirment qu’aucune
 valeur correspondante n’est incluse.
 
+Les assets 1.0.0 et 1.1.0 ont été reconstruits depuis les tags réécrits, remplacés
+sur GitHub, retéléchargés et rescannés. Le dépôt, les releases, les PR/issues, les
+commentaires, les reviews et les noms d’artefacts GitHub ne contiennent aucune
+occurrence détectée. Aucun fork n’existe au moment du contrôle.
+
 ## Paramètres GitHub
 
 Le dépôt supprime automatiquement les branches fusionnées, limite les Actions aux
@@ -93,9 +98,10 @@ la refuse, les étapes manuelles et l’erreur exacte seront consignées.
 - le propriétaire du profil ou Browser Toolbox contrôle déjà le processus local ;
 - les fournisseurs IMAP/POP/Gmail/Microsoft, dossiers virtuels et Agenda ne peuvent
   être prouvés par les seuls modèles ;
-- la réécriture Git retire les données des références accessibles, mais les caches
-  et anciennes URLs d’objets GitHub peuvent nécessiter l’expiration ou l’assistance
-  de GitHub.
+- la réécriture Git retire les données des branches, tags, archives et métadonnées
+  accessibles, mais 11 références internes de pull request et les vues en cache
+  nécessitent encore une purge par GitHub Support ; le portail doit être ouvert
+  dans une session utilisateur authentifiée.
 
 Le résultat final des commandes, artefacts et empreintes est consigné dans
 `VALIDATION_REPORT_1.1.1.md` après leur exécution depuis un état propre.

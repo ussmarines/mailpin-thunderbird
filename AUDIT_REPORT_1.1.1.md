@@ -40,8 +40,10 @@ L’inspection de toutes les références Git avait aussi identifié 189 occurre
 historiques réparties sur 19 chemins. Une sauvegarde Git locale isolée a été créée
 et vérifiée, puis la réécriture ciblée autorisée a assaini les branches et tags :
 le contrôle postérieur retrouve zéro occurrence active et zéro approbation
-historique nécessaire. Les anciennes archives source et XPI GitHub restent à
-reconstruire et remplacer avant la publication 1.1.1.
+historique nécessaire. Les archives source et XPI GitHub 1.0.0 et 1.1.0 ont été
+reconstruites depuis les tags assainis, remplacées, retéléchargées puis rescannées
+sans occurrence résiduelle ; leurs tailles et empreintes distantes correspondent
+aux fichiers locaux reconstruits.
 
 ## Nettoyage
 
