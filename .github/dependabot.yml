@@ -2,6 +2,7 @@ version: 2
 updates:
   - package-ecosystem: github-actions
     directory: /
+    target-branch: main
     schedule:
       interval: weekly
       day: monday
@@ -9,8 +10,17 @@ updates:
       timezone: Europe/Paris
     cooldown:
       default-days: 7
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 3
     rebase-strategy: auto
+    pull-request-branch-name:
+      separator: "-"
+    assignees:
+      - ussmarines
+    reviewers:
+      - ussmarines
+    labels:
+      - dependencies
+      - github_actions
     groups:
       github-actions:
         patterns:
