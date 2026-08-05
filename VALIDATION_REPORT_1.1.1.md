@@ -32,15 +32,15 @@ publication finale.
 | Menu natif privilégié en anglais | Réussi — 17 actions inspectées via l’accessibilité Windows, aucune fuite française MailPerch parmi 111 libellés accessibles visibles |
 | `npm run ci` sur le candidat courant | Réussi — contrôles, tests, reproductibilité et build 1.1.1 |
 | Suite classique rapide `--enforce` | Réussi — identité courante, Gitleaks, OpenGrep, Trivy, SBOM et Zizmor |
-| Suite classique complète | Cinq contrôles réussis ; seul le garde historique signale les 189 occurrences de confidentialité déjà inventoriées, sans valeur dans le rapport expurgé |
+| Suite classique complète `--enforce` | Réussi — identité courante et historique, Gitleaks, OpenGrep, Trivy, SBOM et Zizmor ; zéro occurrence d’identité privée après réécriture |
 
 Les tests navigateur chargent les actifs de production et de vrais catalogues de
 langue, mais remplacent l’API privilégiée par des données synthétiques locales.
 
 ## Contrôles finaux requis avant publication
 
-- `npm run ci` depuis le commit final après réécriture ;
-- suite de sécurité classique complète en mode strict après réécriture ;
+- `npm run ci` depuis le commit final après remplacement des anciennes archives ;
+- vérification des sommes et liens des assets des releases 1.0.0, 1.1.0 et 1.1.1 ;
 - deux builds binaires comparés, inspection XPI/source et SHA-256 ;
 - installation du XPI final dans Thunderbird 153.0.1 avec profil jetable ;
 - recherche de confidentialité dans toutes les références après réécriture ;

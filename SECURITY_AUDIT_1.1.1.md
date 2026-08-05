@@ -67,12 +67,12 @@ recopiés dans les rapports. Toute détection future d’un secret réel bloque 
 release et impose sa révocation hors dépôt.
 
 Le profil classique rapide en mode strict passe les six contrôles : identité de
-l’arbre courant, Gitleaks, OpenGrep, Trivy, SBOM CycloneDX et Zizmor. Le profil
-complet passe les cinq contrôles de sécurité et de supply chain ; son seul échec
-attendu est le garde de confidentialité historique, qui retrouve 189 occurrences
-dans l’historique Git et aucune dans l’arbre courant. Les rapports sont expurgés et
-confirment qu’aucune valeur correspondante n’est incluse. Le profil complet strict
-doit être rejoué après la réécriture ciblée.
+l’arbre courant, Gitleaks, OpenGrep, Trivy, SBOM CycloneDX et Zizmor. Après la
+réécriture ciblée, le profil complet strict passe également les six contrôles et le
+garde retrouve zéro occurrence dans l’arbre courant, les métadonnées ou les blobs
+historiques. Les 189 approbations exactes devenues obsolètes et l’ancien fingerprint
+Gitleaks ont été supprimés. Les rapports restent expurgés et confirment qu’aucune
+valeur correspondante n’est incluse.
 
 ## Paramètres GitHub
 

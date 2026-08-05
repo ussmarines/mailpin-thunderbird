@@ -36,11 +36,12 @@ dans 6 fichiers courants. Elles ont été remplacées par l’identité publique
 Le garde de dépôt détecte désormais ces chaînes par empreinte et peut assainir un
 arbre sans afficher les valeurs supprimées.
 
-L’inspection de toutes les références Git a aussi identifié 189 occurrences
-historiques réparties sur 19 chemins. Les anciennes releases GitHub ont été
-contrôlées : leurs archives source et XPI doivent être reconstruites après la
-réécriture ciblée autorisée. La sauvegarde Git locale, la réécriture et le contrôle
-postérieur sont des conditions de publication, pas des résultats anticipés ici.
+L’inspection de toutes les références Git avait aussi identifié 189 occurrences
+historiques réparties sur 19 chemins. Une sauvegarde Git locale isolée a été créée
+et vérifiée, puis la réécriture ciblée autorisée a assaini les branches et tags :
+le contrôle postérieur retrouve zéro occurrence active et zéro approbation
+historique nécessaire. Les anciennes archives source et XPI GitHub restent à
+reconstruire et remplacer avant la publication 1.1.1.
 
 ## Nettoyage
 

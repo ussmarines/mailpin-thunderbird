@@ -6,7 +6,7 @@ Les audits de sécurité sont indépendants de Codex et ne consomment aucun toke
 
 L’identité publique autorisée est `ussmarines` avec le profil `https://github.com/ussmarines`. Le garde recherche dans l’arbre courant, les métadonnées de commits et les blobs historiques des empreintes SHA-256 correspondant aux identifiants civils interdits. Les valeurs recherchées et détectées ne sont jamais affichées dans les rapports. Toute nécessité légale ou opérationnelle d’utiliser une identité civile doit être soumise au propriétaire avant modification.
 
-Les occurrences présentes dans l’arbre courant ne peuvent jamais être approuvées. Les occurrences historiques déjà triées sont enregistrées dans `.security/approved-historical-identity-findings.json` uniquement par emplacement exact `blob/chemin/ligne` et catégorie. Toute nouvelle occurrence, toute entrée dupliquée, toute catégorie différente ou toute approbation devenue obsolète bloque le garde et impose un nouveau triage. Cette procédure ne réécrit pas l’historique Git.
+Les occurrences présentes dans l’arbre courant ne peuvent jamais être approuvées. Une exception historique temporaire, si elle est expressément autorisée, doit être enregistrée dans `.security/approved-historical-identity-findings.json` uniquement par emplacement exact `blob/chemin/ligne` et catégorie. Toute nouvelle occurrence, toute entrée dupliquée, toute catégorie différente ou toute approbation devenue obsolète bloque le garde. Après la réécriture de confidentialité 1.1.1, le dépôt ne conserve aucune approbation historique active.
 
 ## GitHub
 
