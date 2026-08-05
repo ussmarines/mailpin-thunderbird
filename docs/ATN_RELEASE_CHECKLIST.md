@@ -1,4 +1,4 @@
-# Checklist de publication Add-ons for Thunderbird — 1.1.1
+# Checklist de publication Add-ons for Thunderbird — 1.1.2
 
 Les cases cochées sont vérifiées automatiquement ou directement dans les sources. Les cases non cochées nécessitent une action humaine ou l’accès au portail ATN.
 
@@ -6,7 +6,7 @@ Les cases cochées sont vérifiées automatiquement ou directement dans les sour
 
 - [x] nom, sous-titres FR/EN, auteur et icônes synchronisés ;
 - [x] identifiant permanent défini avant la première publication ;
-- [x] version 1.1.1 synchronisée dans le manifeste, le package, la documentation et les livrables ;
+- [x] version 1.1.2 synchronisée dans le manifeste, le package, la documentation et les livrables ;
 - [x] licence et mentions de marque explicites ;
 - [ ] recherche juridique finale de disponibilité de la marque ;
 - [ ] dépôt, support et politique de confidentialité accessibles publiquement.

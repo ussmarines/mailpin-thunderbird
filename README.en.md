@@ -6,7 +6,7 @@
 **Pin, organize and follow up on important email in Thunderbird.**
 
 [![QA](https://github.com/ussmarines/mailperch-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailperch-thunderbird/actions/workflows/ci.yml)
-![Release](https://img.shields.io/badge/release-v1.1.1-0078D4)
+![Release](https://img.shields.io/badge/release-v1.1.2-0078D4)
 ![License](https://img.shields.io/badge/license-MailPerch%20Source--Available%201.0-6A5ACD)
 </div>
 
@@ -24,7 +24,7 @@ MailPerch adds a dedicated pinned-message panel above Thunderbird’s native mes
 
 ## Compatibility
 
-- **MailPerch:** `1.1.1`;
+- **MailPerch:** `1.1.2`;
 - **Thunderbird:** `128.0` through `153.*`;
 - **Format:** Manifest V3 MailExtension;
 - **Languages:** French and English;
@@ -38,12 +38,12 @@ MailPerch includes a privileged Experiment API to integrate its panel into Thund
 
 ### From a GitHub release
 
-1. Download `MailPerch_v1.1.1.xpi` from release `v1.1.1`.
+1. Download `MailPerch_v1.1.2.xpi` from release `v1.1.2`.
 2. In Thunderbird, open **Add-ons and Themes**.
 3. From the gear menu, select **Install Add-on From File**.
 4. Select the XPI and restart Thunderbird if required.
 
-> Internal `3.2.x` development builds used a version number higher than the current public versions. To test `1.1.1` after a development build, use a clean test profile or uninstall the previous build after exporting your MailPerch data.
+> Internal `3.2.x` development builds used a version number higher than the current public versions. To test `1.1.2` after a development build, use a clean test profile or uninstall the previous build after exporting your MailPerch data.
 
 ### From source
 
@@ -61,8 +61,8 @@ MailPerch is local-first: no network calls, telemetry, advertising, or remotely 
 
 - [Privacy policy](PRIVACY.md)
 - [Security policy](SECURITY.md)
-- [1.1.1 security audit](SECURITY_AUDIT_1.1.1.md)
-- [1.1.1 validation report](VALIDATION_REPORT_1.1.1.md)
+- [Latest full security audit: 1.1.1](SECURITY_AUDIT_1.1.1.md)
+- [Latest Thunderbird validation report: 1.1.1](VALIDATION_REPORT_1.1.1.md)
 - [Known limitations](docs/KNOWN_LIMITATIONS.md)
 
 ## Documentation and support
