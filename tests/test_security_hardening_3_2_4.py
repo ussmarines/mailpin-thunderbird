@@ -20,7 +20,8 @@ CHECK_REPO = (ROOT / "scripts/check_repo.py").read_text(encoding="utf-8")
 CI_WORKFLOW = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
 RELEASE_WORKFLOW = (ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8")
 
-assert PACKAGE["version"] == MANIFEST["version"] == "1.2.0"
+assert PACKAGE["version"] == MANIFEST["version"]
+assert re.fullmatch(r"\d+\.\d+\.\d+", str(MANIFEST["version"]))
 assert MANIFEST["permissions"] == ["menus"]
 assert "content_scripts" not in MANIFEST
 assert "externally_connectable" not in MANIFEST
@@ -85,7 +86,6 @@ for token in (
 ):
     assert token in IMPLEMENTATION, token
 
-
 for token in (
     'const SQLITE_LIST_TABLE_COLUMNS = Object.freeze({',
     'const SQLITE_REF_COLUMN_DEFINITIONS = Object.freeze([',
@@ -104,7 +104,6 @@ for token in (
     'boundedText(reason, 128) || "manual"',
 ):
     assert token in IMPLEMENTATION, token
-
 
 for token in (
     "function portableSettingsSnapshot(value)",

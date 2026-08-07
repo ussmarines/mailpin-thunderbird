@@ -1,13 +1,13 @@
 # Mémoire opérationnelle — MailPerch
 
-> Version publique : **1.2.0**
-> Branche de développement 1.2 : `feature/mailperch-1.2.0`
-> Base GitHub : `main` au commit `2ba053932a820792986b12cb3216e4ecbef68a42`
+> Version publique : **1.2.1**
+> Branche de maintenance 1.2 : `security/mailperch-1.2.1-codeql-hosts`
+> Base GitHub : `main` au commit `85569eaec54971d38aa38b7502b1c62b18136559`
 > Extension ID : `pin-mails@MailPerch.local`
 
 ## Résumé
 
-MailPerch est une extension Thunderbird Manifest V3 locale qui ajoute un panneau de messages épinglés et transforme ces épingles en suivis actionnables sans remplacer la liste native. La version 1.2.0 ajoute checklists, recherche globale, tags MailPerch facultatifs, vues enregistrées, palette de commandes, états **J’attends / Je dois répondre**, statistiques enrichies et consolide la synchronisation bidirectionnelle Agenda.
+MailPerch est une extension Thunderbird Manifest V3 locale qui ajoute un panneau de messages épinglés et transforme ces épingles en suivis actionnables sans remplacer la liste native. La version 1.2.0 ajoute checklists, recherche globale, tags MailPerch facultatifs, vues enregistrées, palette de commandes, états **J’attends / Je dois répondre**, statistiques enrichies et consolide la synchronisation bidirectionnelle Agenda. La version 1.2.1 durcit la détection locale des fournisseurs de messagerie en remplaçant les tests de sous-chaîne de noms d’hôte signalés par CodeQL par des correspondances de domaines à frontière stricte.
 
 ## Invariants non négociables
 
@@ -45,7 +45,7 @@ MailPerch est une extension Thunderbird Manifest V3 locale qui ajoute un panneau
 - build et validation : `scripts/`, `tests/`, `.github/workflows/`
 - publication et reviewers : `release/`, `STORE_RELEASE.md`, `docs/ATN_RELEASE_CHECKLIST.md`
 
-## État 1.2.0
+## État 1.2.1
 
 - schéma SQLite : 5 ; schéma paramètres/données : 7 ;
 - compatibilité déclarée : Thunderbird 128.0 à 153.* ;
@@ -54,7 +54,8 @@ MailPerch est une extension Thunderbird Manifest V3 locale qui ajoute un panneau
 - recherche globale limitée aux métadonnées MailPerch/Thunderbird déjà accessibles, jamais au corps ou aux pièces jointes ;
 - synchronisation tags désactivée par défaut et limitée aux tags `mailperch-*` dont le libellé attendu correspond exactement ;
 - synchronisation Agenda bidirectionnelle toujours dépendante des capacités du fournisseur et doit être validée dans Thunderbird réel ;
-- interface Options/dashboard basée sur des polices système locales et un plancher typographique de 12 px.
+- interface Options/dashboard basée sur des polices système locales et un plancher typographique de 12 px ;
+- détection des fournisseurs limitée à des noms de domaine exacts ou à leurs sous-domaines légitimes ; aucun test de sous-chaîne de type `live.com`/`me.com` n’est accepté.
 
 ## Commandes obligatoires
 

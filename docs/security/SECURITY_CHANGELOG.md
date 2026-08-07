@@ -1,5 +1,13 @@
 # Historique de la sécurité
 
+## 2026-08-07 — Correctif CodeQL des noms d’hôte fournisseurs
+
+- correction des deux alertes High `js/incomplete-url-substring-sanitization` détectées dans `extension/api/pinInbox/modules/providers.js` ;
+- suppression des tests `host.includes("live.com")` et `host.includes("me.com")`, ainsi que des autres détections de fournisseur par sous-chaîne arbitraire ;
+- remplacement par une liste fermée de domaines reconnus avec correspondance exacte ou sous-domaine à frontière `.` ;
+- ajout de tests de non-régression pour les domaines trompeurs et conservation des hôtes légitimes Gmail, Microsoft 365, Yahoo et iCloud ;
+- aucune permission, dépendance, connexion réseau, donnée persistante ou surface privilégiée supplémentaire.
+
 ## 2026-08-04 — Suite manuelle indépendante
 
 - conversion des scans secrets en déclenchement manuel pour préserver les minutes GitHub Actions ;

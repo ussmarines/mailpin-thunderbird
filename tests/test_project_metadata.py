@@ -45,9 +45,10 @@ assert "event.preventDefault();" in js and "messenger.tabs.create({url: link.hre
 for key in ("supportTitle", "supportIntro", "supportPayPal", "supportAuthor", "supportRepository", "supportOpenFailed"):
     assert all(locales[locale][key]["message"].strip() for locale in locales), key
 
+release_badge = f"release-v{package['version']}"
 for readme in readmes:
     assert "actions/workflows/ci.yml/badge.svg?branch=main" in readme
-    assert "release-v1.2.0" in readme
+    assert release_badge in readme
     assert "Source--Available%201.1" in readme
     for url in (author_url, repository_url, paypal_url, "PRIVACY.md", "SECURITY.md", "LICENSE"):
         assert url in readme, url

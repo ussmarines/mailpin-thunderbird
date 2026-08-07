@@ -1,5 +1,12 @@
 # Journal des modifications
 
+## 1.2.1 — correction sécurité de la détection des fournisseurs
+
+- remplacement des tests de sous-chaîne sur les noms d’hôte par une comparaison exacte ou par suffixe de domaine à frontière contrôlée ;
+- correction des deux alertes CodeQL `js/incomplete-url-substring-sanitization` signalées sur `live.com` et `me.com` ;
+- ajout de tests de régression couvrant les domaines trompeurs tels que `evil-live.com`, `live.com.attacker.example`, `evil-me.com` et `me.com.attacker.example` ;
+- aucune nouvelle permission, dépendance, connexion réseau, migration de stockage ou modification de schéma.
+
 ## 1.2.0 — productivité locale avancée et finition Fluent 2
 
 - notes étendues et checklists/sous-tâches directement liées aux épingles ;

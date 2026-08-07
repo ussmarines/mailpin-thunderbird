@@ -2,10 +2,10 @@
   "format": "mailperch-project-state",
   "version": 1,
   "project": "MailPerch — Email Pins & Follow-up",
-  "extensionVersion": "1.2.0",
+  "extensionVersion": "1.2.1",
   "baseGitHub": {
     "branch": "main",
-    "commit": "2ba053932a820792986b12cb3216e4ecbef68a42"
+    "commit": "85569eaec54971d38aa38b7502b1c62b18136559"
   },
   "extensionId": "pin-mails@MailPerch.local",
   "thunderbird": {
@@ -49,7 +49,8 @@
     "Missing native install sentinel triggers residue purge before preferences/SQLite load",
     "CI installs no third-party Python helper and pins GitHub Actions by immutable SHA",
     "Only exact MailPerch-owned Thunderbird tags may be managed or removed",
-    "Options and dashboard text has a 12px minimum font-size floor"
+    "Options and dashboard text has a 12px minimum font-size floor",
+    "Provider detection uses exact domain or legitimate subdomain boundaries, never arbitrary URL substrings"
   ],
   "ui": {
     "settingsSpacingAffects": [
@@ -79,11 +80,13 @@
     "related-conversation merge",
     "Thunderbird tag synchronization",
     "saved-view filtering and search",
-    "checklist persistence and editing"
+    "checklist persistence and editing",
+    "provider hostname classification"
   ],
   "security": {
     "uninstallLifecycle": "AddonManager early signal + awaited Gecko Management uninstall purge + core-cleared ExtensionStorage reinstall sentinel",
-    "ciSupplyChain": "stdlib-only checks, immutable action SHAs, no persisted checkout credentials, Dependabot monitoring"
+    "ciSupplyChain": "stdlib-only checks, immutable action SHAs, no persisted checkout credentials, Dependabot monitoring",
+    "providerDetection": "exact recognized domain or dot-boundary subdomain matching; CodeQL incomplete URL substring checks removed in 1.2.1"
   },
-  "developmentBranch": "feature/mailperch-1.2.0"
+  "developmentBranch": "security/mailperch-1.2.1-codeql-hosts"
 }

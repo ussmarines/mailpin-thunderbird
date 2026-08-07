@@ -1,13 +1,26 @@
 (function(scope) {
   "use strict";
+
+  function normalizeHost(value) {
+    return String(value || "").trim().toLowerCase().replace(/\.+$/, "");
+  }
+
+  function hostMatches(host, domain) {
+    return host === domain || host.endsWith(`.${domain}`);
+  }
+
+  function hostMatchesAny(host, domains) {
+    return domains.some(domain => hostMatches(host, domain));
+  }
+
   function providerFor(server = {}) {
-    const host = String(server.hostName || server.realHostName || "").toLowerCase();
+    const host = normalizeHost(server.hostName || server.realHostName || "");
     const type = String(server.type || "unknown").toLowerCase();
     if (type === "none" || type === "local") return "local";
-    if (host.includes("gmail") || host.includes("googlemail")) return "gmail";
-    if (host.includes("outlook") || host.includes("office365") || host.includes("hotmail") || host.includes("live.com")) return "microsoft";
-    if (host.includes("yahoo")) return "yahoo";
-    if (host.includes("icloud") || host.includes("me.com")) return "icloud";
+    if (hostMatchesAny(host, ["gmail.com", "googlemail.com"])) return "gmail";
+    if (hostMatchesAny(host, ["outlook.com", "office365.com", "hotmail.com", "live.com"])) return "microsoft";
+    if (hostMatchesAny(host, ["yahoo.com"])) return "yahoo";
+    if (hostMatchesAny(host, ["icloud.com", "me.com"])) return "icloud";
     if (type === "pop3") return "pop";
     if (type === "imap") return "imap";
     return type || "unknown";

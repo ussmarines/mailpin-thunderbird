@@ -1,6 +1,6 @@
 # Registre des bugs MailPerch
 
-Version publique : **1.2.0**
+Version publique : **1.2.1**
 
 Les entrées corrigées des versions antérieures restent disponibles dans l’historique Git et les rapports d’audit archivés. Ce registre courant conserve les validations encore utiles à la prochaine passe.
 
@@ -15,6 +15,7 @@ Les entrées corrigées des versions antérieures restent disponibles dans l’h
 
 | ID | Introduit | Symptôme | Cause | Fichiers | Test | Statut | Correction | Validation |
 |---|---|---|---|---|---|---|---|---|
+| MP-2026-020 | 1.2.0 | CodeQL signale deux alertes High `js/incomplete-url-substring-sanitization` sur `live.com` et `me.com`; un domaine trompeur peut être classé comme Microsoft/iCloud. | Détection du fournisseur par `host.includes(...)` au lieu d’une frontière de domaine stricte. | `extension/api/pinInbox/modules/providers.js` | `tests/productivity_1_2_model_tests.mjs` | CORRIGÉ | 1.2.1 | Correspondance exacte/sous-domaine légitime et cas `evil-live.com`, `live.com.attacker.example`, `evil-me.com`, `me.com.attacker.example` couverts. |
 | MP-2026-017 | 1.1.0 | Le panneau anglais conservait des libellés français. | Catalogue privilégié incomplet. | `extension/api/pinInbox/modules/localization.js` | tests de localisation | CORRIGÉ | 1.1.1 | Validé dans Thunderbird 153.0.1 anglais avec messages synthétiques. |
 | MP-2026-004 | 3.1.x | Les actions des cartes et le menu natif étaient instables. | Gestionnaires et structure ThreadCard incompatibles. | `extension/api/pinInbox/implementation.js`, `extension/styles/pin.css` | tests UI et menu natif | CORRIGÉ | 3.2.8 | Validé dans une vraie liste de messages synthétiques Thunderbird 153.0.1. |
 | MP-2026-005 | 3.2.4 | Enregistrer et Annuler pouvaient devenir inactifs dans l’onglet Options. | Cycle de formulaire et état de configuration incomplets. | `extension/options/options.js` | tests Options | CORRIGÉ | 3.2.10 | Validé dans Thunderbird 153.0.1 avec réouverture et redémarrage. |

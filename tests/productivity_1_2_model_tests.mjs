@@ -6,7 +6,7 @@ import {fileURLToPath} from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const context = vm.createContext({console, Date, Set, Map, Object, Array, String, Number, Boolean, Math, JSON});
-for (const name of ["checklists", "analytics", "tag-sync", "smart", "saved-views"]) {
+for (const name of ["checklists", "analytics", "tag-sync", "smart", "saved-views", "providers"]) {
   vm.runInContext(
     fs.readFileSync(path.join(root, "extension/api/pinInbox/modules", `${name}.js`), "utf8"),
     context,
@@ -83,5 +83,14 @@ assert.deepEqual([...context.PinTagSync.desiredKeys({workflowStatus:"active", pr
   "mailperch-active", "mailperch-important", "mailperch-follow-up"
 ]);
 assert.deepEqual([...context.PinTagSync.desiredKeys({workflowStatus:"completed", completedAt:now})], ["mailperch-completed"]);
+
+assert.equal(context.PinProviders.providerFor({hostName: "imap.gmail.com", type: "imap"}), "gmail");
+assert.equal(context.PinProviders.providerFor({hostName: "outlook.office365.com", type: "imap"}), "microsoft");
+assert.equal(context.PinProviders.providerFor({hostName: "imap.live.com", type: "imap"}), "microsoft");
+assert.equal(context.PinProviders.providerFor({hostName: "p01-imap.mail.me.com.", type: "imap"}), "icloud");
+assert.equal(context.PinProviders.providerFor({hostName: "evil-live.com", type: "imap"}), "imap");
+assert.equal(context.PinProviders.providerFor({hostName: "live.com.attacker.example", type: "imap"}), "imap");
+assert.equal(context.PinProviders.providerFor({hostName: "evil-me.com", type: "imap"}), "imap");
+assert.equal(context.PinProviders.providerFor({hostName: "me.com.attacker.example", type: "imap"}), "imap");
 
 console.log("MailPerch productivity 1.2 model tests: OK");
