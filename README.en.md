@@ -6,8 +6,8 @@
 **Pin, organize and follow up on important email in Thunderbird.**
 
 [![QA](https://github.com/ussmarines/mailperch-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailperch-thunderbird/actions/workflows/ci.yml)
-![Release](https://img.shields.io/badge/release-v1.1.2-0078D4)
-![License](https://img.shields.io/badge/license-MailPerch%20Source--Available%201.0-6A5ACD)
+![Release](https://img.shields.io/badge/release-v1.2.0-0078D4)
+![License](https://img.shields.io/badge/license-MailPerch%20Source--Available%201.1-6A5ACD)
 </div>
 
 MailPerch adds a dedicated pinned-message panel above Thunderbird’s native message list. It keeps important mail visible, supports follow-up planning, and organizes work without replacing Thunderbird’s normal workflow.
@@ -19,12 +19,17 @@ MailPerch adds a dedicated pinned-message panel above Thunderbird’s native mes
 - **Today** and **Review** views, bulk actions, and quick capture from a message;
 - groups, cases, templates, local rules with preview, and smart views;
 - Thunderbird calendar tasks and events where supported;
+- personal notes and checklists/subtasks attached to messages and conversations;
+- global MailPerch search, saved custom views, and a command palette;
+- separate **Waiting for them** / **Needs reply** indicators and richer follow-up statistics;
+- optional synchronization with Thunderbird tags owned exclusively by MailPerch;
+- bidirectional synchronization with compatible Thunderbird Calendar tasks/events;
 - dashboard, Kanban, history, and a local health center;
 - backup, restore, and redacted diagnostics.
 
 ## Compatibility
 
-- **MailPerch:** `1.1.2`;
+- **MailPerch:** `1.2.0`;
 - **Thunderbird:** `128.0` through `153.*`;
 - **Format:** Manifest V3 MailExtension;
 - **Languages:** French and English;
@@ -38,12 +43,12 @@ MailPerch includes a privileged Experiment API to integrate its panel into Thund
 
 ### From a GitHub release
 
-1. Download `MailPerch_v1.1.2.xpi` from release `v1.1.2`.
+1. Download `MailPerch_v1.2.0.xpi` from release `v1.2.0`.
 2. In Thunderbird, open **Add-ons and Themes**.
 3. From the gear menu, select **Install Add-on From File**.
 4. Select the XPI and restart Thunderbird if required.
 
-> Internal `3.2.x` development builds used a version number higher than the current public versions. To test `1.1.2` after a development build, use a clean test profile or uninstall the previous build after exporting your MailPerch data.
+> Internal `3.2.x` development builds used a version number higher than the current public versions. To test `1.2.0` after a development build, use a clean test profile or uninstall the previous build after exporting your MailPerch data.
 
 ### From source
 
@@ -61,8 +66,8 @@ MailPerch is local-first: no network calls, telemetry, advertising, or remotely 
 
 - [Privacy policy](PRIVACY.md)
 - [Security policy](SECURITY.md)
-- [Latest full security audit: 1.1.1](SECURITY_AUDIT_1.1.1.md)
-- [Latest Thunderbird validation report: 1.1.1](VALIDATION_REPORT_1.1.1.md)
+- [1.2.0 security audit](SECURITY_AUDIT_1.2.0.md)
+- [1.2.0 validation report](VALIDATION_REPORT_1.2.0.md)
 - [Known limitations](docs/KNOWN_LIMITATIONS.md)
 
 ## Documentation and support
@@ -76,4 +81,4 @@ MailPerch is maintained by [ussmarines](https://github.com/ussmarines). Donation
 
 ## License
 
-MailPerch is distributed under the **MailPerch Source-Available License 1.0**. Mozilla/Thunderbird reviewer inspection and official distribution by the owner are allowed; public redistribution, distributed forks, and commercial use require written permission. See [LICENSE](LICENSE).
+MailPerch is distributed under the **MailPerch Source-Available License 1.1**. The public repository may be inspected and any rights granted directly by GitHub remain applicable; the MailPerch license grants no additional right to sell, redistribute, publish a fork, continue the project independently, or exploit it commercially without written permission. See [LICENSE](LICENSE).

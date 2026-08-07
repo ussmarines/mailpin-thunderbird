@@ -1062,7 +1062,7 @@
     "message": "Search a setting…"
   },
   "dashboardSearchPlaceholder": {
-    "message": "Subject, sender, note, group…"
+    "message": "Subject, sender, note, subtask, tag, case…"
   },
   "menuPinMessage": {
     "message": "Pin this message"
@@ -1511,5 +1511,35 @@
   "starsImportBusy": {"message": "Importing Thunderbird stars…"},
   "starsImported": {"message": "$1 star(s) imported."},
   "undoBusy": {"message": "Undoing the latest action…"},
-  "undoComplete": {"message": "Latest action undone."}
+  "undoComplete": {"message": "Latest action undone."},
+  "enableThunderbirdTagSync": {"message": "Sync statuses with Thunderbird tags"},
+  "controlHelpThunderbirdTagSync": {"message": "Creates and updates only MailPerch-prefixed tags. Other Thunderbird tags are never changed or removed."},
+  "syncTags": {"message": "Sync tags"},
+  "buttonHelpSyncTags": {"message": "Applies MailPerch tags to pinned messages based on their current status, priority, and follow-up state."},
+  "tagSyncComplete": {"message": "Tags synchronized: $1 message(s), $2 error(s)."},
+  "tagSyncBusy": {"message": "Synchronizing Thunderbird tags…"},
+  "tagSyncTitle": {"message": "Thunderbird tags"},
+  "tagSyncIntro": {"message": "Optional: reflects MailPerch state in dedicated Thunderbird tags without touching your personal tags."},
+  "smartViewWaitingForThem": {"message": "Waiting for a reply"},
+  "smartViewNeedsReply": {"message": "I need to reply"},
+  "smartViewChecklistPending": {"message": "Subtasks to finish"},
+  "savedViews": {"message": "Saved views"},
+  "saveCurrentView": {"message": "Save current view"},
+  "noSavedViews": {"message": "No saved views."},
+  "commandPalette": {"message": "Open the MailPerch command palette"},
+  "commandPalettePlaceholder": {"message": "Search commands…"},
+  "commandPaletteHelp": {"message": "Quickly access the main views and actions."},
+  "closeCommandPalette": {"message": "Close commands"},
+  "viewName": {"message": "View name"},
+  "saveView": {"message": "Save"},
+  "deleteSavedView": {"message": "Delete view"},
+  "waitingForThem": {"message": "Waiting on them"},
+  "needsReply": {"message": "I need to reply"},
+  "checklistProgress": {"message": "Subtasks · $1/$2"},
+  "pendingSubtasks": {"message": "Pending subtasks"},
+  "averageOpenAge": {"message": "Average follow-up age"},
+  "averageWaitingAge": {"message": "Average waiting time"},
+  "completedLast7Days": {"message": "Completed in 7 days"},
+  "daysShort": {"message": "d"},
+  "responseState": {"message": "Reply status"}
 }

@@ -1,17 +1,17 @@
-# Notes pour les reviewers ATN — MailPerch 1.1.2
+# Notes pour les reviewers ATN — MailPerch 1.2.0
 
 ## Identité
 
 - **Nom :** MailPerch — Email Pins & Follow-up
 - **Nom court :** MailPerch
-- **Version :** 1.1.2
+- **Version :** 1.2.0
 - **ID :** `pin-mails@MailPerch.local`
 - **Compatibilité :** Thunderbird 128.0 à 153.*
 - **Langues :** français et anglais
 
 ## Fonction principale
 
-MailPerch ajoute un panneau local de messages épinglés au-dessus de la liste native, avec suivis, échéances, rappels, groupes, règles, Agenda et tableau de bord. La liste native des messages et ses compteurs ne sont pas remplacés.
+MailPerch ajoute un panneau local de messages épinglés au-dessus de la liste native, avec suivis, échéances, rappels, notes, sous-tâches, vues enregistrées, groupes, règles, Agenda et tableau de bord. La liste native des messages et ses compteurs ne sont pas remplacés.
 
 ## Permission et API privilégiée
 
@@ -22,6 +22,7 @@ La permission WebExtension déclarée est uniquement `menus`. L’extension emba
 - gérer le stockage SQLite local ;
 - écouter les notifications de dossiers ;
 - créer et synchroniser les tâches et événements Agenda compatibles ;
+- gérer les tags MailPerch locaux lorsque cette option est explicitement activée ;
 - gérer correctement l’arrêt, la mise à jour et la désinstallation.
 
 L’Experiment possède par nature un accès privilégié et provoque l’avertissement d’accès complet de Thunderbird. Les entrées sont validées par schéma et dans l’implémentation privilégiée.
@@ -35,7 +36,7 @@ L’Experiment possède par nature un accès privilégié et provoque l’averti
 - aucune dépendance d’exécution ou de build tierce ;
 - code source lisible, non minifié et build reproductible.
 
-Voir `PRIVACY.md`, `SECURITY.md`, `SECURITY_AUDIT_1.1.1.md` et `release/BUILD_INSTRUCTIONS.md`.
+Voir `PRIVACY.md`, `SECURITY.md`, `SECURITY_AUDIT_1.2.0.md` et `release/BUILD_INSTRUCTIONS.md`.
 
 ## Scénario de test rapide
 
@@ -45,10 +46,12 @@ Voir `PRIVACY.md`, `SECURITY.md`, `SECURITY_AUDIT_1.1.1.md` et `release/BUILD_IN
 4. Tester clic simple, double-clic, clic droit, menu `…` et désépinglage.
 5. Ajouter une échéance et un rappel.
 6. Créer une tâche ou un événement dans un calendrier compatible choisi explicitement.
-7. Ouvrir le dashboard et les paramètres, puis basculer les thèmes clair et sombre.
-8. Vérifier que les compteurs natifs de dossiers et l’état lu/non lu ne changent pas.
-9. Exporter une sauvegarde, la prévisualiser et la restaurer en mode sûr.
-10. Désinstaller depuis un profil de test et vérifier la purge des données internes.
+7. Ouvrir le dashboard : tester recherche globale, checklist, vues enregistrées, états de réponse et palette de commandes.
+8. Activer les tags MailPerch, modifier statut/priorité puis confirmer qu’un tag personnel témoin reste intact après désactivation.
+9. Ouvrir les paramètres, puis basculer les thèmes clair et sombre et vérifier le zoom 200 %.
+10. Vérifier que les compteurs natifs de dossiers et l’état lu/non lu ne changent pas.
+11. Exporter une sauvegarde, la prévisualiser et la restaurer en mode sûr.
+12. Désinstaller depuis un profil de test et vérifier la purge des données internes et des seuls tags MailPerch possédés.
 
 ## Validation automatisée
 

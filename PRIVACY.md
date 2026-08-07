@@ -1,12 +1,12 @@
 # Confidentialité / Privacy
 
-Dernière mise à jour / Last updated: 5 août 2026 / August 5, 2026
+Dernière mise à jour / Last updated: 7 août 2026 / August 7, 2026
 
 ## Français
 
 ### Données traitées localement
 
-MailPerch peut conserver les métadonnées nécessaires à ses fonctions : identifiants techniques, compte et dossier, objet, auteur, date, état lu, notes saisies, groupes, échéances, règles, historique d’actions et liens Agenda.
+MailPerch peut conserver les métadonnées nécessaires à ses fonctions : identifiants techniques, compte et dossier, objet, auteur, date, état lu, notes et sous-tâches saisies, groupes, affaires, vues enregistrées, échéances, règles, historique d’actions, état de suivi et liens Agenda. Lorsque la synchronisation de tags est activée, MailPerch ajoute uniquement ses propres mots-clés de tag aux messages concernés dans Thunderbird.
 
 L’extension ne copie pas dans sa base :
 
@@ -16,7 +16,7 @@ L’extension ne copie pas dans sa base :
 
 ### Transmission
 
-MailPerch 1.1.2 ne contient aucun appel réseau, télémétrie, publicité, service de licence ni chargement de code distant. Les données restent dans le profil Thunderbird ou dans un fichier de sauvegarde choisi explicitement par l’utilisateur.
+MailPerch 1.2.0 ne contient aucun appel réseau, télémétrie, publicité, service de licence ni chargement de code distant. Les données restent dans le profil Thunderbird ou dans un fichier de sauvegarde choisi explicitement par l’utilisateur.
 
 ### Sauvegardes et diagnostics
 
@@ -30,13 +30,15 @@ MailPerch 1.1.2 ne contient aucun appel réseau, télémétrie, publicité, serv
 
 La désinstallation ferme le stockage puis supprime la base, les fichiers de récupération, les préférences et les sauvegardes internes gérées par MailPerch. Dans un dossier externe choisi avec le sélecteur natif, seules les enveloppes MailPerch munies d’un checksum local vérifiable sont supprimées ; les autres fichiers et le dossier sont conservés.
 
+La désactivation de la synchronisation des tags ou la désinstallation retire uniquement les tags dont la clé et le libellé correspondent exactement aux définitions MailPerch ; les tags personnels ne sont pas supprimés.
+
 Les exports téléchargés manuellement ne sont pas suivis par l’extension et restent sous le contrôle de l’utilisateur.
 
 ## English
 
 ### Data processed locally
 
-MailPerch may store metadata required for its features: technical identifiers, account and folder, subject, sender, date, read state, user notes, groups, deadlines, rules, action history, and Calendar links.
+MailPerch may store metadata required for its features: technical identifiers, account and folder, subject, sender, date, read state, user notes and subtasks, groups, cases, saved views, deadlines, rules, action history, follow-up state, and Calendar links. When tag synchronization is enabled, MailPerch adds only its own tag keywords to the relevant messages in Thunderbird.
 
 The extension does not copy into its database:
 
@@ -46,7 +48,7 @@ The extension does not copy into its database:
 
 ### Transmission
 
-MailPerch 1.1.2 contains no network call, telemetry, advertising, license service, or remotely loaded code. Data remains in the Thunderbird profile or in a backup file explicitly selected by the user.
+MailPerch 1.2.0 contains no network call, telemetry, advertising, license service, or remotely loaded code. Data remains in the Thunderbird profile or in a backup file explicitly selected by the user.
 
 ### Backups and diagnostics
 
@@ -59,5 +61,7 @@ MailPerch 1.1.2 contains no network call, telemetry, advertising, license servic
 ### Deletion
 
 Uninstalling closes storage and removes the database, recovery files, preferences, and internal backups managed by MailPerch. In an external folder selected through Thunderbird’s native picker, only verifiable MailPerch backup envelopes are removed; other files and the folder remain untouched.
+
+Disabling tag synchronization or uninstalling removes only tags whose key and label exactly match MailPerch-owned definitions; personal tags are not removed.
 
 Manually downloaded exports are not tracked by the extension and remain under the user’s control.

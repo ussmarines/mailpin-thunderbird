@@ -1,5 +1,19 @@
 # Feuille de route
 
+## 1.2.0 — productivité locale avancée
+
+- [x] notes étendues et checklists/sous-tâches liées aux épingles ;
+- [x] recherche globale des métadonnées MailPerch sans indexation du corps des messages ;
+- [x] synchronisation facultative de tags Thunderbird strictement possédés par MailPerch ;
+- [x] consolidation de la synchronisation Agenda ↔ MailPerch ;
+- [x] palette de commandes et accès rapide depuis le dashboard ;
+- [x] vues personnalisées enregistrables ;
+- [x] indicateurs **J’attends** / **Je dois répondre** ;
+- [x] statistiques de suivi enrichies ;
+- [x] finition Fluent 2, polices système locales, alignements/espacements et plancher typographique 12 px ;
+- [x] schémas paramètres/données 7, migrations, tests et documentation de sécurité ;
+- [ ] valider visuellement 1.2.0 dans Thunderbird réel, notamment tags, Agenda bidirectionnel, zoom 200 % et fournisseurs annoncés.
+
 ## 1.1.2 — stabilité responsive du panneau
 
 - [x] supprimer l’espace vide créé par la base flexible de la recherche en disposition verticale ;
@@ -71,7 +85,7 @@
 - confirmer les valeurs recommandées sur un profil neuf : mode guidé, densité normale, automatisations destructives désactivées ;
 - tester les imports malformés, volumineux et contenant des clés dangereuses ;
 - vérifier les sauvegardes dans le dossier interne puis dans un dossier choisi par le sélecteur natif ;
-- maintenir `SECURITY_AUDIT_1.0.0.md`, `docs/SECURITY_BOUNDARY.md` et le test de durcissement dans chaque future version ;
+- conserver les audits historiques, maintenir l’audit de sécurité de la version courante, `docs/SECURITY_BOUNDARY.md` et le test de durcissement dans chaque future version ;
 - exécuter une revue de sécurité indépendante avant toute publication publique.
 
 ## 1.0.x — stabilisation après publication

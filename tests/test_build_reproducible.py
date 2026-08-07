@@ -32,6 +32,10 @@ with tempfile.TemporaryDirectory() as directory:
             "options/options-bootstrap.js",
             "options/options.js",
             "api/pinInbox/modules/settings.js",
+            "api/pinInbox/modules/analytics.js",
+            "api/pinInbox/modules/checklists.js",
+            "api/pinInbox/modules/saved-views.js",
+            "api/pinInbox/modules/tag-sync.js",
         ):
             assert required in names, required
 
@@ -58,6 +62,8 @@ with tempfile.TemporaryDirectory() as directory:
         assert "AGENTS.md" in names
         assert "extension/manifest.json" in names
         assert "release/BUILD_INSTRUCTIONS.md" in names
+        assert "SECURITY_AUDIT_1.2.0.md" in names
+        assert "VALIDATION_REPORT_1.2.0.md" in names
         assert "dist/.gitkeep" in names
         assert not any(name.startswith(".git/") for name in names)
         assert not any(name.startswith("dist/") and name != "dist/.gitkeep" for name in names)

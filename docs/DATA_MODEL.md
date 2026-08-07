@@ -9,13 +9,14 @@ Une référence contient notamment :
 - compte, dossier, clé locale et dernier emplacement connu ;
 - objet, auteur, date et taille ;
 - mode message/conversation ;
-- note, groupe, affaire, modèle et priorité ;
+- note, checklist/sous-tâches, groupe, affaire, modèle et priorité ;
 - échéance, rappel, relance et récurrence ;
-- statut de workflow et dates d’activité ;
+- statut de workflow, `lastReplyAt`, `lastOutgoingAt`, `waitingSince` et dates d’activité ;
 - `noReplyTracking`, `noReplyAt`, `noReplyStartedAt` et empreinte de départ pour le suivi sans réponse ;
 - `snoozeUntil` pour masquer temporairement l’élément des vues actives ;
 - `reminderFiredAt` et `reminderAcknowledgedAt` pour conserver l’état d’un rappel interactif sans le répéter après acquittement ;
 - identifiants Agenda et éventuelle erreur de synchronisation ;
+- état local de synchronisation des tags MailPerch (`tagLastSyncedAt`, erreur éventuelle) ;
 - `updatedAt` pour la résolution de concurrence.
 
 Le corps du message et les pièces jointes ne sont pas stockés.
@@ -27,7 +28,7 @@ Le corps du message et les pièces jointes ne sont pas stockés.
 - `rules_data` : règles ;
 - `cases_data` : affaires ;
 - `templates` : modèles ;
-- `ui_state` : ordre, panneau, vue intelligente et dashboard ;
+- `ui_state` / `state_data` : ordre, panneau, vue intelligente, dashboard et vues enregistrées ;
 - `providerMatrix` : dernier résultat local de compatibilité des comptes/calendriers ;
 - `activity`, `rule_log` et diagnostic : journaux bornés ;
 - `undo_log` : pile d’annulation bornée ;
@@ -93,7 +94,7 @@ Les vues sont calculées à partir des références et de l’état résolu du m
 
 ## Migrations et restaurations
 
-Le schéma logique courant est 6. Une migration ou restauration doit :
+Le schéma logique paramètres/données courant est 7 ; le schéma SQLite physique reste 5 car les nouveaux champs sont contenus dans les payloads JSON et `state_data`. Une migration ou restauration doit :
 
 1. valider format, version, collections, limites et clés ;
 2. créer une sauvegarde préalable obligatoire ;
@@ -103,4 +104,18 @@ Le schéma logique courant est 6. Une migration ou restauration doit :
 6. conserver l’ancien identifiant d’extension ;
 7. ne jamais supprimer silencieusement les données non reconnues.
 
-Les champs introduits en 1.1.0 sont facultatifs et reçoivent une valeur neutre lors de la normalisation, afin que les sauvegardes 1.0.0 restent importables.
+Les champs introduits en 1.1.0 et 1.2.0 sont facultatifs et reçoivent une valeur neutre lors de la normalisation, afin que les sauvegardes 1.0.0 à 1.1.x restent importables.
+
+## Checklists et vues enregistrées
+
+Une checklist contient au maximum 50 entrées. Chaque entrée possède un identifiant local borné, un texte de 240 caractères maximum, son état et ses dates de création/achèvement. La note d’une référence et la note d’une affaire sont bornées à 4 000 caractères.
+
+Une vue enregistrée contient un nom et des critères fermés : vue intelligente, recherche, groupe, affaire, priorité, état de réponse et état de checklist. Elle ne contient aucune copie de message. Le nombre de vues est limité à 30.
+
+## États de réponse et statistiques
+
+`waitingForThem` signifie que le dernier événement de conversation connu est sortant, ou qu’un workflow d’attente/relance a été posé manuellement. `needsReply` signifie que le dernier événement connu est entrant et plus récent que le dernier sortant. Les statistiques sont dérivées localement des références et de l’historique : âges d’ouverture/attente, sous-tâches restantes et éléments terminés sur sept jours.
+
+## Tags Thunderbird
+
+Les clés gérées sont fermées (`mailperch-active`, `mailperch-waiting`, `mailperch-planned`, `mailperch-completed`, `mailperch-important`, `mailperch-follow-up`). MailPerch refuse une collision si une de ces clés existe avec un libellé différent. La suppression ne vise que les définitions dont la clé **et** le libellé correspondent exactement aux valeurs MailPerch.

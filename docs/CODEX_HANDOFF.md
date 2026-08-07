@@ -6,15 +6,28 @@ En cas de contradiction sur l’identité de l’extension, le manifeste, `docs/
 
 ## État courant
 
-- version publique : **1.1.2** ;
+- version publique : **1.2.0** ;
 - base GitHub de référence avant audit : `main`, synchronisée le 5 août 2026 ;
 - ID canonique : `pin-mails@MailPerch.local` ;
 - décision d’identité résolue le 4 août 2026 avant toute publication, signature ou diffusion catalogue ;
 - une installation locale portant une ancienne identité doit être sauvegardée, réinstallée et restaurée selon `docs/IDENTITY_MIGRATION_REQUIRED.md` ;
-- productivité 1.1.0 : Aujourd’hui, Revue, veille, rappels interactifs, capture rapide, aperçu des règles, raccourcis et fusion prudente ;
-- schémas : SQLite 5, paramètres 6, données 6 ;
+- productivité 1.2.0 : fonctions 1.1 conservées, plus checklists, recherche globale, tags MailPerch, vues enregistrées, palette de commandes, états de réponse et statistiques enrichies ;
+- schémas : SQLite 5, paramètres 7, données 7 ;
 - la CI s’exécute sur les changements de `main` ; une release GitHub n’est déclenchée que par un tag `v*` cohérent avec la version ou par lancement manuel explicite.
-- historique GitHub publié et vérifié jusqu’à `v1.1.1` ; la version courante 1.1.2 doit être publiée par le workflow de release avec un tag cohérent.
+- historique GitHub publié et vérifié jusqu’à `v1.1.2` ; la version 1.2.0 est préparée sur `feature/mailperch-1.2.0` avant PR, fusion et release cohérentes.
+
+## Passe 1.2.0
+
+- notes portées à 4 000 caractères et checklists bornées à 50 sous-tâches ;
+- recherche globale sur les métadonnées, sans corps de message ni pièces jointes ;
+- synchronisation facultative avec six tags MailPerch à propriété stricte clé+libellé ;
+- Agenda bidirectionnel conservé et relié aux changements de workflow/tags ;
+- palette de commandes et vues personnalisées enregistrables ;
+- états **J’attends / Je dois répondre** calculés sans IA ;
+- statistiques locales enrichies ;
+- paramètres/dashboard affinés avec pile typographique système Fluent 2 et plancher 12 px ;
+- schéma logique 7 et nouvelles gardes 1.2 ;
+- aucune permission WebExtension ni dépendance tierce ajoutée.
 
 ## Passe 1.1.2
 

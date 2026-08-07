@@ -2,10 +2,10 @@
   "format": "mailperch-project-state",
   "version": 1,
   "project": "MailPerch — Email Pins & Follow-up",
-  "extensionVersion": "1.1.2",
+  "extensionVersion": "1.2.0",
   "baseGitHub": {
     "branch": "main",
-    "commit": "ac74f188adf9832d2e164a73d418a9e47967bfcd"
+    "commit": "2ba053932a820792986b12cb3216e4ecbef68a42"
   },
   "extensionId": "pin-mails@MailPerch.local",
   "thunderbird": {
@@ -14,8 +14,8 @@
   },
   "schemas": {
     "sqlite": 5,
-    "settings": 6,
-    "data": 6
+    "settings": 7,
+    "data": 7
   },
   "entrypoints": {
     "manifest": "extension/manifest.json",
@@ -47,7 +47,9 @@
     "Privileged API inputs are bounded and normalized",
     "Uninstall closes storage before deleting all MailPerch profile data",
     "Missing native install sentinel triggers residue purge before preferences/SQLite load",
-    "CI installs no third-party Python helper and pins GitHub Actions by immutable SHA"
+    "CI installs no third-party Python helper and pins GitHub Actions by immutable SHA",
+    "Only exact MailPerch-owned Thunderbird tags may be managed or removed",
+    "Options and dashboard text has a 12px minimum font-size floor"
   ],
   "ui": {
     "settingsSpacingAffects": [
@@ -74,10 +76,14 @@
     "settings save/cancel lifecycle",
     "interactive reminders",
     "snooze lifecycle",
-    "related-conversation merge"
+    "related-conversation merge",
+    "Thunderbird tag synchronization",
+    "saved-view filtering and search",
+    "checklist persistence and editing"
   ],
   "security": {
     "uninstallLifecycle": "AddonManager early signal + awaited Gecko Management uninstall purge + core-cleared ExtensionStorage reinstall sentinel",
     "ciSupplyChain": "stdlib-only checks, immutable action SHAs, no persisted checkout credentials, Dependabot monitoring"
-  }
+  },
+  "developmentBranch": "feature/mailperch-1.2.0"
 }

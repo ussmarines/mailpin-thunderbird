@@ -47,8 +47,8 @@ for key in ("supportTitle", "supportIntro", "supportPayPal", "supportAuthor", "s
 
 for readme in readmes:
     assert "actions/workflows/ci.yml/badge.svg?branch=main" in readme
-    assert "release-v1.1.2" in readme
-    assert "Source--Available%201.0" in readme
+    assert "release-v1.2.0" in readme
+    assert "Source--Available%201.1" in readme
     for url in (author_url, repository_url, paypal_url, "PRIVACY.md", "SECURITY.md", "LICENSE"):
         assert url in readme, url
     assert "C:\\" not in readme

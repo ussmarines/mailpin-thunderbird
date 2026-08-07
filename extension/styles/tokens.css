@@ -3,7 +3,7 @@
  * the same light, dark and high-contrast behavior without hard-coded overrides. */
 :root {
   color-scheme: light;
-  --mp-font-family: "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --mp-font-family: "Segoe UI Variable Text", "Segoe UI Variable", "Aptos", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 
   /* Brand palette */
   --mp-brand-background: #0f6cbd;

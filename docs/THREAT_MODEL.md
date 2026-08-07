@@ -2,16 +2,16 @@
 
 ## Actifs
 
-- métadonnées des messages épinglés, notes et échéances ;
+- métadonnées des messages épinglés, notes, sous-tâches, vues enregistrées et échéances ;
 - base SQLite, préférences, récupération et sauvegardes ;
-- accès privilégié aux messages, dossiers et calendriers Thunderbird ;
+- accès privilégié aux messages, dossiers, tags et calendriers Thunderbird ;
 - intégrité des messages, compteurs natifs et historique ;
 - confidentialité du profil local.
 
 ## Acteurs considérés
 
 1. contenu de message non fiable : objet, auteur, tags et aperçu ;
-2. sauvegarde JSON malformée, énorme ou construite volontairement ;
+2. sauvegarde JSON, note, sous-tâche, recherche ou vue enregistrée malformée, énorme ou construite volontairement ;
 3. autre page non privilégiée tentant d’atteindre l’Experiment ;
 4. action utilisateur accidentelle ou règle locale en boucle ;
 5. rapprochement erroné entre des messages seulement similaires ;
@@ -26,6 +26,7 @@ Le propriétaire local du profil et un logiciel ayant déjà le contrôle du sys
 - message/import → page WebExtension : données non fiables ;
 - page WebExtension → Experiment : données structurées mais toujours non fiables ;
 - Experiment → Thunderbird/SQLite/fichiers : frontière privilégiée ;
+- état MailPerch → tags/Agenda Thunderbird : effet de bord local privilégié, opt-in et réversible ;
 - export téléchargé → extérieur du profil : responsabilité explicite utilisateur.
 
 ## Menaces et mesures
@@ -38,6 +39,11 @@ Le propriétaire local du profil et un logiciel ayant déjà le contrôle du sys
 | Objet/API géant ou cyclique | limites de profondeur, nœuds, octets et sélections |
 | Prototype pollution | rejet de `__proto__`, `prototype`, `constructor` |
 | Import activant une automatisation | règles, suivi auto, Agenda bidirectionnel et listes auto désactivés |
+| Métadonnée 1.2 surdimensionnée ou incohérente | notes, sous-tâches, vues, identifiants et recherches bornés puis normalisés dans l’Experiment |
+| Collision avec un tag Thunderbird existant | clé **et** libellé MailPerch exacts exigés ; refus en cas de collision, aucun renommage automatique |
+| Suppression d’un tag personnel | nettoyage limité aux définitions possédées par MailPerch et aux mots-clés correspondants sur les messages suivis |
+| Recherche exposant le contenu des messages | index local limité aux métadonnées de suivi ; aucun corps de message ni contenu de pièce jointe copié ou indexé |
+| Boucle Agenda ↔ MailPerch ↔ tags | synchronisations bornées, observateurs contrôlés, écritures persistées seulement sur changement utile et erreurs isolées par référence |
 | Chemin disque arbitraire | chemin conservé côté privilégié, sélecteur natif uniquement |
 | Suppression involontaire | confirmation UI, actions fermées et pile d’annulation |
 | Fusion de conversations non liées | identité forte commune obligatoire ; objet seul interdit ; confirmation utilisateur |
@@ -59,7 +65,10 @@ Le propriétaire local du profil et un logiciel ayant déjà le contrôle du sys
 - aucune nouvelle commande n’envoie, ne supprime ou ne déplace un message automatiquement ;
 - une action UI est revérifiée dans l’Experiment, même si le dashboard a déjà contrôlé sa sélection ;
 - les dates de veille et rappel sont bornées et normalisées avant persistance ;
-- les libellés issus des messages sont affichés comme texte, jamais interprétés comme balisage.
+- les libellés issus des messages sont affichés comme texte, jamais interprétés comme balisage ;
+- les sous-tâches et vues enregistrées sont des données locales non fiables : elles sont normalisées et bornées avant persistance et avant usage dans les filtres ;
+- la synchronisation des tags reste désactivée par défaut et ne peut créer/supprimer que les clés explicitement réservées à MailPerch dont la propriété est vérifiée ;
+- les indicateurs « J’attends / Je dois répondre » sont dérivés des événements locaux et ne déclenchent jamais un envoi automatique.
 
 ## Risque résiduel
 

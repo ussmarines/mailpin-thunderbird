@@ -3,7 +3,7 @@
   "name": "__MSG_extensionName__",
   "short_name": "__MSG_extensionShortName__",
   "description": "__MSG_extensionDescription__",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "author": "ussmarines",
   "developer": {
     "name": "ussmarines",
@@ -59,6 +59,12 @@
     },
     "quick-today-selected": {
       "description": "__MSG_commandQuickToday__"
+    },
+    "open-command-palette": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+K"
+      },
+      "description": "__MSG_commandPalette__"
     }
   },
   "message_display_action": {

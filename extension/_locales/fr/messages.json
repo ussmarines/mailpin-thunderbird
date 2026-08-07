@@ -1062,7 +1062,7 @@
     "message": "Rechercher un réglage…"
   },
   "dashboardSearchPlaceholder": {
-    "message": "Objet, expéditeur, note, groupe…"
+    "message": "Objet, expéditeur, note, sous-tâche, tag, affaire…"
   },
   "menuPinMessage": {
     "message": "Épingler ce message"
@@ -1511,5 +1511,35 @@
   "starsImportBusy": {"message": "Import des étoiles Thunderbird…"},
   "starsImported": {"message": "$1 étoile(s) importée(s)."},
   "undoBusy": {"message": "Annulation de la dernière action…"},
-  "undoComplete": {"message": "Dernière action annulée."}
+  "undoComplete": {"message": "Dernière action annulée."},
+  "enableThunderbirdTagSync": {"message": "Synchroniser les statuts avec les tags Thunderbird"},
+  "controlHelpThunderbirdTagSync": {"message": "Crée et met à jour uniquement les tags préfixés MailPerch. Les autres tags Thunderbird ne sont ni modifiés ni supprimés."},
+  "syncTags": {"message": "Synchroniser les tags"},
+  "buttonHelpSyncTags": {"message": "Applique les tags MailPerch aux messages épinglés selon leur statut, leur priorité et leur suivi actuel."},
+  "tagSyncComplete": {"message": "Tags synchronisés : $1 message(s), $2 erreur(s)."},
+  "tagSyncBusy": {"message": "Synchronisation des tags Thunderbird…"},
+  "tagSyncTitle": {"message": "Tags Thunderbird"},
+  "tagSyncIntro": {"message": "Facultatif : reflète l’état MailPerch dans des tags Thunderbird dédiés, sans toucher à vos tags personnels."},
+  "smartViewWaitingForThem": {"message": "J’attends une réponse"},
+  "smartViewNeedsReply": {"message": "Je dois répondre"},
+  "smartViewChecklistPending": {"message": "Sous-tâches à terminer"},
+  "savedViews": {"message": "Vues enregistrées"},
+  "saveCurrentView": {"message": "Enregistrer la vue"},
+  "noSavedViews": {"message": "Aucune vue enregistrée."},
+  "commandPalette": {"message": "Ouvrir la palette de commandes MailPerch"},
+  "commandPalettePlaceholder": {"message": "Rechercher une commande…"},
+  "commandPaletteHelp": {"message": "Accédez rapidement aux vues et actions principales."},
+  "closeCommandPalette": {"message": "Fermer les commandes"},
+  "viewName": {"message": "Nom de la vue"},
+  "saveView": {"message": "Enregistrer"},
+  "deleteSavedView": {"message": "Supprimer la vue"},
+  "waitingForThem": {"message": "J’attends"},
+  "needsReply": {"message": "Je dois répondre"},
+  "checklistProgress": {"message": "Sous-tâches · $1/$2"},
+  "pendingSubtasks": {"message": "Sous-tâches en attente"},
+  "averageOpenAge": {"message": "Âge moyen des suivis"},
+  "averageWaitingAge": {"message": "Attente moyenne"},
+  "completedLast7Days": {"message": "Terminés sur 7 jours"},
+  "daysShort": {"message": "j"},
+  "responseState": {"message": "État de réponse"}
 }

@@ -63,10 +63,12 @@ async function toggleDisplayed(tabId, state) {
   }
 }
 
-async function openDashboard() {
+async function openDashboard(options = {}) {
   try {
+    const palette = options?.palette === true;
+    const page = palette ? "dashboard/dashboard.html?palette=1" : "dashboard/dashboard.html";
     return await messenger.tabs.create({
-      url: messenger.runtime.getURL("dashboard/dashboard.html")
+      url: messenger.runtime.getURL(page)
     });
   } catch (error) {
     logError("ouverture du tableau de bord impossible", error);
@@ -194,6 +196,7 @@ messenger.menus.onClicked.addListener(async (info, tab) => {
 messenger.commands.onCommand.addListener(async (command, tab) => {
   try {
     if (command === "open-pin-dashboard") return await openDashboard();
+    if (command === "open-command-palette") return await openDashboard({palette: true});
     if (!tab?.id) return undefined;
 
     switch (command) {

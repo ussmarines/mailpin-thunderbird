@@ -83,7 +83,7 @@ Le bouton injecté émet `pinInbox.onDashboardRequested`; le background ouvre la
 ## Stockage et migrations
 
 - base : `pin-mails-v2.sqlite` ;
-- schéma logique actuel : 6 ;
+- schéma logique paramètres/données actuel : 7 ;
 - écritures incrémentales sérialisées ;
 - WAL, transactions, révision globale et horodatage par entité ;
 - fichier atomique de récupération ;
@@ -118,3 +118,12 @@ Les fonctions 1.1.0 n’ajoutent aucune connexion réseau, dépendance d’exéc
 
 La mémoire d’architecture synthétique et la carte des fichiers sont dans
 [`../PROJECT_MEMORY.md`](../PROJECT_MEMORY.md).
+
+## Productivité 1.2
+
+- Les notes et checklists restent dans le payload JSON de la référence ; aucune table SQLite supplémentaire n’est requise.
+- Les vues enregistrées sont persistées dans `state_data` avec le reste de l’état logique et sont limitées à 30 entrées.
+- La recherche globale assemble uniquement les métadonnées déjà disponibles (objet, auteur, note, sous-tâches, tags, compte/dossier, groupe, affaire, workflow et état de réponse). Elle n’ouvre ni n’indexe les corps ou pièces jointes.
+- `analytics.js` dérive les états **waitingForThem** et **needsReply** à partir des horodatages entrants/sortants et du workflow ; ces états ne sont pas une prédiction IA.
+- La synchronisation Thunderbird tags reste derrière `enableThunderbirdTagSync`, désactivé par défaut. Les tags sont créés via l’Experiment sans nouvelle permission WebExtension et ne sont considérés comme possédés que si leur clé et leur libellé correspondent exactement aux définitions MailPerch.
+- La synchronisation Agenda bidirectionnelle conserve les observateurs et capacités fournisseurs existants ; les changements de statut venant d’Agenda déclenchent aussi la remise en cohérence des tags lorsqu’elle est activée.

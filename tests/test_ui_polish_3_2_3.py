@@ -19,11 +19,11 @@ options_css = (ROOT / "extension/options/options.css").read_text(encoding="utf-8
 tokens_css = (ROOT / "extension/styles/tokens.css").read_text(encoding="utf-8")
 deep_audit = (ROOT / "scripts/deep_audit.py").read_text(encoding="utf-8")
 
-VERSION = "1.1.2"
+VERSION = "1.2.0"
 assert package["version"] == VERSION
 assert manifest["version"] == VERSION
 assert state["extensionVersion"] == VERSION
-assert state["baseGitHub"]["commit"] == "ac74f188adf9832d2e164a73d418a9e47967bfcd"
+assert state["baseGitHub"]["commit"] == "2ba053932a820792986b12cb3216e4ecbef68a42"
 assert f"Version publique : **{VERSION}**" in memory
 
 # Settings spacing must stay scoped to the settings page. Stale attributes are

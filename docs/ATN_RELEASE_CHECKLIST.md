@@ -1,4 +1,4 @@
-# Checklist de publication Add-ons for Thunderbird — 1.1.2
+# Checklist de publication Add-ons for Thunderbird — 1.2.0
 
 Les cases cochées sont vérifiées automatiquement ou directement dans les sources. Les cases non cochées nécessitent une action humaine ou l’accès au portail ATN.
 
@@ -6,7 +6,7 @@ Les cases cochées sont vérifiées automatiquement ou directement dans les sour
 
 - [x] nom, sous-titres FR/EN, auteur et icônes synchronisés ;
 - [x] identifiant permanent défini avant la première publication ;
-- [x] version 1.1.2 synchronisée dans le manifeste, le package, la documentation et les livrables ;
+- [x] version 1.2.0 synchronisée dans le manifeste, le package, la documentation et les livrables ;
 - [x] licence et mentions de marque explicites ;
 - [ ] recherche juridique finale de disponibilité de la marque ;
 - [ ] dépôt, support et politique de confidentialité accessibles publiquement.
@@ -37,12 +37,16 @@ Les cases cochées sont vérifiées automatiquement ou directement dans les sour
 
 - [x] politique de confidentialité à jour ;
 - [x] données locales et suppression documentées ;
-- [x] permissions minimales et CSP sans réseau ;
+- [x] permissions minimales (`menus` uniquement) et CSP sans réseau ;
+- [x] synchronisation tags sans permission supplémentaire, avec propriété stricte clé+libellé ;
+- [x] checklists/vues/recherche 1.2 bornées et sans corps de message ;
 - [x] scan de secrets et recherche de primitives dangereuses ;
 - [x] audit des imports, actions destructives, migrations et désinstallation ;
 - [x] sauvegarde/restauration couverte par les tests de modèles ;
 - [ ] validation manuelle de sauvegarde/restauration dans Thunderbird ;
-- [ ] validation manuelle complète de l’Agenda.
+- [ ] validation manuelle complète de l’Agenda bidirectionnel ;
+- [ ] validation réelle de la synchronisation tags, y compris désactivation et conservation des tags personnels ;
+- [ ] validation visuelle Options/dashboard/panneau à zoom 200 % avec texte ≥ 12 px.
 
 ## Livrables
 

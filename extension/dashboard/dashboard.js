@@ -80,6 +80,38 @@ function formatDate(value) {
   catch { return new Date(timestamp).toLocaleString(); }
 }
 
+function formatDurationDays(value) {
+  const ms = Math.max(0, Number(value) || 0);
+  if (!ms) return "0";
+  const days = ms / 86_400_000;
+  return days < 1 ? "<1" : String(Math.round(days * 10) / 10);
+}
+
+function checklistElement(item) {
+  const stats = item.checklistStats || {total: 0, completed: 0, pending: 0};
+  if (!stats.total) return null;
+  const host = node("div", "item-checklist");
+  const title = node("div", "item-checklist-title", msg("checklistProgress", "Sous-tâches · $1/$2").replace("$1", stats.completed).replace("$2", stats.total));
+  host.append(title);
+  const list = node("div", "item-checklist-list");
+  const visible = (item.checklist || []).filter(entry => !entry.completed).slice(0, 4);
+  for (const entry of visible) {
+    const label = node("label", "item-checklist-row");
+    const checkbox = document.createElement("input"); checkbox.type = "checkbox"; checkbox.checked = false;
+    checkbox.addEventListener("click", event => event.stopPropagation());
+    checkbox.addEventListener("change", async () => {
+      const next = (item.checklist || []).map(candidate => candidate.id === entry.id ? {...candidate, completed: true, completedAt: Date.now()} : candidate);
+      checkbox.disabled = true;
+      try { await api.pinInbox.updateReferenceDetails(item.stableKey, {checklist: next}); await load({silent: true}); }
+      catch (error) { checkbox.disabled = false; setStatus(failureMessage("actionFailed", "Action impossible", error), "error", {persistent: true}); }
+    });
+    label.append(checkbox, node("span", "", entry.text)); list.append(label);
+  }
+  if (stats.pending > visible.length) list.append(node("span", "item-checklist-more", `+${stats.pending - visible.length}`));
+  host.append(list);
+  return host;
+}
+
 function downloadJson(filename, data) {
   const blob = new Blob([JSON.stringify(data, null, 2)], {type: "application/json"});
   const url = URL.createObjectURL(blob);
@@ -195,6 +227,8 @@ function badge(host, condition, label, className = "") {
 function badgesFor(item) {
   const host = node("div", "badges");
   badge(host, item.unread, msg("unread", "Non lu"));
+  badge(host, item.responseState === "waitingForThem", msg("waitingForThem", "J’attends"), "waiting");
+  badge(host, item.responseState === "needsReply", msg("needsReply", "Je dois répondre"), "reply-needed");
   badge(host, item.workflowStatus === "waiting", msg("statusWaiting", "En attente"), "waiting");
   badge(host, item.workflowStatus === "planned", msg("statusPlanned", "Planifié"), "planned");
   badge(host, Number(item.snoozeUntil || 0) > Date.now(), msg("snoozedUntil", "En veille jusqu’au $1").replace("$1", formatDate(item.snoozeUntil)), "snoozed");
@@ -211,6 +245,7 @@ function badgesFor(item) {
   badge(host, item.groupName, `${msg("group", "Groupe")} · ${item.groupName}`);
   badge(host, item.caseName, `${msg("case", "Affaire")} · ${item.caseName}`);
   badge(host, item.calendarSyncError, msg("calendarError", "Agenda à vérifier"), "error");
+  badge(host, item.tagSyncError, msg("tagSyncTitle", "Tags Thunderbird"), "error");
   badge(host, item.missing, msg("missingMessage", "Message introuvable"), "error");
   return host;
 }
@@ -261,6 +296,7 @@ function createCard(item, {compact = false, selectable = true} = {}) {
   body.append(node("h3", "", item.subject || msg("noSubject", "(sans objet)")));
   body.append(node("div", "meta", [item.author, item.accountName, item.folderName, formatDate(item.date)].filter(Boolean).join(" · ")));
   if (item.note) body.append(node("div", "note", item.note));
+  const checklist = checklistElement(item); if (checklist) body.append(checklist);
   body.append(badgesFor(item));
   card.append(body);
 
@@ -286,12 +322,13 @@ function renderStats() {
   $("stats").replaceChildren(
     statCard(msg("allPins", "Toutes"), stats.total || 0),
     statCard(msg("statusActive", "À traiter"), stats.active || 0),
-    statCard(msg("statusWaiting", "En attente"), stats.waiting || 0),
-    statCard(msg("statusPlanned", "Planifiées"), stats.planned || 0),
+    statCard(msg("waitingForThem", "J’attends"), stats.waitingForThem || 0),
+    statCard(msg("needsReply", "Je dois répondre"), stats.needsReply || 0, stats.needsReply ? "warning" : ""),
     statCard(msg("overdue", "En retard"), stats.overdue || 0, stats.overdue ? "warning" : ""),
-    statCard(msg("noReplyTracking", "Sans réponse"), stats.noReply || 0),
-    statCard(msg("smartViewSnoozed", "En veille"), stats.snoozed || 0),
-    statCard(msg("statusComplete", "Terminées"), stats.completed || 0)
+    statCard(msg("pendingSubtasks", "Sous-tâches en attente"), stats.checklistPendingItems || 0),
+    statCard(msg("completedLast7Days", "Terminés sur 7 jours"), stats.completedLast7Days || 0),
+    statCard(msg("averageOpenAge", "Âge moyen des suivis"), `${formatDurationDays(stats.averageOpenAgeMs)} ${msg("daysShort", "j")}`),
+    statCard(msg("averageWaitingAge", "Attente moyenne"), `${formatDurationDays(stats.averageWaitingAgeMs)} ${msg("daysShort", "j")}`)
   );
 }
 
@@ -301,10 +338,11 @@ function renderSmartViews() {
   const views = current?.smartViews?.length ? current.smartViews : [
     {id: "all", labelKey: "smartViewAll", fallback: "Toutes"}, {id: "today", labelKey: "smartViewToday", fallback: "Aujourd’hui"},
     {id: "overdue", labelKey: "smartViewOverdue", fallback: "En retard"}, {id: "week", labelKey: "smartViewWeek", fallback: "Cette semaine"},
-    {id: "waiting", labelKey: "smartViewWaiting", fallback: "En attente"}, {id: "noReply", labelKey: "smartViewNoReply", fallback: "Relances sans réponse"},
+    {id: "waiting", labelKey: "smartViewWaiting", fallback: "En attente"}, {id: "waitingForThem", labelKey: "smartViewWaitingForThem", fallback: "J’attends"},
+    {id: "needsReply", labelKey: "smartViewNeedsReply", fallback: "Je dois répondre"}, {id: "noReply", labelKey: "smartViewNoReply", fallback: "Relances sans réponse"},
     {id: "snoozed", labelKey: "smartViewSnoozed", fallback: "En veille"}, {id: "noDue", labelKey: "smartViewNoDue", fallback: "Sans échéance"}, {id: "unread", labelKey: "smartViewUnread", fallback: "Non lus"},
     {id: "missing", labelKey: "smartViewMissing", fallback: "Messages introuvables"}, {id: "calendarError", labelKey: "smartViewCalendarError", fallback: "Agenda à vérifier"},
-    {id: "recentCompleted", labelKey: "smartViewRecentCompleted", fallback: "Récemment terminés"}
+    {id: "recentCompleted", labelKey: "smartViewRecentCompleted", fallback: "Récemment terminés"}, {id: "checklistPending", labelKey: "smartViewChecklistPending", fallback: "Sous-tâches en attente"}
   ];
   for (const view of views) {
     const button = node("button", "smart-view");
@@ -314,6 +352,74 @@ function renderSmartViews() {
     button.append(node("span", "", msg(view.labelKey || "", view.fallback || view.id)), node("span", "smart-view-count", current.smartCounts?.[view.id] || 0));
     host.append(button);
   }
+}
+
+
+function renderSavedViews() {
+  const host = $("saved-views");
+  host.replaceChildren();
+  const views = current?.savedViews || [];
+  if (!views.length) { host.append(node("p", "saved-view-empty", msg("noSavedViews", "Aucune vue enregistrée."))); return; }
+  for (const view of views) {
+    const row = node("div", "saved-view-row");
+    const button = node("button", "saved-view", view.name); button.type = "button"; button.dataset.savedView = view.id; button.setAttribute("aria-pressed", String(current.savedViewId === view.id));
+    const remove = node("button", "saved-view-delete", "×"); remove.type = "button"; remove.dataset.deleteSavedView = view.id; remove.setAttribute("aria-label", msg("deleteSavedView", "Supprimer la vue")); remove.title = remove.getAttribute("aria-label");
+    row.append(button, remove); host.append(row);
+  }
+}
+
+function openSavedViewDialog() {
+  const smart = $("saved-view-smart"); smart.replaceChildren();
+  for (const view of current?.smartViews || []) smart.append(option(view.id, msg(view.labelKey || "", view.fallback || view.id)));
+  smart.value = current?.smartView || "all";
+  const group = $("saved-view-group");
+  group.replaceChildren(option("", "—"), ...(current?.groups || []).map(item => option(item.id, item.name)));
+  const caseSelect = $("saved-view-case");
+  caseSelect.replaceChildren(option("", "—"), ...(current?.cases || []).map(item => option(item.id, item.name)));
+  $("saved-view-name").value = "";
+  $("saved-view-priority").value = "";
+  $("saved-view-response").value = "";
+  $("saved-view-checklist").value = "";
+  $("saved-view-dialog").showModal(); $("saved-view-name").focus();
+}
+
+function commandDefinitions() {
+  return [
+    {label: msg("viewToday", "Aujourd’hui"), run: () => { current.view="today"; current.savedViewId=""; return load({silent:true}); }},
+    {label: msg("viewList", "Liste"), run: () => { current.view="list"; current.savedViewId=""; return load({silent:true}); }},
+    {label: msg("viewKanban", "Kanban"), run: () => { current.view="kanban"; current.savedViewId=""; return load({silent:true}); }},
+    {label: msg("viewReview", "Revue"), run: () => { current.view="review"; current.savedViewId=""; return load({silent:true}); }},
+    {label: msg("searchPins", "Rechercher"), run: () => $("search").focus()},
+    {label: msg("saveCurrentView", "Enregistrer la vue"), run: openSavedViewDialog},
+    configuration?.settings?.enableThunderbirdTagSync ? {label: msg("syncTags", "Synchroniser les tags"), run: async () => { const result=await api.pinInbox.syncTags([]); setStatus(msg("tagSyncComplete", "Tags synchronisés : $1 message(s), $2 erreur(s).").replace("$1",result.synced||0).replace("$2",result.errors||0), result.errors ? "error" : "success"); }} : null,
+    {label: msg("settings", "Paramètres"), run: () => api.runtime.openOptionsPage()}
+  ].filter(Boolean);
+}
+
+async function runCommand(command) {
+  if (!command) return;
+  $("command-palette").close();
+  try { await command.run(); }
+  catch (error) { setStatus(failureMessage("actionFailed", "Action impossible", error), "error", {persistent: true}); }
+}
+
+function renderCommands(query = "") {
+  const host = $("command-list"); host.replaceChildren();
+  const normalized = String(query || "").trim().toLocaleLowerCase();
+  for (const command of commandDefinitions().filter(item => !normalized || item.label.toLocaleLowerCase().includes(normalized))) {
+    const button = node("button", "command-item", command.label);
+    button.type = "button";
+    button.addEventListener("click", () => runCommand(command));
+    host.append(button);
+  }
+}
+
+function openCommandPalette() {
+  const dialog = $("command-palette");
+  $("command-search").value = "";
+  renderCommands();
+  if (!dialog.open) dialog.showModal();
+  $("command-search").focus();
 }
 
 
@@ -476,8 +582,10 @@ function renderKanban() {
 function renderCases() {
   const host = $("cases");
   host.replaceChildren();
-  if (!current.cases?.length) { host.append(createEmpty(msg("noCases", "Aucune affaire."))); return; }
-  for (const caseItem of current.cases) {
+  const search = String(current?.search || "").trim().toLocaleLowerCase();
+  const cases = (current.cases || []).filter(caseItem => !search || [caseItem.name, caseItem.note, caseItem.status].filter(Boolean).join(" ").toLocaleLowerCase().includes(search));
+  if (!cases.length) { host.append(createEmpty(search ? msg("noPinsForFilters", "Aucun élément ne correspond à cette recherche.") : msg("noCases", "Aucune affaire."))); return; }
+  for (const caseItem of cases) {
     const refs = (current.items || []).filter(item => item.caseId === caseItem.id);
     const card = node("article", "case-card");
     card.style.setProperty("--case-color", caseItem.color || "var(--accent)");
@@ -597,6 +705,7 @@ function render() {
   renderStats();
   renderReminderCenter();
   renderSmartViews();
+  renderSavedViews();
   populateBulkControls();
   renderToday();
   renderList();
@@ -616,10 +725,11 @@ async function load({silent = false} = {}) {
   try {
     if (!configuration) configuration = await api.pinInbox.getConfiguration();
     const options = {
-      search: $("search").value.trim(),
+      search: current ? $("search").value.trim() : undefined,
       smartView: current?.smartView || configuration.settings?.defaultSmartView || "today",
       view: current?.view || "today",
       reviewMode: current?.reviewMode || "daily",
+      savedViewId: current ? (current.savedViewId || "") : undefined,
       useSmartView: true
     };
     const [data, calendarList] = await Promise.all([
@@ -768,19 +878,49 @@ function bindEvents() {
   $("retry").addEventListener("click", () => load());
   $("refresh").addEventListener("click", () => load());
   $("settings").addEventListener("click", () => api.runtime.openOptionsPage());
+  $("commands").addEventListener("click", openCommandPalette);
+  $("command-close").addEventListener("click", () => $("command-palette").close());
+  $("command-search").addEventListener("input", event => renderCommands(event.currentTarget.value));
+  $("command-search").addEventListener("keydown", event => {
+    const commands = [...$("command-list").querySelectorAll(".command-item")];
+    if (event.key === "ArrowDown" && commands.length) { event.preventDefault(); commands[0].focus(); }
+    else if (event.key === "Enter" && commands.length) { event.preventDefault(); commands[0].click(); }
+  });
+  $("command-list").addEventListener("keydown", event => {
+    const commands = [...$("command-list").querySelectorAll(".command-item")];
+    const index = commands.indexOf(document.activeElement);
+    if (event.key === "ArrowDown" && commands.length) { event.preventDefault(); commands[(index + 1 + commands.length) % commands.length].focus(); }
+    else if (event.key === "ArrowUp" && commands.length) { event.preventDefault(); if (index <= 0) $("command-search").focus(); else commands[index - 1].focus(); }
+  });
+  document.addEventListener("keydown", event => { if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") { event.preventDefault(); openCommandPalette(); } });
+  $("save-current-view").addEventListener("click", openSavedViewDialog);
+  $("saved-views").addEventListener("click", async event => {
+    const apply = eventElement(event)?.closest("[data-saved-view]");
+    const remove = eventElement(event)?.closest("[data-delete-saved-view]");
+    if (remove) { await api.pinInbox.deleteSavedView(remove.dataset.deleteSavedView); if (current?.savedViewId === remove.dataset.deleteSavedView) current.savedViewId = ""; await load({silent:true}); return; }
+    if (!apply || !current) return;
+    const view = (current.savedViews || []).find(item => item.id === apply.dataset.savedView); if (!view) return;
+    current.savedViewId = view.id; current.smartView = view.smartView || "all"; $("search").value = view.search || ""; await load({silent:true});
+  });
+  $("saved-view-dialog").addEventListener("close", async () => {
+    if ($("saved-view-dialog").returnValue !== "default") return;
+    const name = $("saved-view-name").value.trim(); if (!name) return;
+    const created = await api.pinInbox.createSavedView({name,smartView:$("saved-view-smart").value || "all",search:$("search").value.trim(),groupId:$("saved-view-group").value,caseId:$("saved-view-case").value,priority:$("saved-view-priority").value,responseState:$("saved-view-response").value,checklist:$("saved-view-checklist").value});
+    if (current) current.savedViewId = created.id; await load({silent:true});
+  });
   $("search").addEventListener("input", () => {
     clearTimeout(searchTimer);
     searchTimer = setTimeout(() => load({silent: true}), 220);
   });
   $("clear-filters").addEventListener("click", () => {
     $("search").value = "";
-    if (current) current.smartView = "all";
+    if (current) { current.smartView = "all"; current.savedViewId = ""; }
     load({silent: true});
   });
   $("smart-views").addEventListener("click", event => {
     const button = eventElement(event)?.closest("[data-smart-view]");
     if (!button || !current) return;
-    current.smartView = button.dataset.smartView;
+    current.smartView = button.dataset.smartView; current.savedViewId = "";
     load({silent: true});
   });
   $("select-visible").addEventListener("click", () => { for (const item of current?.items || []) selected.add(item.stableKey); updateSelectionBar(); });
@@ -884,4 +1024,5 @@ window.addEventListener("DOMContentLoaded", async () => {
   $("app-version").textContent = `v${api.runtime.getManifest().version}`;
   bindEvents();
   await load();
+  if (new URLSearchParams(location.search).get("palette") === "1") openCommandPalette();
 });

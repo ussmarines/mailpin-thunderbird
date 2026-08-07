@@ -1,6 +1,19 @@
-# Plan de test manuel MailPerch 1.1.2
+# Plan de test manuel MailPerch 1.2.0
 
 Utiliser exclusivement un profil Thunderbird jetable avec des messages synthétiques. Ne jamais tester sur le profil réel.
+
+## Priorité — fonctions 1.2.0
+
+1. **Notes/checklists** : ouvrir une épingle message puis conversation, saisir une note longue raisonnable, ajouter/cocher/décocher/supprimer des sous-tâches, fermer/réouvrir Thunderbird et confirmer la persistance.
+2. **Recherche globale** : retrouver une épingle par objet, auteur, note, sous-tâche, groupe, affaire et tag ; confirmer qu’aucun résultat ne dépend du corps du message.
+3. **Tags Thunderbird** : activer la synchronisation, vérifier les tags `MailPerch / …`, changer statut/priorité/relance et confirmer la mise à jour. Créer auparavant un tag personnel et confirmer qu’il reste intact. Désactiver ensuite la synchronisation et vérifier que seuls les tags MailPerch possédés sont retirés.
+4. **Agenda bidirectionnel** : créer une tâche puis un événement dans un calendrier explicitement choisi ; modifier échéance/état dans MailPerch puis dans Agenda et confirmer les deux sens. Refaire au minimum avec un calendrier local et chaque fournisseur réellement annoncé.
+5. **Palette de commandes** : ouvrir depuis le bouton du dashboard, `Ctrl/Cmd+K` dans le dashboard et le raccourci Thunderbird configuré ; tester navigation clavier, Entrée et Échap.
+6. **Vues enregistrées** : enregistrer une vue combinant recherche, vue intelligente, groupe/affaire, priorité, état de réponse ou checklist ; recharger Thunderbird, appliquer puis supprimer la vue.
+7. **J’attends / Je dois répondre** : envoyer/répondre avec messages synthétiques contrôlés et confirmer que l’indicateur suit l’ordre réel des derniers messages entrants/sortants.
+8. **Statistiques** : contrôler manuellement les compteurs de réponses, sous-tâches, éléments terminés sur 7 jours et âges moyens sur un jeu de données connu.
+9. **Interface** : Options et dashboard en clair/sombre, largeurs étroites et zoom 100/125/200 % ; aucun texte ne doit être visuellement inférieur à 12 px, chevaucher un bouton ou perdre son alignement.
+10. **Migration** : installer 1.1.2 avec des données synthétiques, exporter une sauvegarde, mettre à jour vers 1.2.0 et confirmer pins, notes, groupes, affaires, règles et Agenda avant/après redémarrage.
 
 ## Priorité — correctif responsive MP-2026-019
 

@@ -630,6 +630,78 @@
         "type": "function",
         "async": true,
         "parameters": []
+      },
+      {
+        "name": "updateReferenceDetails",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "stableKey",
+            "type": "string",
+            "maxLength": 8192
+          },
+          {
+            "name": "details",
+            "$ref": "ReferenceDetails"
+          }
+        ]
+      },
+      {
+        "name": "createSavedView",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "details",
+            "$ref": "SavedViewDetails"
+          }
+        ]
+      },
+      {
+        "name": "updateSavedView",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "viewId",
+            "type": "string",
+            "maxLength": 80
+          },
+          {
+            "name": "details",
+            "$ref": "SavedViewDetails"
+          }
+        ]
+      },
+      {
+        "name": "deleteSavedView",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "viewId",
+            "type": "string",
+            "maxLength": 80
+          }
+        ]
+      },
+      {
+        "name": "syncTags",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "stableKeys",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 8192
+            },
+            "optional": true,
+            "maxItems": 500
+          }
+        ]
       }
     ],
     "events": [
@@ -775,6 +847,11 @@
             "type": "string",
             "optional": true,
             "maxLength": 32
+          },
+          "savedViewId": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 80
           }
         }
       },
@@ -814,7 +891,7 @@
           "note": {
             "type": "string",
             "optional": true,
-            "maxLength": 1200
+            "maxLength": 4000
           },
           "dueAt": {
             "type": "number",
@@ -988,7 +1065,7 @@
           "note": {
             "type": "string",
             "optional": true,
-            "maxLength": 1200
+            "maxLength": 4000
           },
           "dueAt": {
             "type": "number",
@@ -1118,6 +1195,98 @@
           "keepWaiting": {
             "type": "boolean",
             "optional": true
+          }
+        }
+      },
+      {
+        "id": "ChecklistItem",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 80
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "completed": {
+            "type": "boolean",
+            "optional": true
+          },
+          "createdAt": {
+            "type": "number",
+            "optional": true
+          },
+          "completedAt": {
+            "type": "number",
+            "optional": true
+          }
+        }
+      },
+      {
+        "id": "ReferenceDetails",
+        "type": "object",
+        "properties": {
+          "note": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 4000
+          },
+          "checklist": {
+            "type": "array",
+            "items": {
+              "$ref": "ChecklistItem"
+            },
+            "optional": true,
+            "maxItems": 50
+          }
+        }
+      },
+      {
+        "id": "SavedViewDetails",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 100
+          },
+          "smartView": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 32
+          },
+          "search": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 500
+          },
+          "groupId": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 48
+          },
+          "caseId": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 64
+          },
+          "priority": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 16
+          },
+          "responseState": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 32
+          },
+          "checklist": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 16
           }
         }
       }

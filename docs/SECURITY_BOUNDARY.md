@@ -86,4 +86,14 @@ Les exports téléchargés manuellement par l’utilisateur ne sont pas suivis e
 - aucun secret ne doit être nécessaire au fonctionnement ;
 - toute action automatique importée doit rester désactivée jusqu’à validation ;
 - toute nouvelle donnée persistante doit être incluse dans la purge de désinstallation ;
-- les tests de sécurité 3.2.4 et les contrôles de release 1.1.2 doivent rester verts.
+- les tests de sécurité 3.2.4 et les contrôles de release 1.2.0 doivent rester verts.
+
+## Extension de frontière 1.2 — tags, vues et checklists
+
+- `updateReferenceDetails` accepte uniquement note/checklist, avec objet borné, note ≤ 4 000 caractères, checklist ≤ 50 éléments et texte ≤ 240 caractères.
+- Les vues enregistrées sont limitées à 30 et n’acceptent que des critères fermés et bornés.
+- La recherche globale n’accède pas au corps du message ni au contenu des pièces jointes.
+- La synchronisation de tags n’ajoute aucune permission WebExtension. Elle passe par l’Experiment déjà privilégié, avec un ensemble fermé de clés `mailperch-*`.
+- Une clé existante portant un autre libellé est une collision bloquante ; MailPerch ne la renomme pas, ne l’adopte pas et ne la supprime pas.
+- À la désactivation ou désinstallation, les mots-clés sont retirés des messages avant la suppression des seules définitions de tags reconnues comme possédées.
+- Les états **J’attends / Je dois répondre** sont dérivés d’horodatages locaux et ne déclenchent ni envoi ni appel réseau.

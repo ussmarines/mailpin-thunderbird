@@ -14,7 +14,7 @@
   }
 
   const DEFAULTS = deepFreeze({
-    schemaVersion: 6,
+    schemaVersion: 7,
     pinMode: "independent",
     panelScope: "currentInbox",
     sortMode: "manual",
@@ -79,6 +79,7 @@
     compatibilityMode: "auto",
     enablePerformanceMetrics: true,
     enableBidirectionalCalendarSync: false,
+    enableThunderbirdTagSync: false,
     calendarDeleteOnUnpin: false,
     calendarCompleteOnPinComplete: false,
     enableWaitingWorkflow: false,
@@ -212,7 +213,7 @@
       "autoCompleteOnArchive", "autoUnpinOnDelete", "autoUnpinOnRead",
       "autoUnpinOnReply", "moveToWaitingOnReply", "keepPinOnMove",
       "enableCalendarIntegration", "enableGlobalDashboard", "enablePerformanceMetrics",
-      "enableBidirectionalCalendarSync", "calendarDeleteOnUnpin",
+      "enableBidirectionalCalendarSync", "enableThunderbirdTagSync", "calendarDeleteOnUnpin",
       "calendarCompleteOnPinComplete", "enableWaitingWorkflow",
       "reopenOnConversationReply", "enableCases", "enableKanban",
       "enableRecurringFollowUps", "enableTemplates", "enableHistory",
@@ -248,7 +249,7 @@
     settings.preferredCalendarId = String(source.preferredCalendarId || "").slice(0, 256);
     settings.backupDirectory = String(source.backupDirectory || "").slice(0, 2048);
     settings.showFolderBadge = false;
-    settings.schemaVersion = 6;
+    settings.schemaVersion = 7;
     return settings;
   }
 
@@ -269,7 +270,7 @@
   }
 
   scope.PinSettings = Object.freeze({
-    SCHEMA_VERSION: 6,
+    SCHEMA_VERSION: 7,
     MIGRATION_STRATEGY,
     DEFAULTS,
     defaults: () => clone(DEFAULTS),

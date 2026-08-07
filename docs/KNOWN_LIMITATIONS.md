@@ -24,3 +24,10 @@
 ## Validation des correctifs récents
 
 MP-2026-004, MP-2026-005, MP-2026-007, MP-2026-008 et MP-2026-017 ont été validés dans Thunderbird 153.0.1 avec des profils jetables. MP-2026-010 reste à valider avec un calendrier synthétique ; MP-2026-011 conserve la matrice Thunderbird 128–153 et le zoom 200 % comme validations réelles restantes.
+
+## Validation 1.2.0 restant à faire dans Thunderbird réel
+
+- Les nouvelles checklists, vues enregistrées, recherche étendue, palette de commandes, indicateurs de réponse et statistiques sont couvertes par les tests statiques/modèles, mais leur validation graphique finale doit être faite dans Thunderbird réel.
+- La synchronisation de tags s’appuie sur les API internes Thunderbird actuelles et n’élargit pas les permissions ; elle doit encore être observée dans Thunderbird 128–153, y compris sur conversations et dossiers virtuels.
+- La synchronisation Agenda bidirectionnelle dépend des capacités et comportements des fournisseurs ; un calendrier local et chaque fournisseur annoncé doivent être testés manuellement.
+- Le plancher CSS de 12 px est contrôlé automatiquement, mais le rendu effectif à zoom 200 %, polices système différentes et thèmes de contraste élevé doit être observé manuellement.

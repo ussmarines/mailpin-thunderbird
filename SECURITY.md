@@ -2,8 +2,7 @@
 
 ## Signaler une vulnérabilité
 
-Ne pas ouvrir publiquement une vulnérabilité exploitable tant que le dépôt est
-privé ou que le correctif n’est pas disponible. Envoyer au propriétaire :
+Ne pas ouvrir publiquement une vulnérabilité exploitable avant qu’un correctif ne soit disponible. Lorsque le dépôt public propose le signalement privé de vulnérabilité GitHub, utiliser ce canal en priorité ; sinon contacter le propriétaire par un canal privé approprié. Fournir :
 version, Thunderbird/OS, étapes, impact, journaux expurgés et éventuel correctif.
 Ne jamais joindre de messages, profil ou base utilisateur non expurgés.
 
@@ -29,7 +28,8 @@ SQLite et Agenda. Voir [docs/SECURITY_BOUNDARY.md](docs/SECURITY_BOUNDARY.md).
 - fermeture du stockage avant purge complète lors de la désinstallation ;
 - sentinelle d’installation effacée par le stockage natif Gecko afin qu’une réinstallation purge les résidus avant toute initialisation ;
 - tests interdisant les compteurs natifs parallèles et les rôles admin client ;
-- CI sans installation Python tierce, actions GitHub épinglées par SHA et identifiants de checkout non persistés.
+- CI sans installation Python tierce, actions GitHub épinglées par SHA et identifiants de checkout non persistés ;
+- synchronisation tags facultative, sans permission supplémentaire, avec propriété stricte clé+libellé et nettoyage limité aux tags MailPerch.
 
 ## Inspecteur Thunderbird
 
@@ -49,7 +49,7 @@ npm run build
 npm run ci
 ```
 
-Le rapport courant est [SECURITY_AUDIT_1.1.1.md](SECURITY_AUDIT_1.1.1.md).
+Le rapport courant est [SECURITY_AUDIT_1.2.0.md](SECURITY_AUDIT_1.2.0.md).
 
 ## Limite importante
 

@@ -35,7 +35,7 @@
 
     if (!data) errors.push("missing-data");
     if (!SUPPORTED_FORMATS.has(format)) errors.push("unsupported-format");
-    if (!Number.isFinite(version) || version < 1 || version > 6) errors.push("unsupported-version");
+    if (!Number.isFinite(version) || version < 1 || version > 7) errors.push("unsupported-version");
 
     const refEntries = safeObject(data?.refs) ? Object.entries(data.refs) : [];
     if (data && !safeObject(data.refs)) errors.push("invalid-refs");
@@ -43,7 +43,7 @@
     const unsafeKeys = refEntries.filter(([key]) => !safeKey(key)).map(([key]) => key).slice(0, 20);
     if (unsafeKeys.length) errors.push("unsafe-reference-keys");
 
-    for (const name of ["groups", "rules", "cases", "templates", "history", "ruleLog", "activity"]) {
+    for (const name of ["groups", "rules", "cases", "templates", "savedViews", "history", "ruleLog", "activity"]) {
       if (data?.[name] !== undefined && !Array.isArray(data[name])) errors.push(`invalid-${name}`);
       if (countList(data, name) > MAX_IMPORT_LIST) errors.push(`too-many-${name}`);
     }
@@ -54,7 +54,7 @@
       .filter(key => safeKey(key) && Object.prototype.hasOwnProperty.call(currentRefs, key));
     const incomingNewer = conflictKeys.filter(key => Number(data.refs[key]?.updatedAt || 0) > Number(currentRefs[key]?.updatedAt || 0)).length;
     const currentNewer = conflictKeys.length - incomingNewer;
-    if (version < 6) warnings.push("migration-required");
+    if (version < 7) warnings.push("migration-required");
     if (conflictKeys.length) warnings.push("identifier-conflicts");
 
     return {
@@ -70,6 +70,7 @@
         rules: countList(data, "rules"),
         cases: countList(data, "cases"),
         templates: countList(data, "templates"),
+        savedViews: countList(data, "savedViews"),
         history: countList(data, "history")
       },
       current: {refs: Object.keys(currentRefs).length},
@@ -109,7 +110,7 @@
   function merge(current = {}, incoming = {}) {
     const merged = JSON.parse(JSON.stringify(current || {}));
     merged.refs = mergeRecord(current.refs, incoming.refs);
-    for (const name of ["groups", "rules", "cases", "templates", "history", "ruleLog", "activity"]) {
+    for (const name of ["groups", "rules", "cases", "templates", "savedViews", "history", "ruleLog", "activity"]) {
       merged[name] = mergeList(current[name], incoming[name]);
     }
     merged.manualOrder = [...new Set([...(current.manualOrder || []), ...(incoming.manualOrder || [])].map(String).filter(safeKey))]
@@ -120,7 +121,7 @@
     merged.panelVisibleByInbox = {...(current.panelVisibleByInbox || {}), ...(incoming.panelVisibleByInbox || {})};
     merged.dashboard = {...(current.dashboard || {}), ...(incoming.dashboard || {})};
     merged.providerMatrix = incoming.providerMatrix || current.providerMatrix || {checkedAt: 0, accounts: [], providers: [], calendars: []};
-    merged.schemaVersion = Math.max(6, Number(current.schemaVersion) || 0, Number(incoming.schemaVersion) || 0);
+    merged.schemaVersion = Math.max(7, Number(current.schemaVersion) || 0, Number(incoming.schemaVersion) || 0);
     return merged;
   }
 

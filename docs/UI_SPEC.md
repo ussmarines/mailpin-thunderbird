@@ -5,9 +5,10 @@
 - présenter d’abord les actions et informations utiles ;
 - regrouper les réglages par besoin utilisateur plutôt que par détail technique ;
 - réserver les options avancées aux groupes repliables ;
-- laisser de l’espace entre les blocs, avec une hiérarchie typographique nette ;
+- laisser de l’espace entre textes, boutons, cases et blocs, avec une hiérarchie typographique nette et des alignements cohérents ;
 - afficher le résultat près de l’action et dans un toast non bloquant ;
-- conserver le clavier, le zoom 200 %, les thèmes sombre/clair et le contraste élevé.
+- conserver le clavier, le zoom 200 %, les thèmes sombre/clair et le contraste élevé ;
+- utiliser uniquement des polices locales et garantir un plancher de 12 px à tout texte explicite ou hérité via `<small>`.
 
 ## Panneau
 
@@ -60,7 +61,10 @@
 ## Dashboard
 
 - thèmes clair/sombre/contraste élevé et réduction de mouvement ;
-- liste, vues intelligentes, Kanban, affaires, historique et centre de santé ;
+- liste, vues intelligentes, vues enregistrées, Kanban, affaires, historique et centre de santé ;
+- palette de commandes accessible au bouton, au clavier dans le dashboard et via la commande Thunderbird ;
+- recherche globale sur métadonnées, notes, sous-tâches, tags, groupes et affaires ;
+- cartes capables d’afficher progression de checklist et état **J’attends / Je dois répondre** sans surcharger le contenu ;
 - sélection multiple et options contextuelles pour les actions groupées ;
 - diagnostic exportable, matrice fournisseurs et réparations sûres ;
 - état de chargement, erreurs réessayables et mise en page utilisable à largeur réduite.
@@ -88,3 +92,7 @@
 - boutons associés au formulaire par l’attribut `form` ;
 - Enregistrer = `submit`, Annuler = `reset` intercepté pour recharger les valeurs persistées ;
 - état occupé et erreurs affichés sans bloquer le reste de la lecture.
+
+## Typographie Fluent 2
+
+Options et dashboard utilisent la pile locale `Segoe UI Variable Text`, `Segoe UI Variable`, `Aptos`, `Segoe UI`, puis les polices système. Aucune police n’est téléchargée. Le corps courant est 14 px / 20 px et aucun `font-size` explicite ne peut descendre sous 12 px. Les grilles de statistiques utilisent `auto-fit` afin d’éviter les colonnes compressées aux petites largeurs.

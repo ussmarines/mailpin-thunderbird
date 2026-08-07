@@ -1,24 +1,26 @@
 # Mémoire opérationnelle — MailPerch
 
-> Version publique : **1.1.2**
-> Branche de référence : `main`
-> Correctif source : `ac74f188adf9832d2e164a73d418a9e47967bfcd`
+> Version publique : **1.2.0**
+> Branche de développement 1.2 : `feature/mailperch-1.2.0`
+> Base GitHub : `main` au commit `2ba053932a820792986b12cb3216e4ecbef68a42`
 > Extension ID : `pin-mails@MailPerch.local`
 
 ## Résumé
 
-MailPerch est une extension Thunderbird Manifest V3 locale qui ajoute un panneau de messages épinglés, des suivis, rappels, vues Aujourd’hui/Revue, groupes, affaires, règles, Agenda et un dashboard. La version 1.1.2 corrige le vide responsive du panneau et la bande orange d’un centre de rappels vide.
+MailPerch est une extension Thunderbird Manifest V3 locale qui ajoute un panneau de messages épinglés et transforme ces épingles en suivis actionnables sans remplacer la liste native. La version 1.2.0 ajoute checklists, recherche globale, tags MailPerch facultatifs, vues enregistrées, palette de commandes, états **J’attends / Je dois répondre**, statistiques enrichies et consolide la synchronisation bidirectionnelle Agenda.
 
 ## Invariants non négociables
 
-1. Aucun appel réseau, aucune télémétrie, publicité ou ressource distante.
+1. Aucun appel réseau, aucune télémétrie, publicité, CDN, police distante ou code distant.
 2. Ne jamais modifier indirectement les compteurs natifs ou l’état lu lors d’un épinglage.
-3. Ne jamais stocker le corps complet des messages ni les pièces jointes.
-4. Toute entrée de l’Experiment est bornée et normalisée.
+3. Ne jamais stocker le corps complet des messages ni le contenu des pièces jointes.
+4. Toute entrée de l’Experiment est bornée, normalisée et revalidée côté privilégié.
 5. SQLite reste transactionnel, incrémental et sérialisé.
-6. Les ressources injectées, observateurs et timers sont nettoyés.
+6. Les ressources injectées, observateurs, timers et données gérées sont nettoyés selon leur cycle de vie.
 7. Les actions destructives restent confirmées et les imports automatisés sont neutralisés.
-8. L’identité publique reste `ussmarines`; aucune donnée personnelle ne doit être réintroduite.
+8. Les tags personnels Thunderbird ne doivent jamais être renommés ou supprimés ; seuls les tags possédés par MailPerch, reconnus par clé **et** libellé exacts, peuvent être gérés.
+9. L’identité publique reste `ussmarines`; aucune donnée personnelle ou secrète ne doit être réintroduite.
+10. Aucune permission WebExtension supplémentaire n’est ajoutée sans justification documentée et testée.
 
 ## Carte complète des fichiers
 
@@ -35,17 +37,24 @@ MailPerch est une extension Thunderbird Manifest V3 locale qui ajoute un panneau
 
 ## Où modifier quoi
 
-- panneau, menus natifs et cycle Thunderbird : `extension/api/pinInbox/implementation.js`
+- panneau, menus natifs, tags et cycle Thunderbird : `extension/api/pinInbox/implementation.js`
+- logique métier pure : `extension/api/pinInbox/modules/` (`analytics.js`, `checklists.js`, `saved-views.js`, `tag-sync.js` et modules historiques)
 - apparence du panneau : `extension/styles/pin.css` et `extension/styles/tokens.css`
-- logique métier pure : `extension/api/pinInbox/modules/`
 - paramètres : `extension/options/`
-- dashboard : `extension/dashboard/`
+- dashboard, recherche, vues et palette : `extension/dashboard/`
 - build et validation : `scripts/`, `tests/`, `.github/workflows/`
 - publication et reviewers : `release/`, `STORE_RELEASE.md`, `docs/ATN_RELEASE_CHECKLIST.md`
 
-## État 1.1.2
+## État 1.2.0
 
-Le correctif responsive neutralise la base flexible de la recherche quand la barre d’outils passe en colonne, étend le sélecteur de vue à la largeur disponible et impose `display: none` au centre de rappels portant `hidden`. La garde se trouve dans `tests/test_ui_regressions.py`. La validation graphique finale dans Thunderbird réel reste suivie sous `MP-2026-019`.
+- schéma SQLite : 5 ; schéma paramètres/données : 7 ;
+- compatibilité déclarée : Thunderbird 128.0 à 153.* ;
+- permission WebExtension : `menus` uniquement ;
+- notes : 4 000 caractères maximum ; checklist : 50 éléments de 240 caractères maximum ; vues enregistrées : 30 maximum ;
+- recherche globale limitée aux métadonnées MailPerch/Thunderbird déjà accessibles, jamais au corps ou aux pièces jointes ;
+- synchronisation tags désactivée par défaut et limitée aux tags `mailperch-*` dont le libellé attendu correspond exactement ;
+- synchronisation Agenda bidirectionnelle toujours dépendante des capacités du fournisseur et doit être validée dans Thunderbird réel ;
+- interface Options/dashboard basée sur des polices système locales et un plancher typographique de 12 px.
 
 ## Commandes obligatoires
 
@@ -59,8 +68,9 @@ npm run ci
 ## Définition de terminé
 
 - working tree propre et versions synchronisées ;
-- tests, scan de secrets et builds reproductibles verts ;
-- README, changelog, état projet, registre et documents reviewer à jour ;
+- tests, scans de secrets et builds reproductibles verts ;
+- README, changelog, état projet, registre, licence et documents reviewer à jour ;
+- aucune permission, URL distante ou dépendance nouvelle non justifiée ;
 - XPI et archive source construits depuis le commit publié ;
 - limites manuelles indiquées honnêtement ;
 - tag et release GitHub correspondant exactement au commit de `main`.

@@ -23,6 +23,7 @@
         <div class="brand-copy"><span class="brand-overline">MailPerch</span><div class="title-line"><h1 data-i18n="dashboardHeading">Tableau de bord</h1><span id="app-version" class="version"></span></div><p data-i18n="dashboardIntro">Retrouvez rapidement ce qui demande votre attention, sans parcourir tous vos dossiers.</p></div>
       </div>
       <div class="header-actions">
+        <button id="commands" type="button" class="button secondary" data-i18n="commandPalette">Commandes</button>
         <button id="settings" type="button" class="button secondary" data-i18n="settings">Paramètres</button>
         <button id="refresh" type="button" class="button primary" data-i18n="refresh">Actualiser</button>
       </div>
@@ -50,6 +51,10 @@
         <section class="smart-section" aria-labelledby="smart-title">
           <div class="sidebar-heading"><h2 id="smart-title" data-i18n="smartViews">Vues intelligentes</h2><button id="clear-filters" type="button" class="text-button" data-i18n="clear">Effacer</button></div>
           <div id="smart-views" class="smart-views"></div>
+        </section>
+        <section class="smart-section" aria-labelledby="saved-views-title">
+          <div class="sidebar-heading"><h2 id="saved-views-title" data-i18n="savedViews">Vues enregistrées</h2><button id="save-current-view" type="button" class="text-button" data-i18n="saveCurrentView">Enregistrer la vue</button></div>
+          <div id="saved-views" class="saved-views"></div>
         </section>
         <section class="sidebar-help">
           <strong data-i18n="dashboardTipTitle">Astuce</strong>
@@ -112,6 +117,28 @@
       <label><span data-i18n="calendarTarget">Calendrier</span><select id="calendar-target"></select></label>
       <footer><button value="cancel" class="button secondary" data-i18n="cancel">Annuler</button><button id="calendar-confirm" value="default" class="button primary" data-i18n="create">Créer</button></footer>
     </form>
+  </dialog>
+
+  <dialog id="saved-view-dialog" class="calendar-dialog compact-dialog">
+    <form method="dialog">
+      <header><div><h2 data-i18n="saveCurrentView">Enregistrer la vue</h2><p data-i18n="savedViews">Vues enregistrées</p></div><button value="cancel" class="icon-button" aria-label="Fermer" data-i18n-aria-label="close">×</button></header>
+      <label><span data-i18n="viewName">Nom de la vue</span><input id="saved-view-name" type="text" maxlength="100" required></label>
+      <label><span data-i18n="smartViews">Vue intelligente</span><select id="saved-view-smart"></select></label>
+      <label><span data-i18n="group">Groupe</span><select id="saved-view-group"><option value="">—</option></select></label>
+      <label><span data-i18n="case">Affaire</span><select id="saved-view-case"><option value="">—</option></select></label>
+      <label><span data-i18n="priority">Priorité</span><select id="saved-view-priority"><option value="">—</option><option value="normal" data-i18n="priorityNormal">Normale</option><option value="high" data-i18n="priorityHigh">Haute</option><option value="urgent" data-i18n="priorityUrgent">Urgente</option></select></label>
+      <label><span data-i18n="responseState">État de réponse</span><select id="saved-view-response"><option value="">—</option><option value="waitingForThem" data-i18n="waitingForThem">J’attends</option><option value="needsReply" data-i18n="needsReply">Je dois répondre</option></select></label>
+      <label><span data-i18n="pendingSubtasks">Sous-tâches en attente</span><select id="saved-view-checklist"><option value="">—</option><option value="pending" data-i18n="pendingSubtasks">Sous-tâches en attente</option><option value="complete" data-i18n="statusComplete">Terminées</option><option value="none" data-i18n="none">Aucune</option></select></label>
+      <footer><button value="cancel" class="button secondary" data-i18n="cancel">Annuler</button><button id="saved-view-confirm" value="default" class="button primary" data-i18n="saveView">Enregistrer</button></footer>
+    </form>
+  </dialog>
+
+  <dialog id="command-palette" class="command-palette">
+    <div class="command-palette-shell">
+      <header><div><h2 data-i18n="commandPalette">Commandes</h2><p data-i18n="commandPaletteHelp">Accédez rapidement aux vues et actions principales.</p></div><button id="command-close" type="button" class="icon-button" aria-label="Fermer" data-i18n-aria-label="close">×</button></header>
+      <label class="search-field"><span class="visually-hidden" data-i18n="commandPalette">Commandes</span><input id="command-search" type="search" autocomplete="off" placeholder="Rechercher une commande…" data-i18n-placeholder="commandPalettePlaceholder"></label>
+      <div id="command-list" class="command-list" role="list" aria-label="Commandes MailPerch" data-i18n-aria-label="commandPalette"></div>
+    </div>
   </dialog>
   <noscript>JavaScript doit être activé pour afficher le tableau de bord.</noscript>
 </body>

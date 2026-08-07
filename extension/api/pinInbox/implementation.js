@@ -27,7 +27,8 @@ const PIN_MODULES = {};
 const MODULE_PATHS = [
   "settings.js", "identity.js", "storage.js", "workflow.js", "rules.js", "calendar.js",
   "smart.js", "bulk.js", "diagnostics.js", "providers.js", "health.js",
-  "migrations.js", "performance.js", "localization.js", "review.js", "related.js"
+  "migrations.js", "performance.js", "localization.js", "review.js", "related.js",
+  "checklists.js", "analytics.js", "saved-views.js", "tag-sync.js"
 ];
 
 const STYLE_SHEET_SERVICE = "@mozilla.org/content/style-sheet-service;1";
@@ -77,7 +78,7 @@ const READY_RETRY_DELAY_MS = 100;
 const DAY_MS = 86_400_000;
 const COLOR_RE = /^#[0-9a-f]{6}$/i;
 const GROUP_ID_RE = /^[a-z0-9_-]{1,48}$/i;
-const MAX_NOTE_LENGTH = 1200;
+const MAX_NOTE_LENGTH = 4000;
 const MAX_GROUPS = 40;
 const MAX_UNDO = 20;
 const RESOLVE_CACHE_MS = 30_000;
@@ -302,7 +303,7 @@ const DEFAULT_COLORS = [
 let DEFAULT_SETTINGS = null;
 
 const DEFAULT_DATA = Object.freeze({
-  schemaVersion: 6,
+  schemaVersion: 7,
   refs: {},
   manualOrder: [],
   groups: [],
@@ -316,9 +317,10 @@ const DEFAULT_DATA = Object.freeze({
   history: [],
   ruleLog: [],
   activity: [],
-  dashboard: {filter: "active", smartView: "today", search: "", view: "today", reviewMode: "daily"},
+  savedViews: [],
+  dashboard: {filter: "active", smartView: "today", savedViewId: "", search: "", view: "today", reviewMode: "daily"},
   providerMatrix: {checkedAt: 0, accounts: [], providers: [], calendars: []},
-  migration: {from: 0, to: 6, completedAt: 0},
+  migration: {from: 0, to: 7, completedAt: 0},
   revision: 0
 });
 
@@ -507,6 +509,7 @@ function hardenImportedConfiguration(settingsValue, dataValue, currentBackupDire
   settings.autoUnpinOnRead = false;
   settings.autoUnpinOnReply = false;
   settings.enableBidirectionalCalendarSync = false;
+  settings.enableThunderbirdTagSync = false;
   settings.calendarDeleteOnUnpin = false;
   settings.calendarCompleteOnPinComplete = false;
   settings.autoCleanup = false;
@@ -708,6 +711,7 @@ function normalizeReference(key, value) {
     accountName: boundedText(value.accountName, 500),
     folderName: boundedText(value.folderName, 500),
     note: String(value.note || "").slice(0, MAX_NOTE_LENGTH),
+    checklist: PIN_MODULES.PinChecklists?.normalize(value.checklist) || [],
     dueAt: Math.max(0, Number(value.dueAt) || 0),
     reminderAt: Math.max(0, Number(value.reminderAt) || 0),
     reminderFiredAt: Math.max(0, Number(value.reminderFiredAt) || 0),
@@ -741,6 +745,8 @@ function normalizeReference(key, value) {
     noReplyStartedAt: Math.max(0, Number(value.noReplyStartedAt) || 0),
     noReplyBaselineMessageId: boundedText(value.noReplyBaselineMessageId, 2048),
     calendarSyncError: boundedText(value.calendarSyncError, 500),
+    tagSyncError: boundedText(value.tagSyncError, 500),
+    tagLastSyncedAt: Math.max(0, Number(value.tagLastSyncedAt) || 0),
     caseId: String(value.caseId || "").slice(0, 64),
     templateId: String(value.templateId || "").slice(0, 64),
     recurrenceRule: ["", "daily", "weekdays", "weekly", "monthly", "quarterly", "yearly"].includes(value.recurrenceRule) ? value.recurrenceRule : "",
@@ -801,6 +807,8 @@ function normalizeData(value) {
     if (ref.templateId && !templateIds.has(ref.templateId)) ref.templateId = "";
   }
 
+  data.savedViews = PIN_MODULES.PinSavedViews?.normalizeList(source.savedViews) || [];
+
   const normalizedHistory = (Array.isArray(source.history) ? source.history : [])
     .map(normalizeHistory).filter(Boolean);
   data.history = uniqueById(normalizedHistory.slice(-MAX_HISTORY), MAX_HISTORY);
@@ -810,22 +818,23 @@ function normalizeData(value) {
   data.activity = (Array.isArray(source.activity) ? source.activity : [])
     .map(normalizeActivity).filter(Boolean).slice(-MAX_ACTIVITY);
   data.dashboard = {
-    filter: ["active", "all", "overdue", "today", "week", "completed", "unread", "waiting", "planned", "noReply", "noDue", "missing", "calendarError", "recentCompleted"].includes(source.dashboard?.filter)
+    filter: ["active", "all", "overdue", "today", "week", "completed", "unread", "waiting", "waitingForThem", "needsReply", "checklistPending", "planned", "noReply", "snoozed", "noDue", "missing", "calendarError", "recentCompleted"].includes(source.dashboard?.filter)
       ? source.dashboard.filter : "active",
-    smartView: ["all", "today", "overdue", "week", "waiting", "noReply", "snoozed", "noDue", "unread", "missing", "calendarError", "recentCompleted"].includes(source.dashboard?.smartView)
+    smartView: ["all", "today", "overdue", "week", "waiting", "waitingForThem", "needsReply", "checklistPending", "planned", "noReply", "snoozed", "noDue", "unread", "missing", "calendarError", "recentCompleted"].includes(source.dashboard?.smartView)
       ? source.dashboard.smartView : "today",
     reviewMode: source.dashboard?.reviewMode === "weekly" ? "weekly" : "daily",
+    savedViewId: data.savedViews.some(item => item.id === source.dashboard?.savedViewId) ? String(source.dashboard.savedViewId) : "",
     search: boundedText(source.dashboard?.search, 500),
     view: ["today", "list", "kanban", "cases", "review", "history", "health"].includes(source.dashboard?.view) ? source.dashboard.view : "today"
   };
   data.providerMatrix = normalizeProviderMatrix(source.providerMatrix);
   data.migration = {
     from: Number(source.migration?.from) || Number(source.schemaVersion) || 1,
-    to: 6,
+    to: 7,
     completedAt: Number(source.migration?.completedAt) || 0
   };
   data.revision = Math.max(0, Number(source.revision) || 0);
-  data.schemaVersion = 6;
+  data.schemaVersion = 7;
   return data;
 }
 
@@ -1315,6 +1324,7 @@ class PinStructuredStore {
         else if (key === "dashboard") data.dashboard = value;
         else if (key === "providerMatrix") data.providerMatrix = value;
         else if (key === "caseOrder") data.caseOrder = Array.isArray(value) ? value.map(String) : [];
+        else if (key === "savedViews") data.savedViews = PIN_MODULES.PinSavedViews?.normalizeList(value) || [];
       }
       for (const row of await this.connection.execute("SELECT payload FROM rules ORDER BY sort_order")) {
         const rule = normalizeRule(JSON.parse(row.getResultByName("payload")), data.rules.length);
@@ -1527,8 +1537,8 @@ class PinStructuredStore {
       data.caseOrder = (data.caseOrder || []).filter(id => data.cases.some(item => item.id === id));
       for (const item of data.cases) if (!data.caseOrder.includes(item.id)) data.caseOrder.push(item.id);
 
-      const states = {manualOrder:data.manualOrder||[],collapsedByInbox:data.collapsedByInbox||{},panelVisibleByInbox:data.panelVisibleByInbox||{},migration:data.migration||{},dashboard:data.dashboard||{},providerMatrix:data.providerMatrix||{},caseOrder:data.caseOrder||[]};
-      const oldStates = {manualOrder:previous.manualOrder||[],collapsedByInbox:previous.collapsedByInbox||{},panelVisibleByInbox:previous.panelVisibleByInbox||{},migration:previous.migration||{},dashboard:previous.dashboard||{},providerMatrix:previous.providerMatrix||{},caseOrder:previous.caseOrder||[]};
+      const states = {manualOrder:data.manualOrder||[],collapsedByInbox:data.collapsedByInbox||{},panelVisibleByInbox:data.panelVisibleByInbox||{},migration:data.migration||{},dashboard:data.dashboard||{},providerMatrix:data.providerMatrix||{},caseOrder:data.caseOrder||[],savedViews:data.savedViews||[]};
+      const oldStates = {manualOrder:previous.manualOrder||[],collapsedByInbox:previous.collapsedByInbox||{},panelVisibleByInbox:previous.panelVisibleByInbox||{},migration:previous.migration||{},dashboard:previous.dashboard||{},providerMatrix:previous.providerMatrix||{},caseOrder:previous.caseOrder||[],savedViews:previous.savedViews||[]};
       for (const [key, value] of Object.entries(states)) if (this._json(value) !== this._json(oldStates[key])) await c.execute("INSERT INTO state_data(key,payload) VALUES(:key,:payload) ON CONFLICT(key) DO UPDATE SET payload=excluded.payload", {key,payload:JSON.stringify(value)});
 
       const oldHistory = Object.fromEntries((previous.history||[]).map(item=>[item.id,item]));
@@ -1803,6 +1813,11 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         getCases: ready(() => clone(this._data.cases || [])),
         getTemplates: ready(() => clone(this._data.templates || [])),
         getHistory: ready(options => this._getHistory(options || {})),
+        updateReferenceDetails: ready((stableKey, details) => this._updateReferenceDetails(stableKey, details || {})),
+        createSavedView: ready(details => this._createSavedView(details || {})),
+        updateSavedView: ready((viewId, details) => this._updateSavedView(viewId, details || {})),
+        deleteSavedView: ready(viewId => this._deleteSavedView(viewId)),
+        syncTags: ready(stableKeys => this._syncTags(stableKeys || [])),
         setWorkflowStatus: ready((stableKeys, status, options) => this._setWorkflowStatus(stableKeys, status, options || {})),
         createCase: ready(details => this._createCase(details || {})),
         updateCase: ready((caseId, details) => this._updateCase(caseId, details || {})),
@@ -1849,7 +1864,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         if (!base || Number(ref.updatedAt || 0) <= Number(base.updatedAt || 0)) ref.updatedAt = now;
       }
     }
-    for (const field of ["groups", "rules", "cases", "templates"]) {
+    for (const field of ["groups", "rules", "cases", "templates", "savedViews"]) {
       const baseById = new Map((previous[field] || []).map(item => [String(item.id || ""), item]));
       for (const item of this._data[field] || []) {
         const base = baseById.get(String(item.id || ""));
@@ -1917,13 +1932,13 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     const oldSettingsVersion = Number(rawSettings?.schemaVersion) || 1;
     const oldDataVersion = Number(rawData?.schemaVersion) || Number(this._data.schemaVersion) || 1;
     const oldVersion = Math.min(oldSettingsVersion, oldDataVersion);
-    if (oldVersion < 6 || Number(this._data.migration?.to) < 6) {
+    if (oldVersion < 7 || Number(this._data.migration?.to) < 7) {
       const hasUserData = Object.keys(this._data.refs || {}).length || (this._data.groups || []).length || (this._data.rules || []).length || (this._data.cases || []).length;
       if (hasUserData && this._storage?.available) {
         try {
-          await this._storage.createFileBackup(clone(this._data), clone(this._undoStack), `before-migration-${oldVersion}-to-6`);
+          await this._storage.createFileBackup(clone(this._data), clone(this._undoStack), `before-migration-${oldVersion}-to-7`);
         } catch (error) {
-          this._recordDiagnostic("error", "Sauvegarde pré-migration impossible", error, {component: "migration", action: `v${oldVersion}-to-v6`});
+          this._recordDiagnostic("error", "Sauvegarde pré-migration impossible", error, {component: "migration", action: `v${oldVersion}-to-v7`});
           throw new ExtensionError(`Migration annulée : la sauvegarde de sécurité n’a pas pu être créée (${error?.message || error}).`);
         }
       }
@@ -1939,7 +1954,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
           if (ref.trackingMode === "conversation") ref.conversationKey = PIN_MODULES.PinIdentity.conversationIdentity(hdr, ref.accountKey, formatSubject(hdr));
         }
       }
-      this._data.cases ||= []; this._data.caseOrder ||= []; this._data.templates ||= []; this._data.history ||= []; this._data.ruleLog ||= [];
+      this._data.cases ||= []; this._data.caseOrder ||= []; this._data.templates ||= []; this._data.savedViews ||= []; this._data.history ||= []; this._data.ruleLog ||= [];
       this._data.dashboard = {...(this._data.dashboard || {}), smartView: this._data.dashboard?.smartView || this._settings.defaultSmartView || "today", view: this._data.dashboard?.view || "today"};
       this._data.providerMatrix ||= {checkedAt:0,accounts:[],providers:[],calendars:[]};
       for (const ref of Object.values(this._data.refs || {})) {
@@ -1948,9 +1963,10 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         ref.noReplyStartedAt = Math.max(0, Number(ref.noReplyStartedAt || 0));
         ref.calendarSyncError ||= "";
       }
-      this._data.migration = {from: oldVersion, to: 6, completedAt: Date.now()};
-      this._settings.schemaVersion = 6; this._data.schemaVersion = 6;
-      this._saveSettings(); this._saveData("migration-v6");
+      this._data.savedViews = PIN_MODULES.PinSavedViews?.normalizeList(this._data.savedViews) || [];
+      this._data.migration = {from: oldVersion, to: 7, completedAt: Date.now()};
+      this._settings.schemaVersion = 7; this._data.schemaVersion = 7;
+      this._saveSettings(); this._saveData("migration-v7");
     }
   }
 
@@ -2000,6 +2016,8 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     if (!action) {
       return {undone: false, message: "Aucune action à annuler."};
     }
+    const previousTagSync = Boolean(this._settings.enableThunderbirdTagSync);
+    if (previousTagSync) this._clearManagedTagsForReferences(Object.values(this._data.refs));
     this._data = normalizeData(action.data);
     this._settings = normalizeSettings(action.settings);
     for (const item of action.flags || []) {
@@ -2015,6 +2033,12 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     this._saveSettings();
     this._saveData("undo");
     this._applyRuntimeSettings();
+    if (this._settings.enableThunderbirdTagSync) {
+      try { this._ensureMailPerchTags(); this._syncTags([]).catch(error => this._recordDiagnostic("warning", "Restauration de la synchronisation des tags impossible", error, {component: "tags"})); }
+      catch (error) { this._recordDiagnostic("warning", "Restauration de la synchronisation des tags impossible", error, {component: "tags"}); }
+    } else if (previousTagSync) {
+      this._removeMailPerchTagDefinitions();
+    }
     this._refreshAllStates(true);
     this._showToastAll(`${action.label} annulée.`, false);
     return {undone: true, message: `${action.label} annulée.`};
@@ -2152,7 +2176,9 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
   _getConfiguration() {
-    const broken = Object.values(this._data.refs).filter(ref => ref.missingSince).length;
+    const refs = Object.values(this._data.refs);
+    const now = Date.now();
+    const broken = refs.filter(ref => ref.missingSince).length;
     return {
       settings: clone(this._settings),
       recommendedSettings: PIN_MODULES.PinSettings.defaults(),
@@ -2162,17 +2188,18 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       templates: clone(this._data.templates || []),
       accounts: this._getAccountsMetadata(),
       stats: {
-        pinned: Object.keys(this._data.refs).length,
+        pinned: refs.length,
         broken,
-        unread: Object.values(this._data.refs).filter(ref => {
+        unread: refs.filter(ref => {
           const hdr = this._resolveReference(ref, false);
           return Boolean(hdr && !(hdr.flags & Ci.nsMsgMessageFlags.Read));
         }).length,
-        overdue: Object.values(this._data.refs).filter(ref => !ref.completedAt && ((ref.dueAt && ref.dueAt < Date.now()) || (ref.followUpAt && ref.followUpAt < Date.now()))).length,
-        waiting: Object.values(this._data.refs).filter(ref => ref.workflowStatus === "waiting").length,
-        completed: Object.values(this._data.refs).filter(ref => ref.completedAt || ref.workflowStatus === "completed").length,
+        overdue: refs.filter(ref => !ref.completedAt && ((ref.dueAt && ref.dueAt < now) || (ref.followUpAt && ref.followUpAt < now))).length,
+        waiting: refs.filter(ref => ref.workflowStatus === "waiting").length,
+        completed: refs.filter(ref => ref.completedAt || ref.workflowStatus === "completed").length,
         history: (this._data.history || []).length,
-        undoAvailable: Boolean(this._undoStack?.length)
+        undoAvailable: Boolean(this._undoStack?.length),
+        ...(PIN_MODULES.PinAnalytics?.build(refs, this._data.history || [], now, value => PIN_MODULES.PinChecklists?.stats(value) || {pending: 0}) || {})
       },
       shortcut: "Alt+P",
       rules: clone(this._data.rules || []),
@@ -2192,9 +2219,12 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     }
     this._pushUndo("Modification des paramètres");
     const previousPinMode = this._settings.pinMode;
+    const previousTagSync = Boolean(this._settings.enableThunderbirdTagSync);
     if (configuration.settings) {
       const currentBackupDirectory = this._settings.backupDirectory || "";
-      this._settings = normalizeSettings({...this._settings, ...configuration.settings});
+      const nextSettings = normalizeSettings({...this._settings, ...configuration.settings});
+      if (!previousTagSync && nextSettings.enableThunderbirdTagSync) this._ensureMailPerchTags();
+      this._settings = nextSettings;
       // Arbitrary filesystem paths are not accepted through page JavaScript.
       // Only the native folder picker may update this privileged setting.
       this._settings.backupDirectory = currentBackupDirectory;
@@ -2250,6 +2280,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       this._saveData();
     }
     this._applyRuntimeSettings();
+    await this._applyTagSyncSettingTransition(previousTagSync);
     this._refreshAllStates(true);
     // setConfiguration is an explicit user save boundary. Do not acknowledge
     // success until all queued SQLite writes have completed.
@@ -2260,14 +2291,14 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   _exportConfiguration() {
     return {
       format: "thunderbird-pin-mails",
-      version: 6,
+      version: 7,
       exportedAt: new Date().toISOString(),
       settings: portableSettingsSnapshot(this._settings),
       data: portableDataSnapshot(this._data)
     };
   }
 
-  _importConfiguration(configuration) {
+  async _importConfiguration(configuration) {
     assertStructuredInput(configuration, "Sauvegarde", {maxBytes: MAX_IMPORT_BYTES});
     if (configuration?.format === "pin-mails-backup" &&
         !PIN_MODULES.PinStorageHelpers?.verifyBackupEnvelope(configuration)) {
@@ -2276,7 +2307,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     if (configuration?.format === "pin-mails-backup" && configuration.data) {
       configuration = {
         format: "thunderbird-pin-mails",
-        version: Number(configuration.metadata?.schemaVersion || configuration.data?.schemaVersion || 6),
+        version: Number(configuration.metadata?.schemaVersion || configuration.data?.schemaVersion || 7),
         exportedAt: new Date(configuration.createdAt || Date.now()).toISOString(),
         settings: configuration.metadata?.settings || clone(this._settings),
         data: configuration.data,
@@ -2286,7 +2317,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     if (
       !configuration ||
       configuration.format !== "thunderbird-pin-mails" ||
-      ![1, 2, 3, 4, 5, 6].includes(Number(configuration.version))
+      ![1, 2, 3, 4, 5, 6, 7].includes(Number(configuration.version))
     ) {
       throw new ExtensionError("Ce fichier n’est pas une sauvegarde compatible.");
     }
@@ -2294,11 +2325,14 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     if (serialized.length > MAX_IMPORT_BYTES) throw new ExtensionError("La sauvegarde dépasse la taille maximale autorisée.");
     this._pushUndo("Import de la sauvegarde");
     const importUndoAction = this._undoStack?.at(-1) || null;
+    const previousTagSync = Boolean(this._settings.enableThunderbirdTagSync);
     const hardened = hardenImportedConfiguration(
       configuration.settings,
       configuration.data,
       this._settings.backupDirectory || ""
     );
+    if (previousTagSync) this._clearManagedTagsForReferences(Object.values(this._data.refs));
+    if (hardened.settings.enableThunderbirdTagSync) this._ensureMailPerchTags();
     this._settings = hardened.settings;
     this._data = hardened.data;
     // Undo payloads can contain privileged message operations. They are local
@@ -2306,23 +2340,28 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     this._undoStack = importUndoAction ? [importUndoAction] : [];
     this._data.migration = {
       from: Number(configuration.version) || 1,
-      to: 6,
+      to: 7,
       completedAt: Date.now()
     };
     this._saveSettings();
     this._saveData("import");
     this._applyRuntimeSettings();
+    if (this._settings.enableThunderbirdTagSync) await this._syncTags([]);
+    else if (previousTagSync) this._removeMailPerchTagDefinitions();
     this._refreshAllStates(true);
+    await this._storage?.flush();
     return this._getConfiguration();
   }
 
-  _resetConfiguration() {
+  async _resetConfiguration() {
     this._pushUndo("Réinitialisation des paramètres");
+    const previousTagSync = Boolean(this._settings.enableThunderbirdTagSync);
     this._settings = clone(DEFAULT_SETTINGS);
     this._data.manualOrder = Object.keys(this._data.refs);
     this._data.groups = [];
     this._data.groupOrder = [];
-    this._data.cases = []; this._data.caseOrder = []; this._data.templates = []; this._data.rules = [];
+    this._data.cases = []; this._data.caseOrder = []; this._data.templates = []; this._data.rules = []; this._data.savedViews = [];
+    this._data.dashboard = clone(DEFAULT_DATA.dashboard);
     for (const ref of Object.values(this._data.refs)) {
       ref.groupId = "";
       ref.caseId = "";
@@ -2334,7 +2373,9 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     this._saveSettings();
     this._saveData("reset-configuration");
     this._applyRuntimeSettings();
+    await this._applyTagSyncSettingTransition(previousTagSync);
     this._refreshAllStates(true);
+    await this._storage?.flush();
     return this._getConfiguration();
   }
 
@@ -2429,6 +2470,239 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     return (this._data.history || []).filter(item => (!caseId || item.caseId === caseId) && (!search || sanitizeSearchText([item.subject,item.author,item.accountName,item.action].join(" ")).includes(search))).slice(-limit).reverse();
   }
 
+  _updateReferenceDetails(stableKey, details = {}) {
+    assertStructuredInput(details, "Détails du suivi", {maxBytes: 256 * 1024, maxNodes: 5000});
+    const key = boundedText(stableKey, 8192);
+    const ref = this._data.refs[key];
+    if (!ref) throw new ExtensionError("Épingle introuvable.");
+    this._pushUndo("Modification du suivi");
+    if ("note" in details) ref.note = String(details.note || "").slice(0, MAX_NOTE_LENGTH);
+    if ("checklist" in details) ref.checklist = PIN_MODULES.PinChecklists?.normalize(details.checklist) || [];
+    ref.updatedAt = Date.now();
+    this._recordActivity("details", key, ref.subject);
+    this._saveData("reference-details");
+    this._refreshAllStates(true);
+    if (this._settings.enableBidirectionalCalendarSync && ref.calendarItemId) {
+      this._syncReferenceToCalendar(ref).catch(error => this._recordDiagnostic("warning", "Mise à jour Agenda impossible", error));
+    }
+    if (this._settings.enableThunderbirdTagSync) {
+      this._syncTags([key]).catch(error => this._recordDiagnostic("warning", "Synchronisation des tags impossible", error));
+    }
+    return this._serializeReference(ref, true);
+  }
+
+  _createSavedView(details = {}) {
+    assertStructuredInput(details, "Vue enregistrée", {maxBytes: 64 * 1024, maxNodes: 1000});
+    const views = this._data.savedViews || (this._data.savedViews = []);
+    if (views.length >= (PIN_MODULES.PinSavedViews?.MAX_VIEWS || 30)) throw new ExtensionError("Le nombre maximal de vues enregistrées est atteint.");
+    const now = Date.now();
+    const normalized = PIN_MODULES.PinSavedViews?.normalize({...details, id: uniqueEntityId("view", views), createdAt: now, updatedAt: now}, views.length);
+    if (!normalized) throw new ExtensionError("Donnez un nom valide à la vue.");
+    this._pushUndo("Création d’une vue enregistrée");
+    views.push(normalized);
+    this._data.dashboard = {...(this._data.dashboard || {}), savedViewId: normalized.id};
+    this._saveData("saved-view-create");
+    return clone(normalized);
+  }
+
+  _updateSavedView(viewId, details = {}) {
+    assertStructuredInput(details, "Vue enregistrée", {maxBytes: 64 * 1024, maxNodes: 1000});
+    const index = (this._data.savedViews || []).findIndex(item => item.id === String(viewId || ""));
+    if (index < 0) throw new ExtensionError("Vue enregistrée introuvable.");
+    const current = this._data.savedViews[index];
+    const normalized = PIN_MODULES.PinSavedViews?.normalize({...current, ...details, id: current.id, createdAt: current.createdAt, updatedAt: Date.now()}, index);
+    if (!normalized) throw new ExtensionError("Donnez un nom valide à la vue.");
+    this._pushUndo("Modification d’une vue enregistrée");
+    this._data.savedViews[index] = normalized;
+    this._saveData("saved-view-update");
+    return clone(normalized);
+  }
+
+  _deleteSavedView(viewId) {
+    const id = boundedText(viewId, 80);
+    const index = (this._data.savedViews || []).findIndex(item => item.id === id);
+    if (index < 0) return {deleted: false};
+    this._pushUndo("Suppression d’une vue enregistrée");
+    this._data.savedViews.splice(index, 1);
+    if (this._data.dashboard?.savedViewId === id) this._data.dashboard.savedViewId = "";
+    this._saveData("saved-view-delete");
+    return {deleted: true};
+  }
+
+  _clearManagedTagsForReferences(refs) {
+    let cleared = 0;
+    let errors = 0;
+    for (const ref of refs || []) {
+      try {
+        const result = this._clearReferenceTags(ref);
+        cleared += Number(result.removed) || 0;
+        ref.tagSyncError = "";
+      } catch (error) {
+        errors += 1;
+        ref.tagSyncError = boundedText(error?.message || error, 500);
+        this._recordDiagnostic("warning", "Nettoyage des tags MailPerch impossible", error, {component: "tags", stableKey: ref.stableKey});
+      }
+    }
+    return {cleared, errors};
+  }
+
+  async _applyTagSyncSettingTransition(previousEnabled) {
+    const currentEnabled = Boolean(this._settings.enableThunderbirdTagSync);
+    if (Boolean(previousEnabled) === currentEnabled) return {changed: false};
+    if (currentEnabled) {
+      this._ensureMailPerchTags();
+      return {...(await this._syncTags([])), changed: true, enabled: true};
+    }
+    const {cleared, errors} = this._clearManagedTagsForReferences(Object.values(this._data.refs));
+    const definitionsRemoved = this._removeMailPerchTagDefinitions();
+    this._saveData("tag-sync-disabled");
+    return {changed: true, enabled: false, cleared, errors, definitionsRemoved};
+  }
+
+  _ensureMailPerchTags() {
+    const definitions = PIN_MODULES.PinTagSync?.DEFINITIONS || [];
+    // Validate every reserved key before creating anything. A collision must
+    // leave Thunderbird's tag registry untouched instead of partially adding
+    // MailPerch tags before the conflicting key is reached.
+    for (const definition of definitions) {
+      if (!MailServices.tags.isValidKey(definition.key)) continue;
+      const existing = String(MailServices.tags.getTagForKey(definition.key) || "");
+      if (existing !== definition.label) {
+        throw new ExtensionError(`Le tag Thunderbird « ${definition.key} » existe déjà et n’appartient pas à MailPerch.`);
+      }
+    }
+    for (const definition of definitions) {
+      if (MailServices.tags.isValidKey(definition.key)) {
+        try { if (MailServices.tags.getColorForKey(definition.key) !== definition.color) MailServices.tags.setColorForKey(definition.key, definition.color); } catch {}
+      } else {
+        MailServices.tags.addTagForKey(definition.key, definition.label, definition.color, "");
+      }
+    }
+    return definitions;
+  }
+
+  _ownedMailPerchTagKeys() {
+    const owned = new Set();
+    for (const definition of PIN_MODULES.PinTagSync?.DEFINITIONS || []) {
+      try {
+        if (MailServices.tags.isValidKey(definition.key) && String(MailServices.tags.getTagForKey(definition.key) || "") === definition.label) owned.add(definition.key);
+      } catch {}
+    }
+    return owned;
+  }
+
+  _removeMailPerchTagDefinitions() {
+    let removed = 0;
+    for (const key of this._ownedMailPerchTagKeys()) {
+      try { MailServices.tags.deleteKey(key); removed += 1; } catch (error) { this._recordDiagnostic("warning", "Suppression d’un tag MailPerch impossible", error, {component: "tags", tagKey: key}); }
+    }
+    return removed;
+  }
+
+  _tagHeadersForReference(ref) {
+    const resolved = this._resolveReference(ref, false);
+    if (!resolved?.folder) return [];
+    if (ref?.trackingMode !== "conversation") return [resolved];
+    const headers = this._conversationHeaders(resolved).filter(hdr => hdr?.folder);
+    return headers.length ? headers : [resolved];
+  }
+
+  _batchTagHeaders(headers, operation, keywords) {
+    if (!headers?.length || !keywords) return 0;
+    const byFolder = new Map();
+    for (const hdr of headers) {
+      const folder = hdr?.folder;
+      if (!folder) continue;
+      if (!byFolder.has(folder)) byFolder.set(folder, []);
+      byFolder.get(folder).push(hdr);
+    }
+    let count = 0;
+    for (const [folder, folderHeaders] of byFolder) {
+      if (operation === "add") folder.addKeywordsToMessages(folderHeaders, keywords);
+      else folder.removeKeywordsFromMessages(folderHeaders, keywords);
+      count += folderHeaders.length;
+    }
+    return count;
+  }
+
+  _clearReferenceTags(ref) {
+    const headers = this._tagHeadersForReference(ref);
+    if (!headers.length) return {removed: 0, messages: 0};
+    const managed = this._ownedMailPerchTagKeys();
+    if (!managed.size) return {removed: 0, messages: 0};
+    const byKeywords = new Map();
+    for (const hdr of headers) {
+      let keywords = "";
+      try { keywords = hdr.getStringProperty("keywords") || ""; } catch {}
+      const current = new Set(String(keywords).split(/\s+/).filter(Boolean));
+      const remove = [...managed].filter(key => current.has(key)).sort().join(" ");
+      if (!remove) continue;
+      if (!byKeywords.has(remove)) byKeywords.set(remove, []);
+      byKeywords.get(remove).push(hdr);
+    }
+    let removed = 0;
+    let messages = 0;
+    for (const [keywords, taggedHeaders] of byKeywords) {
+      messages += this._batchTagHeaders(taggedHeaders, "remove", keywords);
+      removed += keywords.split(/\s+/).filter(Boolean).length * taggedHeaders.length;
+    }
+    return {removed, messages};
+  }
+
+  _syncReferenceTags(ref) {
+    if (!this._settings.enableThunderbirdTagSync) return {synced: false, reason: "disabled"};
+    const headers = this._tagHeadersForReference(ref);
+    if (!headers.length) return {synced: false, reason: "missing"};
+    const desired = new Set(PIN_MODULES.PinTagSync?.desiredKeys(ref) || []);
+    const managed = this._ownedMailPerchTagKeys();
+    const addGroups = new Map();
+    const removeGroups = new Map();
+    let added = 0;
+    let removed = 0;
+    for (const hdr of headers) {
+      let keywords = "";
+      try { keywords = hdr.getStringProperty("keywords") || ""; } catch {}
+      const current = new Set(String(keywords).split(/\s+/).filter(Boolean));
+      const add = [...desired].filter(key => !current.has(key)).sort().join(" ");
+      const remove = [...managed].filter(key => current.has(key) && !desired.has(key)).sort().join(" ");
+      if (add) {
+        if (!addGroups.has(add)) addGroups.set(add, []);
+        addGroups.get(add).push(hdr);
+        added += add.split(/\s+/).filter(Boolean).length;
+      }
+      if (remove) {
+        if (!removeGroups.has(remove)) removeGroups.set(remove, []);
+        removeGroups.get(remove).push(hdr);
+        removed += remove.split(/\s+/).filter(Boolean).length;
+      }
+    }
+    for (const [keywords, taggedHeaders] of addGroups) this._batchTagHeaders(taggedHeaders, "add", keywords);
+    for (const [keywords, taggedHeaders] of removeGroups) this._batchTagHeaders(taggedHeaders, "remove", keywords);
+    ref.tagSyncError = "";
+    ref.tagLastSyncedAt = Date.now();
+    return {synced: true, added, removed, messages: headers.length};
+  }
+
+  async _syncTags(stableKeys = []) {
+    const requested = normalizeStableKeyList(stableKeys).slice(0, 500);
+    if (!this._settings.enableThunderbirdTagSync) return {synced: 0, skipped: requested.length || Object.keys(this._data.refs).length, errors: 0, disabled: true};
+    this._ensureMailPerchTags();
+    const refs = (requested.length ? requested : Object.keys(this._data.refs)).map(key => this._data.refs[key]).filter(Boolean);
+    let synced = 0, skipped = 0, errors = 0;
+    for (const ref of refs) {
+      try {
+        const result = this._syncReferenceTags(ref);
+        if (result.synced) synced++; else skipped++;
+      } catch (error) {
+        errors++; ref.tagSyncError = boundedText(error?.message || error, 500);
+        this._recordDiagnostic("warning", "Synchronisation d’un tag impossible", error, {component: "tags", stableKey: ref.stableKey});
+      }
+    }
+    this._saveData("tag-sync");
+    this._refreshAllStates(true);
+    return {synced, skipped, errors, managedTags: clone(PIN_MODULES.PinTagSync?.DEFINITIONS || [])};
+  }
+
   _setWorkflowStatus(stableKeys, status, options = {}) {
     assertStructuredInput(options, "Options de workflow", {maxBytes: 64 * 1024, maxNodes: 1000});
     const allowed = new Set(["active", "waiting", "planned", "completed"]);
@@ -2468,6 +2742,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       if (this._settings.enableBidirectionalCalendarSync && ref.calendarItemId) this._syncReferenceToCalendar(ref).catch(error => this._recordDiagnostic("warning","Synchronisation Agenda impossible",error));
     }
     this._saveData(`workflow-${target}`); this._refreshAllStates(true);
+    if (this._settings.enableThunderbirdTagSync) this._syncTags(refs.map(item => item.stableKey)).catch(error => this._recordDiagnostic("warning", "Synchronisation des tags impossible", error));
     return {count:refs.length,status:target};
   }
 
@@ -2551,6 +2826,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     }
     if (save) this._saveData("template-apply");
     if (refresh) this._refreshAllStates(true);
+    if(this._settings.enableThunderbirdTagSync&&save)this._syncTags(refs.map(ref=>ref.stableKey)).catch(error=>this._recordDiagnostic("warning","Synchronisation des tags impossible",error));
     return {count:refs.length,template:clone(template)};
   }
 
@@ -2661,6 +2937,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     const ref=this._data.refs[stableKey];if(!ref)return false;
     if(archiveAction)this._archiveReferenceHistory(ref,archiveAction);
     if(deleteCalendar&&ref.calendarItemId){this._deleteLinkedCalendarItem(ref).catch(error=>this._recordDiagnostic("warning","Suppression de l’élément Agenda impossible",error));}
+    if(this._settings.enableThunderbirdTagSync){try{this._clearReferenceTags(ref);}catch(error){this._recordDiagnostic("warning","Nettoyage des tags MailPerch impossible",error,{component:"tags",stableKey});}}
     delete this._data.refs[stableKey];this._data.manualOrder=this._data.manualOrder.filter(key=>key!==stableKey);return true;
   }
 
@@ -2797,6 +3074,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     this._refreshAllStates(true);
     this._showToastAll(newState ? `${usable.length} message(s) épinglé(s).` : `${usable.length} message(s) désépinglé(s).`, true);
     this._scheduleCounterRegressionCheck(counterSnapshot, newState ? "pin" : "unpin");
+    if(newState&&this._settings.enableThunderbirdTagSync){const tagKeys=usable.map(hdr=>trackingMode==="conversation"?conversationStableKey(hdr):messageStableKey(hdr));this._syncTags(tagKeys).catch(error=>this._recordDiagnostic("warning","Synchronisation des tags impossible",error));}
     return usable.length;
   }
 
@@ -3285,6 +3563,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     const ref=this._data.refs[stableKey];if(!ref||!patch||typeof patch!=="object")return false;
     this._pushUndo("Modification du message épinglé");const now=Date.now();
     if("note" in patch)ref.note=String(patch.note||"").slice(0,MAX_NOTE_LENGTH);
+    if("checklist" in patch)ref.checklist=PIN_MODULES.PinChecklists?.normalize(patch.checklist)||[];
     if("dueAt" in patch)ref.dueAt=Math.max(0,Number(patch.dueAt)||0);
     if("reminderAt" in patch){ref.reminderAt=Math.max(0,Number(patch.reminderAt)||0);ref.reminderFiredAt=0;}
     if("priorityLevel" in patch&&["normal","high","urgent"].includes(patch.priorityLevel))ref.priorityLevel=patch.priorityLevel;
@@ -3300,6 +3579,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     if("snoozeUntil" in patch){ref.snoozeUntil=Math.max(0,Number(patch.snoozeUntil)||0);ref.reminderFiredAt=0;}
     ref.updatedAt=now;this._recordActivity("metadata",stableKey,ref.subject);this._saveData("metadata");this._refreshAllStates(true);this._showToastAll("Informations du message mises à jour.",true);
     if(this._settings.enableBidirectionalCalendarSync&&ref.calendarItemId)this._syncReferenceToCalendar(ref).catch(error=>this._recordDiagnostic("warning","Mise à jour Agenda impossible",error));
+    if(this._settings.enableThunderbirdTagSync)this._syncTags([stableKey]).catch(error=>this._recordDiagnostic("warning","Synchronisation des tags impossible",error));
     return true;
   }
 
@@ -3504,14 +3784,14 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       if (selectedStrategy === "merge") {
         const incoming = PIN_MODULES.PinMigrations?.sourceFor(configuration) || {};
         const merged = PIN_MODULES.PinMigrations?.merge(this._data, incoming) || incoming;
-        result = this._importConfiguration({
+        result = await this._importConfiguration({
           format: "thunderbird-pin-mails",
-          version: Number(configuration.version || configuration.metadata?.schemaVersion || incoming.schemaVersion || 6),
+          version: Number(configuration.version || configuration.metadata?.schemaVersion || incoming.schemaVersion || 7),
           settings: {...this._settings, ...(configuration.settings || configuration.metadata?.settings || {})},
           data: merged
         });
       } else {
-        result = this._importConfiguration(configuration);
+        result = await this._importConfiguration(configuration);
       }
       this._recordDiagnostic("info", "Restauration MailPerch terminée", `${selectedStrategy} · ${preview.incoming?.refs || 0} référence(s)`, {component: "migration", action: selectedStrategy});
       return {...result, strategy: selectedStrategy, safetyBackup: safetyBackup?.path || "", preview};
@@ -3545,6 +3825,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     }
     this._saveData(enabled ? "no-reply-start" : "no-reply-cancel");
     this._refreshAllStates(true);
+    if(this._settings.enableThunderbirdTagSync)this._syncTags(refs.map(ref=>ref.stableKey)).catch(error=>this._recordDiagnostic("warning","Synchronisation des tags impossible",error));
     return {count:refs.length, enabled, dueAt:enabled ? refs[0].noReplyAt : 0};
   }
 
@@ -3779,12 +4060,14 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       const senderMatch=this._settings.autoPinSenders.some(value=>sender.includes(sanitizeSearchText(value)));const tagMatch=this._settings.autoPinTags.some(value=>keywords.split(/\s+/).includes(value));
       if(senderMatch||tagMatch){this._ensureReference(hdr,hdr.folder?.URI||"",this._settings.defaultPinTarget);changed=true;}
       const outgoing=this._isOutgoingHeader(hdr)&&this._isSentFolder(hdr.folder);
+      const messageTime=Date.now();
       if(outgoing){
+        for(const ref of refs){ref.lastOutgoingAt=messageTime;ref.updatedAt=messageTime;changed=true;}
         changed=this._applyCustomRules("reply",hdr)||changed;
         if(this._settings.autoUnpinOnReply){
           for(const ref of refs){this._archiveReferenceHistory(ref,"reply-unpin");changed=this._removeReferenceByKey(ref.stableKey)||changed;}
         } else if(this._settings.enableWaitingWorkflow){
-          const now=Date.now();
+          const now=messageTime;
           for(const ref of refs){
             ref.workflowStatus="waiting";ref.completedAt=0;ref.waitingSince=now;ref.lastOutgoingAt=now;
             const trackingDays=this._settings.enableAutomaticNoReplyTracking?(this._settings.noReplyDefaultDays||5):(this._settings.defaultFollowUpDays||3);
@@ -3794,8 +4077,11 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
             changed=true;this._recordActivity("reply-sent",ref.stableKey,formatSubject(hdr));
           }
         }
-      } else if(this._settings.enableWaitingWorkflow){
-        for(const ref of refs){if(ref.workflowStatus==="waiting"&&this._settings.reopenOnConversationReply){ref.workflowStatus="active";ref.lastReplyAt=Date.now();ref.followUpAt=0;ref.followUpCount=(ref.followUpCount||0)+1;if(this._settings.noReplyCancelOnIncomingReply){ref.noReplyTracking=false;ref.noReplyAt=0;ref.noReplyStartedAt=0;ref.noReplyBaselineMessageId="";}changed=true;this._recordActivity("reply-received",ref.stableKey,formatSubject(hdr));}}
+      } else {
+        for(const ref of refs){ref.lastReplyAt=messageTime;ref.updatedAt=messageTime;changed=true;}
+        if(this._settings.enableWaitingWorkflow){
+          for(const ref of refs){if(ref.workflowStatus==="waiting"&&this._settings.reopenOnConversationReply){ref.workflowStatus="active";ref.followUpAt=0;ref.followUpCount=(ref.followUpCount||0)+1;if(this._settings.noReplyCancelOnIncomingReply){ref.noReplyTracking=false;ref.noReplyAt=0;ref.noReplyStartedAt=0;ref.noReplyBaselineMessageId="";}changed=true;this._recordActivity("reply-received",ref.stableKey,formatSubject(hdr));}}
+        }
       }
     }
     if(trigger==="read"&&this._settings.autoUnpinOnRead)for(const key of keys)changed=this._removeReferenceByKey(key)||changed;
@@ -3809,7 +4095,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     }
     if(trigger==="delete"&&this._settings.autoUnpinOnDelete)for(const ref of refs){this._archiveReferenceHistory(ref,"delete");changed=this._removeReferenceByKey(ref.stableKey)||changed;}
     if(trigger==="move"&&!this._settings.keepPinOnMove)for(const ref of refs)changed=this._removeReferenceByKey(ref.stableKey)||changed;
-    if(changed){this._saveData(`rule-${trigger}`);this._refreshAllStates();}
+    if(changed){this._saveData(`rule-${trigger}`);this._refreshAllStates();if(this._settings.enableThunderbirdTagSync){const tagKeys=this._referencesForHeader(hdr).map(ref=>ref.stableKey);this._syncTags(tagKeys).catch(error=>this._recordDiagnostic("warning","Synchronisation des tags impossible",error));}}
     return changed;
   }
 
@@ -3951,6 +4237,11 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       pinnedAt: ref.pinnedAt,
       updatedAt: ref.updatedAt || ref.pinnedAt,
       note: ref.note,
+      checklist: clone(ref.checklist || []),
+      checklistStats: PIN_MODULES.PinChecklists?.stats(ref.checklist) || {total:0,completed:0,pending:0,progress:0},
+      responseState: PIN_MODULES.PinAnalytics?.responseState(ref) || "none",
+      responseAgeMs: PIN_MODULES.PinAnalytics?.waitingAgeMs(ref) || 0,
+      ageMs: PIN_MODULES.PinAnalytics?.ageMs(ref) || 0,
       dueAt: ref.dueAt,
       reminderAt: ref.reminderAt,
       reminderFiredAt: ref.reminderFiredAt,
@@ -3973,6 +4264,9 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       noReplyAt: ref.noReplyAt || 0,
       noReplyStartedAt: ref.noReplyStartedAt || 0,
       calendarSyncError: ref.calendarSyncError || "",
+      tagSyncError: ref.tagSyncError || "",
+      tagLastSyncedAt: ref.tagLastSyncedAt || 0,
+      tags: hdr ? getTagMetadata(hdr) : [],
       recurrenceRule: ref.recurrenceRule,
       recurrenceInterval: ref.recurrenceInterval,
       trackingMode: ref.trackingMode,
@@ -3990,14 +4284,17 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
 
   _getDashboardData(options = {}) {
     assertStructuredInput(options, "Options du tableau de bord", {maxBytes: 64 * 1024, maxNodes: 1000});
-    const validFilters = new Set(["active", "all", "overdue", "today", "week", "completed", "unread", "waiting", "planned", "noReply", "snoozed", "noDue", "missing", "calendarError", "recentCompleted"]);
+    const validFilters = new Set(["active", "all", "overdue", "today", "week", "completed", "unread", "waiting", "planned", "noReply", "snoozed", "noDue", "missing", "calendarError", "recentCompleted", "waitingForThem", "needsReply", "checklistPending"]);
     const validViews = new Set(["today", "list", "kanban", "cases", "review", "history", "health"]);
     const filter = validFilters.has(options.filter) ? options.filter : (this._data.dashboard?.filter || "active");
     const smartView = validFilters.has(options.smartView) ? options.smartView : (this._data.dashboard?.smartView || this._settings.defaultSmartView || "today");
-    const search = sanitizeSearchText(options.search ?? this._data.dashboard?.search ?? "");
+    const savedViewId = String(options.savedViewId ?? this._data.dashboard?.savedViewId ?? "").slice(0, 80);
+    const savedView = (this._data.savedViews || []).find(item => item.id === savedViewId) || null;
+    const rawSearch = options.search !== undefined ? options.search : (savedView?.search ?? this._data.dashboard?.search ?? "");
+    const search = sanitizeSearchText(rawSearch);
     const view = validViews.has(options.view) ? options.view : (this._data.dashboard?.view || "today");
     const reviewMode = options.reviewMode === "weekly" ? "weekly" : (options.reviewMode === "daily" ? "daily" : (this._data.dashboard?.reviewMode === "weekly" ? "weekly" : "daily"));
-    const nextDashboard = {filter, smartView, search: String(options.search ?? this._data.dashboard?.search ?? "").slice(0, 500), view, reviewMode};
+    const nextDashboard = {filter, smartView, search: String(rawSearch || "").slice(0, 500), view, reviewMode, savedViewId: savedView?.id || ""};
     if ((PIN_MODULES.PinStorageHelpers?.stableStringify(this._data.dashboard) || JSON.stringify(this._data.dashboard)) !==
         (PIN_MODULES.PinStorageHelpers?.stableStringify(nextDashboard) || JSON.stringify(nextDashboard))) {
       this._data.dashboard = nextDashboard;
@@ -4012,17 +4309,21 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     for (const item of serializedAll) {
       const ref = this._data.refs[item.stableKey];
       const context = {unread: item.unread, missing: item.missing, calendarError: Boolean(item.calendarSyncError), now};
-      const activeFilter = options.useSmartView !== false && this._settings.enableSmartViews ? smartView : filter;
-      const matches = PIN_MODULES.PinSmartViews?.matches(activeFilter, ref, context) ?? (activeFilter === "all" || item.smartSection === activeFilter || item.workflowStatus === activeFilter);
+      const activeFilter = savedView?.smartView || (options.useSmartView !== false && this._settings.enableSmartViews ? smartView : filter);
+      const matches = PIN_MODULES.PinSmartViews?.matches(activeFilter, ref, {...context, responseState:item.responseState, checklistStats:item.checklistStats}) ?? (activeFilter === "all" || item.smartSection === activeFilter || item.workflowStatus === activeFilter);
       if (!matches) continue;
-      if (search && !sanitizeSearchText([item.subject, item.author, item.note, item.accountName, item.folderName, item.groupName, item.caseName, item.workflowStatus].join(" ")).includes(search)) continue;
+      const searchText = [item.subject, item.author, item.note, PIN_MODULES.PinChecklists?.searchableText(item.checklist), (item.tags || []).map(tag => tag.name || tag.key).join(" "), item.accountName, item.folderName, item.groupName, item.caseName, item.workflowStatus, item.responseState].join(" ");
+      const normalizedSearchText = sanitizeSearchText(searchText);
+      const searchTokens = search.split(/\s+/).filter(Boolean);
+      if (searchTokens.some(token => !normalizedSearchText.includes(token))) continue;
+      if (savedView && !PIN_MODULES.PinSavedViews?.matches(savedView, {...item, searchText}, {normalizeText:sanitizeSearchText, smartMatches:(viewId, candidate)=>PIN_MODULES.PinSmartViews?.matches(viewId, ref, {...context,responseState:candidate.responseState,checklistStats:candidate.checklistStats})})) continue;
       allItems.push(item);
     }
     allItems.sort((left, right) =>
       (left.snoozeUntil || left.dueAt || left.followUpAt || left.noReplyAt || Number.MAX_SAFE_INTEGER) -
       (right.snoozeUntil || right.dueAt || right.followUpAt || right.noReplyAt || Number.MAX_SAFE_INTEGER) || right.date - left.date);
 
-    const smartCounts = PIN_MODULES.PinSmartViews?.counts(serializedAll.map(item => ({ref: item, unread: item.unread, missing: item.missing, calendarError: Boolean(item.calendarSyncError)})), now) || {};
+    const smartCounts = PIN_MODULES.PinSmartViews?.counts(serializedAll.map(item => ({ref: item, unread: item.unread, missing: item.missing, calendarError: Boolean(item.calendarSyncError), responseState:item.responseState, checklistStats:item.checklistStats})), now) || {};
     const dailyReview = PIN_MODULES.PinReview?.build(serializedAll, {now, mode: "daily"}) || {mode: "daily", buckets: {}, counts: {}, actionable: 0, total: 0};
     const weeklyReview = PIN_MODULES.PinReview?.build(serializedAll, {now, mode: "weekly"}) || {mode: "weekly", buckets: {}, counts: {}, actionable: 0, total: 0};
     const relatedGroups = (PIN_MODULES.PinRelated?.detect(refs) || []).map(group => ({
@@ -4036,10 +4337,12 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       items: allItems,
       filter,
       smartView,
-      search: options.search || "",
+      search: String(rawSearch || ""),
       view,
       reviewMode,
       smartViews: clone(PIN_MODULES.PinSmartViews?.VIEWS || []),
+      savedViews: clone(this._data.savedViews || []),
+      savedViewId: savedView?.id || "",
       smartCounts,
       todayPlan: dailyReview,
       review: reviewMode === "weekly" ? weeklyReview : dailyReview,
@@ -4048,7 +4351,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       groups: clone(this._data.groups),
       cases: clone(this._data.cases || []),
       templates: clone(this._data.templates || []),
-      history: this._getHistory({limit: 200, search: options.historySearch || ""}),
+      history: this._getHistory({limit: 200, search: options.historySearch !== undefined ? options.historySearch : rawSearch}),
       ruleLog: clone((this._data.ruleLog || []).slice(-200).reverse()),
       stats: {
         total: refs.length,
@@ -4059,7 +4362,8 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         overdue: refs.filter(ref => !ref.completedAt && ((ref.dueAt && ref.dueAt < now) || (ref.followUpAt && ref.followUpAt < now))).length,
         noReply: refs.filter(ref => ref.noReplyTracking).length,
         snoozed: refs.filter(ref => Number(ref.snoozeUntil || 0) > now && !ref.completedAt).length,
-        missing: refs.filter(ref => ref.missingSince).length
+        missing: refs.filter(ref => ref.missingSince).length,
+        ...(PIN_MODULES.PinAnalytics?.build(refs, this._data.history || [], now, value => PIN_MODULES.PinChecklists?.stats(value) || {pending:0}) || {})
       },
       activity: clone((this._data.activity || []).slice(-100).reverse()),
       compatibility: clone(this._compatibility),
@@ -4319,7 +4623,18 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     if(completed&&!ref.completedAt){ref.completedAt=Date.now();ref.workflowStatus="completed";this._archiveReferenceHistory(ref,"calendar-complete");changed=true;}
     if(!completed&&ref.completedAt&&ref.workflowStatus==="completed"){ref.completedAt=0;ref.workflowStatus="active";changed=true;}
     ref.calendarLastSyncedAt=Date.now();
-    if(changed){this._recordActivity("calendar-sync",stableKey,ref.subject);this._saveData("calendar-to-pin");this._refreshAllStates(true);}
+    if(changed){
+      this._recordActivity("calendar-sync",stableKey,ref.subject);
+      this._saveData("calendar-to-pin");
+      this._refreshAllStates(true);
+      if (this._settings.enableThunderbirdTagSync) {
+        try {
+          this._syncReferenceTags(ref);
+        } catch (error) {
+          this._recordDiagnostic("warning", "Synchronisation des tags après Agenda impossible", error);
+        }
+      }
+    }
   }
 
   async _syncReferenceToCalendar(ref) {
@@ -5064,6 +5379,34 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       const subject = createNode("p", "pin-mails-editor-subject");
       const noteLabel = createNode("label", "", t("panelPersonalNote"));
       const note = createNode("textarea", "pin-mails-editor-note"); note.maxLength = MAX_NOTE_LENGTH; note.rows = 4; noteLabel.appendChild(note);
+      const checklistSection = createNode("section", "pin-mails-editor-checklist");
+      const checklistTitle = createNode("h3", "pin-mails-editor-checklist-title", t("panelChecklistTitle"));
+      const checklistList = createNode("div", "pin-mails-editor-checklist-list");
+      const checklistAddRow = createNode("div", "pin-mails-editor-checklist-add");
+      const checklistInput = createNode("input", "pin-mails-editor-checklist-input"); checklistInput.type = "text"; checklistInput.maxLength = PIN_MODULES.PinChecklists?.MAX_TEXT || 240; checklistInput.placeholder = t("panelChecklistPlaceholder");
+      const checklistAdd = createNode("button", "secondary", t("panelChecklistAdd")); checklistAdd.type = "button";
+      checklistAddRow.append(checklistInput, checklistAdd); checklistSection.append(checklistTitle, checklistList, checklistAddRow);
+      let checklistItems = [];
+      const renderChecklist = () => {
+        checklistList.replaceChildren();
+        for (const item of checklistItems) {
+          const row = createNode("label", "pin-mails-editor-checklist-item");
+          const checkbox = createNode("input"); checkbox.type = "checkbox"; checkbox.checked = Boolean(item.completed);
+          const text = createNode("span", "pin-mails-editor-checklist-text", item.text);
+          const remove = createNode("button", "pin-mails-editor-checklist-remove", "×"); remove.type = "button"; remove.setAttribute("aria-label", t("panelChecklistRemove")); remove.title = t("panelChecklistRemove");
+          checkbox.addEventListener("change", () => { item.completed = checkbox.checked; item.completedAt = checkbox.checked ? Date.now() : 0; });
+          remove.addEventListener("click", event => { event.preventDefault(); checklistItems = checklistItems.filter(candidate => candidate.id !== item.id); renderChecklist(); });
+          row.append(checkbox, text, remove); checklistList.appendChild(row);
+        }
+      };
+      const addChecklistItem = () => {
+        const text = String(checklistInput.value || "").trim().slice(0, PIN_MODULES.PinChecklists?.MAX_TEXT || 240);
+        if (!text || checklistItems.length >= (PIN_MODULES.PinChecklists?.MAX_ITEMS || 50)) return;
+        checklistItems.push({id:`task-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,7)}`,text,completed:false,createdAt:Date.now(),completedAt:0});
+        checklistInput.value = ""; renderChecklist(); checklistInput.focus();
+      };
+      checklistAdd.addEventListener("click", addChecklistItem);
+      checklistInput.addEventListener("keydown", event => { if (event.key === "Enter") { event.preventDefault(); addChecklistItem(); } });
       const grid = createNode("div", "pin-mails-editor-grid");
       const field = (labelText, control) => { const label = createNode("label", "", labelText); label.appendChild(control); grid.appendChild(label); return control; };
       const group = field(t("panelGroupLabel"), createNode("select", "pin-mails-editor-group"));
@@ -5102,7 +5445,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       const actions = createNode("div", "pin-mails-editor-actions");
       const cancel = createNode("button", "secondary", t("panelCancel")); cancel.type = "button";
       const save = createNode("button", "primary", t("panelSave")); save.type = "submit"; actions.append(cancel, save);
-      form.append(title, subject, noteLabel, grid, calendarRow, actions); editor.appendChild(form); document.body.appendChild(editor);
+      form.append(title, subject, noteLabel, checklistSection, grid, calendarRow, actions); editor.appendChild(form); document.body.appendChild(editor);
       cancel.addEventListener("click", () => editor.close());
       applyTemplateButton.addEventListener("click", () => {
         if (!templateSelect.value) return;
@@ -5141,7 +5484,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       form.addEventListener("submit", event => {
         event.preventDefault();
         this._setReferenceMetadata(editor.dataset.stableKey, {
-          note: note.value, groupId: group.value, caseId: caseSelect.value, priorityLevel: priority.value,
+          note: note.value, checklist: checklistItems, groupId: group.value, caseId: caseSelect.value, priorityLevel: priority.value,
           workflowStatus: workflow.value, dueAt: fromLocalDateTimeValue(due.value), reminderAt: fromLocalDateTimeValue(reminder.value),
           followUpAt: fromLocalDateTimeValue(followUp.value), repeatRule: repeat.value,
           recurrenceRule: recurrence.value, recurrenceInterval: Number(recurrenceInterval.value) || 1,
@@ -5157,6 +5500,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       const dialog = createEditor(); dialog.dataset.stableKey = stableKey;
       dialog.querySelector(".pin-mails-editor-subject").textContent = `${ref.trackingMode === "conversation" ? t("panelConversationPrefix") : ""}${ref.subject || t("panelNoSubject")}`;
       dialog.querySelector(".pin-mails-editor-note").value = ref.note || "";
+      checklistItems = PIN_MODULES.PinChecklists?.normalize(ref.checklist) || []; renderChecklist();
       const groupSelect = dialog.querySelector(".pin-mails-editor-group"); groupSelect.replaceChildren();
       const none = createNode("option", "", t("panelNoGroup")); none.value = ""; groupSelect.appendChild(none);
       for (const item of this._data.groups) { const option = createNode("option", "", item.name); option.value = item.id; groupSelect.appendChild(option); }
@@ -6066,8 +6410,13 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       card.append(top, subject);
 
       if (this._settings.showNotes && ref.note) card.appendChild(createNode("div", "pin-mails-note", ref.note));
+      const checklistStats = PIN_MODULES.PinChecklists?.stats(ref.checklist) || {total:0,completed:0,pending:0};
+      if (checklistStats.total) card.appendChild(createNode("div", "pin-mails-checklist-summary", t("panelChecklistProgress", checklistStats)));
       const statusLine = createNode("div", "pin-mails-status-line");
       if (ref.trackingMode === "conversation") statusLine.appendChild(createNode("span", "pin-mails-conversation-chip", `${t("panelMessagesCount", {count: ref.conversationCount || 1})}${ref.conversationUnread ? ` · ${t("panelUnreadCount", {count: ref.conversationUnread})}` : ""}`));
+      const responseState = PIN_MODULES.PinAnalytics?.responseState(ref) || "none";
+      if (responseState === "waitingForThem") statusLine.appendChild(createNode("span", "pin-mails-response-chip waiting", t("panelWaitingForThem")));
+      else if (responseState === "needsReply") statusLine.appendChild(createNode("span", "pin-mails-response-chip reply", t("panelNeedsReply")));
       if (ref.workflowStatus === "waiting") statusLine.appendChild(createNode("span", "pin-mails-workflow-chip waiting", ref.waitingSince ? t("panelWaitingSince", {date: this._formatTimestamp(about3Pane, ref.waitingSince)}) : t("panelWaitingForReply")));
       else if (ref.workflowStatus === "planned") statusLine.appendChild(createNode("span", "pin-mails-workflow-chip planned", t("panelPlanned")));
       if (ref.completedAt || ref.workflowStatus === "completed") statusLine.appendChild(createNode("span", "pin-mails-completed-chip", t("panelCompleted")));
@@ -6431,6 +6780,8 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   async _prepareForUninstall() {
     this._uninstallPreparationPromise ??= (async () => {
       try { await this._readyPromise; } catch {}
+      this._clearManagedTagsForReferences(Object.values(this._data?.refs || {}));
+      this._removeMailPerchTagDefinitions();
       this._stopRuntimeResources();
       const storage = this._storage;
       this._storage = null;

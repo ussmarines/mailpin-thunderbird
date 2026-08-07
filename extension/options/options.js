@@ -241,7 +241,7 @@ const SETTINGS_CONTROL_DEFINITIONS = Object.freeze([
     "enableReminders", "enableAdvancedReminders", "enableAutomaticRules",
     "enableRuleSimulation", "autoUnpinOnArchive", "autoCompleteOnArchive",
     "autoUnpinOnDelete", "autoUnpinOnRead", "autoUnpinOnReply", "keepPinOnMove",
-    "moveToWaitingOnReply", "enableCalendarIntegration", "enableBidirectionalCalendarSync",
+    "moveToWaitingOnReply", "enableCalendarIntegration", "enableBidirectionalCalendarSync", "enableThunderbirdTagSync",
     "calendarCompleteOnPinComplete", "calendarDeleteOnUnpin", "enableGlobalDashboard",
     "enablePerformanceMetrics", "autoCleanup", "enableWaitingWorkflow",
     "reopenOnConversationReply", "enableRecurringFollowUps", "enableHistory",
@@ -322,6 +322,7 @@ const CONTROL_HELP = {
   confirmDelete: "controlHelpConfirmDelete",
   enableCalendarIntegration: "controlHelpCalendarIntegration",
   enableBidirectionalCalendarSync: "controlHelpCalendarSync",
+  enableThunderbirdTagSync: "controlHelpThunderbirdTagSync",
   calendarCompleteOnPinComplete: "controlHelpCalendarComplete",
   calendarDeleteOnUnpin: "controlHelpCalendarDelete",
   calendarItemType: "controlHelpCalendarItemType",
@@ -342,6 +343,7 @@ const BUTTON_HELP = {
   "add-case": "buttonHelpAddCase",
   "add-template": "buttonHelpAddTemplate",
   "sync-calendar": "buttonHelpSyncCalendar",
+  "sync-tags": "buttonHelpSyncTags",
   "choose-backup": "buttonHelpChooseBackup",
   "run-backup": "buttonHelpRunBackup",
   "integrity-check": "buttonHelpIntegrityCheck",
@@ -403,6 +405,22 @@ function failureMessage(key, error) {
   return `${msg(key)} (${safeErrorName(error)})`;
 }
 
+function syncIntegrationControls() {
+  const tagSyncEnabled = Boolean($("enableThunderbirdTagSync")?.checked);
+  const tagSyncButton = $("sync-tags");
+  if (tagSyncButton) {
+    tagSyncButton.disabled = !tagSyncEnabled;
+    tagSyncButton.setAttribute("aria-disabled", String(!tagSyncEnabled));
+  }
+
+  const calendarEnabled = Boolean($("enableCalendarIntegration")?.checked);
+  const calendarSyncButton = $("sync-calendar");
+  if (calendarSyncButton) {
+    calendarSyncButton.disabled = !calendarEnabled;
+    calendarSyncButton.setAttribute("aria-disabled", String(!calendarEnabled));
+  }
+}
+
 function syncToggleCards() {
   const recommended = configuration?.recommendedSettings || {};
   for (const card of document.querySelectorAll(".setting-toggle")) {
@@ -419,6 +437,7 @@ function syncToggleCards() {
     }
     if (badge) badge.hidden = !isRecommendedButDisabled;
   }
+  syncIntegrationControls();
 }
 
 function slugify(value) {
@@ -1851,6 +1870,12 @@ async function startOptions() {
     () => messenger.pinInbox.syncCalendarLinks(),
     result => msg("calendarSyncComplete", [result.synced || 0]),
     msg("calendarSyncBusy")
+  );
+  bindRun(
+    "sync-tags",
+    () => messenger.pinInbox.syncTags([]),
+    result => msg("tagSyncComplete", [result.synced || 0, result.errors || 0]),
+    msg("tagSyncBusy")
   );
   bindRun(
     "run-backup",

@@ -7,6 +7,9 @@
     {id: "overdue", labelKey: "smartViewOverdue", fallback: "En retard"},
     {id: "week", labelKey: "smartViewWeek", fallback: "Cette semaine"},
     {id: "waiting", labelKey: "smartViewWaiting", fallback: "En attente"},
+    {id: "waitingForThem", labelKey: "smartViewWaitingForThem", fallback: "J’attends une réponse"},
+    {id: "needsReply", labelKey: "smartViewNeedsReply", fallback: "Je dois répondre"},
+    {id: "checklistPending", labelKey: "smartViewChecklistPending", fallback: "Sous-tâches à terminer"},
     {id: "noReply", labelKey: "smartViewNoReply", fallback: "Relances sans réponse"},
     {id: "snoozed", labelKey: "smartViewSnoozed", fallback: "En veille"},
     {id: "noDue", labelKey: "smartViewNoDue", fallback: "Sans échéance"},
@@ -60,6 +63,9 @@
       case "active": return !completed && (ref?.workflowStatus || "active") === "active";
       case "completed": return completed;
       case "waiting": return !completed && ref?.workflowStatus === "waiting";
+      case "waitingForThem": return !completed && (context.responseState || scope.PinAnalytics?.responseState(ref)) === "waitingForThem";
+      case "needsReply": return !completed && (context.responseState || scope.PinAnalytics?.responseState(ref)) === "needsReply";
+      case "checklistPending": return !completed && Number(context.checklistStats?.pending ?? scope.PinChecklists?.stats(ref?.checklist)?.pending ?? 0) > 0;
       case "planned": return !completed && ref?.workflowStatus === "planned";
       case "today": return !completed && due >= boundaries(now).today && due < tomorrow;
       case "overdue": return !completed && due > 0 && due < now;
@@ -81,7 +87,7 @@
     result.planned = 0;
     for (const item of items || []) {
       const ref = item.ref || item;
-      const context = {now, unread: Boolean(item.unread), missing: Boolean(item.missing), calendarError: Boolean(item.calendarError)};
+      const context = {now, unread: Boolean(item.unread), missing: Boolean(item.missing), calendarError: Boolean(item.calendarError), responseState: item.responseState || scope.PinAnalytics?.responseState(ref), checklistStats: item.checklistStats || scope.PinChecklists?.stats(ref?.checklist)};
       for (const view of VIEWS) if (matches(view.id, ref, context)) result[view.id]++;
       if (matches("active", ref, context)) result.active++;
       if (matches("completed", ref, context)) result.completed++;

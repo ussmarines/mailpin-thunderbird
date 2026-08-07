@@ -41,6 +41,7 @@
   display: flex;
   flex-direction: column;
   min-block-size: 0;
+  font-size: max(1em, 12px);
   max-block-size: min(55vh, var(--pin-mails-max-height));
   background: var(--pin-mails-panel-bg);
   border-block-end: 1px solid var(--pin-mails-border);
@@ -120,7 +121,7 @@
   border-radius: 999px;
   background: color-mix(in srgb, var(--pin-mails-accent) 18%, transparent);
   color: var(--pin-mails-accent);
-  font-size: 0.82rem;
+  font-size: max(0.82rem, 12px);
   text-align: center;
 }
 
@@ -133,7 +134,7 @@
   background: var(--layout-background-0);
   color: inherit;
   font: inherit;
-  font-size: 0.9rem;
+  font-size: max(0.9rem, 12px);
 }
 
 .pin-mails-reminder-center {
@@ -174,7 +175,7 @@
 }
 .pin-mails-reminder-copy { display: grid; min-inline-size: 0; gap: 1px; }
 .pin-mails-reminder-copy strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pin-mails-reminder-copy span { color: var(--layout-color-2); font-size: .78rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pin-mails-reminder-copy span { color: var(--layout-color-2); font-size: max(.78rem, 12px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pin-mails-reminder-actions { flex-wrap: wrap; justify-content: flex-end; }
 .pin-mails-reminder-action {
   min-block-size: 24px;
@@ -184,7 +185,7 @@
   background: var(--layout-background-0);
   color: inherit;
   font: inherit;
-  font-size: .75rem;
+  font-size: max(.75rem, 12px);
   cursor: pointer;
 }
 .pin-mails-reminder-action:hover,
@@ -222,7 +223,7 @@
   padding: 4px 8px;
   background: color-mix(in srgb, var(--pin-account-color, var(--pin-mails-accent)) 10%, var(--pin-mails-header-bg));
   border-block-end: 1px solid color-mix(in srgb, var(--pin-account-color, var(--pin-mails-accent)) 26%, var(--pin-mails-border));
-  font-size: 0.9rem;
+  font-size: max(0.9rem, 12px);
   font-weight: 650;
 }
 
@@ -324,9 +325,9 @@
 
 .pin-mails-author { flex: 1 1 auto; font-weight: 600; }
 .pin-mails-subject { color: var(--layout-color-1); }
-.pin-mails-preview { color: var(--layout-color-2); font-size: 0.9rem; }
-.pin-mails-date { flex: 0 0 auto; color: var(--layout-color-2); font-size: 0.88rem; white-space: nowrap; }
-.pin-mails-folder { color: var(--layout-color-2); font-size: 0.84rem; }
+.pin-mails-preview { color: var(--layout-color-2); font-size: max(0.9rem, 12px); }
+.pin-mails-date { flex: 0 0 auto; color: var(--layout-color-2); font-size: max(0.88rem, 12px); white-space: nowrap; }
+.pin-mails-folder { color: var(--layout-color-2); font-size: max(0.84rem, 12px); }
 
 .pin-mails-card[data-unread] .pin-mails-author,
 .pin-mails-card[data-unread] .pin-mails-subject { font-weight: 750; }
@@ -387,7 +388,7 @@
   flex: 0 0 auto;
   min-inline-size: 16px;
   color: var(--layout-color-2);
-  font-size: 0.84rem;
+  font-size: max(0.84rem, 12px);
   text-align: center;
 }
 
@@ -407,7 +408,7 @@
   border: 1px solid color-mix(in srgb, var(--tag-color, currentColor) 65%, transparent);
   border-radius: 999px;
   color: var(--tag-color, currentColor);
-  font-size: 0.78rem;
+  font-size: max(0.78rem, 12px);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -738,7 +739,7 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
 }
 .pin-mails-quick-button:hover,
 .pin-mails-quick-button:focus-visible { background: var(--pin-mails-card-hover); border-color: var(--pin-mails-accent); }
-.pin-mails-summary { color: var(--layout-color-2); font-size: .78rem; white-space: nowrap; }
+.pin-mails-summary { color: var(--layout-color-2); font-size: max(.78rem, 12px); white-space: nowrap; }
 
 .pin-mails-note {
   padding: 5px 7px;
@@ -755,7 +756,7 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
 .pin-mails-priority-chip {
   padding: 2px 7px;
   border-radius: 999px;
-  font-size: .78rem;
+  font-size: max(.78rem, 12px);
   border: 1px solid color-mix(in srgb, currentColor 28%, transparent);
 }
 .pin-mails-card[data-overdue] .pin-mails-due { color: var(--mp-color-danger-foreground); background: var(--mp-color-danger-background); }
@@ -916,7 +917,7 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   padding: 1px 7px;
   border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
   border-radius: 999px;
-  font-size: .78em;
+  font-size: max(.78em, 12px);
 }
 
 .pin-mails-completed-chip { color: #57d163; }
@@ -946,7 +947,7 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   padding: 2px 7px;
   border: 1px solid color-mix(in srgb, currentColor 28%, transparent);
   border-radius: 999px;
-  font-size: .78rem;
+  font-size: max(.78rem, 12px);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1158,7 +1159,7 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   background: var(--layout-background-1);
   color: inherit;
   font: inherit;
-  font-size: .84rem;
+  font-size: max(.84rem, 12px);
 }
 .pin-mails-no-reply-chip {
   display: inline-flex;
@@ -1168,7 +1169,7 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   border-radius: 999px;
   background: color-mix(in srgb, #8764b8 20%, var(--pin-mails-card-bg));
   color: color-mix(in srgb, #8764b8 68%, var(--mp-text));
-  font-size: .75rem;
+  font-size: max(.75rem, 12px);
   font-weight: 650;
 }
 .pin-mails-no-reply-chip.overdue {
@@ -1188,7 +1189,7 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   background: var(--mp-color-warning-background);
   color: var(--mp-color-warning-foreground);
   font: inherit;
-  font-size: .76rem;
+  font-size: max(.76rem, 12px);
   font-weight: 700;
   cursor: pointer;
 }
@@ -1337,7 +1338,7 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   background: color-mix(in srgb, var(--pin-group-color) 18%, transparent);
   color: inherit;
   font: inherit;
-  font-size: .75rem;
+  font-size: max(.75rem, 12px);
   font-weight: 650;
   line-height: 1.15;
   opacity: .9;
@@ -1411,3 +1412,19 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
 /* En mode indépendant, MailPerch ne masque, ne déplace et ne redessine
  * jamais les étoiles natives. Le masquage de doublon est strictement limité
  * au mode où l'étoile native sert elle-même d'épingle MailPerch. */
+
+/* MailPerch 1.2 — checklist and response-state refinements. */
+.pin-mails-editor-checklist { display: grid; gap: 8px; padding: 10px; border: 1px solid var(--pin-mails-border); border-radius: 8px; background: color-mix(in srgb, var(--pin-mails-card-bg) 92%, transparent); }
+.pin-mails-editor-checklist-title { margin: 0; font-size: max(.95rem, 12px); }
+.pin-mails-editor-checklist-list { display: grid; gap: 6px; }
+.pin-mails-editor-checklist-item { display: grid !important; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px !important; font-weight: 400 !important; }
+.pin-mails-editor-checklist-item input { inline-size: 16px; block-size: 16px; margin: 0; }
+.pin-mails-editor-checklist-text { min-width: 0; overflow-wrap: anywhere; }
+.pin-mails-editor-checklist-remove { min-inline-size: 28px; min-block-size: 28px; border: 0; border-radius: 6px; background: transparent; color: inherit; cursor: pointer; }
+.pin-mails-editor-checklist-remove:hover, .pin-mails-editor-checklist-remove:focus-visible { background: var(--pin-mails-card-hover); }
+.pin-mails-editor-checklist-add { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; }
+.pin-mails-editor-checklist-add .secondary { min-block-size: 34px; padding: 6px 12px; border: 1px solid var(--pin-mails-border); border-radius: 6px; background: transparent; color: inherit; cursor: pointer; }
+.pin-mails-checklist-summary { margin-block-start: 6px; color: var(--layout-color-2); font-size: max(.8rem, 12px); }
+.pin-mails-response-chip { display: inline-flex; align-items: center; min-block-size: 24px; padding: 2px 7px; border-radius: 999px; font-size: max(.78rem, 12px); font-weight: 650; }
+.pin-mails-response-chip.waiting { background: color-mix(in srgb, #8a3700 14%, transparent); color: color-mix(in srgb, #8a3700 80%, currentColor); }
+.pin-mails-response-chip.reply { background: color-mix(in srgb, #0f6cbd 14%, transparent); color: color-mix(in srgb, #0f6cbd 82%, currentColor); }
