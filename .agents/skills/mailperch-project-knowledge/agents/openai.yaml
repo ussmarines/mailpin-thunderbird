@@ -1,0 +1,4 @@
+interface:
+  display_name: "MailPerch Project Knowledge"
+  short_description: "Current MailPerch domain knowledge"
+  default_prompt: "Use $mailperch-project-knowledge to locate the current documented MailPerch architecture and product rules for this task."
