@@ -110,3 +110,17 @@ Le XPI est construit dans `dist/`. Aucun outil de compilation externe n’est re
 ## Définition de « terminé »
 
 Une correction n’est pas considérée terminée sur la seule base de contrôles statiques. Il faut indiquer explicitement quels tests Thunderbird réels ont été exécutés lorsque la surface exige une preuve runtime. Ne jamais affirmer qu’un comportement graphique fonctionne sans l’avoir observé dans Thunderbird. La restitution doit distinguer les tests exécutés, les preuves réutilisées car encore valides et les contrôles non relancés.
+
+<!-- BEGIN brain.md -->
+## Project Brain
+
+This project keeps a **Project Brain** complementary to the canonical MailPerch sources. Its priority is below the current user instruction, observed Git/GitHub state, `MAILPERCH_AI_RULES.md`, this `AGENTS.md`, and canonical MailPerch documents. Read `./BRAIN.md` for the scoped read/write contract.
+
+Use it selectively:
+- First verify Git and the diff, then read the MailPerch rules; load Brain only when a durable decision relevant to the task's scope may matter.
+- Record only a durable, hard-to-reconstruct decision, constraint, requirement, or rationale. Never store transient Git/GitHub state, CI or test evidence, releases, bugs, TODOs, or ordinary implementation detail.
+- All reads and writes go through the `brain` CLI — never hand-edit brain files.
+- Do not run `brain-bootstrap` by default; do not install a Brain pre-commit hook without explicit approval.
+
+The brain skills (`brain-setup`, `brain-page`, `brain-ingest`, `brain-bootstrap`) are installed in your global skills directory.
+<!-- END brain.md -->
