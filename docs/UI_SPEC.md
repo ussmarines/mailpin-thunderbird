@@ -95,4 +95,4 @@
 
 ## Typographie Fluent 2
 
-Options et dashboard utilisent la pile locale `Segoe UI Variable Text`, `Segoe UI Variable`, `Aptos`, `Segoe UI`, puis les polices système. Aucune police n’est téléchargée. Le corps courant est 14 px / 20 px et aucun `font-size` explicite ne peut descendre sous 12 px. Les grilles de statistiques utilisent `auto-fit` afin d’éviter les colonnes compressées aux petites largeurs.
+Options, dashboard et panneau injecté utilisent une pile sans-serif locale commençant par `system-ui`, complétée par les variantes système Segoe UI/Aptos. Aucune police n’est téléchargée ni embarquée sans son actif et sa licence explicitement revus. Le corps courant est 14 px / 20 px et aucun `font-size` explicite ne peut descendre sous 12 px. Les grilles de statistiques utilisent `auto-fit` afin d’éviter les colonnes compressées aux petites largeurs.

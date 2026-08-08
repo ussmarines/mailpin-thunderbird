@@ -11,6 +11,8 @@
 - restauration du contrôle Options `moveToWaitingOnReply`, dont l’absence bloquait l’initialisation, et ajout d’une garde bidirectionnelle entre le registre des réglages et le HTML ;
 - correction de la recherche initiale du dashboard qui affichait `undefined`, et réalignement du scénario navigateur sur les neuf statistiques actuelles ;
 - conservation de Fluent 2 au moyen des contrôles natifs et jetons CSS locaux ; retrait de `@fluentui/web-components` et du lockfile inutilisés, sans ajout de bundler ni de code au XPI ;
+- modernisation visuelle cohérente du dashboard, des Options et du panneau injecté : en-têtes plus compacts, hiérarchie et états vides clarifiés, jetons de contrôles, espacements, focus et élévations unifiés ;
+- typographie sans-serif garantie locale via `system-ui` et ses fallbacks natifs, sans police embarquée, CDN ni requête réseau runtime ;
 - documentation de la frontière Thunderbird, du banc de test, de la reprise Codex et des limites mise à jour ;
 - aucune nouvelle permission WebExtension, dépendance runtime, connexion réseau du produit, migration de stockage ou nouvelle fonction métier.
 

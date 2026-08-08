@@ -3,7 +3,16 @@
  * the same light, dark and high-contrast behavior without hard-coded overrides. */
 :root {
   color-scheme: light;
-  --mp-font-family: "Segoe UI Variable Text", "Segoe UI Variable", "Aptos", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  /* A guaranteed local sans-serif stack. MailPerch intentionally ships no
+   * third-party font until its asset and licence can be reviewed together. */
+  --mp-font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI Variable", "Aptos", "Segoe UI", sans-serif;
+  --mp-font-size-caption: 12px;
+  --mp-font-size-body: 14px;
+  --mp-font-size-title: 20px;
+  --mp-line-height-body: 1.45;
+  --mp-font-weight-regular: 400;
+  --mp-font-weight-medium: 500;
+  --mp-font-weight-semibold: 600;
 
   /* Brand palette */
   --mp-brand-background: #0f6cbd;
@@ -72,13 +81,18 @@
   --mp-space-10: 40px;
   --mp-space-12: 48px;
   --mp-space-16: 64px;
+  --mp-control-height-compact: 32px;
+  --mp-control-height-standard: 36px;
+  --mp-control-height-comfortable: 42px;
+  --mp-page-max-width: 1440px;
+  --mp-focus-ring-color: color-mix(in srgb, var(--mp-brand-foreground) 72%, transparent);
 
   /* Elevation — light */
-  --mp-shadow-2: 0 1px 2px rgb(0 0 0 / 0.08), 0 0 2px rgb(0 0 0 / 0.06);
-  --mp-shadow-4: 0 2px 4px rgb(0 0 0 / 0.10), 0 0 2px rgb(0 0 0 / 0.06);
-  --mp-shadow-8: 0 4px 8px rgb(0 0 0 / 0.12), 0 0 2px rgb(0 0 0 / 0.06);
-  --mp-shadow-16: 0 8px 16px rgb(0 0 0 / 0.14), 0 0 2px rgb(0 0 0 / 0.08);
-  --mp-shadow-28: 0 14px 28px rgb(0 0 0 / 0.18), 0 0 8px rgb(0 0 0 / 0.08);
+  --mp-shadow-2: 0 1px 2px rgb(18 50 74 / 0.08), 0 0 1px rgb(18 50 74 / 0.05);
+  --mp-shadow-4: 0 2px 5px rgb(18 50 74 / 0.09), 0 0 2px rgb(18 50 74 / 0.05);
+  --mp-shadow-8: 0 5px 12px rgb(18 50 74 / 0.10), 0 1px 3px rgb(18 50 74 / 0.06);
+  --mp-shadow-16: 0 9px 22px rgb(18 50 74 / 0.12), 0 2px 5px rgb(18 50 74 / 0.07);
+  --mp-shadow-28: 0 16px 36px rgb(18 50 74 / 0.16), 0 3px 9px rgb(18 50 74 / 0.08);
 
   /* Motion */
   --mp-duration-ultra-fast: 50ms;
