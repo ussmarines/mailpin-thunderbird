@@ -12,7 +12,8 @@ Ce dépôt contient une MailExtension Thunderbird Manifest V3 avec une API Exper
 6. `docs/BUG_TRACKER.md` — bugs ouverts, corrigés et validations réelles restantes ;
 7. `docs/THUNDERBIRD_COMPATIBILITY.md` uniquement si la frontière Thunderbird est touchée ;
 8. le fichier `AGENTS.md` le plus proche de la zone modifiée ;
-9. uniquement les fichiers spécialisés indiqués par la mémoire.
+9. `docs/SUPERPOWERS_POLICY.md` uniquement si Superpowers est explicitement demandé ou si une tâche complexe/risquée peut en tirer une valeur matérielle ; ne pas le charger pour les micro-tâches ;
+10. uniquement les fichiers spécialisés indiqués par la mémoire.
 
 En cas de contradiction sur l’identité de l’extension, `docs/IDENTITY_MIGRATION_REQUIRED.md`, `extension/manifest.json` et `docs/PROJECT_STATE.json` sont prioritaires sur les anciennes mentions conservées dans la mémoire historique.
 
@@ -49,6 +50,16 @@ Afficher des messages épinglés dans un panneau distinct au-dessus de la liste 
 - Avant chaque prompt destiné à Codex, appliquer `MAILPERCH_AI_RULES.md` et afficher séparément le modèle GPT-5.6 recommandé et la puissance avant le prompt.
 - Ne jamais utiliser Codex Security par défaut. Si les outils standards ne permettent pas de conclure sur une question de sécurité précise, demander l’autorisation explicite de l’utilisateur avant une analyse Codex Security strictement ciblée.
 
+## Superpowers
+
+- Ce dépôt opte explicitement pour le plugin Superpowers installé globalement dans Codex, mais uniquement selon `docs/SUPERPOWERS_POLICY.md`.
+- `AGENTS.md`, `MAILPERCH_AI_RULES.md`, les documents canoniques spécialisés et les invariants MailPerch restent prioritaires sur les comportements génériques de Superpowers.
+- La règle générique d’auto-invocation systématique de Superpowers est explicitement restreinte : la disponibilité d’un skill ne suffit pas à justifier son utilisation.
+- Une tâche simple ou localisée ne doit pas déclencher automatiquement brainstorming, plan formel, worktree, TDD complet, sous-agents, reviewer séparé ou workflow de fin de branche.
+- Utiliser un workflow Superpowers uniquement s’il réduit matériellement l’ambiguïté, le risque ou le coût total d’une tâche réellement complexe.
+- Réutiliser les validations encore valides de `docs/AI_VALIDATION_STATE.json` et conserver la validation différentielle ; Superpowers ne justifie jamais de retester les surfaces inchangées.
+- Superpowers ne donne aucune permission supplémentaire pour Git/GitHub, Codex Security, les dépendances, le réseau, les permissions Thunderbird ou les opérations de release.
+
 ## Secrets, identité et agents
 
 - Lire et appliquer `SECURITY_PRODUCTION_RULES.md` avant toute opération touchant la configuration, la CI, la production, une release ou des credentials.
@@ -73,6 +84,7 @@ La carte exhaustive est dans `PROJECT_MEMORY.md`. Cette liste ne conserve que le
 - `tests/` : modèles, contrats de compatibilité, stockage et gardes anti-régression.
 - `.github/workflows/thunderbird-smoke.yml` : smoke sur vrai binaire Thunderbird, distinct de la QA générique.
 - `docs/AI_VALIDATION_STATE.json` : cache des validations réutilisables et de leurs conditions d’invalidation.
+- `docs/SUPERPOWERS_POLICY.md` : politique opt-in et seuil d’utilisation de Superpowers.
 - `docs/` : architecture, sécurité, débogage et validation manuelle.
 
 ## Commandes
