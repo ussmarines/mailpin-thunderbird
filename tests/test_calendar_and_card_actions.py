@@ -9,6 +9,7 @@ options_css = (ROOT / "extension/options/options.css").read_text(encoding="utf-8
 dashboard_html = (ROOT / "extension/dashboard/dashboard.html").read_text(encoding="utf-8")
 dashboard_js = (ROOT / "extension/dashboard/dashboard.js").read_text(encoding="utf-8")
 pin_css = (ROOT / "extension/styles/pin.css").read_text(encoding="utf-8")
+calendar_adapter = (ROOT / "extension/api/pinInbox/modules/thunderbird-calendar.js").read_text(encoding="utf-8")
 
 # Card actions must share one dispatcher and must not depend on the DOM CSS global.
 assert "CSS.escape" not in impl
@@ -49,9 +50,6 @@ assert 'contextMenu.style.left' not in impl
 
 # Calendar inventory and writes must check ACL, disabled/read-only state and capabilities.
 for token in [
-    "lazy.cal.acl.isCalendarWritable",
-    "capabilities.tasks.supported",
-    "capabilities.events.supported",
     "taskCompatible",
     "eventCompatible",
     "_selectCalendarForItem",
@@ -59,6 +57,14 @@ for token in [
     "MODIFICATION_FAILED",
 ]:
     assert token in impl
+for token in [
+    "cal?.acl?.isCalendarWritable",
+    "capabilities.tasks.supported",
+    "capabilities.events.supported",
+    "taskCompatible",
+    "eventCompatible",
+]:
+    assert token in calendar_adapter
 assert ".filter(calendar => !calendar.readOnly && !calendar.disabled)" not in impl
 assert "caseItem.calendarItemType || \"task\"" in impl
 assert "caseItem.calendarItemType=type" in impl

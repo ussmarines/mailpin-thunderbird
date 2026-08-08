@@ -236,6 +236,16 @@ async page => {
     assert(successfulStartup.trace.includes(stage), `Successful startup must report ${stage}`);
   }
 
+  await page.setViewportSize({width: 720, height: 900});
+  const responsiveOverflow = await page.evaluate(() => ({
+    scrollWidth: document.documentElement.scrollWidth,
+    clientWidth: document.documentElement.clientWidth
+  }));
+  assert(responsiveOverflow.scrollWidth <= responsiveOverflow.clientWidth + 1,
+    `Options must not overflow horizontally at 720px: ${JSON.stringify(responsiveOverflow)}`);
+  await page.setViewportSize({width: 1440, height: 900});
+  await page.screenshot({path: "output/playwright/options-fr.png", fullPage: true});
+
   const initial = await page.evaluate(() => ({
     formHidden: document.querySelector("#settings-form").hidden,
     loadingHidden: document.querySelector("#settings-loading").hidden,
@@ -587,6 +597,7 @@ async page => {
     controlsExercised: controls.length,
     finalMeta: await meta(),
     startupStages: (await startupState()).trace.length,
+    responsiveOverflow,
     initialRecommended: {
       showSearch: initial.showSearch,
       showQuickActions: initial.showQuickActions,

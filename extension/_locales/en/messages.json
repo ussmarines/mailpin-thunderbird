@@ -75,7 +75,7 @@
     "message": "Accounts and colors"
   },
   "accountsColorsHelp": {
-    "message": "Colors are used only to visually distinguish accounts."
+    "message": "Colors only distinguish accounts. Use the provider test only when troubleshooting."
   },
   "actionsPerMinute": {
     "message": "Maximum actions per minute"
@@ -480,7 +480,7 @@
     "message": "Groups"
   },
   "guidedTipText": {
-    "message": "Recommended settings are already enabled. Change only what matches your workflow."
+    "message": "Recommended mode hides advanced technical settings. Use “Apply recommended settings” to prepare a draft, then Save to confirm it."
   },
   "guidedTipTitle": {
     "message": "Tip"
@@ -768,13 +768,13 @@
     "message": "Preview every import before writing and automatically back up before migrations."
   },
   "sectionFollowUp": {
-    "message": "Follow-ups and no reply"
+    "message": "Reminders and reply states"
   },
   "sectionFollowUpEyebrow": {
     "message": "Tracking"
   },
   "sectionFollowUpIntro": {
-    "message": "MailPerch can automatically remind you when a conversation remains unanswered."
+    "message": "Track what needs your attention: reminders, awaited replies, and messages you need to answer."
   },
   "sectionHealth": {
     "message": "Health center and diagnostics"
@@ -813,13 +813,13 @@
     "message": "Keep useful information visible and hide the rest."
   },
   "sectionPins": {
-    "message": "Pinning and compatibility"
+    "message": "Pins"
   },
   "sectionPinsEyebrow": {
     "message": "Foundations"
   },
   "sectionPinsIntro": {
-    "message": "Define what a pin is and how MailPerch integrates with Thunderbird."
+    "message": "Choose how messages are pinned. Thunderbird technical settings are kept under Advanced."
   },
   "sectionShortcut": {
     "message": "Keyboard shortcut"
@@ -855,7 +855,7 @@
     "message": "Settings level"
   },
   "settingsGuided": {
-    "message": "Guided — recommended"
+    "message": "Recommended"
   },
   "showCounters": {
     "message": "Show counters"
@@ -1310,7 +1310,7 @@
   "controlHelpGlobalDashboard": {"message": "Enables the global tab that groups pins from all accounts."},
   "controlHelpPerformanceMetrics": {"message": "Measures only local render times, with no telemetry or network transfer."},
   "controlHelpShortcut": {"message": "Thunderbird shortcut used to pin or unpin the current selection."},
-  "controlHelpSettingsExperience": {"message": "Guided mode hides advanced settings. Advanced mode shows all settings without changing their values."},
+  "controlHelpSettingsExperience": {"message": "Recommended mode hides advanced settings. Advanced mode shows all settings without changing their values."},
   "controlHelpUiPreset": {"message": "Adjusts only the settings-page spacing. It never changes the message list or main panel."},
   "controlHelpReduceMotion": {"message": "Reduces animations for comfort without disabling action feedback."},
   "controlHelpVirtualization": {"message": "Above this pin count, MailPerch limits the initial render to preserve responsiveness."},
@@ -1541,5 +1541,29 @@
   "averageWaitingAge": {"message": "Average waiting time"},
   "completedLast7Days": {"message": "Completed in 7 days"},
   "daysShort": {"message": "d"},
-  "responseState": {"message": "Reply status"}
+  "responseState": {"message": "Reply status"},
+  "navAutomation": {"message": "Automation"},
+  "navAdvanced": {"message": "Advanced"},
+  "recommendedModeTitle": {"message": "Recommended configuration"},
+  "recommendedModeHelp": {"message": "Restores technical and interface settings to a safe baseline without deleting your groups, cases, rules, selected calendar, or backup folder."},
+  "applyRecommendedSettings": {"message": "Apply recommended settings"},
+  "buttonHelpApplyRecommended": {"message": "Prepares recommended values in the form. Nothing is saved until you click Save."},
+  "recommendedDraftApplied": {"message": "Recommended settings have been prepared. Review them, then click Save to apply them."},
+  "settingsSearchMatches": {"message": "$1 section(s) containing “$2”."},
+  "settingsSectionsAvailable": {"message": "$1 sections available."},
+  "workflowSettingsTitle": {"message": "Tracking workflows"},
+  "workflowSettingsHelp": {"message": "Active, Waiting, Planned and Completed states organize the lifecycle without moving your messages."},
+  "organizationChecklistsTitle": {"message": "Checklists"},
+  "organizationChecklistsHelp": {"message": "Add subtasks directly from a pin; no additional setting is required."},
+  "organizationSavedViewsTitle": {"message": "Saved views"},
+  "organizationSavedViewsHelp": {"message": "Combine search and filters in the dashboard, then save the view for reuse."},
+  "sectionCalendarEssential": {"message": "Calendar"},
+  "calendarTargetTitle": {"message": "Calendar and synchronization"},
+  "calendarTargetHelp": {"message": "Choose the calendar to use or let MailPerch ask you each time an item is created."},
+  "sectionTagsAutomation": {"message": "Thunderbird tags"},
+  "tagSyncControlTitle": {"message": "Status synchronization"},
+  "tagSyncControlHelp": {"message": "Only tags reserved for MailPerch are created, changed, or removed."},
+  "sectionThunderbirdTechnicalEyebrow": {"message": "Thunderbird"},
+  "sectionThunderbirdTechnical": {"message": "Compatibility and technical behavior"},
+  "sectionThunderbirdTechnicalIntro": {"message": "These settings are for diagnostics, special compatibility cases, and very large volumes. Recommended mode manages them automatically."}
 }

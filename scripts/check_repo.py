@@ -150,11 +150,11 @@ required_root = [
     "package.json", ".editorconfig", ".gitattributes", ".gitignore", "extension/AGENTS.md",
     "extension/api/pinInbox/AGENTS.md", "tests/AGENTS.md",
     "docs/PROJECT_STATE.json", "docs/ARCHITECTURE.md", "docs/CODEX_HANDOFF.md", "docs/IDENTITY_MIGRATION_REQUIRED.md", "docs/DATA_MODEL.md", "docs/DEBUGGING.md", "docs/SECURITY_BOUNDARY.md",
-    "docs/UI_SPEC.md", "docs/THREAT_MODEL.md", "docs/ATN_RELEASE_CHECKLIST.md",
+    "docs/UI_SPEC.md", "docs/THREAT_MODEL.md", "docs/THUNDERBIRD_COMPATIBILITY.md", "docs/THUNDERBIRD_TEST_BENCH.md", "docs/ATN_RELEASE_CHECKLIST.md",
     "docs/MANUAL_TEST_PLAN.md", "docs/SCREENSHOT_FINDINGS.md", "docs/DECISIONS.md",
     "docs/KNOWN_LIMITATIONS.md", "scripts/build.py", "scripts/check_repo.py", "scripts/check_versions.py", "scripts/check_project_memory.py", "scripts/deep_audit.py", "scripts/scan_secrets.py", ".github/scripts/security_guard.py",
     "release/BUILD_INSTRUCTIONS.md", "release/ATN_REVIEW_NOTES_TEMPLATE.md", "release/manifest-store-template.json",
-    "tests/test_build_reproducible.py", "tests/test_security_hardening_3_2_4.py", "tests/test_ui_regressions.py", "tests/test_api_schema_contract.py", "tests/test_data_integrity_guards.py", "tests/test_native_card_menu.py", "tests/test_accessibility_localization.py", "tests/test_ux_3_2_features.py", "tests/ux_3_2_model_tests.mjs"
+    "tests/test_build_reproducible.py", "tests/test_recommended_options_ux.py", "tests/test_thunderbird_compatibility_boundary.py", "tests/thunderbird_compatibility_contract.mjs", "tests/test_thunderbird_test_bench.py", "tests/thunderbird/real_smoke.py", ".github/workflows/thunderbird-smoke.yml", "tests/test_security_hardening_3_2_4.py", "tests/test_ui_regressions.py", "tests/test_api_schema_contract.py", "tests/test_data_integrity_guards.py", "tests/test_native_card_menu.py", "tests/test_accessibility_localization.py", "tests/test_ux_3_2_features.py", "tests/ux_3_2_model_tests.mjs"
 ]
 for relative in required_root:
     check((ROOT / relative).is_file(), f"fichier dépôt manquant: {relative}")

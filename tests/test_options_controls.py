@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from html.parser import HTMLParser
 from pathlib import Path
 
@@ -15,9 +16,12 @@ class ControlParser(HTMLParser):
         super().__init__()
         self.buttons: list[dict[str, str]] = []
         self.settings_controls: list[dict[str, str]] = []
+        self.ids: set[str] = set()
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         values = {key: value or "" for key, value in attrs}
+        if values.get("id"):
+            self.ids.add(values["id"])
         if tag == "button" and values.get("id"):
             self.buttons.append(values)
         if tag in {"input", "select", "textarea"} and values.get("id"):
@@ -98,6 +102,26 @@ for control in parser.settings_controls:
     if control_id in non_setting_controls:
         continue
     assert f'"{control_id}"' in JS, f"Unregistered settings control: {control_id}"
+
+# Keep the reverse mapping as well: every statically declared settings control
+# must exist in the production HTML. The runtime validates this too, but this
+# guard catches a missing control without requiring a browser.
+definitions = re.search(
+    r"const SETTINGS_CONTROL_DEFINITIONS = Object\.freeze\(\[(?P<body>.*?)\n\]\);",
+    JS,
+    re.S,
+)
+assert definitions, "Settings control definitions missing"
+definition_body = definitions.group("body")
+registered_ids = set(re.findall(r'settingControl\("([^"]+)"', definition_body))
+for mapped in re.finditer(
+    r"\.\.\.\[(?P<ids>.*?)\]\.map\(id => settingControl\(id, \"(?:boolean|string|number)\"\)\)",
+    definition_body,
+    re.S,
+):
+    registered_ids.update(re.findall(r'"([A-Za-z0-9-]+)"', mapped.group("ids")))
+missing_registered_ids = sorted(registered_ids - parser.ids)
+assert not missing_registered_ids, f"Registered settings controls missing from HTML: {missing_registered_ids}"
 
 assert '<script src="options-bootstrap.js" defer></script>' in HTML
 assert '<script src="options.js"' not in HTML

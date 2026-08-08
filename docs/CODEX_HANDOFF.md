@@ -1,138 +1,140 @@
-# Passage de relais Codex
+# Passage de relais Codex — consolidation Thunderbird / Options
 
-Lire d’abord [`IDENTITY_MIGRATION_REQUIRED.md`](IDENTITY_MIGRATION_REQUIRED.md), puis [`../PROJECT_MEMORY.md`](../PROJECT_MEMORY.md). Ce fichier est volontairement court afin d’éviter de dupliquer le contexte.
+Ce fichier décrit uniquement la branche de travail actuelle pour éviter de recharger tout l’historique. Lire dans cet ordre :
 
-En cas de contradiction sur l’identité de l’extension, le manifeste, `docs/PROJECT_STATE.json` et l’historique d’identité sont prioritaires sur les mentions anciennes de la mémoire.
+1. `docs/IDENTITY_MIGRATION_REQUIRED.md` — identité immuable ;
+2. `PROJECT_MEMORY.md` — invariants et carte des fichiers ;
+3. ce fichier ;
+4. `docs/THUNDERBIRD_COMPATIBILITY.md` si la frontière Thunderbird est inspectée ;
+5. `docs/THUNDERBIRD_TEST_BENCH.md` si le banc runtime est inspecté ;
+6. uniquement les fichiers modifiés pertinents dans le diff contre `main`.
 
-## État courant
+## Référence Git
 
-- version publique : **1.2.0** ;
-- base GitHub de référence avant audit : `main`, synchronisée le 5 août 2026 ;
-- ID canonique : `pin-mails@MailPerch.local` ;
-- décision d’identité résolue le 4 août 2026 avant toute publication, signature ou diffusion catalogue ;
-- une installation locale portant une ancienne identité doit être sauvegardée, réinstallée et restaurée selon `docs/IDENTITY_MIGRATION_REQUIRED.md` ;
-- productivité 1.2.0 : fonctions 1.1 conservées, plus checklists, recherche globale, tags MailPerch, vues enregistrées, palette de commandes, états de réponse et statistiques enrichies ;
-- schémas : SQLite 5, paramètres 7, données 7 ;
-- la CI s’exécute sur les changements de `main` ; une release GitHub n’est déclenchée que par un tag `v*` cohérent avec la version ou par lancement manuel explicite.
-- historique GitHub publié et vérifié jusqu’à `v1.1.2` ; la version 1.2.0 est préparée sur `feature/mailperch-1.2.0` avant PR, fusion et release cohérentes.
+- version préparée pour publication : **1.3.0** ;
+- base : `main` = `385815f546968acf721c8cd8486ff48f55f78a32` ;
+- branche : `refactor/thunderbird-integration-and-ux` ;
+- ne pas fusionner `main` ;
+- ne pas créer de tag/release ;
+- revue Codex terminée ; la publication 1.3.0 reste soumise aux gates PR/CodeQL/QA.
 
-## Passe 1.2.0
+## Objectifs de la branche
 
-- notes portées à 4 000 caractères et checklists bornées à 50 sous-tâches ;
-- recherche globale sur les métadonnées, sans corps de message ni pièces jointes ;
-- synchronisation facultative avec six tags MailPerch à propriété stricte clé+libellé ;
-- Agenda bidirectionnel conservé et relié aux changements de workflow/tags ;
-- palette de commandes et vues personnalisées enregistrables ;
-- états **J’attends / Je dois répondre** calculés sans IA ;
-- statistiques locales enrichies ;
-- paramètres/dashboard affinés avec pile typographique système Fluent 2 et plancher 12 px ;
-- schéma logique 7 et nouvelles gardes 1.2 ;
-- aucune permission WebExtension ni dépendance tierce ajoutée.
+1. isoler les API internes Thunderbird derrière une couche Messages / Tags / Agenda ;
+2. préserver le comportement métier de 1.2.1 tout en livrant la consolidation en 1.3.0 ;
+3. rendre les Options plus simples avec **Essentiel / Organisation / Automatisation / Avancé** ;
+4. présenter `guided` comme mode **Recommandé** sans migration ;
+5. ajouter un smoke test qui lance un vrai Thunderbird officiel ;
+6. documenter les limites et la reprise.
 
-## Passe 1.1.2
+## Hors périmètre
 
-- correction du grand espace vide créé par le passage responsive des outils du panneau en colonne ;
-- base flexible du champ de recherche neutralisée dans les panneaux étroits et sélecteur de vue étendu à la largeur disponible ;
-- centre de rappels totalement masqué lorsqu’il porte `hidden`, sans supprimer sa fonction lorsqu’un rappel existe ;
-- `MP-2026-019` ajouté au registre et scénario manuel dédié ajouté au plan de test ;
-- version, README, changelog, métadonnées de build et documents de publication synchronisés sur 1.1.2.
+Ne pas implémenter ici : **Prochaine action**, **Timeline conversation**, **Follow-up récurrent**, **Résultat du suivi**, IA, cloud, comptes MailPerch ou nouvelle synchronisation distante.
 
-## Passe 1.1.1
+## Architecture à préserver
 
-- rapprochement de conversations limité à une identité forte, jamais au seul objet ;
-- diagnostics et erreurs privilégiées expurgés des chemins, credentials et identifiants privés ;
-- packaging limité aux fichiers suivis, sans ajout arbitraire à l’allowlist reviewer ;
-- workflows de scan/release durcis, actions limitées aux éditeurs autorisés et SHA obligatoires côté dépôt ;
-- catalogues FR/EN complets pour Options et dashboard, y compris ARIA et contenu dynamique ;
-- catalogue FR/EN fermé de 237 libellés pour le panneau privilégié, son menu natif, l’éditeur, les rappels et Agenda ;
-- scénarios Playwright : 98 contrôles Options, 7 vues dashboard, responsive, thème sombre et mouvement réduit ;
-- validation Thunderbird 153.0.1 : compte local et quatre messages synthétiques, panneau séparé, invariants de lecture, géométrie native et 17 actions du menu anglais observés ; MP-2026-004 et MP-2026-017 sont corrigés.
-- historique accessible, tags, releases et métadonnées GitHub assainis ; GitHub Support doit encore purger 11 références internes de PR et les vues en cache depuis une session authentifiée.
-- `MP-2026-018` suit l’écart d’empreinte du conteneur ZIP entre Windows et Linux malgré des entrées et contenus décompressés identiques.
+```text
+business modules
+      │
+      ▼
+PinCompatibility
+ ├─ thunderbird-messages.js
+ ├─ thunderbird-tags.js
+ └─ thunderbird-calendar.js
+      │
+      ▼
+Thunderbird internal APIs
+```
 
-## Décision d’identité du 4 août 2026
+`implementation.js` conserve l’orchestration, le cycle de vie et le DOM `about:3pane`. Ne pas lancer un grand refactoring du DOM dans cette passe.
 
-- MailPerch est un projet personnel indépendant de Sibylla ;
-- le produit n’avait encore jamais été publié sur ATN, AMO ou un autre catalogue ;
-- l’identifiant intermédiaire de la branche de sécurité a été remplacé avant fusion ;
-- le nouvel identifiant doit conserver exactement sa casse dans le manifeste, le modèle de publication, l’état projet, les tests et les contrôles ;
-- ne jamais réintroduire les anciennes références nominatives ;
-- avant la première publication, vérifier la disponibilité de l’ID et les exigences de manifeste applicables ;
-- après la première signature ou publication, considérer l’ID comme immuable.
+### Invariants de compatibilité
 
-## Passe 3.2.4
+- pas d’appels métier directs à `MailServices`, `MailUtils`, `MessageArchiver`, `cal`, `CalEvent`, `CalTodo` hors adaptateurs ;
+- Tags : vérifier toutes les collisions avant toute création ; ne jamais adopter/supprimer un tag personnel ;
+- Agenda/Tags facultatifs : indisponibilité locale, pas panne globale ;
+- résolution de messages bornée ;
+- listeners/observers enregistrés avec cleanup idempotent ;
+- aucune nouvelle permission WebExtension, dépendance runtime, connexion réseau ou migration de stockage.
 
-- rail étoile/punaise/menu centré dans les lignes natives ;
-- confort des paramètres séparé de la densité des cartes ;
-- densités compactes maintenues lisibles ;
-- toast fermé depuis son coin supérieur droit ;
-- primitives CSS ajoutées pour les classes options auparavant non stylées ;
-- toggles, aides de boutons, groupes, comptes, calendriers et centre de santé réorganisés ;
-- duplication visible des comptes supprimée ;
-- état Agenda reformulé selon les capacités réelles ;
-- duplication du bouton Enregistrer supprimée ;
-- audit Git Windows rendu robuste aux fins de ligne CRLF ;
-- `PROJECT_MEMORY.md` et `docs/PROJECT_STATE.json` ajoutés ;
-- validation récursive et bornée de toutes les entrées privilégiées sensibles ;
-- imports neutralisés avant persistance et diagnostic anonymisé ;
-- chemins de sauvegarde réservés au sélecteur natif ;
-- purge complète des données gérées lors de la désinstallation et sentinelle native de réinstallation propre ;
-- correction du flux Enregistrer/Annuler et de l’étoile native dupliquée ;
-- manifeste/CSP, scan de secrets, frontière de confiance et audit sécurité documentés.
+## Options
 
-## Validation obligatoire
+Le stockage garde `settingsExperience = guided|advanced`. L’interface affiche **Recommandé** pour `guided`.
+
+Le mode Recommandé masque les sections marquées avancées mais ne supprime aucun contrôle. L’action d’application des recommandations :
+
+- charge la configuration réelle ;
+- applique un brouillon sûr ;
+- conserve calendrier préféré, groupe d’attente, dossier de sauvegarde, couleurs de comptes et activation des boîtes ;
+- marque le formulaire modifié ;
+- **ne sauvegarde pas** ;
+- laisse Enregistrer/Annuler décider du résultat.
+
+Le registre de réglages et le HTML doivent rester bijectifs. La passe Playwright finale a trouvé puis corrigé l’absence de `moveToWaitingOnReply`, qui rendait sinon l’initialisation terminale. `tests/test_options_controls.py` contrôle maintenant aussi registre → HTML ; ne pas revenir à une garde dans un seul sens.
+
+Le langage visuel Fluent 2 est implémenté avec les contrôles HTML natifs et `extension/styles/tokens.css`. L’essai de `@fluentui/web-components` 3.0.3 a été retiré : le code ne l’importait pas, le build ne le regroupait pas dans le XPI et son exigence Node 22/24 contredisait la matrice Node 20. Le dépôt reste donc sans dépendance npm runtime et sans lockfile tant qu’un besoin de composant, un bundle local déterministe et sa maintenance sécurité ne sont pas démontrés ensemble.
+
+## Banc Thunderbird
+
+- workflow : `.github/workflows/thunderbird-smoke.yml` ;
+- runner : `tests/thunderbird/real_smoke.py` ;
+- garde statique : `tests/test_thunderbird_test_bench.py` ;
+- binaire ciblé actuellement : Thunderbird `153.0.1esr` ;
+- geckodriver : `0.37.1` ;
+- téléchargements test uniquement, SHA-256 vérifiés ;
+- le smoke installe/désinstalle/réinstalle l’XPI et contrôle l’injection/cleanup du panneau ;
+- exécution réelle réussie le 8 août 2026 sur Thunderbird **153.0.1 ESR** Linux avec profil Local Folders synthétique : background `Startup: Complete`, panneau/bouton injectés une seule fois, cleanup complet, réinstallation propre.
+
+Le banc a détecté pendant cette branche un crash de bootstrap `ReferenceError: ExtensionError is not defined` provoqué par l’injection immédiate d’une dépendance privilégiée jusque-là implicite. La correction importe explicitement `ExtensionError` depuis `ExtensionUtils.sys.mjs`; `tests/test_thunderbird_compatibility_boundary.py` garde cet invariant. Ne pas retirer cet import ni assouplir le smoke sans cause démontrée.
+
+Ne jamais déduire qu’il est compatible avec toutes les versions/fournisseurs à partir d’un seul smoke Linux.
+
+## Tests ciblés déjà prévus
+
+```bash
+python tests/test_thunderbird_compatibility_boundary.py
+node tests/thunderbird_compatibility_contract.mjs
+python tests/test_recommended_options_ux.py
+python tests/test_thunderbird_test_bench.py
+```
+
+La validation complète de branche reste :
 
 ```bash
 npm run ci
 ```
 
-Puis suivre `docs/MANUAL_TEST_PLAN.md`, particulièrement la section 3.2.4 et la procédure locale de changement d’identité.
+Ne relancer une suite coûteuse en boucle que si ses fichiers/dépendances ont changé ou si une correction peut l’affecter. Après une correction finale, une seule passe complète est attendue.
 
-## Identité Fluent 1.0.0
+## Surface à examiner en priorité lors de la revue Codex
 
-- `extension/styles/tokens.css` est la source visuelle commune et expose des palettes explicites clair/sombre ;
-- `extension/styles/theme.js` synchronise Options et dashboard avec le thème Thunderbird, avec repli `prefers-color-scheme` ;
-- Options et dashboard ont été réorganisés visuellement sans modifier leurs IDs, contrats DOM ni logique métier ;
-- le panneau natif consomme les mêmes tokens tout en conservant ses interactions et sa géométrie Thunderbird ;
-- les captures navigateur clair/sombre sont validées, mais les thèmes, le zoom 200 % et le panneau restent à confirmer dans Thunderbird 128–153.
+1. diff `main...refactor/thunderbird-integration-and-ux` ;
+2. contrats des trois adaptateurs et appels de `implementation.js` ;
+3. cleanup des listeners/observers et comportement de capacité manquante ;
+4. atomicité/propriété des tags ;
+5. Options : masquage, recherche/navigation, brouillon Recommandé, save/cancel ;
+6. workflow runtime : chaîne de confiance, absence de secret, checksums, timeouts, logs ;
+7. documentation et cohérence des assertions.
 
-## Passe 3.2.5
+## Ce qu’une revue ne doit pas faire
 
-- étoiles natives laissées intactes en mode indépendant ;
-- sauvegarde/annulation des paramètres basées sur les événements natifs du formulaire ;
-- audit Git Windows converti aux flux NUL-délimités binaires ;
-- registre permanent des bugs ajouté et contrôlé par la CI.
+- refaire un audit historique exhaustif des anciennes builds 3.2.x sans indice lié au diff ;
+- remplacer les adaptateurs par un abstrait générique sans besoin concret ;
+- assouplir un test simplement pour obtenir du vert ;
+- ajouter Selenium/npm packages pour le smoke si la bibliothèque standard suffit ;
+- modifier `main`, taguer ou publier ;
+- supprimer les tests historiques de zones inchangées uniquement pour raccourcir la CI.
 
-## Passe 3.2.7
+## Rapport attendu de Codex
 
-Priorité absolue : MP-2026-004 et MP-2026-005. Ne pas les déclarer corrigés sur la seule base des tests statiques. Lire `docs/BUG_TRACKER.md`, conserver l’étoile dans le DOM natif en mode indépendant et maintenir un gestionnaire direct sur les boutons visibles des paramètres.
+À la fin, fournir :
 
-## Passe 3.2.8
+- constat du diff revu ;
+- bugs/régressions trouvés et corrections exactes ;
+- tests réellement exécutés et résultats ;
+- limites qui nécessitent encore Thunderbird réel ;
+- `git status --short --branch` ;
+- dernier commit ;
+- confirmation explicite : aucun push `main`, aucun tag, aucune release.
 
-- `modules/settings.js` est la source unique des recommandations et migrations ;
-- le registre Options doit rester exhaustif et son validateur doit échouer visiblement si le DOM et le schéma divergent ;
-- les tests Playwright chargent les vrais actifs mais utilisent une API synthétique locale ; ils ne constituent pas une validation de l'onglet Thunderbird ;
-- le rail d'actions repose sur la structure réelle de ThreadCard 153 et ne doit pas être remplacé par un offset de capture ;
-- le lancement Thunderbird temporaire a réussi, mais WebDriver BiDi n'a exposé aucun contexte d'onglet ;
-- À cette date, MP-2026-004, MP-2026-005 et MP-2026-007 restaient `À VALIDER` ; leurs validations ultérieures sont consignées dans `docs/BUG_TRACKER.md`.
-
-## Passe 3.2.9
-
-- l’initialisation Options est terminale : formulaire prêt ou panneau d’erreur avec Réessayer ;
-- toute attente API de configuration est bornée, et Agenda/santé/sauvegarde sont secondaires ;
-- les diagnostics d’initialisation ne contiennent que des codes techniques expurgés ;
-- Playwright local a validé le timeout, le panneau terminal et Réessayer sur les vrais actifs ; Thunderbird 153.0.1 a chargé l’XPI dans un profil vierge sans compte, mais son onglet Options n’était pas automatisable ;
-- la validation graphique réelle dans Thunderbird reste obligatoire.
-
-## Passe 3.2.10
-
-- le XPI 3.2.9 a été reproduit dans Thunderbird 153.0.1 : `localize()` supprimait
-  `input#import-file`, puis `options.js:1773:4` échouait avant l’initialisation ;
-- `options-bootstrap.js` garantit une trace expurgée et un état terminal même si
-  les réglages, le module principal ou l’API Experiment manquent ou se bloquent ;
-- la localisation ne peut plus remplacer un élément qui contient des contrôles ;
-- la matrice Playwright couvre les actifs réels, les échecs pré-module et API,
-  les 98 contrôles, une sauvegarde unique et Réessayer sans écouteur dupliqué ;
-- Thunderbird 153.0.1, profil jetable sans compte, a validé recommandations,
-  Enregistrer, Annuler, réouverture et persistance après redémarrage ;
-- MP-2026-004 restait alors à valider ; il a été confirmé le 5 août 2026 dans une vraie liste de messages synthétiques avec le XPI 1.1.1.
+Le prompt précis sera fourni séparément après choix des outils/skills Codex disponibles.

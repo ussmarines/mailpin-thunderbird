@@ -14,6 +14,7 @@ dashboard_js = (EXT / "dashboard/dashboard.js").read_text(encoding="utf-8")
 options_html = (EXT / "options/options.html").read_text(encoding="utf-8")
 options_js = (EXT / "options/options.js").read_text(encoding="utf-8")
 tokens_css = (EXT / "styles/tokens.css").read_text(encoding="utf-8")
+tag_adapter = (EXT / "api/pinInbox/modules/thunderbird-tags.js").read_text(encoding="utf-8")
 
 modules = ("checklists.js", "analytics.js", "saved-views.js", "tag-sync.js")
 for module in modules:
@@ -47,10 +48,11 @@ assert "messageBody" not in impl and "attachmentContent" not in impl
 # 4: optional tag synchronization stays in the existing privileged API and does not widen MV3 permissions.
 assert 'enableThunderbirdTagSync' in options_html and 'sync-tags' in options_html
 assert '_ensureMailPerchTags' in impl and '_clearReferenceTags' in impl and '_tagHeadersForReference' in impl
-assert 'MailServices.tags' in impl and 'MailServices.tags.deleteKey' in impl
+assert 'this._thunderbird?.tags?.ensureDefinitions' in impl and 'this._thunderbird?.tags?.removeDefinitions' in impl
+assert 'tags.deleteKey' in tag_adapter
 assert re.search(r'hardenImportedConfiguration[\s\S]*?settings\.enableThunderbirdTagSync = false;', impl), "Imported backups must not auto-enable Thunderbird tag side effects"
-assert 'existing !== definition.label' in impl, "Managed tag ownership must be exact"
-assert impl.index('for (const definition of definitions) {', impl.index('_ensureMailPerchTags')) < impl.index('MailServices.tags.addTagForKey', impl.index('_ensureMailPerchTags')), "Tag collision preflight must run before creation"
+assert 'existing !== String(definition.label || "")' in tag_adapter, "Managed tag ownership must be exact"
+assert tag_adapter.index('validateDefinitions(definitions);') < tag_adapter.index('tags.addTagForKey'), "Tag collision preflight must run before creation"
 assert 'trackingMode !== "conversation"' in impl and '_conversationHeaders(resolved)' in impl
 permissions = set(manifest.get("permissions", []))
 assert "messagesTags" not in permissions and "messagesRead" not in permissions

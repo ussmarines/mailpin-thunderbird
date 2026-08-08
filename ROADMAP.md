@@ -1,111 +1,99 @@
 # Feuille de route
 
-## 1.2.0 — productivité locale avancée
+## 1.3.0 — consolidation Thunderbird et interface
 
-- [x] notes étendues et checklists/sous-tâches liées aux épingles ;
-- [x] recherche globale des métadonnées MailPerch sans indexation du corps des messages ;
-- [x] synchronisation facultative de tags Thunderbird strictement possédés par MailPerch ;
-- [x] consolidation de la synchronisation Agenda ↔ MailPerch ;
-- [x] palette de commandes et accès rapide depuis le dashboard ;
-- [x] vues personnalisées enregistrables ;
-- [x] indicateurs **J’attends** / **Je dois répondre** ;
+Branche : `refactor/thunderbird-integration-and-ux`
+Base stable : `main` / `385815f546968acf721c8cd8486ff48f55f78a32`
+
+### Intégration Thunderbird
+
+- [x] isoler les opérations Messages derrière un adaptateur injecté ;
+- [x] isoler la gestion des tags et leur propriété stricte ;
+- [x] isoler Agenda, ACL, capacités et observateurs ;
+- [x] fournir une façade `PinCompatibility` ;
+- [x] ajouter des contrats avec faux services Thunderbird ;
+- [x] ajouter une garde empêchant le métier de réintroduire les accès natifs extraits ;
+- [x] garder le DOM `about:3pane` dans l’orchestrateur pour éviter un refactoring graphique massif simultané ;
+- [x] exécuter et stabiliser le smoke runtime sur Thunderbird 153.0.1 ESR Linux avec profil local synthétique, installation/cleanup/réinstallation validés ;
+- [ ] après revue Codex, tester la future release sur le poste utilisateur et ses comptes réels.
+
+### Options plus simples
+
+- [x] organiser les réglages en **Essentiel / Organisation / Automatisation / Avancé** ;
+- [x] présenter le mode `guided` comme **Recommandé** sans modifier la valeur persistée ;
+- [x] masquer les sections techniques avancées en Recommandé sans supprimer les fonctions ;
+- [x] ajouter une action de brouillon recommandé qui ne sauvegarde jamais automatiquement ;
+- [x] préserver les choix propres au profil lors de l’application du brouillon ;
+- [x] conserver recherche, Enregistrer, Annuler et le mode Avancé ;
+- [x] couvrir la taxonomie et le comportement par une garde dédiée FR/EN.
+- [x] valider dans un navigateur réel la bijection registre/HTML, le brouillon, Enregistrer/Annuler et les reprises d’initialisation.
+
+### Qualité et banc de test
+
+- [x] ajouter un workflow de smoke Thunderbird séparé de la QA obligatoire pendant sa phase d’épreuve ;
+- [x] vérifier les téléchargements de test Thunderbird/geckodriver par SHA-256 ;
+- [x] installer, désinstaller et réinstaller le XPI dans le scénario runtime ;
+- [x] conserver les logs/résultats/captures comme artefacts ;
+- [x] documenter les niveaux de preuve et la voie officielle comm-central `mach` ;
+- [x] confirmer que Fluent 2 reste local et sans dépendance npm runtime tant qu’aucun bundle de composants n’est justifié ;
+- [ ] promouvoir éventuellement le smoke en contrôle requis uniquement après plusieurs exécutions fiables.
+
+### Documentation et revue
+
+- [x] documenter la frontière Thunderbird et le banc runtime ;
+- [x] remettre la mémoire projet, l’état machine, l’architecture, la sécurité et le handoff au niveau de la branche ;
+- [x] exécuter la passe finale `npm run ci` et l’audit du diff ;
+- [x] synchroniser la branche GitHub et obtenir QA/smoke verts ; CodeQL reste le gate de PR ;
+- [x] faire relire/corriger la branche par Codex avec Thunderbird, Fluent 2, Playwright, Context7 et Security Diff Scan ;
+- [x] préparer la release 1.3.0 ; PR, CodeQL, fusion et publication constituent les derniers gates GitHub.
+
+## Validation de la 1.2.1 stable
+
+- [x] release 1.2.1 publiée avec QA et CodeQL verts ;
+- [x] correctif des détections fournisseurs `live.com` / `me.com` validé par CodeQL ;
+- [x] test réel utilisateur de la 1.2.1 effectué le 8 août 2026 sans anomalie signalée sur la passe demandée ;
+- [ ] la matrice exhaustive Windows/Linux/macOS, extrêmes 128/153, zoom 200 % et chaque fournisseur annoncé reste une exigence distincte avant une éventuelle soumission ATN.
+
+## 1.2.0 / 1.2.1 — socle fonctionnel actuel
+
+- [x] notes étendues et checklists/sous-tâches ;
+- [x] recherche globale sur métadonnées, sans corps de message ;
+- [x] synchronisation facultative de tags MailPerch ;
+- [x] synchronisation Agenda bidirectionnelle ;
+- [x] palette de commandes et vues enregistrées ;
+- [x] états **J’attends / Je dois répondre** ;
 - [x] statistiques de suivi enrichies ;
-- [x] finition Fluent 2, polices système locales, alignements/espacements et plancher typographique 12 px ;
-- [x] schémas paramètres/données 7, migrations, tests et documentation de sécurité ;
-- [ ] valider visuellement 1.2.0 dans Thunderbird réel, notamment tags, Agenda bidirectionnel, zoom 200 % et fournisseurs annoncés.
+- [x] Fluent 2, plancher typographique 12 px et responsive ;
+- [x] schémas paramètres/données 7, migrations, sauvegardes et documentation sécurité ;
+- [x] durcissement 1.2.1 de la classification locale des fournisseurs.
 
-## 1.1.2 — stabilité responsive du panneau
+## Après consolidation — prochaine version fonctionnelle
 
-- [x] supprimer l’espace vide créé par la base flexible de la recherche en disposition verticale ;
-- [x] masquer totalement le centre de rappels lorsqu’il ne contient aucun rappel ;
-- [x] adapter le sélecteur de vue à la largeur des panneaux étroits ;
-- [x] ajouter une garde de non-régression et synchroniser la documentation de release ;
-- [ ] confirmer le correctif dans Thunderbird réel avec plusieurs redimensionnements et un rappel actif.
+Ces fonctions sont volontairement hors de la branche actuelle et seront développées après la nouvelle release de consolidation et sa validation réelle :
 
-## 1.1.1 — confidentialité et durcissement de publication
+1. **Prochaine action** — file de traitement centrée sur ce qui demande réellement l’attention ;
+2. **Timeline complète d’une conversation** — chronologie messages, rappels, notes, checklist, Agenda et changements d’état ;
+3. **Follow-up récurrent** — génération contrôlée de rappels tant qu’une réponse manque, sans envoi automatique ;
+4. **Résultat du suivi** — motif de clôture structuré pour enrichir les statistiques.
 
-- [x] retirer les références personnelles de la branche courante et préparer le nettoyage ciblé de l’historique ;
-- [x] empêcher les rapprochements de conversations sur le seul objet ;
-- [x] expurger chemins, credentials et identifiants des diagnostics et journaux ;
-- [x] verrouiller le packaging, les workflows de release et les actions GitHub ;
-- [x] compléter l’anglais, les noms accessibles et les scénarios navigateur Options/dashboard ;
-- [ ] terminer la matrice Thunderbird réelle et la validation ATN sur les systèmes annoncés.
+## Dette et validations longues
 
-## 1.1.0 — productivité intégrée
-
-- [x] suivi automatique sans réponse et capture rapide ;
-- [x] mise en veille réelle, réveil et vue dédiée ;
-- [x] vues Aujourd’hui et Revue quotidienne/hebdomadaire ;
-- [x] actions groupées étendues et sélection par plage ;
-- [x] centre de rappels interactif ;
-- [x] aperçu des règles avant enregistrement ;
-- [x] personnalisation des dix raccourcis ;
-- [x] détection et fusion prudente des conversations associées ;
-- [ ] validation manuelle des fonctions 1.1.0, reportée sur le XPI courant 1.1.2 dans une vraie liste de messages Thunderbird sur les systèmes annoncés.
-
-## 3.2.10 — validation réelle de la page Options
-
-- recommandations, dock, Enregistrer, Annuler, réouverture et redémarrage validés dans Thunderbird 153.0.1 avec un profil jetable ;
-- MP-2026-005, MP-2026-007 et MP-2026-008 corrigés et conservés comme régressions automatisées ;
-- MP-2026-004 reste à valider sur une vraie liste de messages contenant les variantes de cartes requises.
-
-## 3.2.9 — validation Thunderbird de l’initialisation récupérable
-
-- ouvrir Options dans un profil vierge sans compte ni calendrier et confirmer que le chargeur disparaît ;
-- vérifier le formulaire, les recommandations, Enregistrer, Annuler et la persistance après redémarrage ;
-- provoquer une indisponibilité de l’Experiment et confirmer le panneau d’erreur, le diagnostic expurgé et Réessayer ;
-- conserver MP-2026-008 en `À VALIDER` jusqu’à cette observation réelle.
-
-## 3.2.8 — validation Thunderbird des corrections structurelles
-
-- confirmer dans un profil Thunderbird 153 jetable que les recommandations sont visibles dès la première ouverture des paramètres ;
-- confirmer les 98 contrôles, Enregistrer, Annuler, réouverture et redémarrage avec l'API Experiment réelle ;
-- mesurer le rail sur une liste de messages synthétiques virtualisée et comparer aux seuils automatisés ;
-- conserver MP-2026-004, MP-2026-005 et MP-2026-007 en `À VALIDER` jusqu'à ces observations ;
-- intégrer à terme le scénario Playwright à un harnais Thunderbird qui expose ses contextes d'onglets.
-
-## 3.2.7 — seconde correction des interactions réelles
-
-- confirmer dans Thunderbird 153 qu’une seule étoile native, une seule punaise MailPerch et un seul bouton Plus sont visibles par ligne ;
-- confirmer les clics directs Enregistrer et Annuler, puis la persistance après fermeture/réouverture ;
-- maintenir MP-2026-004 et MP-2026-005 en `À VALIDER` jusqu’à confirmation utilisateur ;
-- ne plus déplacer `.button-star` en mode indépendant et ne jamais appliquer les classes génériques Thunderbird à la punaise MailPerch.
-
-## 3.2.5 — validation des régressions réelles
-
-- confirmer dans Thunderbird 153 qu’une seule étoile native est visible en mode indépendant et en mode `nativeStar` ;
-- modifier un champ texte, une case, un nombre et une liste, puis valider Enregistrer, Annuler et `Ctrl/Cmd+S` ;
-- confirmer le passage du job Windows après le flux NUL-délimité de `deep_audit.py` ;
-- maintenir `docs/BUG_TRACKER.md` à chaque bug reproduit, même lorsqu’une correction est différée ;
-- intégrer progressivement les validations graphiques au harnais Thunderbird réel.
-
-## 3.2.4 — porte de sécurité et cycle de vie
-
-- valider dans Thunderbird réel la fermeture/purge à la désinstallation et la sentinelle de réinstallation à zéro, y compris après désactivation/réactivation ;
-- confirmer les valeurs recommandées sur un profil neuf : mode guidé, densité normale, automatisations destructives désactivées ;
-- tester les imports malformés, volumineux et contenant des clés dangereuses ;
-- vérifier les sauvegardes dans le dossier interne puis dans un dossier choisi par le sélecteur natif ;
-- conserver les audits historiques, maintenir l’audit de sécurité de la version courante, `docs/SECURITY_BOUNDARY.md` et le test de durcissement dans chaque future version ;
-- exécuter une revue de sécurité indépendante avant toute publication publique.
-
-## 1.0.x — stabilisation après publication
-
-- exécuter les tests browser/XPCShell dans un checkout Thunderbird réel ;
-- compléter la matrice manuelle Windows/Linux pour IMAP, POP, Gmail, Microsoft, boîte unifiée, dossiers virtuels et calendriers ;
-- mesurer le panneau avec 100, 500 et 2 000 épingles réelles ;
-- corriger les résultats de l’audit lecteur d’écran NVDA/Orca ;
-- finir la traduction des messages techniques rares et des journaux de maintenance.
-
-## 1.1.x — compatibilité et automatisation
-
-- conserver l’identifiant public, le nom et la licence désormais figés ;
-- figer une plage Thunderbird réellement testée ;
-- ajouter un harnais Thunderbird téléchargeable pour la CI graphique ;
-- préparer captures, notes reviewers, politique de support et procédure de retour arrière.
+- reproductibilité binaire ZIP réellement identique entre Windows et Linux (`MP-2026-018`) ;
+- tests XPCShell/Mochitest dans un checkout Thunderbird réel ;
+- matrice manuelle IMAP, POP, Gmail, Microsoft, boîte unifiée, dossiers virtuels et calendriers ;
+- mesure avec 100, 500 et 2 000 épingles ;
+- audit lecteur d’écran NVDA/Orca ;
+- validation de désinstallation/réinstallation et sauvegardes sur plusieurs plateformes ;
+- captures, notes reviewers, politique de support et procédure de retour arrière avant ATN.
 
 ## Publication ATN
+
+Avant une soumission :
 
 - fournir le code source lisible et les instructions de build reproductible ;
 - joindre la matrice de compatibilité réelle et les hashes SHA-256 ;
 - confirmer la conformité des marques, de la licence et des données personnelles ;
-- soumettre la version stable courante après validation manuelle complète et traiter les retours reviewers sans modifications hors périmètre.
+- tester la version stable courante dans Thunderbird réel ;
+- traiter les retours reviewers sans élargissement opportuniste du périmètre.
+
+Les anciennes étapes internes `3.2.x` restent consultables dans l’historique Git et les audits archivés ; elles ne constituent plus la feuille de route active.

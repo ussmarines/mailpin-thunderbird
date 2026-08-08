@@ -88,3 +88,17 @@ MailPerch peut proposer le regroupement d’épingles uniquement lorsqu’elles 
 ## 2026-08-04 — état explicite des rappels interactifs
 
 Un rappel possède un horodatage de déclenchement et un horodatage d’acquittement distincts. Cette séparation permet de conserver un rappel récurrent visible jusqu’à une action utilisateur, de reporter sans dupliquer et d’ignorer sans supprimer l’épingle. Le centre de rappels n’envoie, ne déplace et ne supprime jamais de message.
+
+## 2026-08-08 — frontière de compatibilité Thunderbird explicite
+
+Les opérations Messages, Tags et Agenda qui dépendent des services internes Thunderbird sont regroupées derrière `PinCompatibility` et des adaptateurs injectables. La logique métier ne doit plus réintroduire ces appels directs dans l’orchestrateur. Le DOM `about:3pane` reste temporairement dans `implementation.js` afin de ne pas cumuler extraction des services et réécriture graphique risquée dans la même passe.
+
+Une capacité Tags ou Agenda absente doit dégrader uniquement cette fonction. Les tests de contrat avec faux services complètent, mais ne remplacent pas, un test avec un vrai binaire Thunderbird.
+
+## 2026-08-08 — mode Recommandé sans migration de préférence
+
+La valeur persistée `guided` est conservée pour la compatibilité des profils, mais son libellé utilisateur devient **Recommandé**. Ce mode masque les sections techniques Avancé sans supprimer leurs contrôles. L’action d’application des recommandations modifie uniquement un brouillon, préserve les valeurs propres au profil et exige toujours un Enregistrer explicite.
+
+## 2026-08-08 — smoke Thunderbird séparé de la QA obligatoire
+
+Le smoke runtime utilise un binaire Thunderbird officiel et geckodriver vérifiés par SHA-256. Pendant sa phase d’épreuve, il reste un workflow séparé et non requis afin qu’une incompatibilité du harnais externe ne bloque pas la QA source. Il ne pourra devenir un contrôle requis qu’après plusieurs exécutions fiables et une décision explicite.

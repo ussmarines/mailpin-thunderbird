@@ -1,33 +1,54 @@
 # Limites connues
 
-- Le panneau, les épingles, le clic de carte, le compteur non lu, la géométrie des icônes et le menu natif anglais ont été validés dans Thunderbird 153.0.1 avec un compte local et quatre messages synthétiques. Les fonctions de productivité qui dépendent d’un fournisseur réel, d’Agenda ou d’un cycle long restent à valider par environnement.
-- La page Options 3.2.10 et les cartes `about:3pane` ont été exécutées dans des profils Thunderbird 153.0.1 jetables distincts ; cette preuve ne couvre pas encore toute la plage 128–153 ni le zoom 200 %.
-- Les gardes automatiques valident les contrats, la syntaxe, les modèles, les données et le build, mais ne remplacent pas les clics réels restant dans `docs/MANUAL_TEST_PLAN.md`.
-- Les tests XPCShell/Mochitest fournis nécessitent un checkout de développement Thunderbird et ne sont pas exécutés par la CI générique.
-- Une API Experiment déclenche un avertissement d’accès complet et peut casser lors d’une évolution interne de Thunderbird.
-- Les pages Options et dashboard ainsi que le panneau privilégié, leurs contenus dynamiques et leurs noms accessibles sont disponibles en français et en anglais ; les codes de diagnostic internes restent volontairement techniques et indépendants de la langue.
-- La matrice intégrée décrit les capacités détectées localement, mais ne garantit pas le comportement de chaque serveur sans test manuel.
-- Les actions supprimer/archiver, les dossiers virtuels et la synchronisation Agenda doivent être validés sur chaque fournisseur utilisé.
-- Le fichier principal de l’Experiment reste l’orchestrateur privilégié. Les logiques pures et stables sont séparées dans `modules/`, mais le découpage de l’intégration DOM doit rester progressif.
-- Le portail ATN doit encore accepter l’identifiant, le nom et la licence ; l’identifiant déjà utilisé par les releases GitHub ne doit pas être remplacé silencieusement.
+## Version 1.3.0 et portée de validation
 
-- La mémoire projet décrit le dépôt mais ne remplace pas une validation graphique réelle ;
-  elle est contrôlée automatiquement pour la version et les points d’entrée.
-- La purge immédiate s’appuie sur des écouteurs de cycle de vie enregistrés lorsque l’Experiment a été chargé et doit être validée dans Thunderbird réel. Si l’extension est restée désactivée depuis le démarrage, l’Experiment ne peut pas exécuter lui-même cette purge au moment exact de la suppression. La sentinelle stockée dans la zone locale que Gecko efface nativement force toutefois une purge des résidus avant toute initialisation lors d’une réinstallation normale. Les préférences de développement Firefox/Thunderbird permettant volontairement de conserver le stockage d’extension à la désinstallation peuvent neutraliser ce mécanisme et sont hors configuration utilisateur normale.
-- Le propriétaire du profil local et toute personne disposant de Browser Toolbox contrôlent déjà le processus Thunderbird ; MailPerch ne peut pas créer une frontière d’autorisation contre cet acteur. Il n’existe donc aucun rôle administrateur client à contourner.
-- Les sauvegardes exportées manuellement hors des dossiers gérés par MailPerch ne peuvent ni ne doivent être effacées automatiquement lors de la désinstallation.
-- Une sécurité absolue ne peut pas être garantie ; toute nouvelle version de Thunderbird ou modification de l’API Experiment exige une nouvelle revue et des tests réels.
-- Les actions GitHub sont épinglées à des commits précis et suivies par Dependabot ; une mise à jour doit être relue avant fusion plutôt que suivie automatiquement par un tag mobile.
-- Les builds ZIP répétés sur un même environnement sont binaires identiques, mais Python `zipfile`/zlib encode des flux DEFLATE et des métadonnées d’hôte différents entre Windows et Linux. La release 1.1.1 contient les mêmes entrées et octets décompressés sur les deux systèmes ; ses SHA-256 Linux publiés sont autoritatifs. `MP-2026-018` suit une reproductibilité binaire réellement inter-plateforme.
+La version **1.3.0** livre la consolidation Thunderbird et Options. L’utilisateur a effectué le 8 août 2026 une passe réelle de la 1.2.1 sur son Thunderbird sans anomalie signalée ; la 1.3.0 bénéficie en plus des validations automatisées, de la revue Codex et du smoke Thunderbird 153.0.1 ESR. Cela ne remplace pas une matrice exhaustive par système, version, fournisseur, type de dossier et calendrier.
 
+La branche `refactor/thunderbird-integration-and-ux` a été revue par Codex et validée par la CI GitHub ainsi que par le smoke Thunderbird réel. Les scénarios fournisseurs/OS/zoom/accessibilité qui restent manuels sont détaillés ci-dessous et doivent être distingués de cette validation automatisée.
 
-## Validation des correctifs récents
+## Compatibilité Thunderbird
 
-MP-2026-004, MP-2026-005, MP-2026-007, MP-2026-008 et MP-2026-017 ont été validés dans Thunderbird 153.0.1 avec des profils jetables. MP-2026-010 reste à valider avec un calendrier synthétique ; MP-2026-011 conserve la matrice Thunderbird 128–153 et le zoom 200 % comme validations réelles restantes.
+- Le manifeste déclare Thunderbird `128.0` à `153.*`, mais tous les points internes ne sont pas automatiquement prouvés sur chaque version de cette plage.
+- MailPerch utilise une API Experiment privilégiée. Une évolution interne de Thunderbird peut donc exiger une adaptation même si les APIs WebExtension publiques restent compatibles.
+- Les opérations Messages, Tags et Agenda sont désormais isolées dans des adaptateurs dédiés ; cela réduit la surface d’adaptation future mais ne supprime pas la nécessité des tests réels.
+- Le DOM `about:3pane`, la structure `ThreadCard`, les fenêtres et menus natifs restent orchestrés dans `implementation.js`. Cette zone est volontairement extraite progressivement plutôt que réécrite en bloc.
+- Les dossiers virtuels, actions supprimer/archiver et comportements de fournisseurs doivent toujours être observés dans les environnements réellement utilisés.
 
-## Validation 1.2.0 restant à faire dans Thunderbird réel
+## Agenda et tags
 
-- Les nouvelles checklists, vues enregistrées, recherche étendue, palette de commandes, indicateurs de réponse et statistiques sont couvertes par les tests statiques/modèles, mais leur validation graphique finale doit être faite dans Thunderbird réel.
-- La synchronisation de tags s’appuie sur les API internes Thunderbird actuelles et n’élargit pas les permissions ; elle doit encore être observée dans Thunderbird 128–153, y compris sur conversations et dossiers virtuels.
-- La synchronisation Agenda bidirectionnelle dépend des capacités et comportements des fournisseurs ; un calendrier local et chaque fournisseur annoncé doivent être testés manuellement.
-- Le plancher CSS de 12 px est contrôlé automatiquement, mais le rendu effectif à zoom 200 %, polices système différentes et thèmes de contraste élevé doit être observé manuellement.
+- La synchronisation Agenda dépend des capacités et ACL du calendrier. Un calendrier local, CalDAV ou un fournisseur tiers peut exposer des comportements différents.
+- La synchronisation Tags est facultative et ne doit gérer que les définitions dont la propriété MailPerch est démontrée par clé et libellé exacts.
+- Une indisponibilité Agenda ou Tags doit dégrader uniquement la fonction concernée ; cette politique est testée par contrat, mais les comportements propres aux fournisseurs exigent encore une validation réelle.
+
+## Banc de test Thunderbird
+
+- Les gardes statiques et contrats de la branche sont exécutables sans Thunderbird.
+- Le workflow `.github/workflows/thunderbird-smoke.yml` a réussi le 8 août 2026 sur Thunderbird **153.0.1 ESR** Linux avec un profil Local Folders synthétique : installation, background `Startup: Complete`, injection unique, désinstallation/cleanup et réinstallation propre ont été observés. Cette preuve est limitée à ce scénario local sans fournisseur réseau.
+- Un smoke Linux sur une version épinglée ne prouve pas Windows/macOS, les extrêmes de version, les fournisseurs réels, le zoom 200 %, l’accessibilité ni les performances à grande échelle.
+- Les tests XPCShell/Mochitest fournis nécessitent un checkout/build Thunderbird et ne sont pas exécutés par la CI générique du dépôt.
+
+## Interface et accessibilité
+
+- Options et dashboard sont disponibles en français et en anglais ; les codes de diagnostic internes restent volontairement techniques.
+- Le mode **Recommandé** masque les réglages avancés mais ne supprime pas leurs fonctions. Le stockage conserve la valeur historique `guided` afin d’éviter une migration.
+- Le plancher CSS de 12 px est contrôlé automatiquement, mais le rendu effectif à zoom 200 %, avec polices système différentes, contraste élevé et lecteurs d’écran doit être observé manuellement.
+- Les gardes DOM/Playwright utilisent des actifs réels mais une API synthétique ; elles ne remplacent pas les interactions dans `about:3pane`.
+- Les scénarios Chromium ont validé Options et dashboard après les corrections finales, mais ils ne prouvent ni le rendu dans un onglet Thunderbird ni le zoom navigateur réel à 200 %.
+
+## Cycle de vie et stockage
+
+- La purge immédiate repose sur des écouteurs de cycle de vie enregistrés lorsque l’Experiment est chargé. Si l’extension est restée désactivée depuis le démarrage, l’Experiment ne peut pas exécuter lui-même cette purge au moment exact de la suppression.
+- La sentinelle stockée dans la zone locale que Gecko efface normalement force toutefois la purge des résidus avant une réinstallation normale. Les préférences de développement qui demandent volontairement à Gecko de conserver le stockage à la désinstallation sont hors configuration utilisateur normale.
+- Les sauvegardes exportées manuellement hors des dossiers gérés par MailPerch ne peuvent ni ne doivent être effacées automatiquement.
+- Le propriétaire du profil local et toute personne disposant de la Browser Toolbox contrôlent déjà le processus Thunderbird ; MailPerch ne peut pas créer une frontière d’autorisation contre cet acteur.
+
+## Build et publication
+
+- Les builds ZIP répétés sur un même environnement sont binaires identiques, mais Python `zipfile`/zlib peut produire des conteneurs différents entre Windows et Linux malgré des entrées décompressées identiques. `MP-2026-018` suit cette reproductibilité inter-plateforme.
+- Les SHA-256 de la release GitHub sont autoritatifs pour les artefacts publiés.
+- Les actions GitHub sont épinglées à des commits précis et suivies par Dependabot ; une mise à jour doit être relue avant fusion.
+- Le portail ATN doit encore accepter l’identifiant, le nom, la licence et la matrice de compatibilité réelle avant toute diffusion catalogue.
+
+## Sécurité
+
+Une sécurité absolue ne peut pas être garantie. Toute nouvelle version Thunderbird ou modification de l’API Experiment exige une nouvelle revue des frontières privilégiées et des tests réels. Les téléchargements Thunderbird/geckodriver du banc sont des dépendances **de test uniquement** et ne modifient pas la promesse locale/no-network de l’extension installée.

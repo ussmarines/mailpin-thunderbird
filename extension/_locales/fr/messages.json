@@ -75,7 +75,7 @@
     "message": "Comptes et couleurs"
   },
   "accountsColorsHelp": {
-    "message": "Les couleurs servent uniquement à distinguer visuellement les comptes."
+    "message": "Les couleurs distinguent uniquement les comptes. Utilisez le test fournisseur seulement en cas de doute."
   },
   "actionsPerMinute": {
     "message": "Actions max/minute"
@@ -480,7 +480,7 @@
     "message": "Groupes"
   },
   "guidedTipText": {
-    "message": "Les réglages recommandés sont déjà actifs. Modifiez uniquement ce qui correspond à votre façon de travailler."
+    "message": "Le mode Recommandé masque les réglages techniques avancés. Utilisez « Appliquer les réglages recommandés » pour préparer un brouillon, puis Enregistrer pour le confirmer."
   },
   "guidedTipTitle": {
     "message": "Conseil"
@@ -768,13 +768,13 @@
     "message": "Prévisualisez chaque import avant d’écrire et créez automatiquement une sauvegarde avant les migrations."
   },
   "sectionFollowUp": {
-    "message": "Relances et absence de réponse"
+    "message": "Rappels et états de réponse"
   },
   "sectionFollowUpEyebrow": {
     "message": "Suivi"
   },
   "sectionFollowUpIntro": {
-    "message": "MailPerch peut vous rappeler automatiquement lorsqu’une conversation reste sans réponse."
+    "message": "Suivez ce qui demande votre attention : rappels, réponses attendues et messages auxquels vous devez répondre."
   },
   "sectionHealth": {
     "message": "Centre de santé et diagnostic"
@@ -813,13 +813,13 @@
     "message": "Gardez les informations utiles visibles et masquez le reste."
   },
   "sectionPins": {
-    "message": "Épinglage et compatibilité"
+    "message": "Épingles"
   },
   "sectionPinsEyebrow": {
     "message": "Fondations"
   },
   "sectionPinsIntro": {
-    "message": "Définissez ce qu’est une épingle et la manière dont MailPerch s’intègre à Thunderbird."
+    "message": "Choisissez comment épingler vos messages. Les réglages techniques Thunderbird sont rangés dans Avancé."
   },
   "sectionShortcut": {
     "message": "Raccourci clavier"
@@ -855,7 +855,7 @@
     "message": "Niveau de réglages"
   },
   "settingsGuided": {
-    "message": "Guidé — recommandé"
+    "message": "Recommandé"
   },
   "showCounters": {
     "message": "Afficher les compteurs"
@@ -1310,7 +1310,7 @@
   "controlHelpGlobalDashboard": {"message": "Active l’onglet global regroupant les épingles de tous les comptes."},
   "controlHelpPerformanceMetrics": {"message": "Mesure uniquement les durées de rendu locales, sans télémétrie ni envoi réseau."},
   "controlHelpShortcut": {"message": "Raccourci Thunderbird utilisé pour épingler ou désépingler la sélection courante."},
-  "controlHelpSettingsExperience": {"message": "Le mode Guidé masque les réglages avancés. Le mode Avancé affiche tous les réglages sans modifier leur valeur."},
+  "controlHelpSettingsExperience": {"message": "Le mode Recommandé masque les réglages avancés. Le mode Avancé affiche tous les réglages sans modifier leur valeur."},
   "controlHelpUiPreset": {"message": "Ajuste uniquement l’espacement de la page des paramètres. Cette option ne modifie jamais la liste des messages ni le panneau principal."},
   "controlHelpReduceMotion": {"message": "Réduit les animations pour plus de confort, sans désactiver les retours d’action."},
   "controlHelpVirtualization": {"message": "Au-delà de ce nombre d’épingles, MailPerch limite le rendu initial afin de préserver la fluidité."},
@@ -1541,5 +1541,29 @@
   "averageWaitingAge": {"message": "Attente moyenne"},
   "completedLast7Days": {"message": "Terminés sur 7 jours"},
   "daysShort": {"message": "j"},
-  "responseState": {"message": "État de réponse"}
+  "responseState": {"message": "État de réponse"},
+  "navAutomation": {"message": "Automatisation"},
+  "navAdvanced": {"message": "Avancé"},
+  "recommendedModeTitle": {"message": "Configuration recommandée"},
+  "recommendedModeHelp": {"message": "Remet les réglages techniques et d’interface sur une base sûre sans effacer vos groupes, affaires, règles, calendrier choisi ni dossier de sauvegarde."},
+  "applyRecommendedSettings": {"message": "Appliquer les réglages recommandés"},
+  "buttonHelpApplyRecommended": {"message": "Prépare les valeurs recommandées dans le formulaire. Rien n’est enregistré tant que vous ne cliquez pas sur Enregistrer."},
+  "recommendedDraftApplied": {"message": "Les réglages recommandés ont été préparés. Vérifiez-les puis cliquez sur Enregistrer pour les appliquer."},
+  "settingsSearchMatches": {"message": "$1 section(s) contenant « $2 »."},
+  "settingsSectionsAvailable": {"message": "$1 sections disponibles."},
+  "workflowSettingsTitle": {"message": "Workflows de suivi"},
+  "workflowSettingsHelp": {"message": "Les états Actif, En attente, Planifié et Terminé organisent le cycle de vie sans déplacer vos messages."},
+  "organizationChecklistsTitle": {"message": "Checklists"},
+  "organizationChecklistsHelp": {"message": "Ajoutez des sous-tâches directement depuis une épingle ; aucun réglage supplémentaire n’est nécessaire."},
+  "organizationSavedViewsTitle": {"message": "Vues enregistrées"},
+  "organizationSavedViewsHelp": {"message": "Combinez recherche et filtres depuis le tableau de bord puis enregistrez la vue pour la réutiliser."},
+  "sectionCalendarEssential": {"message": "Agenda"},
+  "calendarTargetTitle": {"message": "Calendrier et synchronisation"},
+  "calendarTargetHelp": {"message": "Choisissez le calendrier à utiliser ou laissez MailPerch vous le demander lors de chaque création."},
+  "sectionTagsAutomation": {"message": "Tags Thunderbird"},
+  "tagSyncControlTitle": {"message": "Synchronisation des statuts"},
+  "tagSyncControlHelp": {"message": "Seuls les tags réservés à MailPerch sont créés, modifiés ou supprimés."},
+  "sectionThunderbirdTechnicalEyebrow": {"message": "Thunderbird"},
+  "sectionThunderbirdTechnical": {"message": "Compatibilité et comportements techniques"},
+  "sectionThunderbirdTechnicalIntro": {"message": "Ces réglages servent au diagnostic, aux cas de compatibilité particuliers et aux très grands volumes. Le mode Recommandé les gère automatiquement."}
 }

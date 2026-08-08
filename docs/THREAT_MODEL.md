@@ -25,7 +25,8 @@ Le propriétaire local du profil et un logiciel ayant déjà le contrôle du sys
 
 - message/import → page WebExtension : données non fiables ;
 - page WebExtension → Experiment : données structurées mais toujours non fiables ;
-- Experiment → Thunderbird/SQLite/fichiers : frontière privilégiée ;
+- Experiment → `PinCompatibility` → Thunderbird : frontière privilégiée Messages/Tags/Agenda ;
+- Experiment → SQLite/fichiers : frontière privilégiée de stockage ;
 - état MailPerch → tags/Agenda Thunderbird : effet de bord local privilégié, opt-in et réversible ;
 - export téléchargé → extérieur du profil : responsabilité explicite utilisateur.
 
@@ -56,14 +57,15 @@ Le propriétaire local du profil et un logiciel ayant déjà le contrôle du sys
 | Données persistantes après désinstallation | arrêt/flush puis purge DB, fichiers, sauvegardes et préférences ; sentinelle native absente à la réinstallation ⇒ purge avant initialisation |
 | Réécriture après purge | récupération de shutdown interdite pendant désinstallation |
 | Diagnostic sensible | expurgation des comptes, calendriers, chemins et contenus |
-| Incompatibilité Thunderbird | plage déclarée, mode réduit, tests manuels |
-| Compromission de la chaîne CI | aucune installation helper, actions épinglées par SHA, checkout sans identifiants persistés |
+| Incompatibilité Thunderbird | adaptateurs dédiés, capacités explicites, dégradation locale des fonctions facultatives, contrats + smoke runtime + tests manuels |
+| Compromission de la chaîne CI | actions épinglées par SHA, checkout sans identifiants persistés ; téléchargements du smoke Thunderbird/geckodriver vérifiés par SHA-256 |
 
 ## Principes pour les nouvelles actions
 
 - une proposition n’est pas une autorisation : la détection d’éléments associés ne fusionne rien seule ;
 - aucune nouvelle commande n’envoie, ne supprime ou ne déplace un message automatiquement ;
 - une action UI est revérifiée dans l’Experiment, même si le dashboard a déjà contrôlé sa sélection ;
+- les modules métier n’obtiennent pas de nouveau privilège en passant par `PinCompatibility` : les entrées restent bornées et la façade ne constitue pas une autorisation ;
 - les dates de veille et rappel sont bornées et normalisées avant persistance ;
 - les libellés issus des messages sont affichés comme texte, jamais interprétés comme balisage ;
 - les sous-tâches et vues enregistrées sont des données locales non fiables : elles sont normalisées et bornées avant persistance et avant usage dans les filtres ;

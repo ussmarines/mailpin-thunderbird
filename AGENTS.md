@@ -6,9 +6,11 @@ Ce dépôt contient une MailExtension Thunderbird Manifest V3 avec une API Exper
 
 1. `docs/IDENTITY_MIGRATION_REQUIRED.md` — décision canonique et historique de l’identifiant ;
 2. `PROJECT_MEMORY.md` — état courant, carte complète et procédures ;
-3. `docs/BUG_TRACKER.md` — bugs ouverts, corrigés et validations réelles restantes ;
-4. le fichier `AGENTS.md` le plus proche de la zone modifiée ;
-5. uniquement les fichiers spécialisés indiqués par la mémoire.
+3. `docs/CODEX_HANDOFF.md` — objectif et périmètre de la branche active ;
+4. `docs/BUG_TRACKER.md` — bugs ouverts, corrigés et validations réelles restantes ;
+5. `docs/THUNDERBIRD_COMPATIBILITY.md` uniquement si la frontière Thunderbird est touchée ;
+6. le fichier `AGENTS.md` le plus proche de la zone modifiée ;
+7. uniquement les fichiers spécialisés indiqués par la mémoire.
 
 En cas de contradiction sur l’identité de l’extension, `docs/IDENTITY_MIGRATION_REQUIRED.md`, `extension/manifest.json` et `docs/PROJECT_STATE.json` sont prioritaires sur les anciennes mentions conservées dans la mémoire historique.
 
@@ -31,6 +33,8 @@ Afficher des messages épinglés dans un panneau distinct au-dessus de la liste 
 11. Toute entrée de page ou de sauvegarde est non fiable : borne, valide et normalise avant un sink privilégié.
 12. Aucun rôle `admin`, secret client, chemin de fichier arbitraire ou autorisation fondée sur le DOM.
 13. Lire `docs/SECURITY_BOUNDARY.md` avant toute modification de l’API Experiment, des imports ou du stockage.
+14. Ne pas contourner `PinCompatibility` pour les opérations Messages, Tags ou Agenda déjà extraites.
+15. Le mode Recommandé ne sauvegarde jamais automatiquement et ne doit pas écraser les choix propres au profil.
 
 ## Secrets, identité et agents
 
@@ -48,11 +52,13 @@ La carte exhaustive est dans `PROJECT_MEMORY.md`. Cette liste ne conserve que le
 - `extension/manifest.json` : manifeste installable.
 - `extension/background.js` : API WebExtension publique, menus, commandes, ouverture du dashboard.
 - `extension/api/pinInbox/implementation.js` : intégration privilégiée et orchestration.
-- `extension/api/pinInbox/modules/` : identité, stockage, workflow, règles, Agenda.
+- `extension/api/pinInbox/modules/compatibility.js` + `thunderbird-*.js` : frontière Messages / Tags / Agenda.
+- `extension/api/pinInbox/modules/` : logique métier pure, identité, stockage, workflows et règles.
 - `extension/styles/pin.css` : panneau et adaptation des lignes natives.
 - `extension/dashboard/` : tableau de bord global.
 - `extension/options/` : paramètres et outils de diagnostic.
-- `tests/` : modèles, stockage et gardes anti-régression.
+- `tests/` : modèles, contrats de compatibilité, stockage et gardes anti-régression.
+- `.github/workflows/thunderbird-smoke.yml` : smoke sur vrai binaire Thunderbird, distinct de la QA générique.
 - `docs/` : architecture, sécurité, débogage et validation manuelle.
 
 ## Commandes
@@ -80,6 +86,8 @@ Le XPI est construit dans `dist/`. Aucun outil de compilation externe n’est re
 - `_setupAbout3Pane()` : DOM interne Thunderbird, clics, menu contextuel, drag-and-drop.
 - `PinStructuredStore` : concurrence, migrations et récupération.
 - `_resolveReference()` et conversations : Gmail/IMAP/copies/déplacements.
+- `PinCompatibility` et `thunderbird-*.js` : évolution des API internes, listeners, ACL et propriété des tags.
+- `.github/workflows/thunderbird-smoke.yml` / `tests/thunderbird/real_smoke.py` : compatibilité du banc avec le binaire réel.
 - observateurs Agenda et dossiers : boucles, doublons et nettoyage.
 - règles automatiques : limite d’actions et anti-boucle.
 

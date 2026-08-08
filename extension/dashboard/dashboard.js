@@ -739,7 +739,7 @@ async function load({silent = false} = {}) {
     if (generation !== loadGeneration) return false;
     current = data;
     calendars = calendarList;
-    $("search").value = data.search || options.search;
+    $("search").value = data.search || options.search || "";
     selected.forEach(key => { if (!(data.items || []).some(item => item.stableKey === key)) selected.delete(key); });
     render();
     $("fatal-error").hidden = true;

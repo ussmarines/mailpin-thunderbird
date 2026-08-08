@@ -52,7 +52,7 @@
 - barre latérale groupée : Essentiel, Suivi, Organisation, Intégrations, Maintenance et Accès rapide ;
 - recherche filtrant sections et navigation ;
 - section active signalée par `aria-current` ;
-- modes Guidé/Avancé et espacement Compact/Équilibré/Très aéré limité à cette page ;
+- modes Recommandé/Avancé et espacement Compact/Équilibré/Très aéré limité à cette page ;
 - aide sous chaque contrôle et bouton, sans placer aide et libellé côte à côte ;
 - un seul dock Enregistrer/Annuler, visible uniquement lorsqu’une modification existe ;
 - toast fixe non invasif, avec fermeture en haut à droite ;

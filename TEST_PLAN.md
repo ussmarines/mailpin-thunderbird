@@ -1,59 +1,66 @@
 # Plan de test
 
-Le plan manuel complet se trouve dans `docs/MANUAL_TEST_PLAN.md`.
+Le plan manuel complet se trouve dans `docs/MANUAL_TEST_PLAN.md`. La stratégie du banc réel est décrite dans `docs/THUNDERBIRD_TEST_BENCH.md`.
 
-Les contrôles disponibles sans environnement Thunderbird sont lancés par :
+## Niveau 1 — contrôle complet sans Thunderbird
 
 ```bash
 npm run ci
 ```
 
-Ils couvrent structure, versions, mémoire projet, scan de secrets, permissions/CSP, validation des entrées privilégiées, import durci, cycle cœur de désinstallation, purge et sentinelle de réinstallation, accessibilité, localisation FR/EN, données, migrations, vues intelligentes, actions groupées, fournisseurs, santé, diagnostic, performances, modèles SQLite et build reproductible.
+Cette commande couvre structure, versions, mémoire projet, scan de secrets, permissions/CSP, validation des entrées privilégiées, import durci, cycle de désinstallation, accessibilité, localisation FR/EN, données, migrations, logique métier, stockage SQLite et build reproductible.
 
-Les fichiers `tests/browser/` et `tests/xpcshell/` restent des points d’entrée pour un checkout Thunderbird. Aucune compatibilité graphique complète ne doit être affirmée avant leur exécution et la matrice manuelle Windows/Linux.
-
-Le contexte de test, les invariants et les chemins à haut risque sont résumés dans [`PROJECT_MEMORY.md`](PROJECT_MEMORY.md). Les bugs reproduits et leur validation sont suivis dans [`docs/BUG_TRACKER.md`](docs/BUG_TRACKER.md).
-
-
-## Porte de sécurité 3.2.4
-
-Le contrôle ciblé est lancé par :
+## Niveau 2 — contrats de la consolidation
 
 ```bash
-python tests/test_security_hardening_3_2_4.py
+python tests/test_thunderbird_compatibility_boundary.py
+node tests/thunderbird_compatibility_contract.mjs
+python tests/test_recommended_options_ux.py
+python tests/test_thunderbird_test_bench.py
 ```
 
-Il ne remplace pas une validation dans Thunderbird. La désinstallation doit être vérifiée manuellement avec un profil de test : fermeture des fenêtres, suppression du module, absence de base/préférences/sauvegardes internes, puis réinstallation avec les valeurs recommandées.
+Ces tests vérifient :
 
+- l’absence de réintroduction des appels Thunderbird extraits dans l’orchestrateur ;
+- les contrats Messages / Tags / Agenda avec faux services ;
+- l’atomicité/propriété des tags et les capacités Agenda ;
+- le mode Recommandé, son brouillon sans auto-save et la taxonomie Options ;
+- la structure, les versions épinglées et la chaîne de vérification du smoke runtime.
 
-## Régressions ciblées 3.2.5
+Ils ne prouvent pas le comportement graphique dans Thunderbird.
+
+## Niveau 3 — vrai binaire Thunderbird en CI
+
+Workflow : `.github/workflows/thunderbird-smoke.yml`.
+
+Il construit l’XPI, télécharge et vérifie un Thunderbird officiel ainsi qu’un geckodriver épinglé, puis teste : installation temporaire, extension active, présence unique du panneau/toggle, désinstallation et cleanup, réinstallation sans duplication.
+
+Tant que ce job n’a pas réellement réussi sur un commit, il faut décrire son état comme **implémenté mais runtime non validé**. Les artefacts de diagnostic sont conservés même en cas d’échec.
+
+## Niveau 4 — checkout Thunderbird / comm-central
+
+Les fichiers `tests/browser/` et `tests/xpcshell/` restent des points d’entrée pour un checkout Thunderbird. Les suites officielles peuvent être lancées via `mach`, par exemple :
 
 ```bash
-python tests/test_regressions_3_2_5.py
-python scripts/check_bug_tracker.py
+./mach xpcshell-test comm/mail/components/extensions/test/xpcshell
+./mach mochitest mail/components/extensions/test/browser
 ```
 
-Dans Thunderbird, vérifier séparément :
+Un checkout/build Thunderbird complet est requis. Cette couche permet d’aller plus loin que le smoke externe pour les internals et interactions natives.
 
-1. une seule étoile native et une seule punaise MailPerch en mode indépendant ;
-2. le passage vers `nativeStar`, puis le retour au mode indépendant sans étoile déplacée ni masquée ;
-3. Enregistrer, Annuler, Entrée/Espace et `Ctrl/Cmd+S` dans les paramètres ;
-4. le job Windows GitHub Actions, qui ne doit plus signaler `dist/.gitkeep\r`.
+## Niveau 5 — validation manuelle
 
-## Régressions ciblées 3.2.8
+Aucune compatibilité complète ne doit être affirmée avant les scénarios pertinents de `docs/MANUAL_TEST_PLAN.md`, notamment :
 
-Automatisé localement avec un serveur HTTP limité à l'interface locale et le CLI
-Playwright (laisser le serveur ouvert dans un premier terminal) :
+- comptes et dossiers réels ;
+- Agenda/fournisseurs ;
+- tags et dossiers virtuels ;
+- thèmes/zoom/accessibilité ;
+- redémarrage et cycle de vie ;
+- performances et grands volumes.
 
-```bash
-python -m http.server 8765 --bind 127.0.0.1
-playwright-cli -s=mailperch-regression open http://127.0.0.1:8765
-playwright-cli -s=mailperch-regression run-code --filename tests/options_dom_flow.playwright.js
-playwright-cli -s=mailperch-regression run-code --filename tests/thread_card_geometry.playwright.js
-playwright-cli -s=mailperch-regression close
-```
+## Régressions historiques à conserver
 
-Ces scénarios chargent les vrais HTML/JS/CSS et une API synthétique sans données
-personnelles. Ils ne remplacent pas la validation Thunderbird : défilement rapide
-de 200 messages, comptes/dossiers, réouverture, redémarrage et clics natifs doivent
-être exécutés selon `docs/MANUAL_TEST_PLAN.md`.
+Les gardes 3.2.x restent utiles même si ces numéros ne sont plus la roadmap active : elles couvrent des bugs réels déjà rencontrés, notamment étoile/punaise, Options Enregistrer/Annuler, initialisation, CRLF Windows, responsive et sécurité de cycle de vie.
+
+Ne supprimer ou assouplir une garde historique que si son contrat n’existe réellement plus et que cette décision est documentée.

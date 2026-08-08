@@ -43,7 +43,7 @@ possède une règle CSS.
 - le bandeau Enregistrer/Annuler apparaissait mais ses actions pouvaient rester inopérantes lorsque l’état de configuration n’était pas initialisé ; les états `configurationReady`, `dirty` et `saveInFlight` sont désormais explicites et protégés ;
 - la liste native pouvait afficher deux glyphes d’étoile lorsque Thunderbird exposait simultanément `.button-star` et `.tree-button-flag` ; un seul contrôle canonique est conservé et les attributs sont nettoyés à la fermeture ;
 - une réinstallation conservait les données de profil historiques ; le cycle de désinstallation ferme maintenant SQLite avant de purger base, récupération, sauvegardes internes et préférences, et une sentinelle native déclenche une purge avant initialisation si des résidus subsistent ;
-- les valeurs recommandées d’une installation neuve sont Guidé, Équilibré, densité Normale et automatismes sensibles désactivés ;
+- les valeurs recommandées d’une installation neuve sont Recommandé, Équilibré, densité Normale et automatismes sensibles désactivés ;
 - la demande de sécurité a conduit à documenter la frontière réelle : aucune notion d’administrateur client, validation au niveau Experiment, imports non fiables et chemins de fichiers réservés au sélecteur natif.
 
 

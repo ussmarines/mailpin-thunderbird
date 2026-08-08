@@ -1,10 +1,10 @@
-# Notes pour les reviewers ATN — MailPerch 1.2.0
+# Notes pour les reviewers ATN — MailPerch 1.3.0
 
 ## Identité
 
 - **Nom :** MailPerch — Email Pins & Follow-up
 - **Nom court :** MailPerch
-- **Version :** 1.2.0
+- **Version :** 1.3.0
 - **ID :** `pin-mails@MailPerch.local`
 - **Compatibilité :** Thunderbird 128.0 à 153.*
 - **Langues :** français et anglais

@@ -2,10 +2,10 @@
   "format": "mailperch-project-state",
   "version": 1,
   "project": "MailPerch — Email Pins & Follow-up",
-  "extensionVersion": "1.2.1",
+  "extensionVersion": "1.3.0",
   "baseGitHub": {
     "branch": "main",
-    "commit": "85569eaec54971d38aa38b7502b1c62b18136559"
+    "commit": "385815f546968acf721c8cd8486ff48f55f78a32"
   },
   "extensionId": "pin-mails@MailPerch.local",
   "thunderbird": {
@@ -26,7 +26,14 @@
     "dashboard": "extension/dashboard/dashboard.html",
     "projectMemory": "PROJECT_MEMORY.md",
     "securityBoundary": "docs/SECURITY_BOUNDARY.md",
-    "bugTracker": "docs/BUG_TRACKER.md"
+    "bugTracker": "docs/BUG_TRACKER.md",
+    "compatibilityFacade": "extension/api/pinInbox/modules/compatibility.js",
+    "thunderbirdMessages": "extension/api/pinInbox/modules/thunderbird-messages.js",
+    "thunderbirdTags": "extension/api/pinInbox/modules/thunderbird-tags.js",
+    "thunderbirdCalendar": "extension/api/pinInbox/modules/thunderbird-calendar.js",
+    "thunderbirdCompatibilityDoc": "docs/THUNDERBIRD_COMPATIBILITY.md",
+    "thunderbirdTestBench": "docs/THUNDERBIRD_TEST_BENCH.md",
+    "codexHandoff": "docs/CODEX_HANDOFF.md"
   },
   "commands": [
     "npm run check",
@@ -50,7 +57,12 @@
     "CI installs no third-party Python helper and pins GitHub Actions by immutable SHA",
     "Only exact MailPerch-owned Thunderbird tags may be managed or removed",
     "Options and dashboard text has a 12px minimum font-size floor",
-    "Provider detection uses exact domain or legitimate subdomain boundaries, never arbitrary URL substrings"
+    "Provider detection uses exact domain or legitimate subdomain boundaries, never arbitrary URL substrings",
+    "Optional Thunderbird capabilities fail locally instead of disabling the full extension",
+    "Business modules do not call Thunderbird core services directly outside compatibility adapters",
+    "Recommended mode never auto-saves and preserves profile-specific settings",
+    "Privileged dependencies injected into compatibility adapters are explicitly imported before facade creation",
+    "Fluent 2 styling uses local CSS tokens and native HTML controls with no npm runtime dependency or remote asset"
   ],
   "ui": {
     "settingsSpacingAffects": [
@@ -66,6 +78,7 @@
   },
   "highRisk": [
     "_setupAbout3Pane",
+    "PinCompatibility adapters",
     "PinStructuredStore",
     "_resolveReference",
     "calendar observers",
@@ -75,18 +88,36 @@
     "uninstall lifecycle",
     "privileged API input validation",
     "settings save/cancel lifecycle",
+    "recommended settings draft",
     "interactive reminders",
     "snooze lifecycle",
     "related-conversation merge",
     "Thunderbird tag synchronization",
     "saved-view filtering and search",
     "checklist persistence and editing",
-    "provider hostname classification"
+    "provider hostname classification",
+    "Thunderbird runtime smoke harness"
   ],
   "security": {
     "uninstallLifecycle": "AddonManager early signal + awaited Gecko Management uninstall purge + core-cleared ExtensionStorage reinstall sentinel",
     "ciSupplyChain": "stdlib-only checks, immutable action SHAs, no persisted checkout credentials, Dependabot monitoring",
-    "providerDetection": "exact recognized domain or dot-boundary subdomain matching; CodeQL incomplete URL substring checks removed in 1.2.1"
+    "providerDetection": "exact recognized domain or dot-boundary subdomain matching; CodeQL incomplete URL substring checks removed in 1.2.1",
+    "thunderbirdBoundary": "MailServices/MailUtils/MessageArchiver and Calendar internals are injected into dedicated compatibility adapters; business logic must not call them directly",
+    "recommendedMode": "recommended values are draft-only, preserve profile-specific fields and require explicit save",
+    "uiDependencyPolicy": "native HTML plus local Fluent 2 CSS tokens; no npm runtime dependency, bundler, CDN or remote asset",
+    "runtimeTestSupplyChain": "test-only Thunderbird/geckodriver downloads are checksum-verified and are not runtime dependencies of the extension"
   },
-  "developmentBranch": "security/mailperch-1.2.1-codeql-hosts"
+  "developmentBranch": "main",
+  "testing": {
+    "contract": [
+      "tests/test_thunderbird_compatibility_boundary.py",
+      "tests/thunderbird_compatibility_contract.mjs",
+      "tests/test_recommended_options_ux.py",
+      "tests/test_thunderbird_test_bench.py"
+    ],
+    "runtimeWorkflow": ".github/workflows/thunderbird-smoke.yml",
+    "runtimeScript": "tests/thunderbird/real_smoke.py",
+    "browserStatus": "production Options and dashboard assets passed local Chromium Playwright flows with a synthetic extension API on 2026-08-08; 99 persisted settings, save/cancel/failure/retry paths, 7 dashboard views, 9 statistics, localization, dark mode and 720px overflow were checked",
+    "runtimeStatus": "passed on 2026-08-08 with Thunderbird 153.0.1 ESR Linux and a synthetic Local Folders profile; MV3 Startup Complete, single injection, uninstall cleanup and clean reinstall validated; provider/OS/version matrix remains manual"
+  }
 }

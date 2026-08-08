@@ -5,6 +5,7 @@ const startup = globalThis.MailPerchOptionsStartup;
 
 let configuration = null;
 let configurationReady = false;
+let refreshSettingsNavigation = null;
 let saveInFlight = false;
 let groups = [];
 let rules = [];
@@ -125,6 +126,27 @@ function setInitializationState(state, error = null) {
 
 function currentSettings(overrides = {}) {
   return {...(configuration?.settings || {}), ...overrides};
+}
+
+const RECOMMENDED_PRESERVED_SETTING_KEYS = Object.freeze(new Set([
+  "preferredCalendarId", "waitingGroupId", "backupDirectory", "accountColors", "inboxEnabled"
+]));
+
+function applyRecommendedDraft(control = null) {
+  const config = requireConfiguration();
+  const recommended = PinSettings.normalize(config.recommendedSettings || PinSettings.defaults());
+  for (const entry of SETTINGS_CONTROL_DEFINITIONS) {
+    if (entry.dynamic || RECOMMENDED_PRESERVED_SETTING_KEYS.has(entry.key)) continue;
+    const target = $(entry.id);
+    if (!target) continue;
+    entry.write(target, recommended[entry.key], {entry, settings: recommended});
+  }
+  syncToggleCards();
+  const draft = collectSettings();
+  applyUxPreferences(draft);
+  syncDirtyState();
+  if (control) setLocalStatus(control, msg("recommendedDraftApplied"), "success");
+  return draft;
 }
 
 function requireConfiguration() {
@@ -335,6 +357,7 @@ const CONTROL_HELP = {
 };
 
 const BUTTON_HELP = {
+  "apply-recommended-settings": "buttonHelpApplyRecommended",
   "import-stars": "buttonHelpImportStars",
   "simulate-rules": "buttonHelpSimulateRules",
   "clear-rule-log": "buttonHelpClearRuleLog",
@@ -546,7 +569,9 @@ function enhanceSettingsPage() {
     const query = search.value.trim().toLocaleLowerCase();
     let visible = 0;
     for (const section of sections) {
-      const match = !query || section.dataset.searchText.includes(query);
+      const matchesSearch = !query || section.dataset.searchText.includes(query);
+      const matchesExperience = section.dataset.experienceHidden !== "true";
+      const match = matchesSearch && matchesExperience;
       section.hidden = !match;
       const link = links.get(section.id);
       if (link) link.hidden = !match;
@@ -555,11 +580,13 @@ function enhanceSettingsPage() {
     for (const group of groups.values()) {
       group.hidden = ![...group.querySelectorAll(".settings-nav-link")].some(link => !link.hidden);
     }
+    const available = sections.filter(section => section.dataset.experienceHidden !== "true").length;
     $("settings-search-summary").textContent = query
-      ? `${visible} section(s) contenant « ${search.value.trim()} ».`
-      : `${sections.length} sections disponibles.`;
+      ? msg("settingsSearchMatches", [visible, search.value.trim()])
+      : msg("settingsSectionsAvailable", [available]);
     if (query) setActiveSection(sections.find(section => !section.hidden)?.id || "");
   };
+  refreshSettingsNavigation = applySearch;
   search.addEventListener("input", applySearch);
   search.addEventListener("keydown", event => {
     if (event.key !== "Escape" || !search.value) return;
@@ -1150,13 +1177,19 @@ async function renderCalendars(selected) {
 
 
 function applyUxPreferences(settings = configuration?.settings || {}) {
-  document.body.dataset.settingsExperience = settings.settingsExperience || "guided";
+  const experience = settings.settingsExperience === "advanced" ? "advanced" : "guided";
+  document.body.dataset.settingsExperience = experience;
   document.body.dataset.uiPreset = settings.uiPreset || "balanced";
   document.body.dataset.reduceMotion = settings.reduceMotion || "auto";
-  const advanced = settings.settingsExperience === "advanced";
+  const advanced = experience === "advanced";
+  for (const section of document.querySelectorAll("#settings-form > section[data-experience='advanced']")) {
+    section.dataset.experienceHidden = String(!advanced);
+    section.hidden = !advanced;
+  }
   for (const details of document.querySelectorAll("details.advanced-group")) {
     if (!advanced && !details.hasAttribute("data-guided-visible")) details.open = false;
   }
+  refreshSettingsNavigation?.();
 }
 
 function humanTime(value) {
@@ -1785,6 +1818,7 @@ async function startOptions() {
     }));
   };
 
+  $("apply-recommended-settings").addEventListener("click", event => applyRecommendedDraft(event.currentTarget));
   $("settingsExperience").addEventListener("change", () => applyUxPreferences(currentSettings({settingsExperience: $("settingsExperience").value})));
   $("uiPreset").addEventListener("change", () => applyUxPreferences(currentSettings({uiPreset: $("uiPreset").value})));
   $("reduceMotion").addEventListener("change", () => applyUxPreferences(currentSettings({reduceMotion: $("reduceMotion").value})));

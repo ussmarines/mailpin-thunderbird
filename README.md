@@ -6,7 +6,7 @@
 **Épinglez, organisez et suivez vos e-mails importants dans Thunderbird.**
 
 [![QA](https://github.com/ussmarines/mailperch-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailperch-thunderbird/actions/workflows/ci.yml)
-![Release](https://img.shields.io/badge/release-v1.2.1-0078D4)
+![Release](https://img.shields.io/badge/release-v1.3.0-0078D4)
 ![Licence](https://img.shields.io/badge/licence-MailPerch%20Source--Available%201.1-6A5ACD)
 </div>
 
@@ -29,7 +29,7 @@ MailPerch ajoute à Thunderbird un panneau d’épingles distinct au-dessus de l
 
 ## Compatibilité
 
-- **MailPerch :** `1.2.1` ;
+- **MailPerch :** `1.3.0` ;
 - **Thunderbird :** `128.0` à `153.*` ;
 - **Format :** MailExtension Manifest V3 ;
 - **Langues :** français et anglais ;
@@ -39,16 +39,18 @@ La plage de versions est déclarée dans le manifeste, mais la matrice complète
 
 MailPerch utilise une API Experiment privilégiée pour intégrer son panneau à Thunderbird, gérer son stockage SQLite local et accéder aux fonctions Agenda nécessaires. Thunderbird affiche donc un avertissement d’accès complet lors de l’installation.
 
+Sur la branche de consolidation, les accès internes Messages, Tags et Agenda sont isolés derrière une couche de compatibilité dédiée afin de réduire le couplage aux internals Thunderbird. Le DOM `about:3pane` reste volontairement adapté progressivement.
+
 ## Installation
 
 ### Depuis une release GitHub
 
-1. Téléchargez `MailPerch_v1.2.1.xpi` depuis la release `v1.2.1`.
+1. Téléchargez `MailPerch_v1.3.0.xpi` depuis la release `v1.3.0`.
 2. Dans Thunderbird, ouvrez **Extensions et thèmes**.
 3. Dans le menu de l’engrenage, choisissez **Installer un module depuis un fichier**.
 4. Sélectionnez le fichier XPI, puis redémarrez Thunderbird si nécessaire.
 
-> Les anciennes builds internes `3.2.x` utilisaient un numéro supérieur aux versions publiques actuelles. Pour tester `1.2.1` après une build de développement, utilisez un profil de test propre ou désinstallez d’abord l’ancienne build après avoir exporté vos données MailPerch.
+> Les anciennes builds internes `3.2.x` utilisaient un numéro supérieur aux versions publiques actuelles. Pour tester `1.3.0` après une build de développement, utilisez un profil de test propre ou désinstallez d’abord l’ancienne build après avoir exporté vos données MailPerch.
 
 ### Depuis les sources
 
@@ -73,6 +75,9 @@ MailPerch fonctionne localement : aucun appel réseau, aucune télémétrie, auc
 ## Documentation et support
 
 - [Guide d’architecture](docs/ARCHITECTURE.md)
+- [Couche de compatibilité Thunderbird](docs/THUNDERBIRD_COMPATIBILITY.md)
+- [Banc de test Thunderbird](docs/THUNDERBIRD_TEST_BENCH.md)
+- [Plan de test manuel](docs/MANUAL_TEST_PLAN.md)
 - [Instructions de build pour reviewers](release/BUILD_INSTRUCTIONS.md)
 - [Préparation de la soumission Thunderbird Add-ons](STORE_RELEASE.md)
 - [Signaler un problème](https://github.com/ussmarines/mailperch-thunderbird/issues)

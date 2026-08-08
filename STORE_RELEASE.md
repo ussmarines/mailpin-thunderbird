@@ -1,10 +1,10 @@
-# Publication de MailPerch 1.2.0
+# Publication de MailPerch 1.3.0
 
 ## Identité
 
 - **Nom :** MailPerch
 - **Nom complet :** MailPerch — Email Pins & Follow-up
-- **Version publique :** 1.2.0
+- **Version publique :** 1.3.0
 - **Sous-titre FR :** Épinglez, organisez et suivez vos e-mails dans Thunderbird.
 - **Subtitle EN:** Pin, organize and follow up on your emails in Thunderbird.
 - **Auteur public :** ussmarines
@@ -16,7 +16,7 @@ MailPerch n’ayant jamais été publié avant la migration d’identité, cet i
 
 ## État de préparation
 
-La version 1.2.0 est construite de manière reproductible et les contrôles automatisés du dépôt couvrent la syntaxe, les ressources, les permissions, la CSP, l’absence de réseau, les contrats API, les migrations, les compteurs natifs, l’accessibilité, les modèles JavaScript/SQLite, le scan de secrets et le packaging.
+La version 1.3.0 est construite de manière reproductible et les contrôles automatisés du dépôt couvrent la syntaxe, les ressources, les permissions, la CSP, l’absence de réseau, les contrats API, les migrations, les compteurs natifs, l’accessibilité, les modèles JavaScript/SQLite, le scan de secrets et le packaging.
 
 La soumission Add-ons for Thunderbird reste une action manuelle : seul le portail ATN et ses reviewers peuvent valider ou refuser la publication. Avant l’envoi, le propriétaire doit terminer les cases manuelles de `docs/ATN_RELEASE_CHECKLIST.md`, rendre accessibles publiquement la page de support et la politique de confidentialité, puis tester le XPI dans les versions et systèmes annoncés.
 
@@ -24,8 +24,8 @@ La soumission Add-ons for Thunderbird reste une action manuelle : seul le portai
 
 Après `npm run ci` :
 
-- `dist/MailPerch_v1.2.0.xpi` — extension à téléverser ;
-- `dist/MailPerch_GitHub_Repository_v1.2.0.zip` — sources complètes pour review ;
+- `dist/MailPerch_v1.3.0.xpi` — extension à téléverser ;
+- `dist/MailPerch_GitHub_Repository_v1.3.0.zip` — sources complètes pour review ;
 - `dist/SHA256SUMS.txt` — empreintes des deux archives ;
 - `release/ATN_REVIEW_NOTES_TEMPLATE.md` — informations de test et justification de l’Experiment ;
 - `release/BUILD_INSTRUCTIONS.md` — reproduction exacte du build.

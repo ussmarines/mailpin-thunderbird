@@ -12,6 +12,10 @@ var { MessageArchiver } = ChromeUtils.importESModule(
 var { Management } = ChromeUtils.importESModule(
   "resource://gre/modules/Extension.sys.mjs"
 );
+var { ExtensionUtils } = ChromeUtils.importESModule(
+  "resource://gre/modules/ExtensionUtils.sys.mjs"
+);
+var { ExtensionError } = ExtensionUtils;
 
 const lazy = {};
 ChromeUtils.defineESModuleGetters(lazy, {
@@ -24,11 +28,13 @@ ChromeUtils.defineESModuleGetters(lazy, {
 });
 
 const PIN_MODULES = {};
+let THUNDERBIRD_COMPAT = null;
 const MODULE_PATHS = [
   "settings.js", "identity.js", "storage.js", "workflow.js", "rules.js", "calendar.js",
   "smart.js", "bulk.js", "diagnostics.js", "providers.js", "health.js",
   "migrations.js", "performance.js", "localization.js", "review.js", "related.js",
-  "checklists.js", "analytics.js", "saved-views.js", "tag-sync.js"
+  "checklists.js", "analytics.js", "saved-views.js", "tag-sync.js",
+  "thunderbird-messages.js", "thunderbird-tags.js", "thunderbird-calendar.js", "compatibility.js"
 ];
 
 const STYLE_SHEET_SERVICE = "@mozilla.org/content/style-sheet-service;1";
@@ -852,65 +858,23 @@ function getDefaultColor(accountKey) {
 }
 
 function getFolderChildren(folder) {
-  const result = [];
-  try {
-    for (const child of folder.subFolders) {
-      result.push(child.QueryInterface(Ci.nsIMsgFolder));
-    }
-    return result;
-  } catch {
-    // Fallback for older XPCOM enumerators.
-  }
-  try {
-    const children = folder.subFolders;
-    while (children.hasMoreElements()) {
-      result.push(children.getNext().QueryInterface(Ci.nsIMsgFolder));
-    }
-  } catch {
-    // Folder has no readable children.
-  }
-  return result;
+  return THUNDERBIRD_COMPAT?.messages?.folderChildren?.(folder) || [];
 }
 
 function walkFolders(root) {
-  const result = [];
-  const stack = [root];
-  const seen = new Set();
-  while (stack.length) {
-    const folder = stack.pop();
-    if (!folder || seen.has(folder.URI)) {
-      continue;
-    }
-    seen.add(folder.URI);
-    result.push(folder);
-    for (const child of getFolderChildren(folder)) {
-      stack.push(child);
-    }
-  }
-  return result;
+  return THUNDERBIRD_COMPAT?.messages?.walkFolders?.(root) || [];
 }
 
 function getAccountForFolder(folder) {
-  if (!folder?.server) {
-    return null;
-  }
-  try {
-    return MailServices.accounts.findAccountForServer(folder.server);
-  } catch {
-    return null;
-  }
+  return THUNDERBIRD_COMPAT?.messages?.accountForFolder?.(folder) || null;
 }
 
 function accountKeyForFolder(folder) {
-  return getAccountForFolder(folder)?.key || folder?.server?.key || "unknown";
+  return THUNDERBIRD_COMPAT?.messages?.accountKeyForFolder?.(folder) || folder?.server?.key || "unknown";
 }
 
 function accountNameForFolder(folder) {
-  return (
-    getAccountForFolder(folder)?.incomingServer?.prettyName ||
-    folder?.server?.prettyName ||
-    "Compte inconnu"
-  );
+  return THUNDERBIRD_COMPAT?.messages?.accountNameForFolder?.(folder) || folder?.server?.prettyName || "Compte inconnu";
 }
 
 function messageStableKey(hdr) {
@@ -946,31 +910,7 @@ function getCachedPreview(hdr) {
 }
 
 function getTagMetadata(hdr) {
-  let keywords = "";
-  try {
-    keywords = hdr.getStringProperty("keywords") || "";
-  } catch {
-    return [];
-  }
-  const tags = [];
-  for (const key of keywords.split(/\s+/).filter(Boolean)) {
-    try {
-      const name = MailServices.tags.getTagForKey(key);
-      if (!name) {
-        continue;
-      }
-      tags.push({
-        key,
-        name,
-        color: COLOR_RE.test(String(MailServices.tags.getColorForKey(key) || ""))
-          ? String(MailServices.tags.getColorForKey(key)).toLowerCase()
-          : "currentColor"
-      });
-    } catch {
-      // Ignore unknown keywords which are not Thunderbird tags.
-    }
-  }
-  return tags.slice(0, 3);
+  return THUNDERBIRD_COMPAT?.tags?.metadataForHeader?.(hdr, 3) || [];
 }
 
 function hasAttachment(hdr) {
@@ -998,30 +938,7 @@ function getMessageDateMs(hdr) {
 }
 
 function findHeaderInFolder(folder, ref) {
-  if (!folder) return null;
-  try {
-    const database = folder.msgDatabase;
-    if (ref.headerMessageId) {
-      const found = database?.getMsgHdrForMessageID(ref.headerMessageId);
-      if (found && (!ref.identityFingerprint || messageIdentityFingerprint(found) === ref.identityFingerprint)) return found;
-    }
-    if (ref.lastMessageKey && database?.containsKey(ref.lastMessageKey)) {
-      const found = database.getMsgHdrForKey(ref.lastMessageKey);
-      if (!ref.identityFingerprint || messageIdentityFingerprint(found) === ref.identityFingerprint) return found;
-    }
-    // Fallback for messages without Message-ID, copied messages, Gmail labels and
-    // rebuilt IMAP databases. The scan is bounded to protect large folders.
-    let inspected = 0;
-    const messages = folder.messages;
-    while (messages.hasMoreElements() && inspected++ < 20000) {
-      const hdr = messages.getNext().QueryInterface(Ci.nsIMsgDBHdr);
-      if (ref.identityFingerprint && messageIdentityFingerprint(hdr) === ref.identityFingerprint) return hdr;
-      if (!ref.identityFingerprint && ref.headerMessageId && String(hdr.messageId || "") === ref.headerMessageId) return hdr;
-    }
-  } catch {
-    // Database can be unavailable while a remote folder is loading.
-  }
-  return null;
+  return THUNDERBIRD_COMPAT?.messages?.findHeaderInFolder?.(folder, ref, messageIdentityFingerprint) || null;
 }
 
 function sanitizeSearchText(value) {
@@ -1688,6 +1605,15 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       DEFAULT_SETTINGS = PIN_MODULES.PinSettings.DEFAULTS;
       this._modulesLoaded = true;
     }
+    if (!this._thunderbird) {
+      let calendarDependencies = {};
+      try { calendarDependencies = {cal: lazy.cal, CalEvent: lazy.CalEvent, CalTodo: lazy.CalTodo}; } catch {}
+      this._thunderbird = PIN_MODULES.PinCompatibility?.create?.({
+        MailServices, MailUtils, MessageArchiver, ChromeUtils, Ci, ExtensionError,
+        ...calendarDependencies
+      }) || null;
+    }
+    THUNDERBIRD_COMPAT = this._thunderbird;
     if (!this._readyPromise) {
       this._readyPromise = (async () => {
         await ensureMailPerchInstallationState(context.extension.id);
@@ -2145,7 +2071,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   _getAccountsMetadata() {
     const accounts = [];
     try {
-      for (const account of MailServices.accounts.accounts) {
+      for (const account of this._thunderbird?.messages?.accountList?.() || []) {
         const server = account.incomingServer;
         if (!server?.rootFolder) {
           continue;
@@ -2382,7 +2308,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   _identityEmails() {
     if (this._cachedIdentityEmails) return this._cachedIdentityEmails;
     const emails = new Set();
-    try { for (const identity of MailServices.accounts.allIdentities) if (identity?.email) emails.add(String(identity.email).toLowerCase()); } catch {}
+    for (const email of this._thunderbird?.messages?.identityEmails?.() || []) emails.add(email);
     this._cachedIdentityEmails = emails;
     return emails;
   }
@@ -2561,42 +2487,19 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
 
   _ensureMailPerchTags() {
     const definitions = PIN_MODULES.PinTagSync?.DEFINITIONS || [];
-    // Validate every reserved key before creating anything. A collision must
-    // leave Thunderbird's tag registry untouched instead of partially adding
-    // MailPerch tags before the conflicting key is reached.
-    for (const definition of definitions) {
-      if (!MailServices.tags.isValidKey(definition.key)) continue;
-      const existing = String(MailServices.tags.getTagForKey(definition.key) || "");
-      if (existing !== definition.label) {
-        throw new ExtensionError(`Le tag Thunderbird « ${definition.key} » existe déjà et n’appartient pas à MailPerch.`);
-      }
-    }
-    for (const definition of definitions) {
-      if (MailServices.tags.isValidKey(definition.key)) {
-        try { if (MailServices.tags.getColorForKey(definition.key) !== definition.color) MailServices.tags.setColorForKey(definition.key, definition.color); } catch {}
-      } else {
-        MailServices.tags.addTagForKey(definition.key, definition.label, definition.color, "");
-      }
-    }
+    this._thunderbird?.tags?.ensureDefinitions?.(definitions);
     return definitions;
   }
 
   _ownedMailPerchTagKeys() {
-    const owned = new Set();
-    for (const definition of PIN_MODULES.PinTagSync?.DEFINITIONS || []) {
-      try {
-        if (MailServices.tags.isValidKey(definition.key) && String(MailServices.tags.getTagForKey(definition.key) || "") === definition.label) owned.add(definition.key);
-      } catch {}
-    }
-    return owned;
+    return this._thunderbird?.tags?.ownedKeys?.(PIN_MODULES.PinTagSync?.DEFINITIONS || []) || new Set();
   }
 
   _removeMailPerchTagDefinitions() {
-    let removed = 0;
-    for (const key of this._ownedMailPerchTagKeys()) {
-      try { MailServices.tags.deleteKey(key); removed += 1; } catch (error) { this._recordDiagnostic("warning", "Suppression d’un tag MailPerch impossible", error, {component: "tags", tagKey: key}); }
-    }
-    return removed;
+    return this._thunderbird?.tags?.removeDefinitions?.(
+      PIN_MODULES.PinTagSync?.DEFINITIONS || [],
+      (key, error) => this._recordDiagnostic("warning", "Suppression d’un tag MailPerch impossible", error, {component: "tags", tagKey: key})
+    ) || 0;
   }
 
   _tagHeadersForReference(ref) {
@@ -2609,20 +2512,8 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
 
   _batchTagHeaders(headers, operation, keywords) {
     if (!headers?.length || !keywords) return 0;
-    const byFolder = new Map();
-    for (const hdr of headers) {
-      const folder = hdr?.folder;
-      if (!folder) continue;
-      if (!byFolder.has(folder)) byFolder.set(folder, []);
-      byFolder.get(folder).push(hdr);
-    }
-    let count = 0;
-    for (const [folder, folderHeaders] of byFolder) {
-      if (operation === "add") folder.addKeywordsToMessages(folderHeaders, keywords);
-      else folder.removeKeywordsFromMessages(folderHeaders, keywords);
-      count += folderHeaders.length;
-    }
-    return count;
+    const result = this._thunderbird?.tags?.batchKeywords?.(headers, String(keywords).split(/\s+/), operation === "add");
+    return Number(result?.headers) || 0;
   }
 
   _clearReferenceTags(ref) {
@@ -2632,9 +2523,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     if (!managed.size) return {removed: 0, messages: 0};
     const byKeywords = new Map();
     for (const hdr of headers) {
-      let keywords = "";
-      try { keywords = hdr.getStringProperty("keywords") || ""; } catch {}
-      const current = new Set(String(keywords).split(/\s+/).filter(Boolean));
+      const current = this._thunderbird?.tags?.keywordsForHeader?.(hdr) || new Set();
       const remove = [...managed].filter(key => current.has(key)).sort().join(" ");
       if (!remove) continue;
       if (!byKeywords.has(remove)) byKeywords.set(remove, []);
@@ -2660,9 +2549,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     let added = 0;
     let removed = 0;
     for (const hdr of headers) {
-      let keywords = "";
-      try { keywords = hdr.getStringProperty("keywords") || ""; } catch {}
-      const current = new Set(String(keywords).split(/\s+/).filter(Boolean));
+      const current = this._thunderbird?.tags?.keywordsForHeader?.(hdr) || new Set();
       const add = [...desired].filter(key => !current.has(key)).sort().join(" ");
       const remove = [...managed].filter(key => current.has(key) && !desired.has(key)).sort().join(" ");
       if (add) {
@@ -2942,7 +2829,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
   async _deleteLinkedCalendarItem(ref) {
-    const {calendar,item}=await this._calendarItemForRef(ref);if(calendar&&item)await calendar.deleteItem(item);
+    const {calendar,item}=await this._calendarItemForRef(ref);if(calendar&&item)await this._thunderbird?.calendar?.deleteItem?.(calendar, item);
     ref.calendarId="";ref.calendarItemId="";
   }
 
@@ -2956,7 +2843,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     let folder = null;
     if (ref.lastFolderURI) {
       try {
-        folder = MailServices.folderLookup.getFolderForURL(ref.lastFolderURI);
+        folder = this._thunderbird?.messages?.folderForURL?.(ref.lastFolderURI);
       } catch {
         folder = null;
       }
@@ -2974,7 +2861,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
 
     let account = null;
     try {
-      account = [...MailServices.accounts.accounts].find(
+      account = (this._thunderbird?.messages?.accountList?.() || []).find(
         candidate => candidate.key === ref.accountKey
       );
     } catch {
@@ -3126,7 +3013,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     for (const account of this._getAccountsMetadata()) {
       for (const inbox of account.inboxes) {
         try {
-          const folder = MailServices.folderLookup.getFolderForURL(inbox.uri);
+          const folder = this._thunderbird?.messages?.folderForURL?.(inbox.uri);
           changed = this._syncInbox(folder) || changed;
         } catch {
           // Ignore unavailable inboxes.
@@ -3619,7 +3506,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     for (const account of this._getAccountsMetadata()) {
       for (const inbox of account.inboxes) {
         try {
-          const folder = MailServices.folderLookup.getFolderForURL(inbox.uri);
+          const folder = this._thunderbird?.messages?.folderForURL?.(inbox.uri);
           const messages = folder.messages;
           while (messages.hasMoreElements()) {
             const hdr = messages.getNext().QueryInterface(Ci.nsIMsgDBHdr);
@@ -3832,12 +3719,12 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   _resolveCapturedHeader(item) {
     if (!item) return null;
     try {
-      const folder = item.folderURI ? MailServices.folderLookup.getFolderForURL(item.folderURI) : null;
+      const folder = item.folderURI ? this._thunderbird?.messages?.folderForURL?.(item.folderURI) : null;
       const direct = findHeaderInFolder(folder, item);
       if (direct) return direct;
     } catch {}
     let account = null;
-    try { account = [...MailServices.accounts.accounts].find(candidate => candidate.key === item.accountKey); } catch {}
+    try { account = (this._thunderbird?.messages?.accountList?.() || []).find(candidate => candidate.key === item.accountKey); } catch {}
     if (!account?.incomingServer?.rootFolder) return null;
     for (const folder of walkFolders(account.incomingServer.rootFolder)) {
       const hdr = findHeaderInFolder(folder, item);
@@ -3850,9 +3737,12 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     const now = Date.now();
     if (!force && now - (this._compatibility?.checkedAt || 0) < COMPATIBILITY_CHECK_INTERVAL_MS) return clone(this._compatibility);
     const missing = [];
-    if (!MailServices?.mfn?.addListener) missing.push("folder-notifications");
-    if (!MailServices?.folderLookup?.getFolderForURL) missing.push("folder-lookup");
-    if (!MailUtils?.displayMessageInFolderTab) missing.push("message-display");
+    const capabilities = this._thunderbird?.snapshot?.().groups || {};
+    if (!capabilities.messages?.folderNotifications) missing.push("folder-notifications");
+    if (!capabilities.messages?.folderLookup) missing.push("folder-lookup");
+    if (!capabilities.messages?.displayMessage) missing.push("message-display");
+    if (!capabilities.tags?.registry) missing.push("tag-registry");
+    if (!capabilities.calendar?.manager) missing.push("calendar-manager");
     if (!lazy.Sqlite?.openConnection) missing.push("sqlite");
     const win = Services.wm.getMostRecentWindow("mail:3pane");
     if (win) {
@@ -3889,28 +3779,22 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
   _registerFolderListener() {
-    if (this._folderListener || !MailServices?.mfn?.addListener) return;
-    const owner = this;
-    this._folderListener = {
-      QueryInterface: ChromeUtils.generateQI(["nsIMsgFolderListener"]),
-      msgAdded(msg) { owner._onMsgAdded(msg); },
-      msgsDeleted(msgs) { owner._onMsgsDeleted([...msgs]); },
-      msgsMoveCopyCompleted(move, srcMsgs, destFolder, destMsgs) { owner._onMsgsMoveCopyCompleted(move, [...(srcMsgs || [])], destFolder, destMsgs ? [...destMsgs] : []); },
-      msgsClassified(msgs) { for (const msg of msgs || []) owner._onMsgAdded(msg); },
-      msgPropertyChanged(msg, property, oldValue, newValue) { owner._onMsgPropertyChanged(msg, property, oldValue, newValue); },
-      msgKeyChanged(oldKey, newHdr) { owner._onMsgKeyChanged(oldKey, newHdr); },
-      folderRenamed(oldFolder, newFolder) { owner._onFolderRenamed(oldFolder, newFolder); }
-    };
-    const flags = MailServices.mfn.msgAdded | MailServices.mfn.msgsDeleted |
-      MailServices.mfn.msgsMoveCopyCompleted | MailServices.mfn.msgsClassified | MailServices.mfn.msgPropertyChanged |
-      MailServices.mfn.msgKeyChanged | MailServices.mfn.folderRenamed;
-    MailServices.mfn.addListener(this._folderListener, flags);
+    if (this._folderListenerHandle) return;
+    const handle = this._thunderbird?.messages?.registerFolderListener?.({
+      msgAdded: msg => this._onMsgAdded(msg),
+      msgsDeleted: msgs => this._onMsgsDeleted(msgs),
+      msgsMoveCopyCompleted: (move, srcMsgs, destFolder, destMsgs) => this._onMsgsMoveCopyCompleted(move, srcMsgs, destFolder, destMsgs),
+      msgsClassified: msgs => { for (const msg of msgs || []) this._onMsgAdded(msg); },
+      msgPropertyChanged: (msg, property, oldValue, newValue) => this._onMsgPropertyChanged(msg, property, oldValue, newValue),
+      msgKeyChanged: (oldKey, newHdr) => this._onMsgKeyChanged(oldKey, newHdr),
+      folderRenamed: (oldFolder, newFolder) => this._onFolderRenamed(oldFolder, newFolder)
+    });
+    if (handle?.registered) this._folderListenerHandle = handle;
   }
 
   _unregisterFolderListener() {
-    if (!this._folderListener) return;
-    try { MailServices.mfn.removeListener(this._folderListener); } catch {}
-    this._folderListener = null;
+    try { this._folderListenerHandle?.dispose?.(); } catch {}
+    this._folderListenerHandle = null;
   }
 
   _ruleContext(hdr, trigger = "messageAdded") {
@@ -4030,7 +3914,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       ? options.rules.slice(0, MAX_RULES).map((rule, index) => normalizeRule(rule, index)).filter(Boolean)
       : (this._data.rules || []);
     const limit=clampNumber(options.limit,1,10000,1000);const matches=[];let scanned=0;
-    for(const account of MailServices.accounts.accounts){
+    for(const account of this._thunderbird?.messages?.accountList?.() || []){
       const root=account?.incomingServer?.rootFolder;if(!root)continue;
       for(const folder of walkFolders(root)){
         if(options.accountKey&&account.key!==options.accountKey)continue;if(options.folderURI&&folder.URI!==options.folderURI)continue;
@@ -4451,7 +4335,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     let hdr = this._resolveReference(ref, true);
     if (hdr && ref.trackingMode === "conversation") hdr = this._updateConversationReference(ref, hdr);
     if (!hdr) return {opened: false, missing: true};
-    try { MailUtils.displayMessageInFolderTab(hdr, true); return {opened: true}; }
+    try { if (this._thunderbird?.messages?.displayMessageInFolderTab?.(hdr)) return {opened: true}; return {opened: false}; }
     catch (error) { this._recordDiagnostic("error", "Ouverture du message impossible", error); return {opened: false}; }
   }
 
@@ -4541,30 +4425,15 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
 
   _registerCalendarObservers() {
     if (!this._settings.enableCalendarIntegration || !this._settings.enableBidirectionalCalendarSync) return;
-    const calendars=lazy.cal.manager.getCalendars();
-    const activeIds=new Set(calendars.map(calendar=>calendar.id));
-    for (const [id, record] of this._calendarObservers) {
-      if (activeIds.has(id)) continue;
-      try { record.calendar.removeObserver(record.observer); } catch {}
-      this._calendarObservers.delete(id);
-    }
-    for (const calendar of calendars) {
-      if (this._calendarObservers.has(calendar.id)) continue;
-      const owner=this;
-      const observer={
-        QueryInterface:ChromeUtils.generateQI(["calIObserver"]),
-        onStartBatch(){},onEndBatch(){},onLoad(){},onError(){},onPropertyChanged(){},onPropertyDeleting(){},
-        onAddItem(item){owner._onCalendarItemChanged(item,false);},
-        onModifyItem(newItem,_oldItem){owner._onCalendarItemChanged(newItem,false);},
-        onDeleteItem(item){owner._onCalendarItemChanged(item,true);}
-      };
-      try { calendar.addObserver(observer); this._calendarObservers.set(calendar.id,{calendar,observer}); } catch(error) { this._recordDiagnostic("warning",`Observateur Agenda impossible : ${calendar.name||calendar.id}`,error); }
-    }
+    this._thunderbird?.calendar?.registerObservers?.(
+      this._calendarObservers,
+      {changed: (item, deleted) => this._onCalendarItemChanged(item, deleted)},
+      (calendar, error) => this._recordDiagnostic("warning", `Observateur Agenda impossible : ${calendar?.name || calendar?.id || "inconnu"}`, error)
+    );
   }
 
   _unregisterCalendarObservers() {
-    for(const {calendar,observer} of this._calendarObservers?.values()||[]){try{calendar.removeObserver(observer);}catch{}}
-    this._calendarObservers?.clear();
+    this._thunderbird?.calendar?.unregisterObservers?.(this._calendarObservers);
   }
 
   _startCalendarSyncTimer() {
@@ -4590,13 +4459,13 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
   _calendarForRef(ref) {
-    const calendars=lazy.cal.manager.getCalendars();
+    const calendars=(this._thunderbird?.calendar?.calendars?.() || []);
     return calendars.find(item=>item.id===ref.calendarId)||null;
   }
 
   async _calendarItemForRef(ref) {
     const calendar=this._calendarForRef(ref);if(!calendar||!ref.calendarItemId)return {calendar,item:null};
-    try{return {calendar,item:await calendar.getItem(ref.calendarItemId)};}catch(error){this._recordDiagnostic("warning","Lecture de l’élément Agenda impossible",error);return {calendar,item:null};}
+    try{return {calendar,item:await this._thunderbird?.calendar?.getItem?.(calendar, ref.calendarItemId)};}catch(error){this._recordDiagnostic("warning","Lecture de l’élément Agenda impossible",error);return {calendar,item:null};}
   }
 
   _onCalendarItemChanged(item, deleted=false) {
@@ -4647,29 +4516,15 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     if (!compatible) { const error=this._calendarOperationError("Calendrier devenu incompatible", descriptor, type); ref.calendarSyncError=String(error.message||error).slice(0,500); throw error; }
     const cloneItem = item.clone();
     const due = ref.dueAt || ref.followUpAt || 0;
-    if (due) {
-      const date = lazy.cal.dtz.jsDateToDateTime(new Date(due));
-      if (type === "event") {
-        cloneItem.startDate = date;
-        cloneItem.endDate = lazy.cal.dtz.jsDateToDateTime(new Date(due + 3600000));
-      } else {
-        cloneItem.dueDate = date;
-      }
-    } else if (type !== "event") {
-      cloneItem.dueDate = null;
-    }
+    this._thunderbird?.calendar?.applySchedule?.(cloneItem, type, due);
     if (type !== "event" && this._settings.calendarCompleteOnPinComplete) {
-      try {
-        cloneItem.percentComplete = ref.completedAt ? 100 : 0;
-        cloneItem.status = ref.completedAt ? "COMPLETED" : "NEEDS-ACTION";
-        cloneItem.completedDate = ref.completedAt ? lazy.cal.dtz.jsDateToDateTime(new Date(ref.completedAt)) : null;
-      } catch {}
+      try { this._thunderbird?.calendar?.applyCompletion?.(cloneItem, ref.completedAt); } catch {}
     }
     cloneItem.title = ref.subject || cloneItem.title;
     cloneItem.setProperty("X-PIN-MAILS-STABLE-KEY", ref.stableKey);
     let saved;
     try {
-      saved = await calendar.modifyItem(cloneItem, item);
+      saved = await this._thunderbird?.calendar?.modifyItem?.(calendar, cloneItem, item);
     } catch (error) {
       const wrapped=this._calendarOperationError(error, descriptor, type);
       ref.calendarSyncError=String(wrapped.message||wrapped).slice(0,500);
@@ -4710,52 +4565,23 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
   _calendarCapabilitySupported(calendar, itemType) {
-    const property = itemType === "event"
-      ? "capabilities.events.supported"
-      : "capabilities.tasks.supported";
-    try {
-      const value = calendar.getProperty?.(property);
-      return value !== false && value !== "false" && value !== 0;
-    } catch {
-      return true;
-    }
+    return this._thunderbird?.calendar?.capabilitySupported?.(calendar, itemType) ?? false;
   }
 
   _calendarDescriptor(calendar) {
-    const readOnly = Boolean(calendar?.readOnly);
-    let disabled = false;
-    let aclWritable = !readOnly;
-    try {
-      const disabledValue = calendar?.getProperty?.("disabled");
-      disabled = disabledValue === true || disabledValue === "true" || disabledValue === 1;
-    } catch {}
-    try {
-      if (lazy.cal.acl?.isCalendarWritable) {
-        aclWritable = Boolean(lazy.cal.acl.isCalendarWritable(calendar));
-      }
-    } catch {
-      aclWritable = false;
-    }
-    const taskSupported = this._calendarCapabilitySupported(calendar, "task");
-    const eventSupported = this._calendarCapabilitySupported(calendar, "event");
-    const writable = !readOnly && !disabled && aclWritable;
+    const base = this._thunderbird?.calendar?.descriptor?.(calendar) || {
+      id: String(calendar?.id || ""), name: String(calendar?.name || ""), type: String(calendar?.type || ""),
+      readOnly: true, disabled: false, aclWritable: false, writable: false,
+      taskSupported: false, eventSupported: false, taskCompatible: false, eventCompatible: false
+    };
     const reasons = [];
-    if (disabled) reasons.push(this._t("calendarDisabledReason", ""));
-    if (readOnly) reasons.push(this._t("calendarReadOnlyReason", ""));
-    if (!readOnly && !aclWritable) reasons.push(this._t("calendarAclDeniedReason", ""));
-    if (!taskSupported && !eventSupported) reasons.push(this._t("calendarItemsUnsupportedReason", ""));
+    if (base.disabled) reasons.push(this._t("calendarDisabledReason", ""));
+    if (base.readOnly) reasons.push(this._t("calendarReadOnlyReason", ""));
+    if (!base.readOnly && !base.aclWritable) reasons.push(this._t("calendarAclDeniedReason", ""));
+    if (!base.taskSupported && !base.eventSupported) reasons.push(this._t("calendarItemsUnsupportedReason", ""));
     return {
-      id: String(calendar?.id || ""),
-      name: String(calendar?.name || calendar?.id || this._t("calendarUnnamed", "")),
-      type: String(calendar?.type || ""),
-      readOnly,
-      disabled,
-      aclWritable,
-      writable,
-      taskSupported,
-      eventSupported,
-      taskCompatible: writable && taskSupported,
-      eventCompatible: writable && eventSupported,
+      ...base,
+      name: base.name || this._t("calendarUnnamed", ""),
       reason: reasons.join(" · ")
     };
   }
@@ -4763,7 +4589,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   _getCalendars() {
     if (!this._settings.enableCalendarIntegration) return [];
     try {
-      return lazy.cal.manager.getCalendars().map(calendar => this._calendarDescriptor(calendar));
+      return (this._thunderbird?.calendar?.calendars?.() || []).map(calendar => this._calendarDescriptor(calendar));
     } catch (error) {
       this._recordDiagnostic("warning", "Calendriers indisponibles", error);
       return [];
@@ -4772,7 +4598,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
 
   _selectCalendarForItem(itemType, calendarId = "") {
     const type = itemType === "event" ? "event" : "task";
-    const calendars = lazy.cal.manager.getCalendars();
+    const calendars = (this._thunderbird?.calendar?.calendars?.() || []);
     const descriptors = calendars.map(calendar => this._calendarDescriptor(calendar));
     const compatible = descriptor => type === "event"
       ? descriptor.eventCompatible
@@ -4833,25 +4659,21 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       `Expéditeur : ${ref.author}`,
       ref.caseId ? `Affaire : ${(this._data.cases || []).find(item => item.id === ref.caseId)?.name || ref.caseId}` : ""
     ].filter(Boolean).join("\n\n");
-    let item;
-    if (type === "event") {
-      item = new lazy.CalEvent();
-      item.title = ref.subject || "Message épinglé";
-      item.startDate = lazy.cal.dtz.jsDateToDateTime(new Date(start));
-      item.endDate = lazy.cal.dtz.jsDateToDateTime(new Date(start + 3600000));
-    } else {
-      item = new lazy.CalTodo();
-      item.title = ref.subject || "Message épinglé";
-      item.entryDate = lazy.cal.dtz.jsDateToDateTime(new Date());
-      item.dueDate = lazy.cal.dtz.jsDateToDateTime(new Date(start));
-    }
-    item.calendar = calendar;
-    item.setProperty("DESCRIPTION", description);
-    item.setProperty("X-PIN-MAILS-STABLE-KEY", ref.stableKey);
-    item.setProperty("X-PIN-MAILS-VERSION", "3");
+    const item = this._thunderbird?.calendar?.createItem?.(type, {
+      calendar,
+      title: ref.subject || "Message épinglé",
+      startAt: start,
+      dueAt: start,
+      properties: {
+        DESCRIPTION: description,
+        "X-PIN-MAILS-STABLE-KEY": ref.stableKey,
+        "X-PIN-MAILS-VERSION": "3"
+      }
+    });
+    if (!item) throw new ExtensionError("L’intégration Agenda n’est pas disponible dans cette version de Thunderbird.");
     let saved;
     try {
-      saved = await calendar.addItem(item);
+      saved = await this._thunderbird?.calendar?.addItem?.(calendar, item);
     } catch (error) {
       throw this._calendarOperationError(error, descriptor, type);
     }
@@ -4869,11 +4691,11 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
 
   async _deleteLinkedCaseCalendarItem(caseItem) {
     if (!caseItem?.calendarId || !caseItem?.calendarItemId) return {deleted:false};
-    const calendar=lazy.cal.manager.getCalendars().find(item=>item.id===caseItem.calendarId);
+    const calendar=(this._thunderbird?.calendar?.calendars?.() || []).find(item=>item.id===caseItem.calendarId);
     if (!calendar) return {deleted:false,missing:true};
-    const item=await calendar.getItem(caseItem.calendarItemId);
+    const item=await this._thunderbird?.calendar?.getItem?.(calendar, caseItem.calendarItemId);
     if (!item) return {deleted:false,missing:true};
-    await calendar.deleteItem(item);
+    await this._thunderbird?.calendar?.deleteItem?.(calendar, item);
     return {deleted:true};
   }
 
@@ -4887,7 +4709,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       throw new ExtensionError(this._t("caseCalendarDueRequired", ""));
     }
     const type = itemType === "event" ? "event" : "task";
-    const calendars = lazy.cal.manager.getCalendars();
+    const calendars = (this._thunderbird?.calendar?.calendars?.() || []);
     if(caseItem.calendarItemId&&caseItem.calendarId){
       try{
         const existingCalendar=calendars.find(item=>item.id===caseItem.calendarId);
@@ -4898,22 +4720,16 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
           const compatible = type === "event" ? existingDescriptor.eventCompatible : existingDescriptor.taskCompatible;
           if (!compatible) throw this._calendarOperationError("Calendrier lié devenu incompatible", existingDescriptor, type);
         }
-        const existing=await existingCalendar?.getItem(caseItem.calendarItemId);
+        const existing=await this._thunderbird?.calendar?.getItem?.(existingCalendar, caseItem.calendarItemId);
         if(existing){
           const cloneItem=existing.clone();
           cloneItem.title=caseItem.name||"Affaire";
           cloneItem.setProperty("DESCRIPTION",caseItem.note||"");
           cloneItem.setProperty("X-PIN-MAILS-CASE-ID",caseItem.id);
-          if(caseItem.dueAt){
-            const date=lazy.cal.dtz.jsDateToDateTime(new Date(caseItem.dueAt));
-            if(existing.type==="event"||cloneItem.startDate){cloneItem.startDate=date;cloneItem.endDate=lazy.cal.dtz.jsDateToDateTime(new Date(caseItem.dueAt+3600000));}
-            else cloneItem.dueDate=date;
-          } else if (!cloneItem.startDate) {
-            cloneItem.dueDate=null;
-          }
-          try{cloneItem.percentComplete=caseItem.status==="completed"?100:0;cloneItem.status=caseItem.status==="completed"?"COMPLETED":"NEEDS-ACTION";}catch{}
+          this._thunderbird?.calendar?.applySchedule?.(cloneItem, existing.type === "event" || cloneItem.startDate ? "event" : "task", caseItem.dueAt);
+          try { this._thunderbird?.calendar?.applyCompletion?.(cloneItem, caseItem.status === "completed" ? Date.now() : 0); } catch {}
           try {
-            await existingCalendar.modifyItem(cloneItem,existing);
+            await this._thunderbird?.calendar?.modifyItem?.(existingCalendar, cloneItem, existing);
           } catch (error) {
             throw this._calendarOperationError(error, this._calendarDescriptor(existingCalendar), type);
           }
@@ -4933,13 +4749,15 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       throw new ExtensionError(this._t("caseCalendarSelectionRequired", ""));
     }
     const {calendar, descriptor} = this._selectCalendarForItem(type, calendarId || caseItem.calendarId);
-    const start=caseItem.dueAt;let item;
-    if(type==="event"){item=new lazy.CalEvent();item.title=caseItem.name||"Affaire";item.startDate=lazy.cal.dtz.jsDateToDateTime(new Date(start));item.endDate=lazy.cal.dtz.jsDateToDateTime(new Date(start+3600000));}
-    else{item=new lazy.CalTodo();item.title=caseItem.name||"Affaire";item.entryDate=lazy.cal.dtz.jsDateToDateTime(new Date());item.dueDate=lazy.cal.dtz.jsDateToDateTime(new Date(start));}
-    item.calendar=calendar;item.setProperty("DESCRIPTION",caseItem.note||"");item.setProperty("X-PIN-MAILS-CASE-ID",caseItem.id);item.setProperty("X-PIN-MAILS-VERSION","3");
+    const start=caseItem.dueAt;
+    const item=this._thunderbird?.calendar?.createItem?.(type,{
+      calendar, title: caseItem.name || "Affaire", startAt: start, dueAt: start,
+      properties: {DESCRIPTION: caseItem.note || "", "X-PIN-MAILS-CASE-ID": caseItem.id, "X-PIN-MAILS-VERSION": "3"}
+    });
+    if (!item) throw new ExtensionError("L’intégration Agenda n’est pas disponible dans cette version de Thunderbird.");
     let saved;
     try {
-      saved = await calendar.addItem(item);
+      saved = await this._thunderbird?.calendar?.addItem?.(calendar, item);
     } catch (error) {
       throw this._calendarOperationError(error, descriptor, type);
     }
@@ -5041,23 +4859,14 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     }
     if (action === "reply" && usable.length === 1) {
       const hdr = usable[0];
-      const uri = hdr.folder.getUriForMsg(hdr);
-      const [identity] = MailUtils.getIdentityForHeader(hdr);
-      MailServices.compose.OpenComposeWindow(
-        null, hdr, uri, Ci.nsIMsgCompType.ReplyToSender,
-        Ci.nsIMsgCompFormat.Default, identity || null, "",
-        about3Pane?.msgWindow || null, null, false
-      );
-      this._recordActivity("reply-compose", messageStableKey(hdr), formatSubject(hdr));
-      return {count: 1, opened: true};
+      const opened = this._thunderbird?.messages?.openReply?.(hdr, about3Pane?.msgWindow || null) || false;
+      if (opened) this._recordActivity("reply-compose", messageStableKey(hdr), formatSubject(hdr));
+      return {count: opened ? 1 : 0, opened};
     }
     if (action === "archive") {
-      const archiver = new MessageArchiver();
-      archiver.msgWindow = about3Pane?.msgWindow || null;
-      archiver.oncomplete = () => this._refreshAllStates(true);
-      archiver.archiveMessages(usable);
-      this._showToastAll(`${usable.length} message(s) archivé(s).`, false);
-      return {count: usable.length, requested: true};
+      const requested = this._thunderbird?.messages?.archive?.(usable, about3Pane?.msgWindow || null, () => this._refreshAllStates(true)) || false;
+      if (requested) this._showToastAll(`${usable.length} message(s) archivé(s).`, false);
+      return {count: requested ? usable.length : 0, requested};
     }
     if (action === "delete") {
       if (this._settings.confirmDelete) {
@@ -6247,7 +6056,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
 
       list.addEventListener("dblclick", event => {
         const card = event.target.closest(".pin-mails-card");
-        if (card && !event.target.closest("button") && card._pinMessageHeader) MailUtils.displayMessage(card._pinMessageHeader);
+        if (card && !event.target.closest("button") && card._pinMessageHeader) this._thunderbird?.messages?.displayMessage?.(card._pinMessageHeader);
       });
 
       list.addEventListener("dragstart", event => {

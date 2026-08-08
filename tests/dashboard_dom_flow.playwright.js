@@ -86,7 +86,8 @@ async page => {
   await page.goto(`${baseUrl}/extension/dashboard/dashboard.html`);
   await page.waitForFunction(() => !document.body.hasAttribute("data-loading"));
   assert(await page.locator("#fatal-error").isHidden(), "Dashboard must initialize without a fatal error");
-  assert(await page.locator(".stat").count() === 8, "Dashboard must render all summary cards");
+  assert(await page.locator(".stat").count() === 9, "Dashboard must render all summary cards");
+  assert(await page.locator("#search").inputValue() === "", "Dashboard search must start empty, never as an undefined string");
   assert(await page.locator("#reminder-center .reminder-item").count() === 1, "Reminder center must render its actionable item");
 
   const viewSections = {today: "today", list: "items", kanban: "kanban", cases: "cases", review: "review", history: "history", health: "health"};

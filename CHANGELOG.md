@@ -1,5 +1,19 @@
 # Journal des modifications
 
+## 1.3.0 — consolidation Thunderbird et interface
+
+- isolation des accès internes Messages, Tags et Agenda derrière `PinCompatibility` et trois adaptateurs injectables ;
+- contrats de compatibilité et garde empêchant la réintroduction des appels natifs extraits dans l’orchestrateur ;
+- Options réorganisées en Essentiel, Organisation, Automatisation et Avancé ; le mode `guided` est présenté comme **Recommandé** sans migration de stockage ;
+- application des valeurs recommandées sous forme de brouillon explicite, sans sauvegarde automatique et en préservant les valeurs propres au profil ;
+- ajout d’un smoke runtime GitHub Actions basé sur un binaire Thunderbird officiel et geckodriver vérifiés par SHA-256 ; exécution réelle réussie sur Thunderbird 153.0.1 ESR avec profil local synthétique, injection/cleanup/réinstallation contrôlés ;
+- correction d’un crash de bootstrap découvert par ce banc (`ExtensionError is not defined`) grâce à un import privilégié explicite et une garde de non-régression ;
+- restauration du contrôle Options `moveToWaitingOnReply`, dont l’absence bloquait l’initialisation, et ajout d’une garde bidirectionnelle entre le registre des réglages et le HTML ;
+- correction de la recherche initiale du dashboard qui affichait `undefined`, et réalignement du scénario navigateur sur les neuf statistiques actuelles ;
+- conservation de Fluent 2 au moyen des contrôles natifs et jetons CSS locaux ; retrait de `@fluentui/web-components` et du lockfile inutilisés, sans ajout de bundler ni de code au XPI ;
+- documentation de la frontière Thunderbird, du banc de test, de la reprise Codex et des limites mise à jour ;
+- aucune nouvelle permission WebExtension, dépendance runtime, connexion réseau du produit, migration de stockage ou nouvelle fonction métier.
+
 ## 1.2.1 — correction sécurité de la détection des fournisseurs
 
 - remplacement des tests de sous-chaîne sur les noms d’hôte par une comparaison exacte ou par suffixe de domaine à frontière contrôlée ;

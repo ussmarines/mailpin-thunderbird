@@ -8,6 +8,7 @@ storage = (ROOT / "extension/api/pinInbox/modules/storage.js").read_text(encodin
 workflow = (ROOT / "extension/api/pinInbox/modules/workflow.js").read_text(encoding="utf-8")
 options = (ROOT / "extension/options/options.js").read_text(encoding="utf-8")
 dashboard = (ROOT / "extension/dashboard/dashboard.js").read_text(encoding="utf-8")
+messages_adapter = (ROOT / "extension/api/pinInbox/modules/thunderbird-messages.js").read_text(encoding="utf-8")
 
 # Imported maps and stable keys must reject prototype-polluting names and use
 # own-property checks rather than inherited membership.
@@ -28,8 +29,8 @@ assert "key in next" not in storage
 # Thunderbird priorities increase from low to high; duplicate Message-IDs must
 # not bypass the stored identity fingerprint.
 assert "Number(hdr.priority) >= Number(Ci.nsMsgPriority.high)" in impl
-assert "if (found && ref.headerMessageId) return found;" not in impl
-assert "!ref.identityFingerprint && ref.headerMessageId" in impl
+assert "if (found && ref.headerMessageId) return found;" not in messages_adapter
+assert "!ref?.identityFingerprint && ref?.headerMessageId" in messages_adapter
 
 # Recovery writes must preserve the Promise<void> chain, and the panel scroll
 # listener must be installed only after the panel exists.

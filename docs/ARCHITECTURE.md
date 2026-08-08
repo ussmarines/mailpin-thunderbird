@@ -10,22 +10,27 @@ WebExtension non privilégiée
        ▼
 Experiment privilégié pinInbox
   implementation.js ── orchestration, cycle de vie et intégration about:3pane
-       ├── modules/identity.js       résolution et conversations
-       ├── modules/storage.js        diff, checksum et sauvegardes
-       ├── modules/workflow.js       statuts, sections et récurrences
-       ├── modules/rules.js          validation et anti-boucle
-       ├── modules/calendar.js       métadonnées Agenda
-       ├── modules/bulk.js           validation des actions groupées
-       ├── modules/review.js         plan Aujourd’hui et revues périodiques
-       ├── modules/related.js        détection et fusion prudente des doublons
-       ├── modules/diagnostics.js    journal borné et expurgation
-       ├── modules/health.js         score et anomalies locales
-       ├── modules/localization.js   chaînes de l’interface injectée
-       ├── modules/migrations.js     analyse, conflits et fusion sûre
-       ├── modules/performance.js    signatures de rendu
-       ├── modules/providers.js      matrice comptes/calendriers
-       └── modules/smart.js          vues intelligentes
+       │
+       ├── logique métier / modules purs
+       │     ├── identity.js / related.js
+       │     ├── workflow.js / rules.js / review.js
+       │     ├── checklists.js / saved-views.js / analytics.js
+       │     ├── storage.js / migrations.js
+       │     └── smart.js / bulk.js / health.js / diagnostics.js / providers.js
+       │
+       ▼
+  modules/compatibility.js ── façade de compatibilité
+       ├── thunderbird-messages.js ── MailServices / MailUtils / MessageArchiver
+       ├── thunderbird-tags.js     ── MailServices.tags / mots-clés dossier
+       └── thunderbird-calendar.js ── cal / CalEvent / CalTodo / ACL / observateurs
+                                      │
+                                      ▼
+                            API internes Thunderbird
 ```
+
+La dépendance descend dans un seul sens : le métier appelle la façade ; les adaptateurs connaissent Thunderbird. Une nouvelle logique métier ne doit pas contourner cette frontière. Les contrats détaillés sont décrits dans [`THUNDERBIRD_COMPATIBILITY.md`](THUNDERBIRD_COMPATIBILITY.md).
+
+`implementation.js` reste volontairement l’orchestrateur du DOM `about:3pane`. Cette zone n’est pas déplacée en bloc pendant la consolidation afin de ne pas mélanger découpage des services et réécriture de la structure native.
 
 ## Frontières de confiance
 
@@ -76,9 +81,15 @@ Les vues Aujourd’hui et Revue sont dérivées à la demande depuis les référ
 
 La détection des éléments associés produit uniquement des propositions. La fusion est déclenchée par l’utilisateur, confirmée dans le dashboard, validée à nouveau dans l’Experiment et enregistrée dans la pile d’annulation.
 
-Les paramètres utilisent une navigation groupée, une recherche, des aides sous chaque contrôle, un aperçu des règles avant enregistrement et des notifications fixes mais non bloquantes. Les dix commandes MailPerch sont personnalisables avec l’API `commands` de Thunderbird et sont incluses dans les exports de configuration.
+Les paramètres utilisent une navigation groupée, une recherche, des aides sous chaque contrôle, un aperçu des règles avant enregistrement et des notifications fixes mais non bloquantes. La présentation est organisée en **Essentiel**, **Organisation**, **Automatisation** et **Avancé**. Le mode historique `guided` est présenté comme **Recommandé** : il masque les sections techniques avancées sans les supprimer et peut préparer un brouillon de valeurs sûres. Ce brouillon conserve les valeurs propres au profil et exige toujours un clic explicite sur Enregistrer. Le mode `advanced` reste disponible pour exposer tous les contrôles.
+
+Les dix commandes MailPerch sont personnalisables avec l’API `commands` de Thunderbird et sont incluses dans les exports de configuration.
 
 Le bouton injecté émet `pinInbox.onDashboardRequested`; le background ouvre la page d’extension avec `messenger.tabs.create`, afin de conserver le bon principal de sécurité.
+
+### Politique de composants UI
+
+MailPerch suit Fluent 2 par ses jetons CSS locaux, sa hiérarchie, ses états et ses contrôles HTML natifs. Le build assemble directement les fichiers suivis sous `extension/` et n’exécute aucun bundler : une dépendance npm non importée ne peut donc pas devenir un composant du XPI. `@fluentui/web-components` 3.0.3 a été évalué puis retiré, notamment parce qu’il exige Node 22/24 alors que la validation du dépôt inclut Node 20. Une future adoption exige simultanément un besoin produit précis, un bundle local déterministe auditable, aucun actif distant et une matrice Node/Thunderbird documentée.
 
 ## Stockage et migrations
 
@@ -108,6 +119,13 @@ Les fonctions 1.1.0 n’ajoutent aucune connexion réseau, dépendance d’exéc
 - minuterie locale de rappels, réveils et récurrences ;
 - observateurs Agenda lorsque la synchronisation bidirectionnelle est activée ;
 - nettoyage systématique des observateurs, popups, timers et nœuds à la fermeture.
+
+
+## Validation de l’intégration Thunderbird
+
+La validation est répartie en niveaux : tests statiques/modèles, contrats de compatibilité avec faux services, smoke runtime sur binaire Thunderbird officiel, tests `mach` dans un checkout comm-central et validation manuelle avec comptes/fournisseurs réels. Le détail et la portée de chaque niveau sont dans [`THUNDERBIRD_TEST_BENCH.md`](THUNDERBIRD_TEST_BENCH.md).
+
+Le workflow runtime reste séparé de la QA obligatoire même après sa première exécution réussie sur Thunderbird 153.0.1 ESR : il doit accumuler plusieurs exécutions fiables avant une éventuelle promotion en contrôle requis. Un test de contrat ne doit jamais être présenté comme une validation graphique Thunderbird.
 
 ## Isolation des préférences visuelles
 

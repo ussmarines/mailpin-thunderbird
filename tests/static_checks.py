@@ -10,7 +10,7 @@ manifest = json.loads((EXT / "manifest.json").read_text(encoding="utf-8"))
 version = manifest["version"]
 
 assert manifest["manifest_version"] == 3
-assert version == "1.2.1"
+assert version == "1.3.0"
 assert manifest["permissions"] == ["menus"]
 assert manifest["browser_specific_settings"]["gecko"]["id"] == "pin-mails@MailPerch.local"
 assert manifest["browser_specific_settings"]["gecko"]["strict_min_version"] == "128.0"
@@ -93,7 +93,7 @@ for needle in [
     "_checkCompatibility", "_registerFolderListener", "msgsMoveCopyCompleted", "msgKeyChanged",
     "_toggleConversationSelectedByTab", "_getDashboardData", "_createCalendarItem",
     "_syncReferenceToCalendar", "_applyCustomRules", "_simulateRules", "_scheduleCounterRegressionCheck",
-    "MailUtils.displayMessageInFolderTab", "pin-mails-independent-button", "about3Pane.messagePane.displayMessage",
+    "this._thunderbird?.messages?.displayMessageInFolderTab", "pin-mails-independent-button", "about3Pane.messagePane.displayMessage",
     "onDashboardRequested", "event.stopImmediatePropagation()", 'event.key === "ContextMenu"',
     'document.createXULElement("menupopup")', 'contextMenu.openPopupAtScreen',
     "clearDropTargets", "startupcache-invalidate"

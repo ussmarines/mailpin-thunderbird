@@ -1,5 +1,14 @@
 # Historique de la sécurité
 
+## 2026-08-08 — Isolation de la frontière Thunderbird et banc runtime
+
+- déplacement des appels Messages, Tags et Agenda extraits vers des adaptateurs injectables dédiés derrière `PinCompatibility` ;
+- ajout d’une garde empêchant la logique orchestratrice de réintroduire les accès directs déjà isolés ;
+- conservation de l’atomicité des collisions de tags, des ACL Agenda, des bornes de résolution et du nettoyage des listeners/observateurs ;
+- ajout de tests de contrat avec faux services, sans nouvelle surface dans le XPI ;
+- ajout d’un smoke de test sur binaire Thunderbird/geckodriver téléchargés et vérifiés par SHA-256 dans GitHub Actions ;
+- aucune nouvelle permission WebExtension, dépendance runtime, migration de stockage, connexion réseau du produit ou donnée persistante.
+
 ## 2026-08-07 — Correctif CodeQL des noms d’hôte fournisseurs
 
 - correction des deux alertes High `js/incomplete-url-substring-sanitization` détectées dans `extension/api/pinInbox/modules/providers.js` ;
