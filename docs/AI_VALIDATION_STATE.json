@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "purpose": "Cache machine-readable des dernières preuves de validation réutilisables. Ce fichier ne remplace ni AGENTS.md ni les règles de sécurité et ne doit jamais servir à inventer un test non exécuté.",
+  "recorded_at": "2026-08-08T20:26:08+02:00",
+  "baseline": {
+    "repository": "ussmarines/mailperch-thunderbird",
+    "branch": "main",
+    "commit_sha": "1a61967a87fde76b7301753406d524086ee25543",
+    "tree_sha": "e8258ddffe5c3cfd0b60c6e4d02bb5f63cc0481c"
+  },
+  "policy": {
+    "mode": "latest-valid-evidence-only",
+    "ignore_for_invalidation": [
+      "docs/AI_VALIDATION_STATE.json"
+    ],
+    "reuse_requires": [
+      "result == success",
+      "aucun chemin modifie depuis validated_commit ne correspond a invalidates_on",
+      "les contraintes d'environnement pertinentes sont inchangees",
+      "aucun nouveau bug, echec ou signal ne remet en cause la preuve"
+    ],
+    "update_rules": [
+      "enregistrer uniquement des controles reellement executes ou des preuves GitHub verifiees",
+      "conserver seulement la preuve la plus recente utile par identifiant de controle",
+      "utiliser des invalidates_on aussi etroits que possible pour les controles cibles",
+      "ne jamais elargir artificiellement la portee d'un test cible",
+      "ne pas relancer un controle encore valide uniquement pour rafraichir sa date",
+      "une passe complete est reservee au jalon final ou a un changement transversal qui la justifie"
+    ],
+    "max_targeted_checks": 32
+  },
+  "repository_checks": [
+    {
+      "id": "qa-linux-full",
+      "result": "success",
+      "validated_commit": "1a61967a87fde76b7301753406d524086ee25543",
+      "validated_tree": "e8258ddffe5c3cfd0b60c6e4d02bb5f63cc0481c",
+      "validated_at": "2026-08-08T17:19:24Z",
+      "command": "npm run ci",
+      "environment": {
+        "os": "ubuntu-24.04",
+        "node": "24",
+        "python": "3.12"
+      },
+      "invalidates_on": [
+        "**"
+      ],
+      "evidence": {
+        "kind": "github-actions",
+        "workflow": "QA",
+        "run_id": 31269123993,
+        "job": "Full verification (Linux)",
+        "job_id": 93132008218
+      }
+    },
+    {
+      "id": "qa-windows-source-model",
+      "result": "success",
+      "validated_commit": "1a61967a87fde76b7301753406d524086ee25543",
+      "validated_tree": "e8258ddffe5c3cfd0b60c6e4d02bb5f63cc0481c",
+      "validated_at": "2026-08-08T17:19:45Z",
+      "command": "npm run check && npm test",
+      "environment": {
+        "os": "windows-latest",
+        "node": "24",
+        "python": "3.12"
+      },
+      "invalidates_on": [
+        "**"
+      ],
+      "evidence": {
+        "kind": "github-actions",
+        "workflow": "QA",
+        "run_id": 31269123993,
+        "job": "Source and model checks (Windows)",
+        "job_id": 93132008195
+      }
+    },
+    {
+      "id": "security-guard-regression",
+      "result": "success",
+      "validated_commit": "1a61967a87fde76b7301753406d524086ee25543",
+      "validated_tree": "e8258ddffe5c3cfd0b60c6e4d02bb5f63cc0481c",
+      "validated_at": "2026-08-08T17:19:27Z",
+      "command": "python -m unittest discover -s tests/security -p \"test_*.py\" && python .github/scripts/security_guard.py --history",
+      "environment": {
+        "os": "ubuntu-24.04",
+        "python": "3.12"
+      },
+      "invalidates_on": [
+        "**"
+      ],
+      "evidence": {
+        "kind": "github-actions",
+        "workflow": "QA",
+        "run_id": 31269123993,
+        "job": "Security guard regression",
+        "job_id": 93132008185
+      }
+    },
+    {
+      "id": "codeql",
+      "result": "success",
+      "validated_commit": "1a61967a87fde76b7301753406d524086ee25543",
+      "validated_tree": "e8258ddffe5c3cfd0b60c6e4d02bb5f63cc0481c",
+      "validated_at": "2026-08-08T17:20:37Z",
+      "command": "GitHub CodeQL",
+      "invalidates_on": [
+        "**"
+      ],
+      "evidence": {
+        "kind": "github-actions",
+        "workflow": "Push on main",
+        "run_id": 31269123984
+      }
+    },
+    {
+      "id": "thunderbird-runtime-smoke-153",
+      "result": "success",
+      "validated_commit": "4548011f7473e3acd109c0f1782c4f1d6e566c37",
+      "validated_tree": "e8258ddffe5c3cfd0b60c6e4d02bb5f63cc0481c",
+      "equivalent_tree_commit": "1a61967a87fde76b7301753406d524086ee25543",
+      "validated_at": "2026-08-08T17:17:39Z",
+      "environment": {
+        "os": "ubuntu-24.04",
+        "thunderbird": "153.0.1esr",
+        "geckodriver": "0.37.1"
+      },
+      "invalidates_on": [
+        ".github/workflows/thunderbird-smoke.yml",
+        "extension/**",
+        "scripts/build.py",
+        "tests/thunderbird/**",
+        "tests/test_thunderbird_test_bench.py",
+        "package.json"
+      ],
+      "evidence": {
+        "kind": "github-actions",
+        "workflow": "Thunderbird runtime smoke",
+        "run_id": 31269042751
+      },
+      "notes": "La preuve provient du head de la PR #16. Son tree Git e8258d... est strictement identique au tree du commit main 1a61967..., donc aucun rerun n'est requis tant qu'aucun chemin invalidant ne change."
+    }
+  ],
+  "targeted_checks": []
+}

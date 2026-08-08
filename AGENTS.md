@@ -6,11 +6,12 @@ Ce dépôt contient une MailExtension Thunderbird Manifest V3 avec une API Exper
 
 1. `docs/IDENTITY_MIGRATION_REQUIRED.md` — décision canonique et historique de l’identifiant ;
 2. `PROJECT_MEMORY.md` — état courant, carte complète et procédures ;
-3. `docs/CODEX_HANDOFF.md` — objectif et périmètre de la branche active ;
-4. `docs/BUG_TRACKER.md` — bugs ouverts, corrigés et validations réelles restantes ;
-5. `docs/THUNDERBIRD_COMPATIBILITY.md` uniquement si la frontière Thunderbird est touchée ;
-6. le fichier `AGENTS.md` le plus proche de la zone modifiée ;
-7. uniquement les fichiers spécialisés indiqués par la mémoire.
+3. `docs/AI_VALIDATION_STATE.json` — dernières preuves de validation encore potentiellement réutilisables ;
+4. `docs/CODEX_HANDOFF.md` — objectif et périmètre de la branche active ;
+5. `docs/BUG_TRACKER.md` — bugs ouverts, corrigés et validations réelles restantes ;
+6. `docs/THUNDERBIRD_COMPATIBILITY.md` uniquement si la frontière Thunderbird est touchée ;
+7. le fichier `AGENTS.md` le plus proche de la zone modifiée ;
+8. uniquement les fichiers spécialisés indiqués par la mémoire.
 
 En cas de contradiction sur l’identité de l’extension, `docs/IDENTITY_MIGRATION_REQUIRED.md`, `extension/manifest.json` et `docs/PROJECT_STATE.json` sont prioritaires sur les anciennes mentions conservées dans la mémoire historique.
 
@@ -36,6 +37,16 @@ Afficher des messages épinglés dans un panneau distinct au-dessus de la liste 
 14. Ne pas contourner `PinCompatibility` pour les opérations Messages, Tags ou Agenda déjà extraites.
 15. Le mode Recommandé ne sauvegarde jamais automatiquement et ne doit pas écraser les choix propres au profil.
 
+## Validation différentielle et économie de contexte
+
+- Commencer par l’état Git réel puis le diff ; ne pas relire tout le dépôt par défaut.
+- Consulter `docs/AI_VALIDATION_STATE.json` avant de relancer un contrôle déjà exécuté.
+- Réutiliser une preuve verte uniquement si aucun chemin ou environnement qui l’invalide n’a changé et qu’aucun nouveau signal ne la remet en cause.
+- Ne jamais enregistrer comme validé un test qui n’a pas réellement été exécuté ou vérifié dans GitHub.
+- Après une modification, lancer d’abord les contrôles les plus ciblés ; réserver une passe complète au jalon final ou à un changement transversal qui la justifie.
+- Mettre à jour le registre avec la dernière preuve utile uniquement ; ne pas en faire un historique croissant.
+- Ne jamais utiliser Codex Security par défaut. Si les outils standards ne permettent pas de conclure sur une question de sécurité précise, demander l’autorisation explicite de l’utilisateur avant une analyse Codex Security strictement ciblée.
+
 ## Secrets, identité et agents
 
 - Lire et appliquer `SECURITY_PRODUCTION_RULES.md` avant toute opération touchant la configuration, la CI, la production, une release ou des credentials.
@@ -59,6 +70,7 @@ La carte exhaustive est dans `PROJECT_MEMORY.md`. Cette liste ne conserve que le
 - `extension/options/` : paramètres et outils de diagnostic.
 - `tests/` : modèles, contrats de compatibilité, stockage et gardes anti-régression.
 - `.github/workflows/thunderbird-smoke.yml` : smoke sur vrai binaire Thunderbird, distinct de la QA générique.
+- `docs/AI_VALIDATION_STATE.json` : cache des validations réutilisables et de leurs conditions d’invalidation.
 - `docs/` : architecture, sécurité, débogage et validation manuelle.
 
 ## Commandes
@@ -74,12 +86,14 @@ Le XPI est construit dans `dist/`. Aucun outil de compilation externe n’est re
 
 ## Ordre de modification recommandé
 
-1. Reproduire le problème dans un profil Thunderbird de test.
-2. Ajouter ou renforcer un test de modèle/statique.
-3. Modifier la plus petite surface possible.
-4. Lancer `npm run ci`.
-5. Tester manuellement les scénarios de `docs/MANUAL_TEST_PLAN.md`.
-6. Mettre à jour `docs/BUG_TRACKER.md`, puis documenter les limites restantes dans `docs/CODEX_HANDOFF.md`.
+1. Reproduire le problème dans un profil Thunderbird de test si le comportement dépend de Thunderbird.
+2. Identifier le diff et la plus petite surface affectée.
+3. Ajouter ou renforcer le test de modèle/statique le plus ciblé si nécessaire.
+4. Modifier la plus petite surface possible.
+5. Lancer d’abord les tests ciblés affectés ; ne pas relancer ceux dont la preuve reste valide.
+6. Lancer `npm run ci` une seule fois au jalon final si la portée de la tâche le justifie.
+7. Tester manuellement uniquement les scénarios pertinents de `docs/MANUAL_TEST_PLAN.md` lorsqu’une preuve réelle Thunderbird est nécessaire.
+8. Mettre à jour `docs/AI_VALIDATION_STATE.json` avec les contrôles réellement exécutés, puis `docs/BUG_TRACKER.md` / `docs/CODEX_HANDOFF.md` seulement si leur contenu doit réellement changer.
 
 ## Zones à haut risque
 
@@ -93,4 +107,4 @@ Le XPI est construit dans `dist/`. Aucun outil de compilation externe n’est re
 
 ## Définition de « terminé »
 
-Une correction n’est pas considérée terminée sur la seule base de contrôles statiques. Il faut indiquer explicitement quels tests Thunderbird réels ont été exécutés. Ne jamais affirmer qu’un comportement graphique fonctionne sans l’avoir observé dans Thunderbird.
+Une correction n’est pas considérée terminée sur la seule base de contrôles statiques. Il faut indiquer explicitement quels tests Thunderbird réels ont été exécutés lorsque la surface exige une preuve runtime. Ne jamais affirmer qu’un comportement graphique fonctionne sans l’avoir observé dans Thunderbird. La restitution doit distinguer les tests exécutés, les preuves réutilisées car encore valides et les contrôles non relancés.
