@@ -4,14 +4,15 @@ Ce dépôt contient une MailExtension Thunderbird Manifest V3 avec une API Exper
 
 **Ordre de lecture obligatoire pour économiser le contexte :**
 
-1. `docs/IDENTITY_MIGRATION_REQUIRED.md` — décision canonique et historique de l’identifiant ;
-2. `PROJECT_MEMORY.md` — état courant, carte complète et procédures ;
-3. `docs/AI_VALIDATION_STATE.json` — dernières preuves de validation encore potentiellement réutilisables ;
-4. `docs/CODEX_HANDOFF.md` — objectif et périmètre de la branche active ;
-5. `docs/BUG_TRACKER.md` — bugs ouverts, corrigés et validations réelles restantes ;
-6. `docs/THUNDERBIRD_COMPATIBILITY.md` uniquement si la frontière Thunderbird est touchée ;
-7. le fichier `AGENTS.md` le plus proche de la zone modifiée ;
-8. uniquement les fichiers spécialisés indiqués par la mémoire.
+1. `MAILPERCH_AI_RULES.md` — gouvernance IA, économie de tokens, choix modèle/puissance et règles Git ;
+2. `docs/IDENTITY_MIGRATION_REQUIRED.md` — décision canonique et historique de l’identifiant ;
+3. `PROJECT_MEMORY.md` — état courant, carte complète et procédures ;
+4. `docs/AI_VALIDATION_STATE.json` — dernières preuves de validation encore potentiellement réutilisables ;
+5. `docs/CODEX_HANDOFF.md` — objectif et périmètre de la branche active ;
+6. `docs/BUG_TRACKER.md` — bugs ouverts, corrigés et validations réelles restantes ;
+7. `docs/THUNDERBIRD_COMPATIBILITY.md` uniquement si la frontière Thunderbird est touchée ;
+8. le fichier `AGENTS.md` le plus proche de la zone modifiée ;
+9. uniquement les fichiers spécialisés indiqués par la mémoire.
 
 En cas de contradiction sur l’identité de l’extension, `docs/IDENTITY_MIGRATION_REQUIRED.md`, `extension/manifest.json` et `docs/PROJECT_STATE.json` sont prioritaires sur les anciennes mentions conservées dans la mémoire historique.
 
@@ -45,6 +46,7 @@ Afficher des messages épinglés dans un panneau distinct au-dessus de la liste 
 - Ne jamais enregistrer comme validé un test qui n’a pas réellement été exécuté ou vérifié dans GitHub.
 - Après une modification, lancer d’abord les contrôles les plus ciblés ; réserver une passe complète au jalon final ou à un changement transversal qui la justifie.
 - Mettre à jour le registre avec la dernière preuve utile uniquement ; ne pas en faire un historique croissant.
+- Avant chaque prompt destiné à Codex, appliquer `MAILPERCH_AI_RULES.md` et afficher séparément le modèle GPT-5.6 recommandé et la puissance avant le prompt.
 - Ne jamais utiliser Codex Security par défaut. Si les outils standards ne permettent pas de conclure sur une question de sécurité précise, demander l’autorisation explicite de l’utilisateur avant une analyse Codex Security strictement ciblée.
 
 ## Secrets, identité et agents
