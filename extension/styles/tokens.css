@@ -27,25 +27,24 @@
   --mp-secondary-background-hover: #0b7777;
   --mp-secondary-foreground: #087f7f;
   --mp-secondary-subtle: #e3f7f5;
-  --mp-brand-gradient: linear-gradient(135deg, #0f6cbd 0%, #0b7f91 58%, #0e8f8f 100%);
 
   /* Fluent neutral aliases — light */
   --mp-color-neutral-background-1: #ffffff;
-  --mp-color-neutral-background-2: #fafafa;
-  --mp-color-neutral-background-3: #f5f5f5;
-  --mp-color-neutral-background-4: #f0f0f0;
+  --mp-color-neutral-background-2: #f7f9fa;
+  --mp-color-neutral-background-3: #f0f4f6;
+  --mp-color-neutral-background-4: #e7edef;
   --mp-color-neutral-background-canvas: #f4f7fb;
-  --mp-color-neutral-background-inverted: #242424;
+  --mp-color-neutral-background-inverted: #17232b;
   --mp-color-neutral-card-background: #ffffff;
   --mp-color-neutral-card-background-hover: #ffffff;
-  --mp-color-neutral-foreground-1: #242424;
-  --mp-color-neutral-foreground-2: #616161;
-  --mp-color-neutral-foreground-3: #707070;
+  --mp-color-neutral-foreground-1: #17232b;
+  --mp-color-neutral-foreground-2: #4e626d;
+  --mp-color-neutral-foreground-3: #657983;
   --mp-color-neutral-foreground-inverted: #ffffff;
-  --mp-color-neutral-stroke-1: #d1d1d1;
-  --mp-color-neutral-stroke-2: #e0e0e0;
-  --mp-color-neutral-stroke-accessible: #8a8a8a;
-  --mp-color-neutral-stroke-focus: #242424;
+  --mp-color-neutral-stroke-1: #d5e0e4;
+  --mp-color-neutral-stroke-2: #e2e9eb;
+  --mp-color-neutral-stroke-accessible: #71848d;
+  --mp-color-neutral-stroke-focus: #07577d;
 
   /* Semantic aliases — light */
   --mp-color-success-foreground: #0e700e;
@@ -63,10 +62,10 @@
 
   /* Geometry and rhythm */
   --mp-radius-none: 0;
-  --mp-radius-small: 2px;
-  --mp-radius-medium: 4px;
-  --mp-radius-large: 6px;
-  --mp-radius-xlarge: 8px;
+  --mp-radius-small: 4px;
+  --mp-radius-medium: 6px;
+  --mp-radius-large: 8px;
+  --mp-radius-xlarge: 10px;
   --mp-radius-xxlarge: 12px;
   --mp-radius-round: 9999px;
   --mp-stroke-width: 1px;
@@ -88,11 +87,11 @@
   --mp-focus-ring-color: color-mix(in srgb, var(--mp-brand-foreground) 72%, transparent);
 
   /* Elevation — light */
-  --mp-shadow-2: 0 1px 2px rgb(18 50 74 / 0.08), 0 0 1px rgb(18 50 74 / 0.05);
-  --mp-shadow-4: 0 2px 5px rgb(18 50 74 / 0.09), 0 0 2px rgb(18 50 74 / 0.05);
-  --mp-shadow-8: 0 5px 12px rgb(18 50 74 / 0.10), 0 1px 3px rgb(18 50 74 / 0.06);
-  --mp-shadow-16: 0 9px 22px rgb(18 50 74 / 0.12), 0 2px 5px rgb(18 50 74 / 0.07);
-  --mp-shadow-28: 0 16px 36px rgb(18 50 74 / 0.16), 0 3px 9px rgb(18 50 74 / 0.08);
+  --mp-shadow-2: 0 1px 2px rgb(18 39 51 / 0.05);
+  --mp-shadow-4: 0 2px 5px rgb(18 39 51 / 0.06);
+  --mp-shadow-8: 0 4px 10px rgb(18 39 51 / 0.08);
+  --mp-shadow-16: 0 8px 18px rgb(18 39 51 / 0.10);
+  --mp-shadow-28: 0 14px 30px rgb(18 39 51 / 0.14);
 
   /* Motion */
   --mp-duration-ultra-fast: 50ms;

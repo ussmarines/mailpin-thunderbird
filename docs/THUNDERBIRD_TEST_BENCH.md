@@ -118,7 +118,7 @@ Après publication de la branche, lancer **Thunderbird functional and scale benc
 ```bash
 python tests/thunderbird/functional_bench.py \
   --binary /chemin/vers/thunderbird \
-  --xpi dist/MailPerch_v1.4.0.xpi \
+  --xpi dist/MailPerch_v1.5.0.xpi \
   --geckodriver /chemin/vers/geckodriver \
   --output-dir artifacts/thunderbird-bench \
   --volumes 50,100,500,1000,2000 \
@@ -136,7 +136,7 @@ Pour préparer cette validation manuelle sans automatiser l’onglet Options, ut
 ```bash
 python tests/thunderbird/functional_bench.py \
   --binary /chemin/vers/thunderbird \
-  --xpi dist/MailPerch_v1.4.0.xpi \
+  --xpi dist/MailPerch_v1.5.0.xpi \
   --geckodriver /chemin/vers/geckodriver \
   --output-dir artifacts/thunderbird-manual-scope \
   --prepare-manual-scope-validation \
@@ -146,7 +146,7 @@ python tests/thunderbird/functional_bench.py \
 ```bash
 python tests/thunderbird/functional_bench.py \
   --binary /chemin/vers/thunderbird \
-  --xpi dist/MailPerch_v1.4.0.xpi \
+  --xpi dist/MailPerch_v1.5.0.xpi \
   --geckodriver /chemin/vers/geckodriver \
   --output-dir artifacts/thunderbird-multi-account \
   --scope-validation-only \
@@ -182,7 +182,7 @@ Sous Windows x64, l’installation utilisateur validée est `C:\Users\ussma\AppD
 ```bash
 python tests/thunderbird/real_smoke.py \
   --binary /chemin/vers/thunderbird \
-  --xpi dist/MailPerch_v1.4.0.xpi \
+  --xpi dist/MailPerch_v1.5.0.xpi \
   --geckodriver /chemin/vers/geckodriver \
   --output-dir artifacts/thunderbird-smoke \
   --timeout 45

@@ -2,10 +2,10 @@
   "format": "mailperch-project-state",
   "version": 1,
   "project": "MailPerch — Email Pins & Follow-up",
-  "extensionVersion": "1.4.0",
+  "extensionVersion": "1.5.0",
   "baseGitHub": {
     "branch": "main",
-    "commit": "26af48770930653ebbf9f4836854e0e078eca112"
+    "commit": "4f73efddc4a515a2a1a3d864050f4aa676e2072d"
   },
   "extensionId": "pin-mails@MailPerch.local",
   "thunderbird": {
@@ -119,7 +119,7 @@
     ],
     "runtimeWorkflow": ".github/workflows/thunderbird-smoke.yml",
     "runtimeScript": "tests/thunderbird/real_smoke.py",
-    "browserStatus": "production Options and dashboard assets passed targeted browser flows including selected-account rendering, save/cancel behavior, localization and dashboard counters before the 1.4.0 release preparation",
-    "runtimeStatus": "post-1.3.0 runtime feedback passed Thunderbird 153.0.2 Windows manual/functional validation: selected-account scope empty=0, A=18, B=16, A+C=34, A+B+C=50, Options save to panel and light/dark pin visuals; functional scale bench passed 50/100/500/1000/2000 pins; PR #24 smoke passed on Thunderbird 153.0.1 ESR Linux. Temporary-addon restart persistence remains a harness limitation, not a demonstrated production defect"
+    "browserStatus": "the 1.5.0 redesign production assets passed targeted Chromium flows before integration: Dashboard 7 views, 9 statistics, bulk action and no overflow at 720 px; Dashboard and Options were also visually inspected",
+    "runtimeStatus": "the user validated the redesign XPI manually in Thunderbird before origin/main 1.4.0 was integrated. Earlier post-1.3.0 runtime evidence remains: selected-account scope empty=0, A=18, B=16, A+C=34, A+B+C=50, Options save to panel and light/dark pin visuals; functional scale bench passed 50/100/500/1000/2000 pins; PR #24 smoke passed on Thunderbird 153.0.1 ESR Linux. Temporary-addon restart persistence remains a harness limitation, not a demonstrated production defect"
   }
 }

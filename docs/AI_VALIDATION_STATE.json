@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "purpose": "Cache machine-readable des dernières preuves de validation réutilisables. Ce fichier ne remplace ni AGENTS.md ni les règles de sécurité et ne doit jamais servir à inventer un test non exécuté.",
-  "recorded_at": "2026-08-08T20:26:08+02:00",
+  "recorded_at": "2026-08-09T19:16:02+02:00",
   "baseline": {
     "repository": "ussmarines/mailperch-thunderbird",
-    "branch": "main",
-    "commit_sha": "1a61967a87fde76b7301753406d524086ee25543",
-    "tree_sha": "e8258ddffe5c3cfd0b60c6e4d02bb5f63cc0481c"
+    "branch": "codex/ui-ux-product-redesign",
+    "commit_sha": "11aeff3eeff9234f46624c95489c5474cf003ff3",
+    "tree_sha": "1fd7aac42ea85981b2ce0ba45a5cc66a322e71b2"
   },
   "policy": {
     "mode": "latest-valid-evidence-only",
@@ -31,116 +31,98 @@
   },
   "repository_checks": [
     {
-      "id": "qa-linux-full",
+      "id": "local-windows-full",
       "result": "success",
-      "validated_commit": "1a61967a87fde76b7301753406d524086ee25543",
-      "validated_tree": "e8258ddffe5c3cfd0b60c6e4d02bb5f63cc0481c",
-      "validated_at": "2026-08-08T17:19:24Z",
+      "validated_commit": "11aeff3eeff9234f46624c95489c5474cf003ff3",
+      "validated_tree": "1fd7aac42ea85981b2ce0ba45a5cc66a322e71b2",
+      "validated_at": "2026-08-09T19:08:00+02:00",
       "command": "npm run ci",
       "environment": {
-        "os": "ubuntu-24.04",
-        "node": "24",
-        "python": "3.12"
+        "os": "Microsoft Windows 11 Professionnel 10.0.26200 64 bits",
+        "node": "24.19.0",
+        "npm": "11.17.0",
+        "python": "3.14.6"
       },
       "invalidates_on": [
         "**"
       ],
       "evidence": {
-        "kind": "github-actions",
-        "workflow": "QA",
-        "run_id": 31269123993,
-        "job": "Full verification (Linux)",
-        "job_id": 93132008218
+        "kind": "local-command",
+        "summary": "check, complete test suite, reproducible-build guard and 1.5.0 packaging passed; XPI, repository ZIP and SHA256SUMS.txt were produced"
       }
-    },
-    {
-      "id": "qa-windows-source-model",
-      "result": "success",
-      "validated_commit": "1a61967a87fde76b7301753406d524086ee25543",
-      "validated_tree": "e8258ddffe5c3cfd0b60c6e4d02bb5f63cc0481c",
-      "validated_at": "2026-08-08T17:19:45Z",
-      "command": "npm run check && npm test",
-      "environment": {
-        "os": "windows-latest",
-        "node": "24",
-        "python": "3.12"
-      },
-      "invalidates_on": [
-        "**"
-      ],
-      "evidence": {
-        "kind": "github-actions",
-        "workflow": "QA",
-        "run_id": 31269123993,
-        "job": "Source and model checks (Windows)",
-        "job_id": 93132008195
-      }
-    },
-    {
-      "id": "security-guard-regression",
-      "result": "success",
-      "validated_commit": "1a61967a87fde76b7301753406d524086ee25543",
-      "validated_tree": "e8258ddffe5c3cfd0b60c6e4d02bb5f63cc0481c",
-      "validated_at": "2026-08-08T17:19:27Z",
-      "command": "python -m unittest discover -s tests/security -p \"test_*.py\" && python .github/scripts/security_guard.py --history",
-      "environment": {
-        "os": "ubuntu-24.04",
-        "python": "3.12"
-      },
-      "invalidates_on": [
-        "**"
-      ],
-      "evidence": {
-        "kind": "github-actions",
-        "workflow": "QA",
-        "run_id": 31269123993,
-        "job": "Security guard regression",
-        "job_id": 93132008185
-      }
-    },
-    {
-      "id": "codeql",
-      "result": "success",
-      "validated_commit": "1a61967a87fde76b7301753406d524086ee25543",
-      "validated_tree": "e8258ddffe5c3cfd0b60c6e4d02bb5f63cc0481c",
-      "validated_at": "2026-08-08T17:20:37Z",
-      "command": "GitHub CodeQL",
-      "invalidates_on": [
-        "**"
-      ],
-      "evidence": {
-        "kind": "github-actions",
-        "workflow": "Push on main",
-        "run_id": 31269123984
-      }
-    },
-    {
-      "id": "thunderbird-runtime-smoke-153",
-      "result": "success",
-      "validated_commit": "4548011f7473e3acd109c0f1782c4f1d6e566c37",
-      "validated_tree": "e8258ddffe5c3cfd0b60c6e4d02bb5f63cc0481c",
-      "equivalent_tree_commit": "1a61967a87fde76b7301753406d524086ee25543",
-      "validated_at": "2026-08-08T17:17:39Z",
-      "environment": {
-        "os": "ubuntu-24.04",
-        "thunderbird": "153.0.1esr",
-        "geckodriver": "0.37.1"
-      },
-      "invalidates_on": [
-        ".github/workflows/thunderbird-smoke.yml",
-        "extension/**",
-        "scripts/build.py",
-        "tests/thunderbird/**",
-        "tests/test_thunderbird_test_bench.py",
-        "package.json"
-      ],
-      "evidence": {
-        "kind": "github-actions",
-        "workflow": "Thunderbird runtime smoke",
-        "run_id": 31269042751
-      },
-      "notes": "La preuve provient du head de la PR #16. Son tree Git e8258d... est strictement identique au tree du commit main 1a61967..., donc aucun rerun n'est requis tant qu'aucun chemin invalidant ne change."
     }
   ],
-  "targeted_checks": []
+  "targeted_checks": [
+    {
+      "id": "dashboard-playwright-dom-flow",
+      "result": "success",
+      "validated_commit": "11aeff3eeff9234f46624c95489c5474cf003ff3",
+      "validated_tree": "1fd7aac42ea85981b2ce0ba45a5cc66a322e71b2",
+      "validated_at": "2026-08-09T19:11:00+02:00",
+      "command": "playwright-cli -s=mailperch-dashboard run-code --filename tests/dashboard_dom_flow.playwright.js",
+      "environment": {
+        "os": "Microsoft Windows 11 Professionnel 10.0.26200 64 bits",
+        "browser": "Chromium",
+        "playwright_cli": "0.1.18"
+      },
+      "invalidates_on": [
+        "extension/dashboard/**",
+        "extension/styles/tokens.css",
+        "extension/_locales/**",
+        "tests/dashboard_dom_flow.playwright.js"
+      ],
+      "evidence": {
+        "kind": "local-browser-flow",
+        "summary": "7 views, 9 statistics, 11 rendered cards, one bulk action, dark and reduced-motion support, and no horizontal overflow at 720 px; final screenshot visually inspected"
+      },
+      "notes": "The repository test temporarily used an isolated local server on port 8766 because port 8765 belonged to an unrelated user process. Only the base URL constant changed during execution and was restored immediately afterward. The only console error was the test server favicon 404."
+    },
+    {
+      "id": "options-playwright-dom-flow",
+      "result": "success",
+      "validated_commit": "11aeff3eeff9234f46624c95489c5474cf003ff3",
+      "validated_tree": "1fd7aac42ea85981b2ce0ba45a5cc66a322e71b2",
+      "validated_at": "2026-08-09T19:14:00+02:00",
+      "command": "playwright-cli -s=mailperch-options run-code --filename tests/options_dom_flow.playwright.js",
+      "environment": {
+        "os": "Microsoft Windows 11 Professionnel 10.0.26200 64 bits",
+        "browser": "Chromium",
+        "playwright_cli": "0.1.18"
+      },
+      "invalidates_on": [
+        "extension/options/**",
+        "extension/styles/tokens.css",
+        "extension/_locales/**",
+        "extension/api/pinInbox/modules/settings.js",
+        "tests/options_dom_flow.playwright.js"
+      ],
+      "evidence": {
+        "kind": "local-browser-flow",
+        "summary": "106 controls exercised through real form interactions; save, cancel, retry and bounded startup failures passed; no horizontal overflow at 720 px; final screenshot visually inspected"
+      },
+      "notes": "The repository test temporarily used an isolated local server on port 8766 because port 8765 belonged to an unrelated user process. Only the base URL constant changed during execution and was restored immediately afterward."
+    },
+    {
+      "id": "user-thunderbird-redesign-xpi",
+      "result": "success",
+      "validated_commit": "46dc82b227fb473be6dc0007ed698e607f23685b",
+      "validated_tree": "6550805213ec97fdc78ecd43d7949a7a0d24f2be",
+      "validated_at": "2026-08-09T00:00:00+02:00",
+      "command": "manual XPI validation supplied by the user",
+      "environment": {
+        "application": "Thunderbird",
+        "observer": "user"
+      },
+      "invalidates_on": [
+        "extension/**",
+        "package.json",
+        "scripts/build.py"
+      ],
+      "evidence": {
+        "kind": "user-manual",
+        "summary": "the redesigned UI/UX and visual direction were accepted in the user's Thunderbird"
+      },
+      "notes": "This evidence predates integration of origin/main 1.4.0 and must not be presented as runtime validation of the later integrated release tree."
+    }
+  ]
 }

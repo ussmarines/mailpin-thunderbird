@@ -1,6 +1,6 @@
 # Registre des bugs MailPerch
 
-Version publique : **1.4.0**
+Version publique : **1.5.0**
 
 Les entrées corrigées des versions antérieures restent disponibles dans l’historique Git et les rapports d’audit archivés. Ce registre courant conserve les validations encore utiles à la prochaine passe.
 

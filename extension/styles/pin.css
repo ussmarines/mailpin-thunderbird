@@ -16,8 +16,8 @@
   --pin-mails-card-hover: var(--layout-background-2);
   --pin-mails-soft: var(--mp-brand-subtle);
   --pin-mails-max-height: 460px;
-  --pin-mails-card-gap: 4px;
-  --pin-mails-card-padding: 8px 10px 8px 12px;
+  --pin-mails-card-gap: 5px;
+  --pin-mails-card-padding: 9px 11px 9px 12px;
   --pin-mails-card-min-height: 56px;
 }
 
@@ -55,9 +55,9 @@
   min-block-size: 44px;
   display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 6px 8px;
-  background: color-mix(in srgb, var(--pin-mails-accent) 8%, var(--pin-mails-header-bg));
+  gap: 8px;
+  padding: 7px 10px;
+  background: var(--pin-mails-header-bg);
   border-block-end: 1px solid var(--pin-mails-border);
 }
 
@@ -113,14 +113,14 @@
   margin-inline-end: auto;
 }
 
-.pin-mails-title { color: var(--pin-mails-accent); font-weight: var(--mp-font-weight-semibold); letter-spacing: -.01em; }
+.pin-mails-title { color: var(--layout-color-1); font-weight: var(--mp-font-weight-semibold); letter-spacing: -.01em; }
 
 .pin-mails-count,
 .pin-mails-group-count {
   min-inline-size: 21px;
   padding: 1px 7px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--pin-mails-accent) 18%, transparent);
+  border-radius: var(--mp-radius-md);
+  background: var(--pin-mails-soft);
   color: var(--pin-mails-accent);
   font-size: max(0.82rem, 12px);
   text-align: center;
@@ -217,8 +217,8 @@
 }
 
 .pin-mails-account-group {
-  margin-block-end: 5px;
-  border: 1px solid color-mix(in srgb, var(--pin-account-color, var(--pin-mails-accent)) 32%, var(--pin-mails-border));
+  margin-block-end: 8px;
+  border: 1px solid var(--pin-mails-border);
   border-radius: var(--mp-radius-md);
   overflow: clip;
 }
@@ -229,8 +229,8 @@
   gap: 7px;
   min-block-size: 28px;
   padding: 4px 8px;
-  background: color-mix(in srgb, var(--pin-account-color, var(--pin-mails-accent)) 10%, var(--pin-mails-header-bg));
-  border-block-end: 1px solid color-mix(in srgb, var(--pin-account-color, var(--pin-mails-accent)) 26%, var(--pin-mails-border));
+  background: var(--pin-mails-header-bg);
+  border-block-end: 1px solid var(--pin-mails-border);
   font-size: max(0.9rem, 12px);
   font-weight: 650;
 }
@@ -751,7 +751,7 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
 
 .pin-mails-note {
   padding: 5px 7px;
-  border-inline-start: 3px solid var(--pin-account-color);
+  border-inline-start: 2px solid var(--pin-account-color);
   border-radius: 4px;
   background: color-mix(in srgb, var(--pin-account-color) 8%, transparent);
   color: var(--layout-color-1);
@@ -1107,13 +1107,13 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
 
 
 .pin-mails-toast[data-kind="success"] {
-  border-inline-start: 4px solid var(--mp-color-success-foreground);
+  border-color: var(--mp-color-success-foreground);
 }
 .pin-mails-toast[data-kind="error"] {
-  border-inline-start: 4px solid var(--mp-color-danger-foreground);
+  border-color: var(--mp-color-danger-foreground);
 }
 .pin-mails-toast[data-kind="busy"] {
-  border-inline-start: 4px solid var(--pin-mails-accent);
+  border-color: var(--pin-mails-accent);
 }
 
 @media (hover: none) {
@@ -1319,14 +1319,14 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   flex-basis: 28px;
 }
 :root[pin-mails-inbox] #threadTree tr.card-layout[data-properties~="unread"] .card-container {
-  border-inline-start: 3px solid color-mix(in srgb, var(--pin-mails-accent) 78%, CanvasText);
+  border-inline-start: 2px solid color-mix(in srgb, var(--pin-mails-accent) 78%, CanvasText);
   font-weight: 620;
 }
 :root[pin-mails-inbox] #threadTree tr.card-layout[data-properties~="unread"]:not(.selected):not(.current) .card-container {
   background: color-mix(in srgb, var(--pin-mails-accent) 8%, transparent);
 }
 :root[pin-mails-inbox] #threadTree tr.card-layout[data-properties~="new"] .card-container {
-  border-inline-start-width: 5px;
+  border-inline-start-width: 2px;
   border-inline-start-color: var(--mp-color-warning-foreground);
 }
 :root[pin-mails-inbox] #threadTree tr.card-layout[data-properties~="new"]:not(.selected):not(.current) .card-container {

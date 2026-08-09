@@ -1,5 +1,15 @@
 # Journal des modifications
 
+## 1.5.0 — refonte visuelle du produit
+
+- nouvelle direction visuelle locale, sobre et cohérente, sans modification des fonctionnalités métier ni du logo actuel ;
+- design system et tokens Fluent locaux harmonisés entre le Dashboard, les Options et le panneau des épingles ;
+- Dashboard restructuré visuellement avec une hiérarchie, une navigation et des statistiques plus lisibles ;
+- Options simplifiées et moins « cardifiées », avec une séparation plus nette des familles et contrôles existants ;
+- panneau des épingles harmonisé avec le reste du produit, sans altérer la liste native Thunderbird ;
+- focus clavier, contraste, responsive, thèmes clair/sombre et réduction du mouvement préservés ;
+- aucune nouvelle permission WebExtension, dépendance runtime ou connexion réseau.
+
 ## 1.4.0 — comptes sélectionnés, fiabilité UI et banc Thunderbird
 
 - Options : sections rendues dans l’ordre Essentiel, Automatisation, Organisation puis Avancé ; nouvelle portée « Comptes sélectionnés » utilisant `account.key` comme identité canonique, avec sélection explicite, conservation du brouillon et migration sûre de l’ancien `currentAccount` vers la boîte courante ;
