@@ -2,7 +2,7 @@
 
 ## Environnement
 
-Le build 1.3.0 est conçu pour l’environnement reviewer standard et a besoin uniquement de :
+Le build 1.4.0 est conçu pour l’environnement reviewer standard et a besoin uniquement de :
 
 - Ubuntu 24.04 ou système équivalent ;
 - Python 3.11+ ;
@@ -24,8 +24,8 @@ Cette commande exécute les contrôles du dépôt, le scan de secrets, les tests
 Les fichiers produits sont :
 
 ```text
-dist/MailPerch_v1.3.0.xpi
-dist/MailPerch_GitHub_Repository_v1.3.0.zip
+dist/MailPerch_v1.4.0.xpi
+dist/MailPerch_GitHub_Repository_v1.4.0.zip
 dist/SHA256SUMS.txt
 ```
 

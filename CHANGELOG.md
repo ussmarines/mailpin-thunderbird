@@ -1,12 +1,15 @@
 # Journal des modifications
 
-## Unreleased
+## 1.4.0 — comptes sélectionnés, fiabilité UI et banc Thunderbird
 
-- Options : sections rendues dans l’ordre Essentiel, Automatisation, Organisation puis Avancé ; portée explicite « Comptes sélectionnés » avec migration de l’ancien `currentAccount` vers la boîte courante ;
-- Options et Dashboard : soutien réduit à PayPal, avec un accès secondaire dans leurs bannières ;
+- Options : sections rendues dans l’ordre Essentiel, Automatisation, Organisation puis Avancé ; nouvelle portée « Comptes sélectionnés » utilisant `account.key` comme identité canonique, avec sélection explicite, conservation du brouillon et migration sûre de l’ancien `currentAccount` vers la boîte courante ;
+- Options et Dashboard : soutien limité à PayPal, volume conseillé jusqu’à 2 000 mails épinglés et indication informative du volume dans le Centre de santé, sans limite dure au-delà de 2 000 ;
 - Dashboard : normalisation des compteurs visibles pour exclure `null`, `undefined` et `NaN`, et retrait du dump « État technique » redondant ;
-- panneau Thunderbird : recherche et vue « Toutes » restent sur une ligne tant que la largeur le permet, hauteur par défaut augmentée et icône de conversation remplacée par une punaise ;
-- smoke Thunderbird : ajout de l’assertion runtime du bouton Dashboard, qui doit ouvrir exactement un onglet Dashboard.
+- panneau Thunderbird : recherche et vue « Toutes » restent sur une ligne tant que la largeur le permet, hauteur par défaut augmentée pour garder au moins deux cartes complètes visibles, ouverture du Dashboard fiabilisée et icônes de punaise adaptées aux thèmes clair/sombre ;
+- validation multi-comptes réelle : portée vide = 0, A = 18, B = 16, A+C = 34 sans B et A+B+C = 50, avec sauvegarde Options → panneau confirmée manuellement ;
+- banc Thunderbird : ajout d’un workflow manuel et d’un scénario fonctionnel/charge réel couvrant 50, 100, 500, 1 000 et 2 000 épingles, tous validés sans exception JavaScript, timeout ni incohérence de comptage ;
+- smoke Thunderbird : le bouton Dashboard doit ouvrir exactement un onglet, l’injection/cleanup/réinstallation restent contrôlés ;
+- aucune nouvelle permission WebExtension, dépendance runtime, connexion réseau du produit ou modification de l’identifiant canonique.
 
 ## 1.3.0 — consolidation Thunderbird et interface
 
@@ -42,7 +45,6 @@
 - interface Options/dashboard affinée : pile de polices système locale, alignements et espacements revus, statistiques responsives et texte explicite d’au moins 12 px ;
 - schéma logique paramètres/données 7, migrations et sauvegardes compatibles avec les versions antérieures ;
 - nouvelles gardes automatisées couvrant les fonctions 1.2, la confidentialité, l’accessibilité, les limites d’entrée et l’absence d’élargissement des permissions.
-
 
 ## 1.1.2 — correction responsive du panneau épinglé
 

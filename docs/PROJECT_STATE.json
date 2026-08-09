@@ -2,10 +2,10 @@
   "format": "mailperch-project-state",
   "version": 1,
   "project": "MailPerch — Email Pins & Follow-up",
-  "extensionVersion": "1.3.0",
+  "extensionVersion": "1.4.0",
   "baseGitHub": {
     "branch": "main",
-    "commit": "385815f546968acf721c8cd8486ff48f55f78a32"
+    "commit": "26af48770930653ebbf9f4836854e0e078eca112"
   },
   "extensionId": "pin-mails@MailPerch.local",
   "thunderbird": {
@@ -62,7 +62,8 @@
     "Business modules do not call Thunderbird core services directly outside compatibility adapters",
     "Recommended mode never auto-saves and preserves profile-specific settings",
     "Privileged dependencies injected into compatibility adapters are explicitly imported before facade creation",
-    "Fluent 2 styling uses local CSS tokens and native HTML controls with no npm runtime dependency or remote asset"
+    "Fluent 2 styling uses local CSS tokens and native HTML controls with no npm runtime dependency or remote asset",
+    "Selected-account scope uses Thunderbird account.key consistently from Options through runtime filtering"
   ],
   "ui": {
     "settingsSpacingAffects": [
@@ -89,6 +90,7 @@
     "privileged API input validation",
     "settings save/cancel lifecycle",
     "recommended settings draft",
+    "selected-account filtering",
     "interactive reminders",
     "snooze lifecycle",
     "related-conversation merge",
@@ -117,7 +119,7 @@
     ],
     "runtimeWorkflow": ".github/workflows/thunderbird-smoke.yml",
     "runtimeScript": "tests/thunderbird/real_smoke.py",
-    "browserStatus": "production Options and dashboard assets passed local Chromium Playwright flows with a synthetic extension API on 2026-08-08; 99 persisted settings, save/cancel/failure/retry paths, 7 dashboard views, 9 statistics, localization, dark mode and 720px overflow were checked",
-    "runtimeStatus": "passed on 2026-08-08 with Thunderbird 153.0.1 ESR Linux and a synthetic Local Folders profile; MV3 Startup Complete, single injection, uninstall cleanup and clean reinstall validated; provider/OS/version matrix remains manual"
+    "browserStatus": "production Options and dashboard assets passed targeted browser flows including selected-account rendering, save/cancel behavior, localization and dashboard counters before the 1.4.0 release preparation",
+    "runtimeStatus": "post-1.3.0 runtime feedback passed Thunderbird 153.0.2 Windows manual/functional validation: selected-account scope empty=0, A=18, B=16, A+C=34, A+B+C=50, Options save to panel and light/dark pin visuals; functional scale bench passed 50/100/500/1000/2000 pins; PR #24 smoke passed on Thunderbird 153.0.1 ESR Linux. Temporary-addon restart persistence remains a harness limitation, not a demonstrated production defect"
   }
 }

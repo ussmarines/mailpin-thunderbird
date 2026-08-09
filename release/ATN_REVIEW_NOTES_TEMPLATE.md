@@ -1,17 +1,17 @@
-# Notes pour les reviewers ATN — MailPerch 1.3.0
+# Notes pour les reviewers ATN — MailPerch 1.4.0
 
 ## Identité
 
 - **Nom :** MailPerch — Email Pins & Follow-up
 - **Nom court :** MailPerch
-- **Version :** 1.3.0
+- **Version :** 1.4.0
 - **ID :** `pin-mails@MailPerch.local`
 - **Compatibilité :** Thunderbird 128.0 à 153.*
 - **Langues :** français et anglais
 
 ## Fonction principale
 
-MailPerch ajoute un panneau local de messages épinglés au-dessus de la liste native, avec suivis, échéances, rappels, notes, sous-tâches, vues enregistrées, groupes, règles, Agenda et tableau de bord. La liste native des messages et ses compteurs ne sont pas remplacés.
+MailPerch ajoute un panneau local de messages épinglés au-dessus de la liste native, avec portée par boîte courante, comptes Thunderbird sélectionnés ou tous les comptes, suivis, échéances, rappels, notes, sous-tâches, vues enregistrées, groupes, règles, Agenda et tableau de bord. La liste native des messages et ses compteurs ne sont pas remplacés.
 
 ## Permission et API privilégiée
 
@@ -43,19 +43,22 @@ Voir `PRIVACY.md`, `SECURITY.md`, `SECURITY_AUDIT_1.2.0.md` et `release/BUILD_IN
 1. Installer le XPI dans un profil Thunderbird propre.
 2. Épingler un message depuis la liste, le menu contextuel et le bouton du message affiché.
 3. Vérifier que le message apparaît dans le panneau sans quitter la liste native.
-4. Tester clic simple, double-clic, clic droit, menu `…` et désépinglage.
-5. Ajouter une échéance et un rappel.
-6. Créer une tâche ou un événement dans un calendrier compatible choisi explicitement.
-7. Ouvrir le dashboard : tester recherche globale, checklist, vues enregistrées, états de réponse et palette de commandes.
-8. Activer les tags MailPerch, modifier statut/priorité puis confirmer qu’un tag personnel témoin reste intact après désactivation.
-9. Ouvrir les paramètres, puis basculer les thèmes clair et sombre et vérifier le zoom 200 %.
-10. Vérifier que les compteurs natifs de dossiers et l’état lu/non lu ne changent pas.
-11. Exporter une sauvegarde, la prévisualiser et la restaurer en mode sûr.
-12. Désinstaller depuis un profil de test et vérifier la purge des données internes et des seuls tags MailPerch possédés.
+4. Dans Options, tester la portée « Comptes sélectionnés », enregistrer puis vérifier le filtrage du panneau.
+5. Tester clic simple, double-clic, clic droit, menu `…` et désépinglage.
+6. Ajouter une échéance et un rappel.
+7. Créer une tâche ou un événement dans un calendrier compatible choisi explicitement.
+8. Ouvrir le dashboard : tester recherche globale, checklist, vues enregistrées, états de réponse et palette de commandes.
+9. Activer les tags MailPerch, modifier statut/priorité puis confirmer qu’un tag personnel témoin reste intact après désactivation.
+10. Ouvrir les paramètres, puis basculer les thèmes clair et sombre et vérifier le zoom 200 %.
+11. Vérifier que les compteurs natifs de dossiers et l’état lu/non lu ne changent pas.
+12. Exporter une sauvegarde, la prévisualiser et la restaurer en mode sûr.
+13. Désinstaller depuis un profil de test et vérifier la purge des données internes et des seuls tags MailPerch possédés.
 
 ## Validation automatisée
 
 `npm run ci` contrôle le dépôt, les permissions, la CSP, les ressources, l’absence de réseau, les contrats de l’Experiment, les migrations, le stockage, les actions de cartes, l’accessibilité, les traductions, la reproductibilité et les secrets.
+
+Le banc Thunderbird fonctionnel dédié couvre 50, 100, 500, 1 000 et 2 000 épingles. La validation multi-comptes de référence utilise une portée vide=0, A=18, B=16, A+C=34 et A+B+C=50. Les téléchargements de Thunderbird/geckodriver appartiennent uniquement au banc de test et sont vérifiés par SHA-256 ; ils ne sont pas des dépendances runtime.
 
 ## Validation manuelle à renseigner avant soumission
 

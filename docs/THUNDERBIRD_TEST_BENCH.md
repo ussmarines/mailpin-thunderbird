@@ -47,7 +47,7 @@ Workflow : `.github/workflows/thunderbird-smoke.yml`
 
 Script : `tests/thunderbird/real_smoke.py`
 
-Le workflow est volontairement séparé de la QA obligatoire pendant sa phase d’épreuve. Il s’exécute sur la branche de consolidation et peut aussi être lancé manuellement.
+Le workflow est volontairement séparé de la QA obligatoire pendant sa phase d’épreuve. Il peut être lancé manuellement et s’exécute sur les PR lorsque les surfaces runtime concernées changent.
 
 Thunderbird documente officiellement `mach`/xpcshell/Mochitest pour ses propres tests. En revanche, la documentation geckodriver est centrée sur Gecko/Firefox et ne garantit pas explicitement ce scénario Thunderbird ; le smoke externe reste donc un contrôle d’intégration complémentaire. En cas d’incompatibilité structurelle future, on conserve les contrats et on utilise la voie officielle comm-central plutôt que de masquer l’échec.
 
@@ -67,7 +67,7 @@ Le job :
 10. passe au contexte privilégié et contrôle l’état runtime, le background MV3 et les injections ;
 11. désinstalle puis contrôle le nettoyage ;
 12. réinstalle et contrôle une nouvelle injection propre ;
-13. conserve logs, résultat JSON et captures comme artefacts.
+13. conserve logs, résultat JSON et captures comme artefacts ;
 14. clique le bouton Dashboard injecté et exige l’ouverture d’un unique onglet Dashboard, sans erreur runtime.
 
 Aucun de ces téléchargements n’est une dépendance d’exécution de MailPerch. Ils existent uniquement dans l’environnement de test.
@@ -84,7 +84,7 @@ Lorsque le job réussit réellement, il démontre au minimum sur la version épi
 - une seule injection `#pin-mails-panel` ;
 - une seule injection `#pin-mails-qfb-toggle` ;
 - retrait des injections après désinstallation ;
-- réinstallation propre sans duplication.
+- réinstallation propre sans duplication ;
 - activation du bouton Dashboard du panneau et ouverture unique du Dashboard.
 
 ### Ce qu’il ne valide pas
@@ -118,7 +118,7 @@ Après publication de la branche, lancer **Thunderbird functional and scale benc
 ```bash
 python tests/thunderbird/functional_bench.py \
   --binary /chemin/vers/thunderbird \
-  --xpi dist/MailPerch_v1.3.0.xpi \
+  --xpi dist/MailPerch_v1.4.0.xpi \
   --geckodriver /chemin/vers/geckodriver \
   --output-dir artifacts/thunderbird-bench \
   --volumes 50,100,500,1000,2000 \
@@ -136,7 +136,7 @@ Pour préparer cette validation manuelle sans automatiser l’onglet Options, ut
 ```bash
 python tests/thunderbird/functional_bench.py \
   --binary /chemin/vers/thunderbird \
-  --xpi dist/MailPerch_v1.3.0.xpi \
+  --xpi dist/MailPerch_v1.4.0.xpi \
   --geckodriver /chemin/vers/geckodriver \
   --output-dir artifacts/thunderbird-manual-scope \
   --prepare-manual-scope-validation \
@@ -146,7 +146,7 @@ python tests/thunderbird/functional_bench.py \
 ```bash
 python tests/thunderbird/functional_bench.py \
   --binary /chemin/vers/thunderbird \
-  --xpi dist/MailPerch_v1.3.0.xpi \
+  --xpi dist/MailPerch_v1.4.0.xpi \
   --geckodriver /chemin/vers/geckodriver \
   --output-dir artifacts/thunderbird-multi-account \
   --scope-validation-only \
@@ -182,7 +182,7 @@ Sous Windows x64, l’installation utilisateur validée est `C:\Users\ussma\AppD
 ```bash
 python tests/thunderbird/real_smoke.py \
   --binary /chemin/vers/thunderbird \
-  --xpi dist/MailPerch_v1.3.0.xpi \
+  --xpi dist/MailPerch_v1.4.0.xpi \
   --geckodriver /chemin/vers/geckodriver \
   --output-dir artifacts/thunderbird-smoke \
   --timeout 45
@@ -208,8 +208,8 @@ Ne jamais assouplir une assertion pour rendre le job vert sans expliquer la caus
 
 ## État de preuve de la branche
 
-Le 8 août 2026, le workflow GitHub a réussi sur le binaire officiel **Thunderbird 153.0.1 ESR** sous Linux avec geckodriver 0.37.1. L’artefact a confirmé le cycle complet : vue locale prête, XPI actif, background `Startup: Complete`, une injection du panneau et du bouton, nettoyage total après désinstallation, puis réinstallation propre sans duplication.
+Le 9 août 2026, la PR #24 a repassé avec succès le workflow sur le binaire officiel **Thunderbird 153.0.1 ESR** sous Linux avec geckodriver 0.37.1. Le cycle a confirmé vue locale prête, XPI actif, background `Startup: Complete`, injection unique, ouverture unique du Dashboard, nettoyage après désinstallation puis réinstallation propre.
 
-Le banc a également détecté pendant sa mise au point un vrai crash de bootstrap introduit par la consolidation : `ReferenceError: ExtensionError is not defined`. La cause était une dépendance privilégiée devenue immédiate lors de la création des adaptateurs. Le correctif importe désormais explicitement `ExtensionError` depuis `ExtensionUtils.sys.mjs`, une garde statique protège cet invariant et le smoke réel est passé après correction.
+La passe fonctionnelle Windows du 9 août 2026 sur Thunderbird 153.0.2/geckodriver 0.37.1 a validé les volumes 50/100/500/1000/2000 et la sélection multi-comptes dans la première session. La sauvegarde Options → panneau et les icônes clair/sombre ont ensuite été confirmées manuellement. La persistance automatisée entre processus avec une extension temporaire reste la limite du harness décrite plus haut.
 
-Cette preuve couvre **le démarrage et le cycle de vie de l’intégration sur ce scénario local synthétique**. Elle ne remplace pas les tests utilisateur avec comptes/fournisseurs réels ni la matrice multi-versions/multi-OS.
+Ces preuves ne remplacent pas les tests utilisateur avec fournisseurs réels ni la matrice multi-versions/multi-OS.
