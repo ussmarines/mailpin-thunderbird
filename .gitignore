@@ -33,6 +33,8 @@ Thumbs.db
 .idea/
 .playwright-cli/
 output/playwright/
+/.impeccable/config.local.json
+/.impeccable/cache/
 
 CI_LOG_*.txt
 ROUNDTRIP_CI_LOG_*.txt

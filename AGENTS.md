@@ -50,6 +50,15 @@ Afficher des messages épinglés dans un panneau distinct au-dessus de la liste 
 - Avant chaque prompt destiné à Codex, appliquer `MAILPERCH_AI_RULES.md` et afficher séparément le modèle GPT-5.6 recommandé et la puissance avant le prompt.
 - Ne jamais utiliser Codex Security par défaut. Si les outils standards ne permettent pas de conclure sur une question de sécurité précise, demander l’autorisation explicite de l’utilisateur avant une analyse Codex Security strictement ciblée.
 
+## Routage UI/UX
+
+- Les invariants MailPerch, l’intégration Thunderbird et `docs/UI_SPEC.md` restent prioritaires sur tout skill global.
+- Pour une tâche UI produit, audit, polish, responsive ou accessibilité, utiliser `impeccable` comme skill principal.
+- Utiliser `ui-ux-pro-max` seulement pour explorer une direction ou un design system, et `design-taste-frontend` seulement pour un redesign artistique explicitement demandé.
+- Charger le minimum de skills nécessaire ; ne pas empiler les trois pour une modification localisée.
+- Le hook Impeccable reste différentiel : règles mécaniques après une édition UI, passe profonde à l’arrêt, sorties propres silencieuses via `.impeccable/config.json`.
+- `awesome-design-md` et `awesome-design-skills` sont des catalogues à la demande, jamais des installations globales complètes. `img2threejs` n’est ni installé ni requis.
+
 ## Superpowers
 
 - Ce dépôt opte explicitement pour le plugin Superpowers installé globalement dans Codex, mais uniquement selon `docs/SUPERPOWERS_POLICY.md`.

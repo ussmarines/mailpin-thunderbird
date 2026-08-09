@@ -85,6 +85,12 @@ La passe navigateur finale a révélé qu’un contrôle encore déclaré par le
 
 Le workflow `.github/workflows/thunderbird-smoke.yml` télécharge un binaire Thunderbird officiel et geckodriver, vérifie leurs empreintes, construit l’XPI, prépare un profil local synthétique, installe temporairement l’extension, contrôle le background MV3 et l’injection, désinstalle, contrôle le nettoyage puis réinstalle. Le 8 août 2026, ce cycle a réussi sur Thunderbird **153.0.1 ESR** Linux : `Startup: Complete`, un panneau, un bouton, nettoyage complet puis réinjection unique. Le banc a auparavant détecté un crash réel `ExtensionError is not defined`, corrigé par un import explicite depuis `ExtensionUtils.sys.mjs` et protégé par une garde. Cette preuve ne couvre pas la matrice fournisseurs/OS/versions.
 
+### Outillage UI Codex
+
+La source de vérité visuelle demeure `docs/UI_SPEC.md`; aucun `PRODUCT.md` ou `DESIGN.md` concurrent n’est nécessaire. Le skill global Impeccable 4.0.4 pilote l’UX/UI produit et ses finitions, UI UX Pro Max sert à la recherche de système, et `design-taste-frontend` à une direction artistique explicitement demandée. Le hook projet est silencieux sur les résultats propres, limité aux fichiers UI modifiés et réserve sa passe profonde à la fin de session.
+
+Diagnostiquer l’environnement avec `npx skills ls -g` et le hook avec `node C:\Users\ussma\.agents\skills\impeccable\scripts\hook-admin.mjs status`. Pour une mise à jour, vérifier d’abord le dépôt officiel, la version et les écritures prévues ; utiliser `npx skills update -g` pour les sources suivies et l’installateur officiel Impeccable avec le fournisseur Codex explicite.
+
 ## État 1.3.0
 
 - schéma SQLite : 5 ; schéma paramètres/données : 7 ;

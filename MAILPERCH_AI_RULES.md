@@ -210,6 +210,12 @@ Règles finales :
 - Le choix du modèle ou de la puissance n'autorise jamais l'utilisation de Codex Security ; ses règles d'autorisation restent distinctes.
 - GPT-5.6 supporte aussi un effort `max`, mais **MailPerch ne le recommande pas par défaut** : rester sur `Low`, `Medium`, `High` ou `XHigh`. N'utiliser `max` que sur demande explicite de l'utilisateur pour un cas exceptionnel où `XHigh` ne suffit pas.
 
+## 5.2 Routage minimal des skills UI
+
+Les règles MailPerch et `docs/UI_SPEC.md` priment toujours. Pour l’UI produit, les réglages, formulaires, audits, finitions, responsive et accessibilité, charger `impeccable`. Pour la recherche amont d’une direction ou d’un design system, charger `ui-ux-pro-max`. Réserver `design-taste-frontend` à un changement artistique ou une surface expressive explicitement demandée. Ne combiner plusieurs skills que si leurs responsabilités sont réellement complémentaires.
+
+Impeccable reste différentiel : contrôles mécaniques immédiats sur les seuls fichiers UI édités, règles complètes au `Stop`, aucun passage complet à chaque édition et silence quand le résultat est propre. Les collections `awesome-design-md` et `awesome-design-skills` servent uniquement de références ponctuelles pour enrichir la source de vérité du projet ; elles ne sont pas installées globalement. `img2threejs` ne fait pas partie de l’environnement MailPerch.
+
 ---
 
 # 6. Codex Security : interdit par défaut

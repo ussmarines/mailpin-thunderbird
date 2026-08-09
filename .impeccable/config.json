@@ -1,0 +1,7 @@
+{
+  "hook": {
+    "enabled": true,
+    "quiet": true,
+    "perEditRules": "immediate"
+  }
+}

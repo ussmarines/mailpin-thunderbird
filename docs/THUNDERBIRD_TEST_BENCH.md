@@ -125,6 +125,8 @@ Références officielles :
 
 Après avoir construit l’XPI et installé un binaire Thunderbird + geckodriver compatibles :
 
+Sous Windows x64, l’installation utilisateur validée est `C:\Users\ussma\AppData\Local\Programs\geckodriver\0.37.1`; son dossier doit être présent dans le `PATH` utilisateur. Diagnostiquer avec `Get-Command geckodriver` puis `geckodriver --version`. Depuis geckodriver 0.37.1, les sessions pilotant l’interface privilégiée nécessitent `--allow-system-access`; `tests/thunderbird/real_smoke.py` le fournit déjà au service du driver.
+
 ```bash
 python tests/thunderbird/real_smoke.py \
   --binary /chemin/vers/thunderbird \
