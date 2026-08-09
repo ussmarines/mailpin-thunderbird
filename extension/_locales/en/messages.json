@@ -617,6 +617,9 @@
   "panelScope": {
     "message": "Scope"
   },
+  "panelScopeHelp": {
+    "message": "Choose which accounts’ pinned mail appears in the MailPerch panel."
+  },
   "performanceMetrics": {
     "message": "Local performance measurements"
   },
@@ -742,6 +745,45 @@
   },
   "scopeInbox": {
     "message": "Current folder"
+  },
+  "scopeSelectedAccounts": {
+    "message": "Selected accounts"
+  },
+  "selectedAccounts": {
+    "message": "Accounts to show"
+  },
+  "selectedAccountsHelp": {
+    "message": "Select one or more Thunderbird accounts below."
+  },
+  "selectedAccountsNone": {
+    "message": "No account selected"
+  },
+  "selectedAccountsOne": {
+    "message": "1 account selected"
+  },
+  "selectedAccountsMany": {
+    "message": "$1 accounts selected"
+  },
+  "selectedAccountsEmpty": {
+    "message": "No compatible Thunderbird account is available."
+  },
+  "selectedAccountsUnavailableOne": {
+    "message": "1 saved account is no longer available; its selection will be kept."
+  },
+  "selectedAccountsUnavailableMany": {
+    "message": "$1 saved accounts are no longer available; their selections will be kept."
+  },
+  "recommendedPinVolume": {
+    "message": "Recommended volume: up to 2,000 pinned emails"
+  },
+  "recommendedPinVolumeHelp": {
+    "message": "MailPerch is tested with up to 2,000 pins. Higher volumes may work, but are not currently within the validated scope."
+  },
+  "pinsWithinRecommendedVolume": {
+    "message": "$1 / 2,000 recommended pins"
+  },
+  "pinsBeyondRecommendedVolume": {
+    "message": "$1 pins — beyond the currently validated volume"
   },
   "searchPins": {
     "message": "Search"
@@ -1165,7 +1207,8 @@
   "dynamicSimulationSummary": {"message": "$1 match(es) across $2 message(s)."},
   "dynamicSimulationBusy": {"message": "Simulating rules…"},
   "dynamicSimulationNoMatch": {"message": "No matches."}
-  ,"supportTitle": {"message": "Support MailPerch"}
+  ,"supportTitle": {"message": "Support the project"}
+  ,"supportProject": {"message": "Support the project"}
   ,"supportIntro": {"message": "Enjoying MailPerch? You can support its continued development with a donation."}
   ,"supportPayPal": {"message": "Support the project via PayPal"}
   ,"supportAuthor": {"message": "Author’s GitHub profile (external link)"}

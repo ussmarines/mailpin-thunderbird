@@ -16,16 +16,11 @@ async page => {
     const STORAGE_KEY = "mailperch-options-dom-persisted";
     const META_KEY = "mailperch-options-dom-meta";
     const clone = value => JSON.parse(JSON.stringify(value));
-    const accounts = [{
-      key: "account-test",
-      name: "Synthetic account",
-      email: "",
-      color: "#0f6cbd",
-      defaultColor: "#0f6cbd",
-      protocol: "none",
-      provider: "test",
-      inboxes: [{uri: "mailbox://synthetic/Inbox", name: "Synthetic inbox", enabled: true}]
-    }];
+    const accounts = [
+      {key: "account1", name: "A = server1", email: "a@example.test", color: "#0f6cbd", defaultColor: "#0f6cbd", protocol: "none", provider: "test", inboxes: [{uri: "mailbox://synthetic/Inbox", name: "Synthetic inbox", enabled: true}]},
+      {key: "account2", name: "B = server2", email: "b@example.test", color: "#107c10", defaultColor: "#107c10", protocol: "none", provider: "test", inboxes: [{uri: "mailbox://work/Inbox", name: "Work inbox", enabled: true}]},
+      {key: "account3", name: "C = server3", email: "c@example.test", color: "#8764b8", defaultColor: "#8764b8", protocol: "none", provider: "test", inboxes: [{uri: "mailbox://support/Inbox", name: "Support inbox", enabled: true}]}
+    ];
     const initial = {
       settings: {},
       groups: [{id: "group-test", name: "Synthetic group", color: "#6264a7", updatedAt: 1}],
@@ -277,11 +272,76 @@ async page => {
   assert((await page.evaluate(() => globalThis.__mailperchExternalUrls.at(-1))) === "https://paypal.me/ussmarinesdot",
     "The PayPal support link must open only after an explicit click");
   await page.evaluate(() => { globalThis.__mailperchFailExternalOpen = true; });
-  await page.locator("#support-author").click();
+  await page.locator("#support-paypal").click();
   const supportOpenFailure = await page.evaluate(() => messenger.i18n.getMessage("supportOpenFailed"));
   assert((await page.locator("#status-message").textContent()).includes(supportOpenFailure),
     "A controlled external-open failure must leave an accessible localized error");
   await page.evaluate(() => { globalThis.__mailperchFailExternalOpen = false; });
+
+  // Selected-account scope is immediately understandable, keeps an explicit
+  // draft, and remains intact when the scope or Recommended mode changes.
+  const selectedAccountSetting = page.locator("#selected-accounts-setting");
+  assert(await selectedAccountSetting.isHidden(), "Selected-account controls must stay hidden outside their scope");
+  await page.locator("#panelScope").selectOption("selectedAccounts");
+  assert(!(await selectedAccountSetting.isHidden()), "Selected-account controls must appear with their scope");
+  assert(await page.evaluate(() => {
+    const selected = document.querySelector("#selected-accounts-setting");
+    const volume = document.querySelector(".volume-guidance");
+    return Boolean(selected?.compareDocumentPosition(volume) & Node.DOCUMENT_POSITION_FOLLOWING);
+  }), "Selected-account controls must appear before the recommended-volume guidance");
+  const selectedAccountInputs = page.locator("#selected-accounts-list input[type='checkbox']");
+  assert(await selectedAccountInputs.count() === 3, "Each compatible Thunderbird account must have one checkbox");
+  assert((await page.locator("#selected-accounts-list").textContent()).includes("A = server1"), "Account labels must prefer readable names");
+  assert(await selectedAccountInputs.evaluateAll(inputs => inputs.every(input => !input.checked)), "A new profile must start with no selected account");
+  assert((await page.locator("#selected-accounts-summary").textContent()) === "Aucun compte sélectionné", "The zero-selection count must be localized and explicit");
+  assert(await page.locator("#selected-accounts-unavailable").isHidden(), "Available A/B/C accounts must not be reported as missing");
+
+  await selectedAccountInputs.nth(0).check();
+  assert((await page.locator("#selected-accounts-summary").textContent()) === "1 compte sélectionné", "A alone must count as one selected account");
+  await selectedAccountInputs.nth(0).uncheck();
+  await selectedAccountInputs.nth(1).check();
+  assert((await page.locator("#selected-accounts-summary").textContent()) === "1 compte sélectionné", "B alone must count as one selected account");
+  await selectedAccountInputs.nth(1).uncheck();
+  await selectedAccountInputs.nth(2).check();
+  assert((await page.locator("#selected-accounts-summary").textContent()) === "1 compte sélectionné", "C alone must count as one selected account");
+  await selectedAccountInputs.nth(0).check();
+  assert(await selectedAccountInputs.nth(0).isChecked() && !(await selectedAccountInputs.nth(1).isChecked()) && await selectedAccountInputs.nth(2).isChecked(), "A+C must check A and C only");
+  assert((await page.locator("#selected-accounts-summary").textContent()) === "2 comptes sélectionnés", "A+C must count as two selected accounts");
+  await selectedAccountInputs.nth(1).check();
+  assert((await page.locator("#selected-accounts-summary").textContent()) === "3 comptes sélectionnés", "A+B+C must count as three selected accounts");
+  await selectedAccountInputs.nth(1).uncheck();
+
+  await page.locator("#panelScope").selectOption("global");
+  assert(await selectedAccountSetting.isHidden(), "Other scopes must hide selected-account controls");
+  await page.locator("#panelScope").selectOption("selectedAccounts");
+  assert(await selectedAccountInputs.nth(0).isChecked() && !(await selectedAccountInputs.nth(1).isChecked()) && await selectedAccountInputs.nth(2).isChecked(), "Changing scope must not erase the A+C draft");
+  await page.locator("#apply-recommended-settings").click();
+  await page.locator("#panelScope").selectOption("selectedAccounts");
+  assert(await selectedAccountInputs.nth(0).isChecked() && !(await selectedAccountInputs.nth(1).isChecked()) && await selectedAccountInputs.nth(2).isChecked(), "Recommended mode must preserve A+C in the draft");
+  assert(!/\b(?:null|undefined|NaN)\b/.test(await page.locator("#selected-accounts-setting").textContent()), "Selected-account UI must never expose invalid counter text");
+
+  await page.locator("#save-all-floating").click();
+  await page.waitForFunction(() => document.querySelector("#save-dock").hidden);
+  await page.reload();
+  await waitReady();
+  assert(await selectedAccountInputs.nth(0).isChecked() && !(await selectedAccountInputs.nth(1).isChecked()) && await selectedAccountInputs.nth(2).isChecked(), "A+C must survive save and Options reload");
+
+  const persistedSelection = async selectedAccountKeys => {
+    const persisted = await page.evaluate(() => JSON.parse(localStorage.getItem("mailperch-options-dom-persisted")));
+    persisted.settings.panelScope = "selectedAccounts";
+    persisted.settings.selectedAccountKeys = selectedAccountKeys;
+    await setPersisted(persisted);
+    await page.reload();
+    await waitReady();
+  };
+  await persistedSelection(["account1", "account-missing"]);
+  assert(await selectedAccountInputs.nth(0).isChecked() && !(await selectedAccountInputs.nth(1).isChecked()) && !(await selectedAccountInputs.nth(2).isChecked()), "Only the available saved account must be checked");
+  assert(!(await page.locator("#selected-accounts-unavailable").isHidden()), "A genuinely missing saved account must be reported");
+  assert((await page.locator("#selected-accounts-unavailable").textContent()).includes("1 compte enregistré"), "The unavailable-account message must use the real missing count");
+  await persistedSelection(["account1", "account2", "account3"]);
+  assert(await selectedAccountInputs.evaluateAll(inputs => inputs.every(input => input.checked)), "A/B/C canonical keys must check all three available accounts");
+  assert((await page.locator("#selected-accounts-summary").textContent()) === "3 comptes sélectionnés", "A+B+C must remain exactly three after reload");
+  assert(await page.locator("#selected-accounts-unavailable").isHidden(), "No available A/B/C account may be reported as unavailable");
 
   // A setting card has one visual source of truth: the native checkbox. The
   // label click and keyboard activation must keep the draft and card in sync.

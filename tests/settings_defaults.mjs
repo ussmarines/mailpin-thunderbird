@@ -41,6 +41,34 @@ assert.equal(previousVersion.enableAutomaticBackups, false);
 assert.equal(previousVersion.enableHealthCenter, false);
 assert.equal(previousVersion.enableSmartViews, true);
 
+const migratedScope = normalize({panelScope: "currentAccount", selectedAccountKeys: ["account-a", "account-a", "", "account-b"]});
+assert.equal(migratedScope.panelScope, "currentInbox");
+assert.deepEqual(migratedScope.selectedAccountKeys, ["account-a", "account-b"]);
+assert.equal(normalize({panelScope: "selectedAccounts"}).panelScope, "selectedAccounts");
+assert.deepEqual(normalize({selectedAccountKeys: ["account-a", "account-a", "user@example.invalid", "", 42]}).selectedAccountKeys, ["account-a"]);
+assert.deepEqual(normalize({selectedAccountKeys: Array.from({length: 60}, (_, index) => `account-${index}`)}).selectedAccountKeys.length, 50);
+
+// The runtime filter compares the same canonical Thunderbird account.key used
+// by Options and persisted in selectedAccountKeys. An empty selection is empty,
+// never an implicit fallback to all accounts.
+const scopedRefs = [
+  ...Array.from({length: 18}, (_, index) => ({stableKey: `account1-${index}`, accountKey: "account1", sourceInboxURI: "mailbox://a"})),
+  ...Array.from({length: 16}, (_, index) => ({stableKey: `account2-${index}`, accountKey: "account2", sourceInboxURI: "mailbox://b"})),
+  ...Array.from({length: 16}, (_, index) => ({stableKey: `account3-${index}`, accountKey: "account3", sourceInboxURI: "mailbox://c"}))
+];
+const selectedScope = selectedAccountKeys => ({panelScope: "selectedAccounts", selectedAccountKeys});
+const visibleRefs = selectedAccountKeys => scopedRefs.filter(ref =>
+  settings.matchesPanelScope(selectedScope(selectedAccountKeys), ref, "mailbox://a")
+);
+assert.equal(visibleRefs([]).length, 0);
+assert.equal(visibleRefs(["account1"]).length, 18);
+assert.equal(visibleRefs(["account2"]).length, 16);
+assert.equal(visibleRefs(["account1", "account3"]).length, 34);
+assert.equal(visibleRefs(["account1", "account2", "account3"]).length, 50);
+assert.ok(visibleRefs(["account1", "account3"]).some(ref => ref.stableKey === "account1-0"));
+assert.ok(visibleRefs(["account1", "account3"]).some(ref => ref.stableKey === "account3-0"));
+assert.ok(visibleRefs(["account1", "account3"]).every(ref => ref.accountKey !== "account2"));
+
 // Invalid values follow the declared strategy: invalid booleans and enums
 // fall back to recommendations, while finite numeric values are clamped.
 const invalid = normalize({

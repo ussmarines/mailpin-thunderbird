@@ -15,7 +15,7 @@
   --pin-mails-card-bg: var(--layout-background-0);
   --pin-mails-card-hover: var(--layout-background-2);
   --pin-mails-soft: var(--mp-brand-subtle);
-  --pin-mails-max-height: 360px;
+  --pin-mails-max-height: 460px;
   --pin-mails-card-gap: 4px;
   --pin-mails-card-padding: 8px 10px 8px 12px;
   --pin-mails-card-min-height: 56px;
@@ -43,7 +43,7 @@
   min-block-size: 0;
   font-family: var(--mp-font-family);
   font-size: max(1em, var(--mp-font-size-caption));
-  max-block-size: min(55vh, var(--pin-mails-max-height));
+  max-block-size: min(65vh, var(--pin-mails-max-height));
   background: var(--pin-mails-panel-bg);
   border-block-end: 1px solid var(--pin-mails-border);
 }
@@ -720,7 +720,7 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   border-block-end: 1px solid var(--pin-mails-border);
   background: color-mix(in srgb, var(--pin-mails-panel-bg) 94%, currentColor 6%);
 }
-.pin-mails-search-wrap { flex: 1 1 220px; min-inline-size: 120px; }
+.pin-mails-search-wrap { flex: 1 1 180px; min-inline-size: 96px; }
 .pin-mails-search {
   inline-size: 100%;
   min-block-size: 30px;
@@ -894,10 +894,9 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   .pin-mails-independent-button:focus-visible, .pin-mails-card:focus-visible, .pin-mails-quick-button:focus-visible { outline: 2px solid Highlight !important; }
   .pin-mails-note, .pin-mails-due, .pin-mails-group-chip { forced-color-adjust: none; }
 }
-@container threadPane (max-width: 700px) {
+@container threadPane (max-width: 390px) {
   .pin-mails-panel-tools { flex-direction: column; align-items: stretch; }
   .pin-mails-search-wrap { flex: 0 0 auto; min-inline-size: 0; }
-  .pin-mails-smart-view-select { inline-size: 100%; max-inline-size: none; }
   .pin-mails-card-actions { opacity: 1; }
   .pin-mails-summary { display: none; }
 }
@@ -988,8 +987,8 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
 }
 
 .pin-mails-action-conversation .pin-mails-header-action-icon {
-  -webkit-mask: url("../icons/conversation.svg") center / contain no-repeat;
-  mask: url("../icons/conversation.svg") center / contain no-repeat;
+  -webkit-mask: url("../icons/pin-filled.svg") center / contain no-repeat;
+  mask: url("../icons/pin-filled.svg") center / contain no-repeat;
 }
 
 .pin-mails-action-dashboard .pin-mails-header-action-icon {
@@ -1159,6 +1158,8 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
 
 /* 3.2.0 — vues intelligentes, confort visuel et suivi sans réponse. */
 .pin-mails-smart-view-select {
+  flex: 0 1 150px;
+  min-inline-size: 104px;
   min-block-size: 30px;
   max-inline-size: 220px;
   padding: 4px 26px 4px 8px;
@@ -1168,6 +1169,14 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   color: inherit;
   font: inherit;
   font-size: max(.84rem, 12px);
+}
+@container threadPane (max-width: 390px) {
+  .pin-mails-smart-view-select {
+    flex: 0 0 auto;
+    inline-size: 100%;
+    block-size: 30px;
+    max-inline-size: none;
+  }
 }
 .pin-mails-no-reply-chip {
   display: inline-flex;

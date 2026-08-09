@@ -57,6 +57,9 @@
 - un seul dock Enregistrer/Annuler, visible uniquement lorsqu’une modification existe ;
 - toast fixe non invasif, avec fermeture en haut à droite ;
 - comptes, groupes et calendriers présentés sans duplication ni jargon technique inutile.
+- les cartes de droite sont rendues dans le même ordre que leur navigation : **Essentiel**, **Automatisation**, **Organisation**, puis **Avancé** lorsque ce niveau est visible ;
+- la portée des épingles est limitée à **Cette boîte**, **Comptes sélectionnés** (identifiants Thunderbird locaux) et **Tous les comptes**. En portée sélectionnée, la liste présente le nom lisible du compte, l’adresse seulement en information secondaire, un compteur localisé et l’état des comptes devenus indisponibles. Le mode Recommandé conserve les comptes sélectionnés dans son brouillon.
+- l’Essentiel indique que **2 000 épingles** est le volume actuellement validé et conseillé, sans imposer de limite technique. Le Centre de santé reprend ce repère à titre informatif seulement.
 
 ## Dashboard
 
@@ -68,6 +71,8 @@
 - sélection multiple et options contextuelles pour les actions groupées ;
 - diagnostic exportable, matrice fournisseurs et réparations sûres ;
 - état de chargement, erreurs réessayables et mise en page utilisable à largeur réduite.
+- les compteurs utilisateur sont normalisés à un entier non négatif avant rendu ; aucun compteur ne peut afficher `null`, `undefined` ou `NaN`.
+- le soutien utilisateur se limite à PayPal ; les diagnostics détaillés restent dans le Centre de santé, pas dans le tableau principal.
 
 
 ## Sécurité de l’interface

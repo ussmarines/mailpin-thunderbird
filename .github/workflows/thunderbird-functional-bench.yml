@@ -1,0 +1,113 @@
+name: Thunderbird functional and scale bench
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mailperch-thunderbird-functional-bench-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  THUNDERBIRD_VERSION: "153.0.1esr"
+  GECKODRIVER_VERSION: "0.37.1"
+
+jobs:
+  functional-bench:
+    name: Real Thunderbird functional bench (50-2000 pins)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          package-manager-cache: false
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+
+      - name: Build the unmodified MailPerch XPI
+        run: npm run check && npm run build
+
+      - name: Download and verify official Thunderbird
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .runtime/thunderbird
+          base="https://archive.mozilla.org/pub/thunderbird/releases/${THUNDERBIRD_VERSION}"
+          archive="linux-x86_64/en-US/thunderbird-${THUNDERBIRD_VERSION}.tar.xz"
+          curl --fail --location --proto '=https' --tlsv1.2 \
+            "$base/SHA256SUMS" -o .runtime/thunderbird/SHA256SUMS
+          expected="$(awk -v path="$archive" '$2 == path {print $1; exit}' .runtime/thunderbird/SHA256SUMS)"
+          test -n "$expected"
+          curl --fail --location --proto '=https' --tlsv1.2 \
+            "$base/$archive" -o .runtime/thunderbird/thunderbird.tar.xz
+          printf '%s  %s\n' "$expected" .runtime/thunderbird/thunderbird.tar.xz | sha256sum --check --strict
+          tar -xJf .runtime/thunderbird/thunderbird.tar.xz -C .runtime/thunderbird
+          test -x .runtime/thunderbird/thunderbird/thunderbird
+
+      - name: Download and verify pinned geckodriver
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p .runtime/geckodriver
+          release_json=.runtime/geckodriver/release.json
+          curl --fail --location --proto '=https' --tlsv1.2 \
+            -H 'Accept: application/vnd.github+json' \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "https://api.github.com/repos/mozilla/geckodriver/releases/tags/v${GECKODRIVER_VERSION}" \
+            -o "$release_json"
+          python - <<'PY' > .runtime/geckodriver/asset.env
+          import json, os, pathlib
+          version = os.environ["GECKODRIVER_VERSION"]
+          name = f"geckodriver-v{version}-linux64.tar.gz"
+          data = json.loads(pathlib.Path(".runtime/geckodriver/release.json").read_text())
+          asset = next((item for item in data.get("assets", []) if item.get("name") == name), None)
+          if not asset:
+              raise SystemExit(f"Missing release asset {name}")
+          digest = str(asset.get("digest") or "")
+          if not digest.startswith("sha256:"):
+              raise SystemExit("GitHub release asset does not expose a SHA-256 digest")
+          print(f"GECKODRIVER_URL={asset['browser_download_url']}")
+          print(f"GECKODRIVER_SHA256={digest.removeprefix('sha256:')}")
+          PY
+          source .runtime/geckodriver/asset.env
+          curl --fail --location --proto '=https' --tlsv1.2 \
+            "$GECKODRIVER_URL" -o .runtime/geckodriver/geckodriver.tar.gz
+          printf '%s  %s\n' "$GECKODRIVER_SHA256" .runtime/geckodriver/geckodriver.tar.gz | sha256sum --check --strict
+          tar -xzf .runtime/geckodriver/geckodriver.tar.gz -C .runtime/geckodriver
+          test -x .runtime/geckodriver/geckodriver
+
+      - name: Run real Thunderbird functional and scale bench
+        shell: bash
+        run: |
+          set -euo pipefail
+          xpi="$(find dist -maxdepth 1 -type f -name 'MailPerch_v*.xpi' -print -quit)"
+          test -n "$xpi"
+          mkdir -p artifacts/thunderbird-bench
+          xvfb-run -a python tests/thunderbird/functional_bench.py \
+            --binary .runtime/thunderbird/thunderbird/thunderbird \
+            --xpi "$xpi" \
+            --geckodriver .runtime/geckodriver/geckodriver \
+            --output-dir artifacts/thunderbird-bench \
+            --volumes 50,100,500,1000,2000 \
+            --timeout 180
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.0
+        if: always()
+        with:
+          name: thunderbird-functional-bench
+          if-no-files-found: error
+          retention-days: 14
+          include-hidden-files: false
+          path: artifacts/thunderbird-bench/

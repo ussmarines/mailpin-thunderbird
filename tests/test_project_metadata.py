@@ -30,9 +30,10 @@ assert package["homepage"] == repository_url
 assert package["repository"]["url"] == f"git+{repository_url}.git"
 assert package["funding"] == {"type": "paypal", "url": paypal_url}
 
-for support_id, url in (("support-paypal", paypal_url), ("support-author", author_url), ("support-repository", repository_url)):
-    assert f'id="{support_id}"' in html and f'href="{url}"' in html
-assert html.count('data-support-link') == 3
+assert f'id="support-paypal"' in html and f'href="{paypal_url}"' in html
+assert 'id="support-author"' not in html
+assert 'id="support-repository"' not in html
+assert html.count('data-support-link') == 2
 assert 'target="_blank"' in html and 'rel="noopener noreferrer"' in html
 for visible_french_string in (
     "Soutenir MailPerch",
@@ -42,7 +43,7 @@ for visible_french_string in (
     assert visible_french_string not in html, visible_french_string
 assert "function openExternalSupportLink(event)" in js
 assert "event.preventDefault();" in js and "messenger.tabs.create({url: link.href})" in js
-for key in ("supportTitle", "supportIntro", "supportPayPal", "supportAuthor", "supportRepository", "supportOpenFailed"):
+for key in ("supportTitle", "supportProject", "supportOpenFailed"):
     assert all(locales[locale][key]["message"].strip() for locale in locales), key
 
 release_badge = f"release-v{package['version']}"

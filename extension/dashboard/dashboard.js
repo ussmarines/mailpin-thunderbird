@@ -87,6 +87,15 @@ function formatDurationDays(value) {
   return days < 1 ? "<1" : String(Math.round(days * 10) / 10);
 }
 
+function displayCount(value) {
+  const count = Number(value);
+  return Number.isFinite(count) && count >= 0 ? Math.floor(count) : 0;
+}
+
+function formatCount(value) {
+  return new Intl.NumberFormat(document.documentElement.lang || undefined).format(displayCount(value));
+}
+
 function checklistElement(item) {
   const stats = item.checklistStats || {total: 0, completed: 0, pending: 0};
   if (!stats.total) return null;
@@ -320,13 +329,13 @@ function createCard(item, {compact = false, selectable = true} = {}) {
 function renderStats() {
   const stats = current?.stats || {};
   $("stats").replaceChildren(
-    statCard(msg("allPins", "Toutes"), stats.total || 0),
-    statCard(msg("statusActive", "À traiter"), stats.active || 0),
-    statCard(msg("waitingForThem", "J’attends"), stats.waitingForThem || 0),
-    statCard(msg("needsReply", "Je dois répondre"), stats.needsReply || 0, stats.needsReply ? "warning" : ""),
-    statCard(msg("overdue", "En retard"), stats.overdue || 0, stats.overdue ? "warning" : ""),
-    statCard(msg("pendingSubtasks", "Sous-tâches en attente"), stats.checklistPendingItems || 0),
-    statCard(msg("completedLast7Days", "Terminés sur 7 jours"), stats.completedLast7Days || 0),
+    statCard(msg("allPins", "Toutes"), displayCount(stats.total)),
+    statCard(msg("statusActive", "À traiter"), displayCount(stats.active)),
+    statCard(msg("waitingForThem", "J’attends"), displayCount(stats.waitingForThem)),
+    statCard(msg("needsReply", "Je dois répondre"), displayCount(stats.needsReply), displayCount(stats.needsReply) ? "warning" : ""),
+    statCard(msg("overdue", "En retard"), displayCount(stats.overdue), displayCount(stats.overdue) ? "warning" : ""),
+    statCard(msg("pendingSubtasks", "Sous-tâches en attente"), displayCount(stats.checklistPendingItems)),
+    statCard(msg("completedLast7Days", "Terminés sur 7 jours"), displayCount(stats.completedLast7Days)),
     statCard(msg("averageOpenAge", "Âge moyen des suivis"), `${formatDurationDays(stats.averageOpenAgeMs)} ${msg("daysShort", "j")}`),
     statCard(msg("averageWaitingAge", "Attente moyenne"), `${formatDurationDays(stats.averageWaitingAgeMs)} ${msg("daysShort", "j")}`)
   );
@@ -349,7 +358,7 @@ function renderSmartViews() {
     button.type = "button";
     button.dataset.smartView = view.id;
     button.setAttribute("aria-pressed", String((current.smartView || "all") === view.id));
-    button.append(node("span", "", msg(view.labelKey || "", view.fallback || view.id)), node("span", "smart-view-count", current.smartCounts?.[view.id] || 0));
+    button.append(node("span", "", msg(view.labelKey || "", view.fallback || view.id)), node("span", "smart-view-count", displayCount(current.smartCounts?.[view.id])));
     host.append(button);
   }
 }
@@ -484,7 +493,7 @@ function renderToday() {
   const hero = node("header", "board-intro");
   const copy = node("div", "");
   copy.append(node("h2", "", msg("todayHeading", "Votre journée")), node("p", "", msg("todayIntro", "Les messages qui demandent une action aujourd’hui, regroupés par priorité de suivi.")));
-  hero.append(copy, node("strong", "board-total", msg("reviewActionable", "$1 élément(s) demandent votre attention.").replace("$1", plan.actionable || 0)));
+  hero.append(copy, node("strong", "board-total", msg("reviewActionable", "$1 élément(s) demandent votre attention.").replace("$1", displayCount(plan.actionable))));
   host.append(hero);
   let visible = 0;
   for (const id of ["overdue", "today", "noReply", "waking"]) {
@@ -624,6 +633,10 @@ function renderHealth() {
   const copy = node("div", "");
   copy.append(node("h2", "", report.status === "healthy" ? msg("healthHealthy", "MailPerch est en bonne santé") : report.status === "attention" ? msg("healthAttention", "Quelques points sont à surveiller") : msg("healthCritical", "Une intervention est recommandée")));
   copy.append(node("p", "", msg("healthSummary", "$1 point(s) détecté(s) · $2 événement(s) diagnostic récent(s).").replace("$1", report.issues?.length || 0).replace("$2", current.diagnostics?.total || 0)));
+  const pinCount = displayCount(current.stats?.total);
+  copy.append(node("p", "volume-guidance", pinCount >= 2000
+    ? msg("pinsBeyondRecommendedVolume", "$1 pins — beyond the currently validated volume.").replace("$1", formatCount(pinCount))
+    : msg("pinsWithinRecommendedVolume", "$1 / 2,000 recommended pins").replace("$1", formatCount(pinCount))));
   const actions = node("div", "item-actions");
   actions.classList.add("health-tools");
   actions.append(actionButton("health-refresh", msg("runHealthCheck", "Analyser")), actionButton("health-repair", msg("repairSafeIssues", "Réparer les anomalies sûres")), actionButton("provider-check", msg("checkProviders", "Tester les fournisseurs")), actionButton("diagnostic-export", msg("exportDiagnostic", "Exporter le diagnostic")), actionButton("diagnostic-clear", msg("clearDiagnostics", "Vider le journal")));
@@ -664,7 +677,6 @@ function renderActivity() {
   };
   renderEntries($("activity"), current.activity, item => `${formatDate(item.time)} · ${item.action || item.type || "action"} · ${item.subject || item.details || ""}`);
   renderEntries($("rule-log"), current.ruleLog, item => `${formatDate(item.time)} · ${item.ruleName || msg("rule", "Règle")} · ${item.result || ""} · ${item.subject || ""}`);
-  $("technical").textContent = JSON.stringify({revision: current.revision, compatibility: current.compatibility, performance: current.performance, diagnostics: current.diagnostics, providerMatrix: current.providerMatrix}, null, 2);
 }
 
 function populateBulkControls() {
@@ -877,6 +889,11 @@ function bindEvents() {
   $("status-close").addEventListener("click", clearStatus);
   $("retry").addEventListener("click", () => load());
   $("refresh").addEventListener("click", () => load());
+  $("header-support").addEventListener("click", async event => {
+    event.preventDefault();
+    try { await api.tabs.create({url: event.currentTarget.href}); }
+    catch (error) { setStatus(failureMessage("supportOpenFailed", "Impossible d’ouvrir ce lien externe.", error), "error", {persistent: true}); }
+  });
   $("settings").addEventListener("click", () => api.runtime.openOptionsPage());
   $("commands").addEventListener("click", openCommandPalette);
   $("command-close").addEventListener("click", () => $("command-palette").close());

@@ -13,6 +13,7 @@ dashboard_js = (EXT / "dashboard/dashboard.js").read_text(encoding="utf-8")
 options_html = (EXT / "options/options.html").read_text(encoding="utf-8")
 options_css = (EXT / "options/options.css").read_text(encoding="utf-8")
 options_js = (EXT / "options/options.js").read_text(encoding="utf-8")
+settings_js = (EXT / "api/pinInbox/modules/settings.js").read_text(encoding="utf-8")
 tokens = (EXT / "styles/tokens.css").read_text(encoding="utf-8")
 
 # The three user-facing surfaces share one compact product design language.
@@ -111,9 +112,14 @@ assert "createGroupDialog" in impl
 assert "openGroupAssignmentDialog" in impl
 assert ".pin-mails-group-dialog" in css
 assert "prompt(" not in impl
-for icon_name in ("pin-filled.svg", "pin-regular.svg"):
+for icon_name in ("pin-filled.svg", "pin-regular.svg", "pin-regular-light.svg"):
     icon = (EXT / "icons" / icon_name).read_text(encoding="utf-8")
     assert 'transform="translate(0 -0.375)"' in icon
+assert 'fill="#fff"' in (EXT / "icons" / "pin-regular-light.svg").read_text(encoding="utf-8")
+manifest = (EXT / "manifest.json").read_text(encoding="utf-8")
+assert '"theme_icons"' in manifest
+assert '"light": "icons/pin-regular-light.svg"' in manifest
+assert '"dark": "icons/pin-regular.svg"' in manifest
 
 # Drag feedback is always scoped and cleared.
 assert "clearDropTargets" in impl and "clearDropFeedback" in impl
@@ -130,11 +136,48 @@ assert 'createNode("button", "pin-mails-header-action", "C")' not in impl
 
 # Narrow thread panes must not turn the search control's horizontal flex basis
 # into a large vertical spacer. Empty reminder centers must stay invisible.
-responsive_start = css.index("@container threadPane (max-width: 700px)")
+responsive_start = css.index("@container threadPane (max-width: 390px)")
 responsive_end = css.index("/* 2.0", responsive_start)
 responsive_block = css[responsive_start:responsive_end]
 assert ".pin-mails-search-wrap { flex: 0 0 auto; min-inline-size: 0; }" in responsive_block
-assert ".pin-mails-smart-view-select { inline-size: 100%; max-inline-size: none; }" in responsive_block
+responsive_select_start = css.index(
+    "@container threadPane (max-width: 390px)", css.index("/* 3.2.0")
+)
+responsive_select_end = css.index(".pin-mails-no-reply-chip", responsive_select_start)
+responsive_select_block = css[responsive_select_start:responsive_select_end]
+assert "flex: 0 0 auto;" in responsive_select_block
+assert "inline-size: 100%;" in responsive_select_block
+assert "block-size: 30px;" in responsive_select_block
+assert "max-inline-size: none;" in responsive_select_block
+assert ".pin-mails-search-wrap { flex: 1 1 180px; min-inline-size: 96px; }" in css
+assert "flex: 0 1 150px;" in css
+assert 'url("../icons/pin-filled.svg")' in css
+assert 'url("../icons/pin.svg")' not in css
+assert 'url("../icons/conversation.svg")' not in css
+assert "max-block-size: min(65vh, var(--pin-mails-max-height));" in css
+assert "selectedAccounts" in impl
+assert "matchesPanelScope(this._settings, ref, folder.URI)" in impl
+assert "selectedAccountKeys" in settings_js and "function matchesPanelScope" in settings_js
+assert 'this._t("scopeSelectedAccounts", "Comptes sélectionnés")' in impl
+assert 'this._t("selectedAccounts", "Comptes sélectionnés")' not in impl
+assert "_dashboardRequestPending = true;" in impl
+
+# Dashboard user-visible counts must be normalized before rendering, and the
+# main dashboard deliberately omits the raw technical dump.
+assert "function displayCount(value)" in dashboard_js
+assert "displayCount(plan.actionable)" in dashboard_js
+assert 'id="technical"' not in dashboard_html
+assert 'id="header-support"' in dashboard_html
+assert "support-panel" in dashboard_html
+
+# Options keep only the PayPal support action and expose the explicit account
+# scope without reintroducing the ambiguous current-account mode.
+assert 'id="support-author"' not in options_html
+assert 'id="support-repository"' not in options_html
+assert 'id="header-support"' in options_html
+assert 'value="selectedAccounts"' in options_html
+assert 'value="currentAccount"' not in options_html
+assert "reorderSettingsFamilies" in options_js
 assert ".pin-mails-reminder-center[hidden]" in css
 hidden_rule = css[css.index(".pin-mails-reminder-center[hidden]"):]
 assert "display: none !important;" in hidden_rule

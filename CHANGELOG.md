@@ -1,5 +1,13 @@
 # Journal des modifications
 
+## Unreleased
+
+- Options : sections rendues dans l’ordre Essentiel, Automatisation, Organisation puis Avancé ; portée explicite « Comptes sélectionnés » avec migration de l’ancien `currentAccount` vers la boîte courante ;
+- Options et Dashboard : soutien réduit à PayPal, avec un accès secondaire dans leurs bannières ;
+- Dashboard : normalisation des compteurs visibles pour exclure `null`, `undefined` et `NaN`, et retrait du dump « État technique » redondant ;
+- panneau Thunderbird : recherche et vue « Toutes » restent sur une ligne tant que la largeur le permet, hauteur par défaut augmentée et icône de conversation remplacée par une punaise ;
+- smoke Thunderbird : ajout de l’assertion runtime du bouton Dashboard, qui doit ouvrir exactement un onglet Dashboard.
+
 ## 1.3.0 — consolidation Thunderbird et interface
 
 - isolation des accès internes Messages, Tags et Agenda derrière `PinCompatibility` et trois adaptateurs injectables ;

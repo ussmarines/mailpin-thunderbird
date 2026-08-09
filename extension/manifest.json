@@ -72,7 +72,19 @@
     "default_icon": {
       "16": "icons/pin-regular.svg",
       "32": "icons/pin-regular.svg"
-    }
+    },
+    "theme_icons": [
+      {
+        "light": "icons/pin-regular-light.svg",
+        "dark": "icons/pin-regular.svg",
+        "size": 16
+      },
+      {
+        "light": "icons/pin-regular-light.svg",
+        "dark": "icons/pin-regular.svg",
+        "size": 32
+      }
+    ]
   },
   "action": {
     "default_title": "__MSG_dashboardActionTitle__",

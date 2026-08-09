@@ -68,6 +68,7 @@ Le job :
 11. désinstalle puis contrôle le nettoyage ;
 12. réinstalle et contrôle une nouvelle injection propre ;
 13. conserve logs, résultat JSON et captures comme artefacts.
+14. clique le bouton Dashboard injecté et exige l’ouverture d’un unique onglet Dashboard, sans erreur runtime.
 
 Aucun de ces téléchargements n’est une dépendance d’exécution de MailPerch. Ils existent uniquement dans l’environnement de test.
 
@@ -84,6 +85,7 @@ Lorsque le job réussit réellement, il démontre au minimum sur la version épi
 - une seule injection `#pin-mails-qfb-toggle` ;
 - retrait des injections après désinstallation ;
 - réinstallation propre sans duplication.
+- activation du bouton Dashboard du panneau et ouverture unique du Dashboard.
 
 ### Ce qu’il ne valide pas
 
@@ -101,7 +103,57 @@ Il ne prouve pas à lui seul :
 
 Ces points restent dans `docs/MANUAL_TEST_PLAN.md`.
 
-## 3. Tests officiels dans un checkout Thunderbird
+## 3. Banc fonctionnel et montée en charge
+
+Workflow manuel dédié : `.github/workflows/thunderbird-functional-bench.yml`
+
+Script : `tests/thunderbird/functional_bench.py`
+
+Ce banc reste volontairement hors du smoke PR. Il construit l’XPI inchangé, crée dans chaque profil WebDriver jetable des messages et métadonnées locales variés, puis laisse le démarrage normal de MailPerch migrer ces données vers son stockage structuré. Aucun compte utilisateur, credential ou serveur mail n’est utilisé ; Thunderbird est forcé hors ligne et les éventuels comptes POP supplémentaires pointent vers le domaine réservé `.invalid` sans relever le courrier.
+
+La matrice fixe couvre `50`, `100`, `500`, `1000` et `2000` épingles. Le scénario fonctionnel du Panneau et l’ouverture réelle du Dashboard s’exécutent sur le plus petit volume ; chaque volume contrôle le compte final, la recherche complète, les portées, le rendu, et, à partir de 500, le chargement de toute la pagination avec absence de doublons et actions sur le premier, le milieu et le dernier élément. `artifacts/thunderbird-bench/results.json` conserve les durées de création, rendu/interactions du panneau, recherche, filtre et ouverture du Dashboard, ainsi que les exceptions, timeouts et comptes observés. Les captures `thunderbird-light.png` et `thunderbird-dark.png` restent des preuves à inspecter humainement pour le contraste et le clipping.
+
+Après publication de la branche, lancer **Thunderbird functional and scale bench** depuis `workflow_dispatch`. Avec des binaires locaux compatibles, la commande équivalente est :
+
+```bash
+python tests/thunderbird/functional_bench.py \
+  --binary /chemin/vers/thunderbird \
+  --xpi dist/MailPerch_v1.3.0.xpi \
+  --geckodriver /chemin/vers/geckodriver \
+  --output-dir artifacts/thunderbird-bench \
+  --volumes 50,100,500,1000,2000 \
+  --timeout 180
+```
+
+Les onglets internes Dashboard et Options de Thunderbird ne sont pas exposés comme handles de contenu Marionette : le banc externe prouve leur ouverture, pas leurs scénarios DOM internes, qui restent couverts séparément par les tests de page et la validation manuelle. De même, Thunderbird ignore les commandes synthétiques non fiables des `menuitem` XUL ; les mutations via l’éditeur de carte restent manuelles. Les intégrations Agenda distantes, la réception POP/IMAP réelle et l’inspection visuelle automatisée ne sont pas simulées. Un calendrier local n’est utilisé que si Thunderbird en expose déjà un compatible et inscriptible.
+
+La validation ciblée `--scope-validation-only` reste séparée de la matrice 50–2000. Pour chacun des cas vide, A, B, A+C et A+B+C, elle crée trois comptes synthétiques dont les identifiants canoniques Thunderbird sont `account1`, `account2`, `account3` (`account.key`) et dont les serveurs natifs distincts sont `server1`, `server2`, `server3` (`incomingServer.key`). Les épingles, `selectedAccountKeys` et le filtre utilisent uniquement les `account.key`. Dès la première session, le banc vérifie le compte rendu, des épingles représentatives de chaque compte inclus, l’absence explicite des comptes exclus et l’absence de doublons. Il persiste ensuite `panelScope` et `selectedAccountKeys` dans la préférence production, ferme la première session, puis démarre un nouveau processus Thunderbird avec exactement le même chemin `-profile`. Avant de réinstaller temporairement le même XPI, il exige que comptes, dossiers, messages, préférence, sentinelle d’installation et lignes SQLite soient encore présents. Il n’utilise ni le DOM de l’onglet Options, non exposé comme contexte WebDriver fiable, ni `addon.userDisabled`, non fiable pour une extension temporaire.
+
+Limite observée le 9 août 2026 avec Thunderbird 153.0.2 sous Windows et geckodriver 0.37.1 : le second processus a bien rouvert le chemin de profil exact, retrouvé les comptes synthétiques et rouvert leur dossier actif, mais le stockage structuré SQLite n’était plus disponible avant la réinstallation du XPI temporaire. Le scénario s’arrête donc explicitement avant toute assertion de portée et classe la preuve automatisée comme limitée par le harness. Il ne copie aucun fichier interne et ne modifie pas le cycle de vie production pour contourner cette suppression ; la clôture complète doit passer par une installation non temporaire dans le profil Thunderbird de test ou par la validation manuelle ciblée.
+
+Pour préparer cette validation manuelle sans automatiser l’onglet Options, utiliser `--prepare-manual-scope-validation`. Le mode crée un profil jetable hors ligne, avec deux dossiers par compte et exactement A = `account1` = 18 épingles, B = `account2` = 16, C = `account3` = 16 (total 50) ; les noms visibles restent A = `server1`, B = `server2`, C = `server3`, et le premier dossier contient 9 épingles. `selectedAccountKeys` est vide dans ce nouveau profil. Il installe l’XPI temporaire, laisse Thunderbird ouvert, affiche le chemin du profil et la checklist dans le terminal, puis conserve le profil après fermeture de Thunderbird. Le chemin imprimé peut être supprimé uniquement après validation terminée et Thunderbird fermé.
+
+```bash
+python tests/thunderbird/functional_bench.py \
+  --binary /chemin/vers/thunderbird \
+  --xpi dist/MailPerch_v1.3.0.xpi \
+  --geckodriver /chemin/vers/geckodriver \
+  --output-dir artifacts/thunderbird-manual-scope \
+  --prepare-manual-scope-validation \
+  --timeout 180
+```
+
+```bash
+python tests/thunderbird/functional_bench.py \
+  --binary /chemin/vers/thunderbird \
+  --xpi dist/MailPerch_v1.3.0.xpi \
+  --geckodriver /chemin/vers/geckodriver \
+  --output-dir artifacts/thunderbird-multi-account \
+  --scope-validation-only \
+  --timeout 180
+```
+
+## 4. Tests officiels dans un checkout Thunderbird
 
 Thunderbird documente l’exécution de tests d’extensions dans un checkout `comm-central` construit. Deux familles sont particulièrement adaptées à MailPerch :
 
@@ -121,7 +173,7 @@ Références officielles :
 - Thunderbird Developer Docs — Experiments : https://developer.thunderbird.net/add-ons/mailextensions/experiments
 - Mozilla geckodriver : https://github.com/mozilla/geckodriver
 
-## 4. Exécution manuelle du smoke
+## 5. Exécution manuelle du smoke
 
 Après avoir construit l’XPI et installé un binaire Thunderbird + geckodriver compatibles :
 
@@ -140,7 +192,7 @@ Sur Linux sans écran, lancer la même commande sous `xvfb-run -a`.
 
 Le script utilise uniquement la bibliothèque standard Python ; Selenium n’est pas requis.
 
-## 5. Interprétation d’un échec
+## 6. Interprétation d’un échec
 
 Un échec du smoke doit être classé avant correction :
 

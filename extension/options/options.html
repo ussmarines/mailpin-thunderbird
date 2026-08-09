@@ -23,6 +23,7 @@
       </div>
       <div class="header-actions">
         <button id="dashboard" type="button" class="primary" data-i18n="openDashboard">Ouvrir le tableau de bord</button>
+        <a id="header-support" class="support-button" href="https://paypal.me/ussmarinesdot" target="_blank" rel="noopener noreferrer" data-support-link data-i18n="supportProject">Soutenir le projet</a>
       </div>
     </header>
 
@@ -96,12 +97,15 @@
         <section class="settings-section" data-nav-icon="▦" data-nav-group="Essentiel" data-nav-group-i18n="navEssential">
           <div class="section-header"><div><p class="eyebrow" data-i18n="sectionPanelEyebrow">Interface</p><h2 data-i18n="sectionPanel">Panneau et cartes</h2><p data-i18n="sectionPanelIntro">Gardez les informations utiles visibles et masquez le reste.</p></div></div>
           <div class="setting-grid three-columns">
-            <label class="setting-field"><span data-i18n="panelScope">Portée</span><select id="panelScope"><option value="currentInbox" data-i18n="scopeInbox">Dossier actuel</option><option value="currentAccount" data-i18n="scopeAccount">Compte actuel</option><option value="global" data-i18n="scopeGlobal">Tous les comptes</option></select></label>
+            <label class="setting-field"><span data-i18n="panelScope">Portée</span><select id="panelScope"><option value="currentInbox" data-i18n="scopeInbox">Dossier actuel</option><option value="selectedAccounts" data-i18n="scopeSelectedAccounts">Comptes sélectionnés</option><option value="global" data-i18n="scopeGlobal">Tous les comptes</option></select></label>
             <label class="setting-field"><span data-i18n="sort">Tri</span><select id="sortMode"><option value="manual" data-i18n="sortManual">Ordre manuel</option><option value="pinnedAt" data-i18n="sortPinned">Date d’épinglage</option><option value="messageDate" data-i18n="sortDate">Date du message</option><option value="deadline" data-i18n="sortDeadline">Échéance</option><option value="priority" data-i18n="sortPriority">Priorité</option><option value="sender" data-i18n="sortSender">Expéditeur</option><option value="account" data-i18n="sortAccount">Compte</option></select></label>
             <label class="setting-field"><span data-i18n="density">Densité des cartes</span><select id="density"><option value="compact" data-i18n="uiCompact">Compacte</option><option value="normal" data-i18n="uiBalanced">Normale</option><option value="comfortable" data-i18n="uiComfortable">Confortable</option></select></label>
             <label class="setting-field"><span data-i18n="cardLines">Informations par carte</span><select id="cardLines"><option value="2" data-i18n="cardTwoLines">Essentiel — 2 lignes</option><option value="3" data-i18n="cardThreeLines">Détaillé — 3 lignes</option></select></label>
             <label class="setting-field"><span data-i18n="panelHeight">Hauteur maximale</span><span class="input-with-unit"><input id="panelMaxHeight" type="number" min="160" max="900"><span>px</span></span></label>
           </div>
+          <p class="setting-help" data-i18n="panelScopeHelp">Choisissez les comptes dont les mails épinglés doivent apparaître dans le panneau MailPerch.</p>
+          <div id="selected-accounts-setting" class="organization-block" hidden><div class="subsection-header"><div><h3 data-i18n="selectedAccounts">Comptes à afficher</h3><p data-i18n="selectedAccountsHelp">Sélectionnez ci-dessous un ou plusieurs comptes Thunderbird.</p></div><p id="selected-accounts-summary" class="selection-summary" aria-live="polite"></p></div><div id="selected-accounts-list" class="selected-accounts-list"></div><p id="selected-accounts-empty" class="hint" hidden data-i18n="selectedAccountsEmpty">Aucun compte Thunderbird compatible n’est disponible.</p><p id="selected-accounts-unavailable" class="hint" hidden></p></div>
+          <p class="volume-guidance"><strong data-i18n="recommendedPinVolume">Volume conseillé : jusqu’à 2 000 mails épinglés</strong><span data-i18n="recommendedPinVolumeHelp">MailPerch est testé jusqu’à 2 000 épingles. Des volumes supérieurs peuvent fonctionner, mais ne font actuellement pas partie du périmètre de validation.</span></p>
           <div class="toggle-grid">
             <label class="setting-toggle"><input id="enableSmartViews" type="checkbox"><span data-i18n="enableSmartViews">Vues intelligentes</span></label>
             <label class="setting-toggle"><input id="showSmartSections" type="checkbox"><span data-i18n="smartSections">Sections intelligentes dans le panneau</span></label>
@@ -194,8 +198,8 @@
 
         <footer class="form-footer"><div><strong data-i18n="readyToSave">Résumé local</strong><span id="stats"></span></div><span class="hint" data-i18n="saveDockHint">Utilisez la barre Enregistrer/Annuler qui apparaît uniquement après une modification.</span></footer>
         <aside class="support-panel" aria-labelledby="support-title">
-          <div><h3 id="support-title" data-i18n="supportTitle"></h3><p data-i18n="supportIntro"></p></div>
-          <div class="support-links"><a id="support-paypal" class="primary" href="https://paypal.me/ussmarinesdot" target="_blank" rel="noopener noreferrer" data-support-link data-i18n="supportPayPal"></a><a id="support-author" href="https://github.com/ussmarines" target="_blank" rel="noopener noreferrer" data-support-link data-i18n="supportAuthor"></a><a id="support-repository" href="https://github.com/ussmarines/mailperch-thunderbird" target="_blank" rel="noopener noreferrer" data-support-link data-i18n="supportRepository"></a></div>
+          <div><h3 id="support-title" data-i18n="supportTitle"></h3></div>
+          <div class="support-links"><a id="support-paypal" class="primary" href="https://paypal.me/ussmarinesdot" target="_blank" rel="noopener noreferrer" data-support-link data-i18n="supportProject">Soutenir le projet</a></div>
         </aside>
         <div id="save-dock" class="save-dock" aria-hidden="true" hidden><span id="save-dock-message" data-i18n="unsavedChanges">Des modifications ne sont pas encore enregistrées.</span><span class="save-dock-actions"><button id="discard-changes" type="reset" class="secondary" aria-disabled="true" disabled data-i18n="cancelChanges">Annuler</button><button id="save-all-floating" type="submit" class="primary" aria-disabled="true" disabled data-i18n="save">Enregistrer</button></span></div>
       </form>

@@ -62,7 +62,7 @@ assert 'id="apply-recommended-settings"' in HTML
 assert 'function applyRecommendedDraft(control = null)' in JS
 assert 'PinSettings.normalize(config.recommendedSettings || PinSettings.defaults())' in JS
 assert 'RECOMMENDED_PRESERVED_SETTING_KEYS' in JS
-for key in ("preferredCalendarId", "waitingGroupId", "backupDirectory", "accountColors", "inboxEnabled"):
+for key in ("preferredCalendarId", "waitingGroupId", "backupDirectory", "accountColors", "inboxEnabled", "selectedAccountKeys"):
     assert f'"{key}"' in JS, key
 function_match = re.search(r"function applyRecommendedDraft\(control = null\) \{(?P<body>.*?)\n\}", JS, re.S)
 assert function_match, "Recommended draft function missing"

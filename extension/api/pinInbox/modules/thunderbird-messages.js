@@ -5,7 +5,22 @@
     const {MailServices, MailUtils, MessageArchiver, ChromeUtils, Ci} = dependencies;
 
     function accountList() {
-      try { return [...(MailServices?.accounts?.accounts || [])]; } catch { return []; }
+      const source = MailServices?.accounts?.accounts;
+      if (!source) return [];
+      try { return [...source]; } catch {}
+      const accounts = [];
+      const length = Math.max(0, Number(source.length) || 0);
+      for (let index = 0; index < length; index += 1) {
+        try {
+          const account = source.queryElementAt?.(index, Ci?.nsIMsgAccount) ?? source.GetElementAt?.(index);
+          if (account) accounts.push(account);
+        } catch {}
+      }
+      return accounts;
+    }
+
+    function accountKeyForAccount(account) {
+      return String(account?.key || "unknown");
     }
 
     function identityEmails() {
@@ -50,11 +65,19 @@
 
     function accountForFolder(folder) {
       if (!folder?.server) return null;
-      try { return MailServices?.accounts?.findAccountForServer?.(folder.server) || null; } catch { return null; }
+      try {
+        const account = MailServices?.accounts?.findAccountForServer?.(folder.server);
+        if (account) return account;
+      } catch {}
+      const serverKey = String(folder.server.key || "");
+      return accountList().find(account =>
+        account?.incomingServer === folder.server ||
+        (serverKey && String(account?.incomingServer?.key || "") === serverKey)
+      ) || null;
     }
 
     function accountKeyForFolder(folder) {
-      return String(accountForFolder(folder)?.key || folder?.server?.key || "unknown");
+      return accountKeyForAccount(accountForFolder(folder));
     }
 
     function accountNameForFolder(folder) {
@@ -72,7 +95,7 @@
 
     function accountByKey(accountKey) {
       const key = String(accountKey || "");
-      return accountList().find(account => String(account?.key || "") === key) || null;
+      return accountList().find(account => accountKeyForAccount(account) === key) || null;
     }
 
     function findHeaderInFolder(folder, ref, fingerprint) {
@@ -183,6 +206,7 @@
 
     return Object.freeze({
       accountList,
+      accountKeyForAccount,
       identityEmails,
       folderChildren,
       walkFolders,

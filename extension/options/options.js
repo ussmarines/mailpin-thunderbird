@@ -25,6 +25,8 @@ let lastInitializationDiagnostic = "options:init:not-started";
 
 const accountControls = new Map();
 const inboxControls = new Map();
+const selectedAccountControls = new Map();
+let unavailableSelectedAccountKeys = [];
 const $ = id => document.getElementById(id);
 const wait = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
 const INITIALIZATION_TIMEOUTS = Object.freeze({
@@ -129,7 +131,7 @@ function currentSettings(overrides = {}) {
 }
 
 const RECOMMENDED_PRESERVED_SETTING_KEYS = Object.freeze(new Set([
-  "preferredCalendarId", "waitingGroupId", "backupDirectory", "accountColors", "inboxEnabled"
+  "preferredCalendarId", "waitingGroupId", "backupDirectory", "accountColors", "inboxEnabled", "selectedAccountKeys"
 ]));
 
 function applyRecommendedDraft(control = null) {
@@ -212,6 +214,10 @@ const CONTROL_CODECS = Object.freeze({
   inboxEnabled: Object.freeze({
     read: () => Object.fromEntries([...inboxControls].map(([uri, input]) => [uri, input.checked])),
     write: () => {}
+  }),
+  selectedAccountKeys: Object.freeze({
+    read: () => [...selectedAccountControls].filter(([, input]) => input.checked).map(([key]) => key).concat(unavailableSelectedAccountKeys),
+    write: () => {}
   })
 });
 
@@ -222,7 +228,8 @@ const CONTROL_VALUE_TYPES = Object.freeze({
   lines: "array",
   preserved: "string",
   accountColors: "record",
-  inboxEnabled: "record"
+  inboxEnabled: "record",
+  selectedAccountKeys: "array"
 });
 
 function cloneSettingValue(value) {
@@ -290,7 +297,8 @@ const SETTINGS_CONTROL_DEFINITIONS = Object.freeze([
   settingControl("autoPinTags", "lines"),
   settingControl("backupDirectory", "preserved", {includeInDirty: false, dependency: "choose-backup"}),
   settingControl("accounts-list", "accountColors", {key: "accountColors", dynamic: true}),
-  settingControl("accounts-list", "inboxEnabled", {key: "inboxEnabled", dynamic: true})
+  settingControl("accounts-list", "inboxEnabled", {key: "inboxEnabled", dynamic: true}),
+  settingControl("selected-accounts-list", "selectedAccountKeys", {key: "selectedAccountKeys", dynamic: true})
 ]);
 
 const SETTINGS_CONTROL_REGISTRY = new Map(
@@ -1061,6 +1069,77 @@ function renderAccounts(accounts) {
     host.append(card);
   }
 }
+
+function renderSelectedAccounts(accounts, selectedKeys) {
+  const host = $("selected-accounts-list");
+  const empty = $("selected-accounts-empty");
+  host.replaceChildren();
+  selectedAccountControls.clear();
+  const selected = new Set(Array.isArray(selectedKeys) ? selectedKeys : []);
+  const compatibleAccounts = Array.isArray(accounts) ? accounts.filter(account => account?.key) : [];
+  unavailableSelectedAccountKeys = [...selected].filter(key => !compatibleAccounts.some(account => account.key === key));
+  if (empty) empty.hidden = compatibleAccounts.length > 0;
+  for (const account of compatibleAccounts) {
+    const label = node("label", "selected-account-choice");
+    const input = document.createElement("input");
+    input.type = "checkbox";
+    input.checked = selected.has(account.key);
+    input.dataset.settingKey = "selectedAccountKeys";
+    input.dataset.settingType = SETTINGS_CONTROL_REGISTRY.get("selectedAccountKeys").valueType;
+    input.dataset.settingDirty = "true";
+    input.dataset.settingSave = "true";
+    input.dataset.settingMigration = PinSettings.MIGRATION_STRATEGY;
+    input.addEventListener("change", syncSelectedAccountsSummary);
+    selectedAccountControls.set(account.key, input);
+    const copy = node("span", "selected-account-copy");
+    copy.append(node("span", "", String(account.name || account.key)));
+    if (account.email && account.email !== account.name) copy.append(node("span", "selected-account-email", String(account.email)));
+    label.append(input, copy);
+    host.append(label);
+  }
+  syncSelectedAccountsSummary();
+}
+
+function syncSelectedAccountsSummary() {
+  const count = [...selectedAccountControls.values()].filter(input => input.checked).length + unavailableSelectedAccountKeys.length;
+  const summary = $("selected-accounts-summary");
+  const unavailable = $("selected-accounts-unavailable");
+  if (summary) summary.textContent = count === 0
+    ? msg("selectedAccountsNone")
+    : count === 1 ? msg("selectedAccountsOne") : msg("selectedAccountsMany", [count]);
+  if (unavailable) {
+    unavailable.hidden = unavailableSelectedAccountKeys.length === 0;
+    unavailable.textContent = unavailableSelectedAccountKeys.length === 1
+      ? msg("selectedAccountsUnavailableOne")
+      : msg("selectedAccountsUnavailableMany", [unavailableSelectedAccountKeys.length]);
+  }
+}
+
+function syncSelectedAccountsVisibility() {
+  const section = $("selected-accounts-setting");
+  if (section) section.hidden = $("panelScope")?.value !== "selectedAccounts";
+}
+
+function reorderSettingsFamilies() {
+  const form = $("settings-form");
+  const tail = form.querySelector(".form-footer");
+  if (!tail) return;
+  for (const heading of form.querySelectorAll(".settings-family-heading")) heading.remove();
+  const families = [
+    ["Essentiel", "navEssential", "Essentiel"],
+    ["Automatisation", "navAutomation", "Automatisation"],
+    ["Organisation", "navOrganization", "Organisation"],
+    ["Avancé", "navAdvanced", "Avancé"]
+  ];
+  for (const [family, key, fallback] of families) {
+    const sections = [...form.querySelectorAll(`:scope > .settings-section[data-nav-group="${family}"]`)];
+    if (!sections.length) continue;
+    const heading = node("div", "settings-family-heading");
+    heading.append(node("h2", "", msg(key, fallback)));
+    form.insertBefore(heading, tail);
+    for (const section of sections) form.insertBefore(section, tail);
+  }
+}
 function renderRules(){
   const host=$("rules-list");host.replaceChildren();
   if(!rules.length)host.append(node("p","hint",msg("noCustomRules")));
@@ -1355,6 +1434,9 @@ async function applyConfiguration(config) {
   renderRules();
   syncToggleCards();
   renderAccounts(config.accounts || []);
+  renderSelectedAccounts(config.accounts || [], settings.selectedAccountKeys);
+  syncSelectedAccountsVisibility();
+  reorderSettingsFamilies();
   renderWaitingGroups(settings.waitingGroupId);
   applyUxPreferences(settings);
   updateRuntimeSummary(config);
@@ -1962,6 +2044,7 @@ async function startOptions() {
       setStatus(failureMessage("dashboardOpenFailed", error), "error");
     }
   });
+  $("panelScope").addEventListener("change", syncSelectedAccountsVisibility);
 
   $("diagnostic").addEventListener("click", async event => {
     try {

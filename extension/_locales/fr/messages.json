@@ -617,6 +617,9 @@
   "panelScope": {
     "message": "Portée"
   },
+  "panelScopeHelp": {
+    "message": "Choisissez les comptes dont les mails épinglés doivent apparaître dans le panneau MailPerch."
+  },
   "performanceMetrics": {
     "message": "Mesures de performance locales"
   },
@@ -742,6 +745,45 @@
   },
   "scopeInbox": {
     "message": "Dossier actuel"
+  },
+  "scopeSelectedAccounts": {
+    "message": "Comptes sélectionnés"
+  },
+  "selectedAccounts": {
+    "message": "Comptes à afficher"
+  },
+  "selectedAccountsHelp": {
+    "message": "Sélectionnez ci-dessous un ou plusieurs comptes Thunderbird."
+  },
+  "selectedAccountsNone": {
+    "message": "Aucun compte sélectionné"
+  },
+  "selectedAccountsOne": {
+    "message": "1 compte sélectionné"
+  },
+  "selectedAccountsMany": {
+    "message": "$1 comptes sélectionnés"
+  },
+  "selectedAccountsEmpty": {
+    "message": "Aucun compte Thunderbird compatible n’est disponible."
+  },
+  "selectedAccountsUnavailableOne": {
+    "message": "1 compte enregistré n’est plus disponible ; sa sélection sera conservée."
+  },
+  "selectedAccountsUnavailableMany": {
+    "message": "$1 comptes enregistrés ne sont plus disponibles ; leurs sélections seront conservées."
+  },
+  "recommendedPinVolume": {
+    "message": "Volume conseillé : jusqu’à 2 000 mails épinglés"
+  },
+  "recommendedPinVolumeHelp": {
+    "message": "MailPerch est testé jusqu’à 2 000 épingles. Des volumes supérieurs peuvent fonctionner, mais ne font actuellement pas partie du périmètre de validation."
+  },
+  "pinsWithinRecommendedVolume": {
+    "message": "$1 / 2 000 épingles conseillées"
+  },
+  "pinsBeyondRecommendedVolume": {
+    "message": "$1 épingles — au-delà du volume actuellement validé"
   },
   "searchPins": {
     "message": "Rechercher"
@@ -1165,7 +1207,8 @@
   "dynamicSimulationSummary": {"message": "$1 correspondance(s) sur $2 message(s)."},
   "dynamicSimulationBusy": {"message": "Simulation des règles…"},
   "dynamicSimulationNoMatch": {"message": "Aucune correspondance."}
-  ,"supportTitle": {"message": "Soutenir MailPerch"}
+  ,"supportTitle": {"message": "Soutenir le projet"}
+  ,"supportProject": {"message": "Soutenir le projet"}
   ,"supportIntro": {"message": "Vous appréciez MailPerch ? Vous pouvez contribuer à la poursuite de son développement en faisant un don."}
   ,"supportPayPal": {"message": "Soutenir le projet via PayPal"}
   ,"supportAuthor": {"message": "Profil GitHub de l’auteur (lien externe)"}

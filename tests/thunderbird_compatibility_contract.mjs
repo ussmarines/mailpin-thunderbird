@@ -17,7 +17,8 @@ for (const name of ["thunderbird-messages", "thunderbird-tags", "thunderbird-cal
 const tagRegistry = new Map();
 const tagColors = new Map();
 const listeners = new Set();
-const account = {key: "acc-1", incomingServer: {prettyName: "Compte", rootFolder: null}};
+const account = {key: "acc-1", incomingServer: {key: "server-1", prettyName: "Compte", rootFolder: null}};
+const indexedAccount = {key: "acc-2", incomingServer: {key: "server-2", prettyName: "Compte indexé", rootFolder: null}};
 const MailServices = {
   accounts: {
     accounts: [account],
@@ -52,6 +53,7 @@ class MessageArchiver {
   archiveMessages(headers) { this.headers = headers; this.oncomplete?.(); MessageArchiver.last = this; }
 }
 const Ci = {
+  nsIMsgAccount: "nsIMsgAccount",
   nsIMsgFolder: "nsIMsgFolder",
   nsIMsgDBHdr: "nsIMsgDBHdr",
   nsIMsgCompType: {ReplyToSender: 1},
@@ -95,6 +97,19 @@ assert.ok(compatibility.messages);
 assert.ok(compatibility.tags);
 assert.ok(compatibility.calendar);
 
+// Thunderbird may expose accounts as an XPCOM indexed collection rather than
+// an iterable array. Options account selection must support both forms.
+MailServices.accounts.accounts = {
+  length: 1,
+  queryElementAt(index, interfaceName) {
+    assert.equal(index, 0);
+    assert.equal(interfaceName, "nsIMsgAccount");
+    return indexedAccount;
+  }
+};
+assert.equal(compatibility.messages.accountList()[0]?.key, indexedAccount.key);
+MailServices.accounts.accounts = [account];
+
 // Messages: account/folder traversal, listener lifecycle and actions remain behind one adapter.
 const child = {URI: "mailbox://child", QueryInterface() { return this; }, subFolders: []};
 const rootFolder = {
@@ -105,8 +120,11 @@ const rootFolder = {
 rootFolder.server.account = account;
 account.incomingServer.rootFolder = rootFolder;
 assert.deepEqual([...compatibility.messages.identityEmails()], ["me@example.test"]);
+assert.equal(compatibility.messages.accountKeyForAccount(account), "acc-1");
 assert.equal(compatibility.messages.accountForFolder(rootFolder), account);
 assert.equal(compatibility.messages.accountKeyForFolder(rootFolder), "acc-1");
+assert.equal(compatibility.messages.accountKeyForFolder({server: {key: "server-1"}}), "acc-1");
+assert.equal(compatibility.messages.accountKeyForFolder({server: {key: "server-missing"}}), "unknown");
 assert.equal(compatibility.messages.accountNameForFolder(rootFolder), "Compte");
 assert.equal(Array.from(compatibility.messages.walkFolders(rootFolder), folder => folder.URI).join("|"), "mailbox://root|mailbox://child");
 assert.equal(compatibility.messages.folderForURL("mailbox://known")?.URI, "mailbox://known");

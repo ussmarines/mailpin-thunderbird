@@ -428,6 +428,35 @@ done({
 """
 
 
+OPEN_DASHBOARD_SCRIPT = r"""
+const done = arguments[arguments.length - 1];
+(async () => {
+  const { classes: Cc, interfaces: Ci } = Components;
+  const windowMediator = Cc["@mozilla.org/appshell/window-mediator;1"].getService(
+    Ci.nsIWindowMediator
+  );
+  const win = windowMediator.getMostRecentWindow("mail:3pane");
+  const pane = win?.document.getElementById("tabmail")?.currentAbout3Pane;
+  const button = pane?.document?.querySelector(".pin-mails-action-dashboard");
+  if (!button || button.hidden) throw new Error("MailPerch dashboard button is unavailable");
+  button.click();
+  const deadline = Date.now() + 10000;
+  let dashboardTabs = [];
+  while (Date.now() < deadline) {
+    const tabs = Array.from(win?.document.getElementById("tabmail")?.tabInfo || []);
+    dashboardTabs = tabs.filter(tab => String(
+      tab.browser?.currentURI?.spec || tab.chromeBrowser?.currentURI?.spec || ""
+    ).includes("dashboard/dashboard.html"));
+    if (dashboardTabs.length) break;
+    await new Promise(resolve => win.setTimeout(resolve, 100));
+  }
+  done({opened: dashboardTabs.length === 1, dashboardTabCount: dashboardTabs.length});
+})().catch(error => done({
+  __mailperchSmokeError: `${String(error?.name || "Error")}: ${String(error?.message || error)}`,
+}));
+"""
+
+
 def _free_port() -> int:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         sock.bind(("127.0.0.1", 0))
@@ -593,6 +622,11 @@ def run(args: argparse.Namespace) -> int:
             )
             result["firstInstall"] = first
             result["checks"].append("panel-and-toggle-injected-once")
+            dashboard_open = client.execute_async(OPEN_DASHBOARD_SCRIPT)
+            if not isinstance(dashboard_open, dict) or not dashboard_open.get("opened"):
+                raise SmokeFailure(f"Dashboard did not open exactly once: {dashboard_open!r}")
+            result["dashboardOpen"] = dashboard_open
+            result["checks"].append("panel-dashboard-button-opens-dashboard-once")
             screenshot = client.full_screenshot()
             if screenshot:
                 (output_dir / "mailperch-installed.png").write_bytes(screenshot)

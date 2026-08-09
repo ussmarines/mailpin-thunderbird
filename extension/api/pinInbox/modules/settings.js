@@ -14,13 +14,14 @@
   }
 
   const DEFAULTS = deepFreeze({
-    schemaVersion: 7,
+    schemaVersion: 8,
     pinMode: "independent",
     panelScope: "currentInbox",
     sortMode: "manual",
     density: "normal",
     cardLines: 3,
-    panelMaxHeight: 420,
+    panelMaxHeight: 460,
+    selectedAccountKeys: [],
     panelPageSize: 100,
     panelVirtualizationThreshold: 180,
     uiPreset: "balanced",
@@ -181,7 +182,11 @@
     settings.reduceMotion = enumValue(source.reduceMotion, new Set(["auto", "always", "never"]), settings.reduceMotion);
     settings.diagnosticLevel = enumValue(source.diagnosticLevel, new Set(["debug", "info", "warning", "error"]), settings.diagnosticLevel);
     settings.defaultSmartView = enumValue(source.defaultSmartView, new Set(["all", "today", "overdue", "week", "waiting", "noReply", "snoozed", "noDue", "unread", "missing", "calendarError", "recentCompleted"]), settings.defaultSmartView);
-    settings.panelScope = enumValue(source.panelScope, new Set(["currentInbox", "currentAccount", "global"]), settings.panelScope);
+    // `currentAccount` never reached beyond the active folder in the 1.3.0
+    // panel. Preserve that visible result while migrating to an explicit scope.
+    settings.panelScope = source.panelScope === "currentAccount"
+      ? "currentInbox"
+      : enumValue(source.panelScope, new Set(["currentInbox", "selectedAccounts", "global"]), settings.panelScope);
     settings.sortMode = enumValue(source.sortMode, new Set(["manual", "pinnedAt", "messageDate", "sender", "account", "deadline", "priority"]), settings.sortMode);
     settings.density = enumValue(source.density, new Set(["compact", "normal", "comfortable"]), settings.density);
     settings.cardLines = [2, 3].includes(Number(source.cardLines)) ? Number(source.cardLines) : settings.cardLines;
@@ -245,12 +250,28 @@
         ? source.autoPinTags.map(item => boundedText(item, 128).trim()).filter(Boolean)
         : []
     ).slice(0, 100);
+    settings.selectedAccountKeys = uniqueStrings(
+      Array.isArray(source.selectedAccountKeys)
+        ? source.selectedAccountKeys.filter(key => isSafeRecordKey(key, 256) && !String(key).includes("@"))
+        : []
+    ).slice(0, 50);
     settings.waitingGroupId = GROUP_ID_RE.test(String(source.waitingGroupId || "")) ? String(source.waitingGroupId) : "";
     settings.preferredCalendarId = String(source.preferredCalendarId || "").slice(0, 256);
     settings.backupDirectory = String(source.backupDirectory || "").slice(0, 2048);
     settings.showFolderBadge = false;
-    settings.schemaVersion = 7;
+    settings.schemaVersion = 8;
     return settings;
+  }
+
+  function matchesPanelScope(settings, ref, currentFolderURI = "") {
+    const panelScope = String(settings?.panelScope || DEFAULTS.panelScope);
+    if (panelScope === "global") return true;
+    if (panelScope === "selectedAccounts") {
+      const selected = Array.isArray(settings?.selectedAccountKeys) ? settings.selectedAccountKeys : [];
+      return selected.includes(String(ref?.accountKey || ""));
+    }
+    return panelScope === "currentInbox" &&
+      String(ref?.sourceInboxURI || "") === String(currentFolderURI || "");
   }
 
   function settingType(key) {
@@ -270,11 +291,12 @@
   }
 
   scope.PinSettings = Object.freeze({
-    SCHEMA_VERSION: 7,
+    SCHEMA_VERSION: 8,
     MIGRATION_STRATEGY,
     DEFAULTS,
     defaults: () => clone(DEFAULTS),
     describe,
-    normalize
+    normalize,
+    matchesPanelScope
   });
 })(this);

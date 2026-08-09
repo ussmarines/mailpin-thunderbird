@@ -27,4 +27,8 @@ for token in ['list: "items"', 'kanban: "kanban"', 'cases: "cases"', 'history: "
     assert token in JS, token
 assert '$(id).hidden = id !== next' not in JS
 assert 'if (!section) throw new Error(`Section du tableau de bord introuvable : ${sectionId}`)' in JS
+assert 'pinsWithinRecommendedVolume' in JS
+assert 'pinsBeyondRecommendedVolume' in JS
+assert 'pinCount >= 2000' in JS
+assert 'classList.add("error")' not in JS[JS.index('function renderHealth()'):JS.index('function renderActivity()')]
 print(f"Dashboard DOM contract: {len(referenced)} referenced ids, OK")

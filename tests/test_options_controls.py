@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import json
 from html.parser import HTMLParser
 from pathlib import Path
 
@@ -131,6 +132,32 @@ assert '<label class="file-button secondary" data-i18n="previewRestore">' not in
 assert 'id="settings-form"' in HTML and 'aria-busy="true" hidden' in HTML
 assert 'id="save-all-floating" type="submit"' in HTML
 assert 'id="discard-changes" type="reset"' in HTML
+
+# Selected accounts remain stable Thunderbird keys in the draft. The UI must
+# make this scope self-explanatory without imposing a pin-volume hard limit.
+for required in (
+    'value="selectedAccounts"',
+    'id="selected-accounts-setting"',
+    'id="selected-accounts-list"',
+    'id="selected-accounts-summary"',
+    'data-i18n="panelScopeHelp"',
+    'data-i18n="recommendedPinVolume"',
+    'data-i18n="recommendedPinVolumeHelp"',
+    'function renderSelectedAccounts(accounts, selectedKeys)',
+    'function syncSelectedAccountsSummary()',
+    'unavailableSelectedAccountKeys',
+    '"selectedAccountKeys"',
+):
+    assert required in HTML or required in JS, required
+assert not re.search(r'panelScope[^<]{0,300}max="2000"', HTML)
+assert not re.search(r'selectedAccountKeys[^\n]{0,160}(?:2000|MAX_PIN)', JS)
+assert HTML.index('id="selected-accounts-setting"') < HTML.index('class="volume-guidance"')
+fr_messages = json.loads((ROOT / "extension/_locales/fr/messages.json").read_text(encoding="utf-8"))
+en_messages = json.loads((ROOT / "extension/_locales/en/messages.json").read_text(encoding="utf-8"))
+assert "2 000" in fr_messages["recommendedPinVolume"]["message"]
+assert "2 000" in fr_messages["recommendedPinVolumeHelp"]["message"]
+assert "2,000" in en_messages["recommendedPinVolume"]["message"]
+assert "2,000" in en_messages["recommendedPinVolumeHelp"]["message"]
 
 assert ".save-dock {" in CSS
 assert ".save-dock { pointer-events: none" not in CSS

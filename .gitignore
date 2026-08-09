@@ -42,6 +42,10 @@ ROUNDTRIP_CI_LOG_*.txt
 # Generated only inside reviewer source archives
 .mailperch-source-files.json
 
+# Local Thunderbird test runtime and generated evidence
+/.runtime/
+/artifacts/
+
 # BEGIN managed secret hardening
 auth.json
 credentials.json

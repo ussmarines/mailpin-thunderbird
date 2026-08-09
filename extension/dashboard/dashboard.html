@@ -23,9 +23,8 @@
         <div class="brand-copy"><span class="brand-overline">MailPerch</span><div class="title-line"><h1 data-i18n="dashboardHeading">Tableau de bord</h1><span id="app-version" class="version"></span></div><p data-i18n="dashboardIntro">Retrouvez rapidement ce qui demande votre attention, sans parcourir tous vos dossiers.</p></div>
       </div>
       <div class="header-actions">
-        <button id="commands" type="button" class="button secondary" data-i18n="commandPalette">Commandes</button>
-        <button id="settings" type="button" class="button secondary" data-i18n="settings">Paramètres</button>
-        <button id="refresh" type="button" class="button primary" data-i18n="refresh">Actualiser</button>
+        <div class="header-primary-actions"><button id="commands" type="button" class="button secondary" data-i18n="commandPalette">Commandes</button><button id="settings" type="button" class="button secondary" data-i18n="settings">Paramètres</button><button id="refresh" type="button" class="button primary" data-i18n="refresh">Actualiser</button></div>
+        <a id="header-support" class="support-button" href="https://paypal.me/ussmarinesdot" target="_blank" rel="noopener noreferrer" data-i18n="supportProject">Soutenir le projet</a>
       </div>
     </header>
 
@@ -102,10 +101,10 @@
     </div>
 
     <aside class="technical-panel">
-      <details><summary data-i18n="technicalStatus">État technique</summary><pre id="technical"></pre></details>
       <details><summary data-i18n="ruleLog">Journal des règles</summary><div id="rule-log" class="activity-list"></div></details>
       <details><summary data-i18n="recentActivity">Activité récente</summary><div id="activity" class="activity-list"></div></details>
     </aside>
+    <aside class="support-panel" aria-labelledby="dashboard-support-title"><div><h2 id="dashboard-support-title" data-i18n="supportTitle">Soutenir le projet</h2></div><a class="button secondary" href="https://paypal.me/ussmarinesdot" target="_blank" rel="noopener noreferrer" data-i18n="supportProject">Soutenir le projet</a></aside>
   </main>
 
   <div id="status" class="status" role="status" aria-live="polite" aria-atomic="true" hidden><span id="status-message"></span><button id="status-close" type="button" aria-label="Fermer" data-i18n-aria-label="close">×</button></div>

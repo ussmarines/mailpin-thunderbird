@@ -870,7 +870,7 @@ function getAccountForFolder(folder) {
 }
 
 function accountKeyForFolder(folder) {
-  return THUNDERBIRD_COMPAT?.messages?.accountKeyForFolder?.(folder) || folder?.server?.key || "unknown";
+  return THUNDERBIRD_COMPAT?.messages?.accountKeyForFolder?.(folder) || "unknown";
 }
 
 function accountNameForFolder(folder) {
@@ -1588,6 +1588,7 @@ class PinStructuredStore {
 
 var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   getAPI(context) {
+    this._extension = context.extension;
     this._states ??= new Set();
     ACTIVE_PIN_INBOX_INSTANCES.add(this);
     this._context = context;
@@ -2070,12 +2071,14 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
 
   _getAccountsMetadata() {
     const accounts = [];
-    try {
-      for (const account of this._thunderbird?.messages?.accountList?.() || []) {
+    for (const account of this._thunderbird?.messages?.accountList?.() || []) {
+      try {
         const server = account.incomingServer;
         if (!server?.rootFolder) {
           continue;
         }
+        const accountKey = this._thunderbird?.messages?.accountKeyForAccount?.(account) || "unknown";
+        if (accountKey === "unknown") continue;
         const inboxes = walkFolders(server.rootFolder)
           .filter(folder => Boolean(folder.flags & Ci.nsMsgFolderFlags.Inbox))
           .map(folder => ({
@@ -2085,18 +2088,18 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
           }));
         const provider = PIN_MODULES.PinProviders?.providerFor(server) || String(server.type || "unknown");
         accounts.push({
-          key: account.key,
-          name: server.prettyName || account.key,
+          key: accountKey,
+          name: server.prettyName || accountKey,
           email: account.defaultIdentity?.email || "",
-          color: this._getAccountColor(account.key),
-          defaultColor: getDefaultColor(account.key),
+          color: this._getAccountColor(accountKey),
+          defaultColor: getDefaultColor(accountKey),
           protocol: String(server.type || "unknown"),
           provider,
           inboxes
         });
+      } catch (error) {
+        console.warn("Épingles : lecture d’un compte incomplète", safeErrorName(error));
       }
-    } catch (error) {
-      console.warn("Épingles : lecture des comptes incomplète", safeErrorName(error));
     }
     return accounts;
   }
@@ -3410,17 +3413,11 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
   _entriesForFolder(folder) {
-    const scope = this._settings.panelScope;
-    const currentAccountKey = accountKeyForFolder(folder);
     const entries = [];
     let dataChanged = false;
 
     for (const ref of Object.values(this._data.refs)) {
-      const inScope =
-        scope === "global" ||
-        (scope === "currentAccount" && ref.accountKey === currentAccountKey) ||
-        (scope === "currentInbox" && ref.sourceInboxURI === folder.URI);
-      if (!inScope) continue;
+      if (!PIN_MODULES.PinSettings.matchesPanelScope(this._settings, ref, folder.URI)) continue;
       if (this._settings.hideCompleted && ref.completedAt) continue;
       let hdr = this._resolveReference(ref, true);
       if (hdr && ref.trackingMode === "conversation") hdr = this._updateConversationReference(ref, hdr);
@@ -5761,7 +5758,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       healthIndicator.hidden = true;
       healthIndicator.setAttribute("aria-label", this._t("healthAttention", "Santé MailPerch à vérifier"));
       const scope = createNode("select", "pin-mails-header-select"); scope.setAttribute("aria-label", this._t("panelScope", "Portée du panneau"));
-      for (const [value, label] of [["currentInbox", this._t("currentInbox", "Cette boîte")], ["currentAccount", this._t("currentAccount", "Ce compte")], ["global", this._t("allAccounts", "Tous les comptes")]]) {
+      for (const [value, label] of [["currentInbox", this._t("currentInbox", "Cette boîte")], ["selectedAccounts", this._t("scopeSelectedAccounts", "Comptes sélectionnés")], ["global", this._t("allAccounts", "Tous les comptes")]]) {
         const option = createNode("option", "", label); option.value = value; scope.appendChild(option);
       }
       const sort = createNode("select", "pin-mails-header-select"); sort.dataset.secondary = "true"; sort.setAttribute("aria-label", this._t("sortPins", "Tri des épingles"));
@@ -5868,14 +5865,21 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         dashboardButton.click();
       });
       dashboardButton.addEventListener("click", () => {
-        const listeners = [...(this._dashboardRequestListeners || [])];
-        if (listeners.length) {
+        this._dashboardRequestPending = true;
+        const notifyBackground = () => {
+          const listeners = [...(this._dashboardRequestListeners || [])];
+          if (!listeners.length) return false;
+          this._dashboardRequestPending = false;
           for (const listener of listeners) {
             try { listener(); } catch (error) { this._recordDiagnostic("warning", "Ouverture du tableau de bord impossible", error); }
           }
-          return;
+          return true;
+        };
+        if (!notifyBackground()) {
+          Promise.resolve(this._extension?.wakeupBackground?.())
+            .then(() => { notifyBackground(); })
+            .catch(error => this._recordDiagnostic("warning", "Réveil du tableau de bord impossible", error));
         }
-        this._dashboardRequestPending = true;
         showToast(t("panelDashboardOpening"), false);
         about3Pane.setTimeout(() => {
           if (!this._dashboardRequestPending) return;
