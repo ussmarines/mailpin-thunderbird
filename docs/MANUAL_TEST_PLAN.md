@@ -1,8 +1,8 @@
-# Plan de test manuel MailPerch — 1.3.0
+# Plan de test manuel MailPerch — 1.5.1
 
 Utiliser de préférence un profil Thunderbird jetable avec des messages synthétiques pour les scénarios destructifs ou de migration. Pour une validation utilisateur finale, un profil réel peut être utilisé après sauvegarde, en évitant toute opération destructive non nécessaire.
 
-La version 1.2.1 a déjà fait l’objet le 8 août 2026 d’une passe utilisateur réelle sans anomalie signalée. Le présent plan sert à valider la release 1.3.0 issue de `refactor/thunderbird-integration-and-ux` et à couvrir les zones modifiées.
+Le présent plan sert à compléter les validations automatisées de la release 1.5.1. Les preuves historiques restent utiles uniquement pour les surfaces inchangées ; toute zone runtime modifiée en 1.5.1 doit disposer d’une preuve fraîche avant publication.
 
 ## Priorité A — intégration Thunderbird consolidée
 
@@ -10,12 +10,13 @@ La version 1.2.1 a déjà fait l’objet le 8 août 2026 d’une passe utilisate
 2. Ouvrir plusieurs fenêtres ou onglets de courrier et confirmer une seule injection du panneau par `about:3pane`.
 3. Épingler puis désépingler depuis : ligne native, menu contextuel, message affiché et carte épinglée.
 4. Clic, double-clic, clic droit, `Shift+F10` et bouton Plus sur plusieurs variantes de cartes.
-5. Vérifier qu’un simple épinglage ne change ni état lu/non lu ni compteurs natifs.
-6. Déplacer/copier un message entre dossiers puis vérifier que la référence reste résoluble lorsque Thunderbird fournit les identités nécessaires.
-7. Archiver un message depuis MailPerch et vérifier le résultat natif sans double action.
-8. Ouvrir une réponse depuis MailPerch et confirmer le bon message/conversation.
-9. Fermer/réouvrir Thunderbird, puis confirmer que le panneau, les épingles et les listeners reviennent une seule fois.
-10. Désactiver/réactiver l’extension dans un profil de test et contrôler l’absence de nœuds/listeners dupliqués.
+5. Ouvrir **Modifier** sur une carte avec et sans checklist, ajouter/cocher une sous-tâche, enregistrer, rouvrir et confirmer l’absence d’exception ainsi que la persistance.
+6. Vérifier qu’un simple épinglage ne change ni état lu/non lu ni compteurs natifs.
+7. Déplacer/copier un message entre dossiers puis vérifier que la référence reste résoluble lorsque Thunderbird fournit les identités nécessaires.
+8. Archiver un message depuis MailPerch et vérifier le résultat natif sans double action.
+9. Ouvrir une réponse depuis MailPerch et confirmer le bon message/conversation.
+10. Fermer/réouvrir Thunderbird, puis confirmer que le panneau, les épingles et les listeners reviennent une seule fois.
+11. Désactiver/réactiver l’extension dans un profil de test et contrôler l’absence de nœuds/listeners dupliqués.
 
 ## Priorité B — Tags Thunderbird
 

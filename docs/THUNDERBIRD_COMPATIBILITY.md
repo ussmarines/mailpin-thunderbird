@@ -123,10 +123,10 @@ Avant d’ajouter une nouvelle capacité Thunderbird :
 
 ## Compatibilité de versions
 
-Le manifeste déclare Thunderbird `128.0` à `153.*`. Cette déclaration n’est pas une preuve que chaque point interne est identique sur toute la plage. La couche de compatibilité rend les dépendances plus faciles à adapter, mais la matrice réelle reste à établir avec le banc runtime et les tests manuels.
+Depuis 1.5.1, le manifeste déclare Thunderbird `153.0` à `153.*`. Cette plage a été resserrée après des essais réels : 128/140 injectent le panneau après activation mais ne garantissent pas l’ouverture du Dashboard via le pont MV3 Experiment → background. La release 1.5.1 ne revendique donc que la branche 153 réellement validée.
 
 Toute future adaptation de version doit rester localisée autant que possible dans ces adaptateurs et être documentée dans `docs/KNOWN_LIMITATIONS.md` et `docs/BUG_TRACKER.md` si elle corrige une régression observée.
 
 ### Preuve runtime actuelle
 
-Le 8 août 2026, le banc réel a validé Thunderbird **153.0.1 ESR** Linux sur un profil local synthétique : vue `about:3pane` prête, Experiment/background à `Startup: Complete`, panneau et bouton injectés une seule fois, nettoyage après désinstallation, puis réinstallation sans duplication. Cela valide le bootstrap et le cycle de vie de la frontière sur cette version, pas les fournisseurs réels ni toute la plage 128–153.
+Le 8 août 2026, le banc réel a validé Thunderbird **153.0.1 ESR** Linux sur un profil local synthétique : vue `about:3pane` prête, Experiment/background à `Startup: Complete`, panneau et bouton injectés une seule fois, nettoyage après désinstallation, puis réinstallation sans duplication. Cela valide le bootstrap et le cycle de vie de la frontière sur la branche 153 déclarée, pas les fournisseurs réels.

@@ -34,6 +34,27 @@ for forbidden in (
 ):
     assert forbidden not in IMPLEMENTATION, f"Thunderbird boundary regression: {forbidden}"
 
+# Native message enumeration/database access and message mutations belong to
+# PinCompatibility.messages, not to the orchestration layer.
+for forbidden in (
+    ".markMessagesFlagged(",
+    ".markMessagesRead(",
+    ".deleteMessages(",
+    ".msgDatabase",
+    "folder.messages",
+):
+    assert forbidden not in IMPLEMENTATION, f"Direct Thunderbird message operation escaped adapter: {forbidden}"
+
+for adapter_call in (
+    "listFolderHeaders",
+    "headerExists",
+    "headerByMessageId",
+    "markFlagged",
+    "markRead",
+    "deleteMessages",
+):
+    assert f"this._thunderbird?.messages?.{adapter_call}" in IMPLEMENTATION, adapter_call
+
 assert 'resource://gre/modules/ExtensionUtils.sys.mjs' in IMPLEMENTATION
 assert "var { ExtensionError } = ExtensionUtils;" in IMPLEMENTATION
 assert "PinCompatibility?.create" in IMPLEMENTATION

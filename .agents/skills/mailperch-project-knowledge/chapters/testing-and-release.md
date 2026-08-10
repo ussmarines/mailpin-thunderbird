@@ -12,7 +12,7 @@ MailPerch separates evidence rather than treating one green check as universal p
 
 A contract test does not prove Thunderbird UI. A Chromium flow does not prove an extension tab. One Linux smoke does not prove all declared Thunderbird versions, providers or platforms.
 
-The current repository declares Thunderbird 128.0-153.*. Current documents record a successful 153.0.1 ESR Linux synthetic Local Folders smoke for bootstrap, single injection, cleanup and reinstall; verify `docs/AI_VALIDATION_STATE.json` before reusing that evidence because branch, commit and invalidation paths matter.
+The current repository declares Thunderbird 153.0-153.*. Current documents record a successful 153.0.1 ESR Linux synthetic Local Folders smoke for bootstrap, single injection, cleanup and reinstall; verify `docs/AI_VALIDATION_STATE.json` before reusing that evidence because branch, commit and invalidation paths matter.
 
 ## Known limits
 

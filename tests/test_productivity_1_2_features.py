@@ -74,7 +74,11 @@ assert "commandDefinitions" in dashboard_js and "openCommandPalette" in dashboar
 
 # 7: saved views persist through schema v7 and expose group/case/priority/response/checklist filters.
 assert 'savedViews: []' in impl
-assert 'schemaVersion: 7' in impl
+assert 'schemaVersion: 7' in impl  # data schema remains v7
+assert 'this._settings.schemaVersion = PIN_MODULES.PinSettings.SCHEMA_VERSION; this._data.schemaVersion = 7;' in impl
+assert 'this._settings.schemaVersion = 7' not in impl
+assert 'secure: Boolean(server.isSecure)' in impl
+assert 'offlineSupport: Number(server.offlineSupportLevel || 0) >= 10' in impl
 for token in ('id="saved-views"', 'id="saved-view-group"', 'id="saved-view-case"', 'id="saved-view-priority"'):
     assert token in dashboard_html, token
 for field in ("groupId", "caseId", "priority", "responseState", "checklist"):

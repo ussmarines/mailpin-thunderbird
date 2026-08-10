@@ -45,6 +45,21 @@ assert 'more.addEventListener("click"' in impl
 assert 'more.setAttribute("aria-expanded", "false")' in impl
 assert 'dispatchCardAction(card, "more", more, event)' in impl
 assert 'button.addEventListener("pointerdown"' in impl
+
+# Editor checklist state must live in the shared about:3pane closure. openEditor()
+# is a sibling of createEditor(), so declarations nested inside createEditor()
+# reproduce the strict-mode ReferenceError observed in Thunderbird 153.
+setup_start = impl.index("  _setupAbout3Pane(about3Pane) {")
+create_editor = impl.index("    const createEditor = () => {", setup_start)
+open_editor = impl.index("    const openEditor = stableKey => {", create_editor)
+prefix = impl[setup_start:create_editor]
+creator = impl[create_editor:open_editor]
+assert "    let checklistItems = [];" in prefix
+assert "    let renderChecklist = () => {};" in prefix
+assert "      let checklistItems = [];" not in creator
+assert "      const renderChecklist = () => {" not in creator
+assert "      checklistItems = [];" in creator
+assert "      renderChecklist = () => {" in creator
 assert 'createNode("div", "pin-mails-context-menu")' not in impl
 assert 'contextMenu.style.left' not in impl
 

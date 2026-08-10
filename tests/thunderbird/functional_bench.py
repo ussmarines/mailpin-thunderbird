@@ -457,7 +457,22 @@ const scopeExpected = arguments[2] || {};
     if (searchable) {
       search.value = `Scope-${searchable}`;
       search.dispatchEvent(new pane.Event("input", {bubbles:true}));
-      await waitFor(() => cards().length === Number(scopeExpected.searchCount || 0), `selected-account search ${searchable}`);
+      const searchExpected = Number(scopeExpected.searchCount || 0);
+      await waitFor(
+        () => searchExpected === 0
+          ? cards().length === 0
+          : cards().length > 0 && cards().every(card => card.textContent.includes(`Scope-${searchable}`)),
+        `selected-account search rendered ${searchable}`
+      );
+      await waitFor(
+        () => count() === expectedScopes.selectedAccounts,
+        "selected-account total preserved during search"
+      );
+      while (cards().length < searchExpected && list.querySelector(".pin-mails-load-more")) {
+        list.querySelector(".pin-mails-load-more").click();
+        await sleep(30);
+      }
+      await waitFor(() => cards().length === searchExpected, `selected-account search ${searchable}`, 60000);
       if (cards().some(card => !card.textContent.includes(`Scope-${searchable}`))) {
         throw new Error("Selected-account search returned another account");
       }

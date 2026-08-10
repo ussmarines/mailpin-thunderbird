@@ -92,5 +92,11 @@ assert.equal(context.PinProviders.providerFor({hostName: "evil-live.com", type: 
 assert.equal(context.PinProviders.providerFor({hostName: "live.com.attacker.example", type: "imap"}), "imap");
 assert.equal(context.PinProviders.providerFor({hostName: "evil-me.com", type: "imap"}), "imap");
 assert.equal(context.PinProviders.providerFor({hostName: "me.com.attacker.example", type: "imap"}), "imap");
+const secureProvider = context.PinProviders.descriptor({key: "secure", provider: "imap", protocol: "imap", secure: true, offlineSupport: true, inboxes: []});
+assert.equal(secureProvider.secure, true);
+assert.equal(secureProvider.offlineSupport, true);
+const insecureProvider = context.PinProviders.descriptor({key: "plain", provider: "imap", protocol: "imap", secure: false, offlineSupport: false, inboxes: []});
+assert.equal(insecureProvider.secure, false);
+assert.equal(insecureProvider.offlineSupport, false);
 
 console.log("MailPerch productivity 1.2 model tests: OK");

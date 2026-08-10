@@ -1,9 +1,17 @@
 # Feuille de route
 
+## État courant — 1.5.1
+
+- [x] refonte visuelle 1.5.0 publiée ;
+- [x] correction de l’éditeur de carte/checklist préparée pour 1.5.1 ;
+- [x] opérations Messages restantes ramenées derrière `PinCompatibility.messages` ;
+- [x] diagnostic fournisseur et schéma Settings réalignés ;
+- [ ] publication GitHub 1.5.1 après double audit, CI, sécurité et banc Thunderbird frais.
+
 ## 1.3.0 — consolidation Thunderbird et interface
 
-Branche : `refactor/thunderbird-integration-and-ux`
-Base stable : `main` / `385815f546968acf721c8cd8486ff48f55f78a32`
+Branche historique fusionnée : `refactor/thunderbird-integration-and-ux`
+Base historique : `main` / `385815f546968acf721c8cd8486ff48f55f78a32`
 
 ### Intégration Thunderbird
 

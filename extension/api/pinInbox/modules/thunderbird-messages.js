@@ -98,6 +98,69 @@
       return accountList().find(account => accountKeyForAccount(account) === key) || null;
     }
 
+    function listFolderHeaders(folder, limit = 20_000) {
+      const headers = [];
+      const boundedLimit = Math.min(100_000, Math.max(1, Number(limit) || 20_000));
+      if (!folder) return {headers, truncated: false};
+      try {
+        const messages = folder.messages;
+        while (messages?.hasMoreElements?.() && headers.length < boundedLimit) {
+          headers.push(messages.getNext().QueryInterface(Ci.nsIMsgDBHdr));
+        }
+        return {headers, truncated: Boolean(messages?.hasMoreElements?.())};
+      } catch {
+        return {headers, truncated: false};
+      }
+    }
+
+    function headerExists(header) {
+      if (!header?.folder || !Number.isInteger(Number(header.messageKey))) return false;
+      try { return Boolean(header.folder.msgDatabase?.containsKey?.(header.messageKey)); } catch { return false; }
+    }
+
+    function headerByMessageId(folder, messageId) {
+      if (!folder || !messageId) return null;
+      try { return folder.msgDatabase?.getMsgHdrForMessageID?.(String(messageId)) || null; } catch { return null; }
+    }
+
+    function groupByFolder(headers) {
+      const groups = new Map();
+      for (const header of headers || []) {
+        if (!header?.folder) continue;
+        const bucket = groups.get(header.folder) || [];
+        bucket.push(header);
+        groups.set(header.folder, bucket);
+      }
+      return groups;
+    }
+
+    function markFlagged(headers, flagged) {
+      let changed = 0;
+      for (const [folder, bucket] of groupByFolder(headers)) {
+        folder.markMessagesFlagged(bucket, Boolean(flagged));
+        changed += bucket.length;
+      }
+      return changed;
+    }
+
+    function markRead(headers, read) {
+      let changed = 0;
+      for (const [folder, bucket] of groupByFolder(headers)) {
+        folder.markMessagesRead(bucket, Boolean(read));
+        changed += bucket.length;
+      }
+      return changed;
+    }
+
+    function deleteMessages(headers, msgWindow = null) {
+      let requested = 0;
+      for (const [folder, bucket] of groupByFolder(headers)) {
+        folder.deleteMessages(bucket, msgWindow || null, false, false, null, true);
+        requested += bucket.length;
+      }
+      return requested;
+    }
+
     function findHeaderInFolder(folder, ref, fingerprint) {
       if (!folder) return null;
       const matches = hdr => !ref?.identityFingerprint || fingerprint?.(hdr) === ref.identityFingerprint;
@@ -215,6 +278,12 @@
       accountNameForFolder,
       accountByKey,
       folderForURL,
+      listFolderHeaders,
+      headerExists,
+      headerByMessageId,
+      markFlagged,
+      markRead,
+      deleteMessages,
       findHeaderInFolder,
       registerFolderListener,
       displayMessageInFolderTab,

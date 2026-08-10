@@ -57,13 +57,14 @@ with tempfile.TemporaryDirectory() as directory:
     module.create_source_zip(source_first)
     module.create_source_zip(source_second)
     assert hashlib.sha256(source_first.read_bytes()).digest() == hashlib.sha256(source_second.read_bytes()).digest()
+    version = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))["version"]
     with zipfile.ZipFile(source_first) as archive:
         names = set(archive.namelist())
         assert "AGENTS.md" in names
         assert "extension/manifest.json" in names
         assert "release/BUILD_INSTRUCTIONS.md" in names
-        assert "SECURITY_AUDIT_1.2.0.md" in names
-        assert "VALIDATION_REPORT_1.2.0.md" in names
+        assert f"SECURITY_AUDIT_{version}.md" in names
+        assert f"VALIDATION_REPORT_{version}.md" in names
         assert "dist/.gitkeep" in names
         assert not any(name.startswith(".git/") for name in names)
         assert not any(name.startswith("dist/") and name != "dist/.gitkeep" for name in names)

@@ -91,7 +91,7 @@ Lorsque le job réussit réellement, il démontre au minimum sur la version épi
 
 Il ne prouve pas à lui seul :
 
-- la totalité de la plage Thunderbird 128–153 ;
+- toute extension future de la plage Thunderbird au-delà de 153 ;
 - Windows ou macOS ;
 - IMAP/POP/Gmail/Microsoft réels ;
 - les dossiers virtuels réels ;
@@ -118,7 +118,7 @@ Après publication de la branche, lancer **Thunderbird functional and scale benc
 ```bash
 python tests/thunderbird/functional_bench.py \
   --binary /chemin/vers/thunderbird \
-  --xpi dist/MailPerch_v1.5.0.xpi \
+  --xpi dist/MailPerch_v1.5.1.xpi \
   --geckodriver /chemin/vers/geckodriver \
   --output-dir artifacts/thunderbird-bench \
   --volumes 50,100,500,1000,2000 \
@@ -136,7 +136,7 @@ Pour préparer cette validation manuelle sans automatiser l’onglet Options, ut
 ```bash
 python tests/thunderbird/functional_bench.py \
   --binary /chemin/vers/thunderbird \
-  --xpi dist/MailPerch_v1.5.0.xpi \
+  --xpi dist/MailPerch_v1.5.1.xpi \
   --geckodriver /chemin/vers/geckodriver \
   --output-dir artifacts/thunderbird-manual-scope \
   --prepare-manual-scope-validation \
@@ -146,7 +146,7 @@ python tests/thunderbird/functional_bench.py \
 ```bash
 python tests/thunderbird/functional_bench.py \
   --binary /chemin/vers/thunderbird \
-  --xpi dist/MailPerch_v1.5.0.xpi \
+  --xpi dist/MailPerch_v1.5.1.xpi \
   --geckodriver /chemin/vers/geckodriver \
   --output-dir artifacts/thunderbird-multi-account \
   --scope-validation-only \
@@ -182,7 +182,7 @@ Sous Windows x64, l’installation utilisateur validée est `C:\Users\ussma\AppD
 ```bash
 python tests/thunderbird/real_smoke.py \
   --binary /chemin/vers/thunderbird \
-  --xpi dist/MailPerch_v1.5.0.xpi \
+  --xpi dist/MailPerch_v1.5.1.xpi \
   --geckodriver /chemin/vers/geckodriver \
   --output-dir artifacts/thunderbird-smoke \
   --timeout 45
@@ -211,5 +211,7 @@ Ne jamais assouplir une assertion pour rendre le job vert sans expliquer la caus
 Le 9 août 2026, la PR #24 a repassé avec succès le workflow sur le binaire officiel **Thunderbird 153.0.1 ESR** sous Linux avec geckodriver 0.37.1. Le cycle a confirmé vue locale prête, XPI actif, background `Startup: Complete`, injection unique, ouverture unique du Dashboard, nettoyage après désinstallation puis réinstallation propre.
 
 La passe fonctionnelle Windows du 9 août 2026 sur Thunderbird 153.0.2/geckodriver 0.37.1 a validé les volumes 50/100/500/1000/2000 et la sélection multi-comptes dans la première session. La sauvegarde Options → panneau et les icônes clair/sombre ont ensuite été confirmées manuellement. La persistance automatisée entre processus avec une extension temporaire reste la limite du harness décrite plus haut.
+
+Le 10 août 2026, le banc a été relancé sous Linux avec Thunderbird 153.0.1 ESR et geckodriver 0.37.1 après correction d’une fausse assertion du harness : `.pin-mails-count` représente le total de la portée et ne doit pas devenir le nombre de cartes filtrées par la recherche. Le test contrôle désormais séparément la stabilité de ce total, l’appartenance de chaque carte au résultat recherché et le nombre exact de cartes après pagination. Le cas ciblé 50 épingles puis la matrice complète 50/100/500/1000/2000 ont tous réussi, avec zéro timeout et zéro exception JavaScript. À 500, 1000 et 2000, la pagination complète a rendu respectivement 500, 1000 et 2000 cartes sans doublon et les contrôles début/milieu/fin sont positifs.
 
 Ces preuves ne remplacent pas les tests utilisateur avec fournisseurs réels ni la matrice multi-versions/multi-OS.

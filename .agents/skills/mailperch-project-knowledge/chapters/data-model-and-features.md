@@ -8,7 +8,7 @@ Identity prefers Gmail ID, normalized Message-ID, account/folder/key, then a fal
 
 ## Storage
 
-The SQLite file is historically named `pin-mails-v2.sqlite`. Physical schema is currently 5; settings/data schema is 7 because later fields live in JSON payloads and `state_data`. Writes stay incremental, transactional and serialized, with WAL, revisions, entity timestamps, atomic recovery and checksummed exports.
+The SQLite file is historically named `pin-mails-v2.sqlite`. Physical schema is currently 5; settings schema is 8 and data schema is 7 because later fields live in JSON payloads and `state_data`. Writes stay incremental, transactional and serialized, with WAL, revisions, entity timestamps, atomic recovery and checksummed exports.
 
 Migrations/imports validate and bound input, create a pre-write backup, preview counts/conflicts, then merge by identity/timestamp or explicitly replace. Imported automation, bidirectional sync, local paths and environmental links remain disabled until reviewed.
 

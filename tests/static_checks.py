@@ -10,13 +10,13 @@ manifest = json.loads((EXT / "manifest.json").read_text(encoding="utf-8"))
 version = manifest["version"]
 
 assert manifest["manifest_version"] == 3
-assert version == "1.5.0"
 assert manifest["permissions"] == ["menus"]
 assert manifest["browser_specific_settings"]["gecko"]["id"] == "pin-mails@MailPerch.local"
-assert manifest["browser_specific_settings"]["gecko"]["strict_min_version"] == "128.0"
+assert manifest["browser_specific_settings"]["gecko"]["strict_min_version"] == "153.0"
 assert manifest["browser_specific_settings"]["gecko"]["strict_max_version"] == "153.*"
 assert manifest["default_locale"] == "fr"
 package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
+assert package["version"] == version
 fr_locale = json.loads((EXT / "_locales/fr/messages.json").read_text(encoding="utf-8"))
 en_locale = json.loads((EXT / "_locales/en/messages.json").read_text(encoding="utf-8"))
 assert package["name"] == "mailperch-thunderbird"

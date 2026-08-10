@@ -34,6 +34,6 @@ Dependencies point inward in one direction: business modules ask the compatibili
 
 ## Current configuration anchors
 
-The manifest currently declares only the `menus` permission, a self-only CSP with `connect-src 'none'`, and Thunderbird 128.0 through 153.*. These declarations are not proof of runtime behavior on every supported version.
+The manifest currently declares only the `menus` permission, a self-only CSP with `connect-src 'none'`, and Thunderbird 153.0 through 153.*. These declarations are not proof of runtime behavior on every supported version.
 
 Sources: `extension/manifest.json`, `docs/PROJECT_STATE.json`, `PROJECT_MEMORY.md`, `docs/ARCHITECTURE.md`, `docs/IDENTITY_MIGRATION_REQUIRED.md`.

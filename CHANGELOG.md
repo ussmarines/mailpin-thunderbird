@@ -1,5 +1,17 @@
 # Journal des modifications
 
+## 1.5.1 — audit complet et durcissement correctif
+
+- correction du crash `ReferenceError: assignment to undeclared variable checklistItems` lors de l’ouverture de l’éditeur de carte ;
+- centralisation des énumérations, accès DB et mutations Messages restantes dans `PinCompatibility.messages`, avec balayages privilégiés bornés et gardes anti-régression renforcées ;
+- correction de la matrice de diagnostic comptes afin de refléter `isSecure` et le support hors-ligne réellement exposés par Thunderbird ;
+- migration Settings réalignée sur le schéma courant 8, tandis que le schéma données reste 7 et SQLite physique 5 ;
+- smoke Thunderbird rattaché à `main` plutôt qu’à une ancienne branche de consolidation supprimée ;
+- plage de compatibilité déclarée resserrée à Thunderbird `153.0`–`153.*` après essais réels : 128/140 injectent le panneau mais ne garantissent pas l’ouverture fiable du Dashboard via le pont MV3 Experiment → background ;
+- banc Thunderbird corrigé pour distinguer le total de portée des résultats filtrés, puis matrice réelle 50/100/500/1000/2000 revalidée sans timeout ni exception JavaScript sur Thunderbird 153.0.1 ESR ;
+- documentation, rapports sécurité/validation, notes reviewers et métadonnées de publication resynchronisés ;
+- aucune nouvelle permission WebExtension, dépendance runtime, connexion réseau, télémétrie, publicité ou code distant.
+
 ## 1.5.0 — refonte visuelle du produit
 
 - nouvelle direction visuelle locale, sobre et cohérente, sans modification des fonctionnalités métier ni du logo actuel ;

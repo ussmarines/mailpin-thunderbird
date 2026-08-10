@@ -123,6 +123,36 @@
         "summary": "the redesigned UI/UX and visual direction were accepted in the user's Thunderbird"
       },
       "notes": "This evidence predates integration of origin/main 1.4.0 and must not be presented as runtime validation of the later integrated release tree."
+    },
+    {
+      "id": "thunderbird-153-scale-bench-1.5.1",
+      "result": "success",
+      "validated_commit": "1072e1a58b9d02aa0c5ca843ba800f5423a34fbc",
+      "validated_tree": "d2d052e0fbf9c58afffe90b9170c03b06d5079aa",
+      "validated_at": "2026-08-10T22:01:55+02:00",
+      "command": "GitHub Actions runtime: targeted --volumes 50, then --volumes 50,100,500,1000,2000",
+      "environment": {
+        "os": "Ubuntu 24.04.4",
+        "thunderbird": "153.0.1esr",
+        "geckodriver": "0.37.1",
+        "python": "3.12.13",
+        "node": "24.18.0"
+      },
+      "invalidates_on": [
+        "extension/**",
+        "tests/thunderbird/functional_bench.py",
+        "tests/test_thunderbird_test_bench.py",
+        "scripts/build.py",
+        "package.json"
+      ],
+      "evidence": {
+        "kind": "github-actions-real-thunderbird",
+        "run_id": 31426885156,
+        "artifact_id": 9077569989,
+        "artifact_sha256": "55f0593c8c385f5336f664fd6f6fcf1c0a14d3bc992621b8fba0f732a0c82dac",
+        "summary": "Targeted 50-pin case and full 50/100/500/1000/2000 matrix passed on real Thunderbird 153.0.1 ESR; zero timeouts and JavaScript exceptions; full pagination verified at 500/1000/2000."
+      },
+      "notes": "The harness was corrected to preserve the scope-total counter during search while validating the exact filtered-card count separately."
     }
   ]
 }

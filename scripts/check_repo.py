@@ -146,7 +146,7 @@ check(en_locale.get("brandSlogan", {}).get("message") == "Keep important mail wi
 
 required_root = [
     "AGENTS.md", "PROJECT_MEMORY.md", "BRANDING.md", "README.md", "README.en.md", "LICENSE", "NOTICE.md", "CHANGELOG.md",
-    "CONTRIBUTING.md", "CODE_OF_CONDUCT.md", "SECURITY.md", "SECURITY_PRODUCTION_RULES.md", "SECURITY_AUDIT_1.0.0.md", "SECURITY_AUDIT_1.1.0.md", "SECURITY_AUDIT_1.1.1.md", "SECURITY_AUDIT_1.2.0.md", "VALIDATION_REPORT_1.2.0.md", "PRIVACY.md", "ROADMAP.md", "SUPPORT.md", "docs/BUG_TRACKER.md",
+    "CONTRIBUTING.md", "CODE_OF_CONDUCT.md", "SECURITY.md", "SECURITY_PRODUCTION_RULES.md", f"SECURITY_AUDIT_{version}.md", f"VALIDATION_REPORT_{version}.md", "PRIVACY.md", "ROADMAP.md", "SUPPORT.md", "docs/BUG_TRACKER.md",
     "package.json", ".editorconfig", ".gitattributes", ".gitignore", "extension/AGENTS.md",
     "extension/api/pinInbox/AGENTS.md", "tests/AGENTS.md",
     "docs/PROJECT_STATE.json", "docs/ARCHITECTURE.md", "docs/CODEX_HANDOFF.md", "docs/IDENTITY_MIGRATION_REQUIRED.md", "docs/DATA_MODEL.md", "docs/DEBUGGING.md", "docs/SECURITY_BOUNDARY.md",

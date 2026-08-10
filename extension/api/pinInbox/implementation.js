@@ -1892,7 +1892,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       }
       this._data.savedViews = PIN_MODULES.PinSavedViews?.normalizeList(this._data.savedViews) || [];
       this._data.migration = {from: oldVersion, to: 7, completedAt: Date.now()};
-      this._settings.schemaVersion = 7; this._data.schemaVersion = 7;
+      this._settings.schemaVersion = PIN_MODULES.PinSettings.SCHEMA_VERSION; this._data.schemaVersion = 7;
       this._saveSettings(); this._saveData("migration-v7");
     }
   }
@@ -1951,8 +1951,8 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       try {
         const hdr = this._resolveCapturedHeader(item);
         if (!hdr) continue;
-        if (typeof item.flagged === "boolean") hdr.folder.markMessagesFlagged([hdr], item.flagged);
-        if (typeof item.read === "boolean") hdr.folder.markMessagesRead([hdr], item.read);
+        if (typeof item.flagged === "boolean") this._thunderbird?.messages?.markFlagged?.([hdr], item.flagged);
+        if (typeof item.read === "boolean") this._thunderbird?.messages?.markRead?.([hdr], item.read);
       } catch (error) {
         this._recordDiagnostic("warning", "Restauration partielle d’une action", error);
       }
@@ -2095,6 +2095,8 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
           defaultColor: getDefaultColor(accountKey),
           protocol: String(server.type || "unknown"),
           provider,
+          secure: Boolean(server.isSecure),
+          offlineSupport: Number(server.offlineSupportLevel || 0) >= 10,
           inboxes
         });
       } catch (error) {
@@ -2168,9 +2170,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         bucket.push(hdr);
         byFolder.set(hdr.folder, bucket);
       }
-      for (const [folder, headers] of byFolder) {
-        folder.markMessagesFlagged(headers, true);
-      }
+      this._thunderbird?.messages?.markFlagged?.([...byFolder.values()].flat(), true);
     }
     if (Array.isArray(configuration.rules)) {
       this._data.rules = configuration.rules.slice(0, MAX_RULES).map(normalizeRule).filter(Boolean);
@@ -2954,9 +2954,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       }
     }
     if (this._settings.pinMode === "nativeStar") {
-      for (const [folder, list] of byFolder) {
-        folder.markMessagesFlagged(list, Boolean(newState));
-      }
+      this._thunderbird?.messages?.markFlagged?.([...byFolder.values()].flat(), Boolean(newState));
     }
     for (const hdr of usable) this._recordActivity(newState ? "pin" : "unpin", trackingMode === "conversation" ? conversationStableKey(hdr) : messageStableKey(hdr), formatSubject(hdr));
     this._saveData(newState ? "pin" : "unpin");
@@ -2989,9 +2987,8 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       return false;
     }
     try {
-      const messages = folder.messages;
-      while (messages.hasMoreElements()) {
-        const hdr = messages.getNext().QueryInterface(Ci.nsIMsgDBHdr);
+      const {headers, truncated} = this._thunderbird?.messages?.listFolderHeaders?.(folder, MAX_API_INPUT_NODES) || {headers: [], truncated: false};
+      for (const hdr of headers) {
         const key = messageStableKey(hdr);
         const flagged = Boolean(hdr.flags & Ci.nsMsgMessageFlags.Marked);
         if (flagged) {
@@ -3002,6 +2999,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
           changed = this._removeReferenceByKey(key) || changed;
         }
       }
+      if (truncated) this._recordDiagnostic("warning", "Synchronisation de la boîte bornée à la limite de sécurité", null, {component: "messages"});
     } catch (error) {
       this._recordDiagnostic("warning", "Synchronisation partielle de la boîte", error);
     }
@@ -3206,7 +3204,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       }
     }
     if (this._settings.pinMode === "nativeStar") {
-      for (const [targetFolder, list] of byFolder) targetFolder.markMessagesFlagged(list, true);
+      this._thunderbird?.messages?.markFlagged?.([...byFolder.values()].flat(), true);
     }
 
     const dueAt = this._quickPresetDueAt(normalizedPreset, now);
@@ -3504,11 +3502,9 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       for (const inbox of account.inboxes) {
         try {
           const folder = this._thunderbird?.messages?.folderForURL?.(inbox.uri);
-          const messages = folder.messages;
-          while (messages.hasMoreElements()) {
-            const hdr = messages.getNext().QueryInterface(Ci.nsIMsgDBHdr);
-            if (hdr.flags & Ci.nsMsgMessageFlags.Marked) headers.push(hdr);
-          }
+          const scan = this._thunderbird?.messages?.listFolderHeaders?.(folder, MAX_API_INPUT_NODES) || {headers: [], truncated: false};
+          for (const hdr of scan.headers) if (hdr.flags & Ci.nsMsgMessageFlags.Marked) headers.push(hdr);
+          if (scan.truncated) this._recordDiagnostic("warning", "Import des étoiles borné à la limite de sécurité", null, {component: "messages"});
         } catch {
           // Ignore les dossiers indisponibles.
         }
@@ -3526,7 +3522,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         list.push(hdr);
         byFolder.set(hdr.folder, list);
       }
-      for (const [folder, list] of byFolder) folder.markMessagesFlagged(list, false);
+      this._thunderbird?.messages?.markFlagged?.([...byFolder.values()].flat(), false);
     }
     this._saveData();
     this._refreshAllStates(true);
@@ -3916,9 +3912,8 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       for(const folder of walkFolders(root)){
         if(options.accountKey&&account.key!==options.accountKey)continue;if(options.folderURI&&folder.URI!==options.folderURI)continue;
         try{
-          const messages=folder.messages;
-          while(messages.hasMoreElements()&&scanned<limit){
-            const hdr=messages.getNext().QueryInterface(Ci.nsIMsgDBHdr);
+          const scan=this._thunderbird?.messages?.listFolderHeaders?.(folder,limit-scanned)||{headers:[]};
+          for(const hdr of scan.headers){
             scanned++;
             const simulated=this._applyCustomRules(trigger,hdr,{simulate:true,rules:candidateRules});
             if (Array.isArray(simulated)) matches.push(...simulated);
@@ -4010,7 +4005,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     for(const hdr of headers){
       pendingChanged=this._consumePendingDeleteForHeader(hdr)||pendingChanged;
       this._applyBuiltInRule("delete",hdr);
-      for(const ref of this._referencesForHeader(hdr).filter(item=>item.trackingMode==="conversation")){Services.tm.dispatchToMainThread(()=>{if(!this._data.refs[ref.stableKey])return;this._conversationCache.delete(ref.stableKey);const remaining=this._conversationHeaders(hdr).filter(item=>item.folder?.msgDatabase?.containsKey(item.messageKey));if(remaining.length)this._updateConversationReference(ref,remaining[0]);else this._removeReferenceByKey(ref.stableKey);this._saveData("conversation-delete");this._refreshAllStates();});}
+      for(const ref of this._referencesForHeader(hdr).filter(item=>item.trackingMode==="conversation")){Services.tm.dispatchToMainThread(()=>{if(!this._data.refs[ref.stableKey])return;this._conversationCache.delete(ref.stableKey);const remaining=this._conversationHeaders(hdr).filter(item=>this._thunderbird?.messages?.headerExists?.(item));if(remaining.length)this._updateConversationReference(ref,remaining[0]);else this._removeReferenceByKey(ref.stableKey);this._saveData("conversation-delete");this._refreshAllStates();});}
     }
     if(pendingChanged){this._saveData("delete-confirmed");this._refreshAllStates();}
   }
@@ -4018,7 +4013,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     const sources=Array.from(srcHeaders||[]),targets=destHeaders?Array.from(destHeaders):[];
     const resolveDestination=src=>{
       if(!src||!destFolder)return null;
-      try{return src.messageId?destFolder.msgDatabase.getMsgHdrForMessageID(src.messageId):null;}catch{return null;}
+      return src.messageId ? this._thunderbird?.messages?.headerByMessageId?.(destFolder, src.messageId) || null : null;
     };
     const triggerForDestination=()=>destFolder?.flags&Ci.nsMsgFolderFlags.Trash?"delete":destFolder?.flags&Ci.nsMsgFolderFlags.Archive?"archive":"move";
     for(let i=0;i<sources.length;i++){
@@ -4043,7 +4038,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   _conversationHeaders(seed) {
     if(!seed)return[];const key=conversationStableKey(seed);const cached=this._conversationCache.get(key);if(cached&&Date.now()-cached.time<CONVERSATION_CACHE_MS)return cached.headers;
     const account=getAccountForFolder(seed.folder);const headers=[];const seedSignature=PIN_MODULES.PinIdentity?.signature(seed,accountKeyForFolder(seed.folder),formatSubject(seed),formatAuthor(seed));
-    if(account?.incomingServer?.rootFolder){for(const folder of walkFolders(account.incomingServer.rootFolder)){try{let count=0;const messages=folder.messages;while(messages.hasMoreElements()&&count++<20000){const hdr=messages.getNext().QueryInterface(Ci.nsIMsgDBHdr);const candidate=PIN_MODULES.PinIdentity?.signature(hdr,accountKeyForFolder(hdr.folder),formatSubject(hdr),formatAuthor(hdr));if((seedSignature&&candidate&&PIN_MODULES.PinIdentity?.sameConversation(seedSignature,candidate))||(isStrongConversationKey(key)&&conversationStableKey(hdr)===key))headers.push(hdr);}}catch{}}}
+    if(account?.incomingServer?.rootFolder){for(const folder of walkFolders(account.incomingServer.rootFolder)){try{const scan=this._thunderbird?.messages?.listFolderHeaders?.(folder,20000)||{headers:[]};for(const hdr of scan.headers){const candidate=PIN_MODULES.PinIdentity?.signature(hdr,accountKeyForFolder(hdr.folder),formatSubject(hdr),formatAuthor(hdr));if((seedSignature&&candidate&&PIN_MODULES.PinIdentity?.sameConversation(seedSignature,candidate))||(isStrongConversationKey(key)&&conversationStableKey(hdr)===key))headers.push(hdr);}}catch{}}}
     headers.sort((a,b)=>Number(b.date||0)-Number(a.date||0));this._conversationCache.set(key,{time:Date.now(),headers});return headers;
   }
 
@@ -4849,7 +4844,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         list.push(hdr);
         byFolder.set(hdr.folder, list);
       }
-      for (const [folder, list] of byFolder) folder.markMessagesRead(list, targetRead);
+      this._thunderbird?.messages?.markRead?.([...byFolder.values()].flat(), targetRead);
       this._showToastAll(targetRead ? "Message(s) marqué(s) comme lu(s)." : "Message(s) marqué(s) comme non lu(s).", false);
       this._refreshAllStates(true);
       return {count: usable.length, read: targetRead};
@@ -4888,9 +4883,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         this._pendingDeleteTimers.add(timer);
         timer.initWithCallback(()=>{for(const key of pendingKeys)this._pendingDeleteKeys.delete(key);this._pendingDeleteTimers.delete(timer);},120000,Ci.nsITimer.TYPE_ONE_SHOT);
       }
-      for (const [folder, list] of byFolder) {
-        folder.deleteMessages(list, about3Pane?.msgWindow || null, false, false, null, true);
-      }
+      this._thunderbird?.messages?.deleteMessages?.([...byFolder.values()].flat(), about3Pane?.msgWindow || null);
       this._showToastAll(`${usable.length} suppression(s) demandée(s).`, false);
       return {count: usable.length, requested: true};
     }
@@ -4919,6 +4912,8 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     let allHeader = null;
     let panelToggle = null;
     let editor = null;
+    let checklistItems = [];
+    let renderChecklist = () => {};
     let toastTimer = null;
     let searchText = "";
     let panelSmartView = "all";
@@ -5192,8 +5187,8 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       const checklistInput = createNode("input", "pin-mails-editor-checklist-input"); checklistInput.type = "text"; checklistInput.maxLength = PIN_MODULES.PinChecklists?.MAX_TEXT || 240; checklistInput.placeholder = t("panelChecklistPlaceholder");
       const checklistAdd = createNode("button", "secondary", t("panelChecklistAdd")); checklistAdd.type = "button";
       checklistAddRow.append(checklistInput, checklistAdd); checklistSection.append(checklistTitle, checklistList, checklistAddRow);
-      let checklistItems = [];
-      const renderChecklist = () => {
+      checklistItems = [];
+      renderChecklist = () => {
         checklistList.replaceChildren();
         for (const item of checklistItems) {
           const row = createNode("label", "pin-mails-editor-checklist-item");
@@ -5925,7 +5920,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
           if (this._settings.pinMode === "nativeStar") {
             const byFolder = new Map();
             for (const hdr of headers) { const bucket = byFolder.get(hdr.folder) || []; bucket.push(hdr); byFolder.set(hdr.folder, bucket); }
-            for (const [folder, bucket] of byFolder) folder.markMessagesFlagged(bucket, false);
+            this._thunderbird?.messages?.markFlagged?.([...byFolder.values()].flat(), false);
           }
           for (const key of keys) this._removeReferenceByKey(key);
           this._saveData();

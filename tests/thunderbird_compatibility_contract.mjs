@@ -129,6 +129,47 @@ assert.equal(compatibility.messages.accountNameForFolder(rootFolder), "Compte");
 assert.equal(Array.from(compatibility.messages.walkFolders(rootFolder), folder => folder.URI).join("|"), "mailbox://root|mailbox://child");
 assert.equal(compatibility.messages.folderForURL("mailbox://known")?.URI, "mailbox://known");
 
+const messageOps = [];
+const enumHeaders = [
+  {id: "enum-1", messageKey: 1, messageId: "id-1", QueryInterface() { return this; }},
+  {id: "enum-2", messageKey: 2, messageId: "id-2", QueryInterface() { return this; }},
+  {id: "enum-3", messageKey: 3, messageId: "id-3", QueryInterface() { return this; }},
+];
+const adapterFolder = {
+  URI: "mailbox://adapter",
+  get messages() {
+    let index = 0;
+    return {
+      hasMoreElements() { return index < enumHeaders.length; },
+      getNext() { return enumHeaders[index++]; },
+    };
+  },
+  msgDatabase: {
+    containsKey(key) { return key === 1; },
+    getMsgHdrForMessageID(id) { return enumHeaders.find(header => header.messageId === id) || null; },
+  },
+  markMessagesFlagged(headers, state) { messageOps.push(["flag", headers.map(item => item.id), state]); },
+  markMessagesRead(headers, state) { messageOps.push(["read", headers.map(item => item.id), state]); },
+  deleteMessages(headers, _win, deleteStorage, isMove, listener, allowUndo) {
+    messageOps.push(["delete", headers.map(item => item.id), deleteStorage, isMove, listener, allowUndo]);
+  },
+};
+for (const header of enumHeaders) header.folder = adapterFolder;
+const bounded = compatibility.messages.listFolderHeaders(adapterFolder, 2);
+assert.equal(Array.from(bounded.headers, item => item.id).join("|"), "enum-1|enum-2");
+assert.equal(bounded.truncated, true);
+assert.equal(compatibility.messages.headerExists(enumHeaders[0]), true);
+assert.equal(compatibility.messages.headerExists(enumHeaders[1]), false);
+assert.equal(compatibility.messages.headerByMessageId(adapterFolder, "id-2")?.id, "enum-2");
+assert.equal(compatibility.messages.markFlagged(enumHeaders.slice(0, 2), true), 2);
+assert.equal(compatibility.messages.markRead([enumHeaders[0]], false), 1);
+assert.equal(compatibility.messages.deleteMessages([enumHeaders[2]], null), 1);
+assert.equal(JSON.stringify(messageOps), JSON.stringify([
+  ["flag", ["enum-1", "enum-2"], true],
+  ["read", ["enum-1"], false],
+  ["delete", ["enum-3"], false, false, null, true],
+]));
+
 let added = 0;
 const registration = compatibility.messages.registerFolderListener({msgAdded() { added += 1; }});
 assert.equal(registration.registered, true);

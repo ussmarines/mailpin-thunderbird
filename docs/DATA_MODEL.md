@@ -94,7 +94,7 @@ Les vues sont calculées à partir des références et de l’état résolu du m
 
 ## Migrations et restaurations
 
-Le schéma logique paramètres/données courant est 7 ; le schéma SQLite physique reste 5 car les nouveaux champs sont contenus dans les payloads JSON et `state_data`. Une migration ou restauration doit :
+Le schéma logique courant est paramètres 8 / données 7 ; le schéma SQLite physique reste 5 car les nouveaux champs sont contenus dans les payloads JSON et `state_data`. Une migration ou restauration doit :
 
 1. valider format, version, collections, limites et clés ;
 2. créer une sauvegarde préalable obligatoire ;

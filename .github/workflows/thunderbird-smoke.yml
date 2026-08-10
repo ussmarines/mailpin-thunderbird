@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - refactor/thunderbird-integration-and-ux
+      - main
     paths:
       - ".github/workflows/thunderbird-smoke.yml"
       - "extension/**"

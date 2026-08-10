@@ -50,11 +50,10 @@ assert "dashboardTabCount" in HARNESS
 assert "runtime-cleanup-after-uninstall" in HARNESS
 assert "clean-reinstall" in HARNESS
 
-# The workflow is intentionally not a required main-branch push job yet. It
-# runs on this consolidation branch, PRs that touch runtime-sensitive paths,
-# and explicit manual dispatch while we establish reliability.
+# Runtime-sensitive changes are checked on PRs and again after integration on main;
+# manual dispatch remains available for explicit reruns.
 assert "workflow_dispatch:" in WORKFLOW
-assert "refactor/thunderbird-integration-and-ux" in WORKFLOW
+assert re.search(r"branches:\s*\n\s*- main", WORKFLOW)
 assert "pull_request:" in WORKFLOW
 assert 'THUNDERBIRD_VERSION: "153.0.1esr"' in WORKFLOW
 assert 'GECKODRIVER_VERSION: "0.37.1"' in WORKFLOW
@@ -106,6 +105,11 @@ for required_runtime_surface in [
     assert required_runtime_surface in BENCH
 assert '"args": ["-profile", str(profile)]' in BENCH
 assert "session-1-selected-account-runtime" in BENCH
+assert "const searchExpected = Number(scopeExpected.searchCount || 0);" in BENCH
+assert 'while (cards().length < searchExpected && list.querySelector(".pin-mails-load-more"))' in BENCH
+assert "selected-account search rendered ${searchable}" in BENCH
+assert "selected-account total preserved during search" in BENCH
+assert "selected-account search count ${searchable}" not in BENCH
 assert '("none", ())' in BENCH
 assert "selected-account-runtime-after-process-restart" in BENCH
 assert "A-and-C-settings-and-render-persistence" in BENCH

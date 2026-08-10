@@ -94,7 +94,7 @@ MailPerch suit Fluent 2 par ses jetons CSS locaux, sa hiérarchie, ses états et
 ## Stockage et migrations
 
 - base : `pin-mails-v2.sqlite` ;
-- schéma logique paramètres/données actuel : 7 ;
+- schéma logique actuel : paramètres 8 / données 7 ;
 - écritures incrémentales sérialisées ;
 - WAL, transactions, révision globale et horodatage par entité ;
 - fichier atomique de récupération ;

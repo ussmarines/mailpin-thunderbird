@@ -1,22 +1,22 @@
-# Publication de MailPerch 1.5.0
+# Publication de MailPerch 1.5.1
 
 ## Identité
 
 - **Nom :** MailPerch
 - **Nom complet :** MailPerch — Email Pins & Follow-up
-- **Version publique :** 1.5.0
+- **Version publique :** 1.5.1
 - **Sous-titre FR :** Épinglez, organisez et suivez vos e-mails dans Thunderbird.
 - **Subtitle EN:** Pin, organize and follow up on your emails in Thunderbird.
 - **Auteur public :** ussmarines
 - **Identifiant permanent :** `pin-mails@MailPerch.local`
-- **Compatibilité déclarée :** Thunderbird 128.0 à 153.*
+- **Compatibilité déclarée :** Thunderbird 153.0 à 153.*
 - **Licence :** MailPerch Source-Available License 1.1
 
 L’identifiant propre au produit doit conserver exactement la même casse et ne plus être modifié après signature ou publication.
 
 ## État de préparation
 
-La version 1.5.0 conserve le fonctionnement local, les permissions et les fonctions de 1.4.0. Elle harmonise les tokens Fluent locaux et la direction visuelle du Dashboard, des Options et du panneau des épingles, sans changer le logo ni ajouter de fonctionnalité métier. Les contrôles automatisés du dépôt couvrent la syntaxe, les ressources, les permissions, la CSP, l’absence de réseau, les contrats API, les migrations, les compteurs natifs, l’accessibilité, les modèles JavaScript/SQLite, le scan de secrets et le packaging.
+La version 1.5.1 conserve le fonctionnement local, les permissions et les fonctions de 1.4.0. Elle harmonise les tokens Fluent locaux et la direction visuelle du Dashboard, des Options et du panneau des épingles, sans changer le logo ni ajouter de fonctionnalité métier. Les contrôles automatisés du dépôt couvrent la syntaxe, les ressources, les permissions, la CSP, l’absence de réseau, les contrats API, les migrations, les compteurs natifs, l’accessibilité, les modèles JavaScript/SQLite, le scan de secrets et le packaging.
 
 Le banc fonctionnel réel a validé 50, 100, 500, 1 000 et 2 000 épingles. La portée multi-comptes a été validée avec vide=0, A=18, B=16, A+C=34 et A+B+C=50 ; la sauvegarde Options → panneau et les icônes clair/sombre ont été confirmées manuellement. La persistance automatisée entre deux processus avec une extension temporaire reste une limite du harness et n’est pas présentée comme un défaut produit.
 
@@ -26,8 +26,8 @@ La soumission Add-ons for Thunderbird reste une action manuelle : seul le portai
 
 Après `npm run ci` :
 
-- `dist/MailPerch_v1.5.0.xpi` — extension à téléverser ;
-- `dist/MailPerch_GitHub_Repository_v1.5.0.zip` — sources complètes pour review ;
+- `dist/MailPerch_v1.5.1.xpi` — extension à téléverser ;
+- `dist/MailPerch_GitHub_Repository_v1.5.1.zip` — sources complètes pour review ;
 - `dist/SHA256SUMS.txt` — empreintes des deux archives ;
 - `release/ATN_REVIEW_NOTES_TEMPLATE.md` — informations de test et justification de l’Experiment ;
 - `release/BUILD_INSTRUCTIONS.md` — reproduction exacte du build.

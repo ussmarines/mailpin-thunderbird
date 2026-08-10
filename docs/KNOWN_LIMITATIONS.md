@@ -1,14 +1,14 @@
 # Limites connues
 
-## Version 1.3.0 et portée de validation
+## Version 1.5.1 et portée de validation
 
-La version **1.3.0** livre la consolidation Thunderbird et Options. L’utilisateur a effectué le 8 août 2026 une passe réelle de la 1.2.1 sur son Thunderbird sans anomalie signalée ; la 1.3.0 bénéficie en plus des validations automatisées, de la revue Codex et du smoke Thunderbird 153.0.1 ESR. Cela ne remplace pas une matrice exhaustive par système, version, fournisseur, type de dossier et calendrier.
+La version **1.5.1** est corrective : elle modifie du code privilégié de l’éditeur et de l’adaptateur Messages, donc les preuves runtime antérieures ne sont pas extrapolées à ces chemins. Les validations fraîches de cette release sont consignées dans `VALIDATION_REPORT_1.5.1.md`.
 
-La branche `refactor/thunderbird-integration-and-ux` a été revue par Codex et validée par la CI GitHub ainsi que par le smoke Thunderbird réel. Les scénarios fournisseurs/OS/zoom/accessibilité qui restent manuels sont détaillés ci-dessous et doivent être distingués de cette validation automatisée.
+Une matrice exhaustive de tous les systèmes, versions Thunderbird, fournisseurs réels, types de dossiers, calendriers, lecteurs d’écran et configurations de profil reste hors de portée d’un banc automatisé unique. Les éléments non observés sont conservés comme limites explicites plutôt que déclarés fonctionnels par supposition.
 
 ## Compatibilité Thunderbird
 
-- Le manifeste déclare Thunderbird `128.0` à `153.*`, mais tous les points internes ne sont pas automatiquement prouvés sur chaque version de cette plage.
+- Le manifeste 1.5.1 déclare Thunderbird `153.0` à `153.*`. Les essais exhaustifs du 10 août 2026 ont volontairement retiré 128/140 de la plage supportée : le panneau s’y injecte après activation, mais l’ouverture du Dashboard via le pont MV3 Experiment → background n’y est pas fiable. La release ne revendique donc pas ces versions.
 - MailPerch utilise une API Experiment privilégiée. Une évolution interne de Thunderbird peut donc exiger une adaptation même si les APIs WebExtension publiques restent compatibles.
 - Les opérations Messages, Tags et Agenda sont désormais isolées dans des adaptateurs dédiés ; cela réduit la surface d’adaptation future mais ne supprime pas la nécessité des tests réels.
 - Le DOM `about:3pane`, la structure `ThreadCard`, les fenêtres et menus natifs restent orchestrés dans `implementation.js`. Cette zone est volontairement extraite progressivement plutôt que réécrite en bloc.

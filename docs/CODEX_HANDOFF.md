@@ -1,54 +1,35 @@
-# Passage de relais Codex — MailPerch 1.5.0
+# Passage de relais Codex — MailPerch 1.5.1
 
-Ce fichier décrit la branche active de refonte visuelle. Lire d’abord `docs/IDENTITY_MIGRATION_REQUIRED.md`, `PROJECT_MEMORY.md`, puis uniquement les sources et tests utiles au diff contre `main`.
+## Référence
 
-## Référence Git
+- source de vérité après publication : `main` ;
+- base de la passe exhaustive : `c87a46de4141e09f2e0b29c0ec6996b2693fc2b1` (1.5.0) ;
+- branche de travail : `audit/full-release-hardening-2026-08-10` jusqu’à fusion ;
+- version préparée : **1.5.1** ;
+- identifiant canonique : `pin-mails@MailPerch.local`.
 
-- version préparée pour publication : **1.5.0** ;
-- base intégrée : `origin/main` = `4f73efddc4a515a2a1a3d864050f4aa676e2072d` (MailPerch 1.4.0) ;
-- branche : `codex/ui-ux-product-redesign` ;
-- publication complète autorisée par l’utilisateur après validation : push, PR, squash merge, tag `v1.5.0`, release et nettoyage de cette branche ;
-- ne contourner aucun ruleset ni check GitHub.
+## Objet de 1.5.1
 
-## Objectif de la branche
+Release corrective et de durcissement après diagnostic Thunderbird 153.0.2 :
 
-Publier la nouvelle direction visuelle locale de MailPerch :
+- réparer l’éditeur de carte/checklist ;
+- terminer la frontière `PinCompatibility.messages` ;
+- réaligner Settings schéma 8 / Data schéma 7 ;
+- fiabiliser les indicateurs `secure`/offline du diagnostic fournisseur ;
+- refaire les validations code, sécurité, runtime et release sur l’arbre final ;
+- resynchroniser documentation, README, checklist ATN et livrables.
 
-- harmoniser les tokens Fluent locaux ;
-- restructurer visuellement le Dashboard ;
-- simplifier les Options et réduire la cardification ;
-- harmoniser le panneau des épingles ;
-- préserver le logo, la hiérarchie, le focus, le contraste, le responsive, les thèmes et la réduction du mouvement.
+Aucune fonction métier, permission WebExtension, dépendance runtime ou connexion réseau n’est ajoutée.
 
-Cette release ne crée aucune fonctionnalité métier et ne modifie ni permission, ni dépendance runtime, ni connexion réseau, ni schéma de données.
+## Preuves exigées avant publication
 
-## Surfaces du redesign
+1. `npm run ci` sur l’arbre final ;
+2. deux inventaires exhaustifs indépendants de tous les fichiers suivis ;
+3. audit sécurité standard avec garde historique, Gitleaks, Opengrep, Trivy/SBOM et zizmor ;
+4. smoke Thunderbird réel sur la version cible ;
+5. banc fonctionnel/charge réel quand le runtime privilégié change ;
+6. CI GitHub Linux/Windows verte ;
+7. build reproductible, XPI/ZIP source et SHA-256 ;
+8. PR vers `main`, squash conforme au ruleset, puis tag/release sur le SHA fusionné.
 
-- `extension/styles/tokens.css` ;
-- `extension/dashboard/dashboard.css` ;
-- `extension/options/options.css` ;
-- `extension/styles/pin.css`.
-
-Les évolutions fonctionnelles/runtime de `main` 1.4.0 restent prioritaires hors de ces choix visuels.
-
-## Preuves disponibles
-
-Avant l’intégration de `main` :
-
-- `npm run ci` vert ;
-- scénario Dashboard avec 7 vues, 9 statistiques, action groupée et absence de débordement à 720 px ;
-- inspection visuelle Dashboard et Options ;
-- XPI du redesign validé manuellement par l’utilisateur dans Thunderbird.
-
-L’intégration de `main` et la préparation 1.5.0 imposent une nouvelle passe finale `npm run ci` et les contrôles UI ciblés nécessaires. La validation utilisateur du XPI ne doit pas être étendue aux changements ultérieurs non observés dans Thunderbird.
-
-## Sortie attendue
-
-La release est terminée uniquement quand :
-
-- la PR unique vers `main` est fusionnée par la méthode autorisée ;
-- le tag annoté `v1.5.0` pointe sur le commit exact de `main` issu de la fusion ;
-- le workflow Release est vert ;
-- la release GitHub `MailPerch 1.5.0` contient l’XPI, le ZIP dépôt et `SHA256SUMS.txt` ;
-- le dépôt local termine sur `main`, synchronisé avec `origin/main`, worktree propre ;
-- seule la branche de redesign devenue inutile est supprimée.
+Les résultats réellement obtenus sont consignés dans `SECURITY_AUDIT_1.5.1.md`, `VALIDATION_REPORT_1.5.1.md` et `docs/AI_VALIDATION_STATE.json`.
