@@ -154,7 +154,7 @@ assert "flex: 0 1 150px;" in css
 assert 'url("../icons/pin-filled.svg")' in css
 assert 'url("../icons/pin.svg")' not in css
 assert 'url("../icons/conversation.svg")' not in css
-assert "max-block-size: min(65vh, var(--pin-mails-max-height));" in css
+assert "max-block-size: min(calc(100vh - 96px), var(--pin-mails-max-height));" in css
 assert "selectedAccounts" in impl
 assert "matchesPanelScope(this._settings, ref, folder.URI)" in impl
 assert "selectedAccountKeys" in settings_js and "function matchesPanelScope" in settings_js

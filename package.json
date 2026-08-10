@@ -1,6 +1,6 @@
 {
   "name": "mailperch-thunderbird",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "private": true,
   "description": "Build, test, and release tooling for MailPerch, a Thunderbird email pinning and follow-up extension.",
   "author": "ussmarines",

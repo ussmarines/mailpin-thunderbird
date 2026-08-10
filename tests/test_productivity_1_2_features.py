@@ -115,3 +115,9 @@ assert '"enableThunderbirdTagSync"' in options_js
 assert 'buttonHelpSyncTags' in options_js
 
 print("MailPerch productivity 1.2 feature guards: OK")
+
+# 1.5.2 runtime-coverage regressions.
+assert 'function msg(key, fallback, substitutions = undefined)' in dashboard_js
+assert 'getMessage(key, values)' in dashboard_js
+assert 'msg("checklistProgress", "Sous-tâches · $1/$2",' in dashboard_js
+assert 'msg("healthSummary", "$1 point(s) détecté(s) · $2 événement(s) diagnostic récent(s).",' in dashboard_js

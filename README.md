@@ -6,7 +6,7 @@
 **Épinglez, organisez et suivez vos e-mails importants dans Thunderbird.**
 
 [![QA](https://github.com/ussmarines/mailperch-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailperch-thunderbird/actions/workflows/ci.yml)
-![Release](https://img.shields.io/badge/release-v1.5.1-0078D4)
+![Release](https://img.shields.io/badge/release-v1.5.2-0078D4)
 ![Licence](https://img.shields.io/badge/licence-MailPerch%20Source--Available%201.1-6A5ACD)
 </div>
 
@@ -30,7 +30,7 @@ MailPerch ajoute à Thunderbird un panneau d’épingles distinct au-dessus de l
 
 ## Compatibilité
 
-- **MailPerch :** `1.5.1` ;
+- **MailPerch :** `1.5.2` ;
 - **Thunderbird :** `153.0` à `153.*` ;
 - **Format :** MailExtension Manifest V3 ;
 - **Langues :** français et anglais ;
@@ -46,12 +46,12 @@ Les accès internes Messages, Tags et Agenda sont isolés derrière une couche d
 
 ### Depuis une release GitHub
 
-1. Téléchargez `MailPerch_v1.5.1.xpi` depuis la release `v1.5.1`.
+1. Téléchargez `MailPerch_v1.5.2.xpi` depuis la release `v1.5.2`.
 2. Dans Thunderbird, ouvrez **Extensions et thèmes**.
 3. Dans le menu de l’engrenage, choisissez **Installer un module depuis un fichier**.
 4. Sélectionnez le fichier XPI, puis redémarrez Thunderbird si nécessaire.
 
-> Les anciennes builds internes `3.2.x` utilisaient un numéro supérieur aux versions publiques actuelles. Pour tester `1.5.1` après une build de développement, utilisez un profil de test propre ou désinstallez d’abord l’ancienne build après avoir exporté vos données MailPerch.
+> Les anciennes builds internes `3.2.x` utilisaient un numéro supérieur aux versions publiques actuelles. Pour tester `1.5.2` après une build de développement, utilisez un profil de test propre ou désinstallez d’abord l’ancienne build après avoir exporté vos données MailPerch.
 
 ### Depuis les sources
 
@@ -69,8 +69,8 @@ MailPerch fonctionne localement : aucun appel réseau, aucune télémétrie, auc
 
 - [Politique de confidentialité](PRIVACY.md)
 - [Politique de sécurité](SECURITY.md)
-- [Audit de sécurité 1.5.1](SECURITY_AUDIT_1.5.1.md)
-- [Rapport de validation 1.5.1](VALIDATION_REPORT_1.5.1.md)
+- [Audit de sécurité 1.5.2](SECURITY_AUDIT_1.5.2.md)
+- [Rapport de validation 1.5.2](VALIDATION_REPORT_1.5.2.md)
 - [Limites connues](docs/KNOWN_LIMITATIONS.md)
 
 ## Documentation et support

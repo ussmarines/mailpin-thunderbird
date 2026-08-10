@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "purpose": "Cache machine-readable des dernières preuves de validation réutilisables. Ce fichier ne remplace ni AGENTS.md ni les règles de sécurité et ne doit jamais servir à inventer un test non exécuté.",
-  "recorded_at": "2026-08-09T19:16:02+02:00",
+  "recorded_at": "2026-08-11T00:58:00+02:00",
   "baseline": {
     "repository": "ussmarines/mailperch-thunderbird",
-    "branch": "codex/ui-ux-product-redesign",
-    "commit_sha": "11aeff3eeff9234f46624c95489c5474cf003ff3",
-    "tree_sha": "1fd7aac42ea85981b2ce0ba45a5cc66a322e71b2"
+    "branch": "release/1.5.2-runtime-coverage",
+    "commit_sha": "9dc1ed4037362f42841f7fc4ed8fbd3dd75c9c80",
+    "tree_sha": "9b424390a9f906ca79d70e8c22690bd5c0607103"
   },
   "policy": {
     "mode": "latest-valid-evidence-only",
@@ -31,52 +31,29 @@
   },
   "repository_checks": [
     {
-      "id": "local-windows-full",
+      "id": "github-linux-release-ci-1.5.2",
       "result": "success",
-      "validated_commit": "11aeff3eeff9234f46624c95489c5474cf003ff3",
-      "validated_tree": "1fd7aac42ea85981b2ce0ba45a5cc66a322e71b2",
-      "validated_at": "2026-08-09T19:08:00+02:00",
+      "validated_commit": "9dc1ed4037362f42841f7fc4ed8fbd3dd75c9c80",
+      "validated_tree": "9b424390a9f906ca79d70e8c22690bd5c0607103",
+      "validated_at": "2026-08-11T00:53:42+02:00",
       "command": "npm run ci",
       "environment": {
-        "os": "Microsoft Windows 11 Professionnel 10.0.26200 64 bits",
-        "node": "24.19.0",
-        "npm": "11.17.0",
-        "python": "3.14.6"
+        "os": "Ubuntu 24.04.4",
+        "node": "24.18.0",
+        "npm": "11.16.0",
+        "python": "3.12.13"
       },
       "invalidates_on": [
         "**"
       ],
       "evidence": {
-        "kind": "local-command",
-        "summary": "check, complete test suite, reproducible-build guard and 1.5.0 packaging passed; XPI, repository ZIP and SHA256SUMS.txt were produced"
+        "kind": "github-actions",
+        "run_id": 31440019097,
+        "summary": "Full check, complete test suite, reproducible build and 1.5.2 packaging passed before the real Thunderbird smoke and functional matrices."
       }
     }
   ],
   "targeted_checks": [
-    {
-      "id": "dashboard-playwright-dom-flow",
-      "result": "success",
-      "validated_commit": "11aeff3eeff9234f46624c95489c5474cf003ff3",
-      "validated_tree": "1fd7aac42ea85981b2ce0ba45a5cc66a322e71b2",
-      "validated_at": "2026-08-09T19:11:00+02:00",
-      "command": "playwright-cli -s=mailperch-dashboard run-code --filename tests/dashboard_dom_flow.playwright.js",
-      "environment": {
-        "os": "Microsoft Windows 11 Professionnel 10.0.26200 64 bits",
-        "browser": "Chromium",
-        "playwright_cli": "0.1.18"
-      },
-      "invalidates_on": [
-        "extension/dashboard/**",
-        "extension/styles/tokens.css",
-        "extension/_locales/**",
-        "tests/dashboard_dom_flow.playwright.js"
-      ],
-      "evidence": {
-        "kind": "local-browser-flow",
-        "summary": "7 views, 9 statistics, 11 rendered cards, one bulk action, dark and reduced-motion support, and no horizontal overflow at 720 px; final screenshot visually inspected"
-      },
-      "notes": "The repository test temporarily used an isolated local server on port 8766 because port 8765 belonged to an unrelated user process. Only the base URL constant changed during execution and was restored immediately afterward. The only console error was the test server favicon 404."
-    },
     {
       "id": "options-playwright-dom-flow",
       "result": "success",
@@ -103,34 +80,10 @@
       "notes": "The repository test temporarily used an isolated local server on port 8766 because port 8765 belonged to an unrelated user process. Only the base URL constant changed during execution and was restored immediately afterward."
     },
     {
-      "id": "user-thunderbird-redesign-xpi",
       "result": "success",
-      "validated_commit": "46dc82b227fb473be6dc0007ed698e607f23685b",
-      "validated_tree": "6550805213ec97fdc78ecd43d7949a7a0d24f2be",
-      "validated_at": "2026-08-09T00:00:00+02:00",
-      "command": "manual XPI validation supplied by the user",
-      "environment": {
-        "application": "Thunderbird",
-        "observer": "user"
-      },
-      "invalidates_on": [
-        "extension/**",
-        "package.json",
-        "scripts/build.py"
-      ],
-      "evidence": {
-        "kind": "user-manual",
-        "summary": "the redesigned UI/UX and visual direction were accepted in the user's Thunderbird"
-      },
-      "notes": "This evidence predates integration of origin/main 1.4.0 and must not be presented as runtime validation of the later integrated release tree."
-    },
-    {
-      "id": "thunderbird-153-scale-bench-1.5.1",
-      "result": "success",
-      "validated_commit": "1072e1a58b9d02aa0c5ca843ba800f5423a34fbc",
-      "validated_tree": "d2d052e0fbf9c58afffe90b9170c03b06d5079aa",
-      "validated_at": "2026-08-10T22:01:55+02:00",
-      "command": "GitHub Actions runtime: targeted --volumes 50, then --volumes 50,100,500,1000,2000",
+      "validated_commit": "9dc1ed4037362f42841f7fc4ed8fbd3dd75c9c80",
+      "validated_tree": "9b424390a9f906ca79d70e8c22690bd5c0607103",
+      "validated_at": "2026-08-11T00:53:42+02:00",
       "environment": {
         "os": "Ubuntu 24.04.4",
         "thunderbird": "153.0.1esr",
@@ -138,6 +91,40 @@
         "python": "3.12.13",
         "node": "24.18.0"
       },
+      "id": "thunderbird-153-runtime-coverage-1.5.2",
+      "command": "GitHub Actions real Thunderbird smoke + functional --volumes 50",
+      "invalidates_on": [
+        "extension/**",
+        "tests/thunderbird/real_smoke.py",
+        "tests/thunderbird/functional_bench.py",
+        "tests/test_thunderbird_test_bench.py",
+        "tests/test_productivity_1_2_features.py",
+        "tests/test_ui_regressions.py",
+        "scripts/build.py",
+        "package.json"
+      ],
+      "evidence": {
+        "kind": "github-actions-real-thunderbird",
+        "run_id": 31440019097,
+        "artifact_id": 9082531880,
+        "artifact_sha256": "d007ed1287bc563021566ab1231c343b8cc37d0aff1458fc6ccd7773f4cb97e0",
+        "summary": "Real 1.5.2 XPI smoke passed; 50-pin run exercised Dashboard/Options DOM, native XUL editor actions, cleanup/reinstall, light/dark clipping/alignment and baseline text contrast with zero MailPerch JavaScript exceptions."
+      }
+    },
+    {
+      "result": "success",
+      "validated_commit": "9dc1ed4037362f42841f7fc4ed8fbd3dd75c9c80",
+      "validated_tree": "9b424390a9f906ca79d70e8c22690bd5c0607103",
+      "validated_at": "2026-08-11T00:53:42+02:00",
+      "environment": {
+        "os": "Ubuntu 24.04.4",
+        "thunderbird": "153.0.1esr",
+        "geckodriver": "0.37.1",
+        "python": "3.12.13",
+        "node": "24.18.0"
+      },
+      "id": "thunderbird-153-scale-bench-1.5.2",
+      "command": "GitHub Actions runtime --volumes 50,100,500,1000,2000",
       "invalidates_on": [
         "extension/**",
         "tests/thunderbird/functional_bench.py",
@@ -147,12 +134,41 @@
       ],
       "evidence": {
         "kind": "github-actions-real-thunderbird",
-        "run_id": 31426885156,
-        "artifact_id": 9077569989,
-        "artifact_sha256": "55f0593c8c385f5336f664fd6f6fcf1c0a14d3bc992621b8fba0f732a0c82dac",
-        "summary": "Targeted 50-pin case and full 50/100/500/1000/2000 matrix passed on real Thunderbird 153.0.1 ESR; zero timeouts and JavaScript exceptions; full pagination verified at 500/1000/2000."
+        "run_id": 31440019097,
+        "artifact_id": 9082531880,
+        "artifact_sha256": "d007ed1287bc563021566ab1231c343b8cc37d0aff1458fc6ccd7773f4cb97e0",
+        "summary": "50/100/500/1000/2000 pin matrix passed; pagination fully loaded 500/1000/2000 without duplicates and with zero timeouts or MailPerch JavaScript exceptions."
+      }
+    },
+    {
+      "result": "success",
+      "validated_commit": "9dc1ed4037362f42841f7fc4ed8fbd3dd75c9c80",
+      "validated_tree": "9b424390a9f906ca79d70e8c22690bd5c0607103",
+      "validated_at": "2026-08-11T00:53:42+02:00",
+      "environment": {
+        "os": "Ubuntu 24.04.4",
+        "thunderbird": "153.0.1esr",
+        "geckodriver": "0.37.1",
+        "python": "3.12.13",
+        "node": "24.18.0"
       },
-      "notes": "The harness was corrected to preserve the scope-total counter during search while validating the exact filtered-card count separately."
+      "id": "thunderbird-153-persistence-1.5.2",
+      "command": "GitHub Actions runtime --scope-validation-only",
+      "invalidates_on": [
+        "extension/**",
+        "tests/thunderbird/real_smoke.py",
+        "tests/thunderbird/functional_bench.py",
+        "tests/test_thunderbird_test_bench.py",
+        "scripts/build.py",
+        "package.json"
+      ],
+      "evidence": {
+        "kind": "github-actions-real-thunderbird",
+        "run_id": 31440019097,
+        "artifact_id": 9082531880,
+        "artifact_sha256": "d007ed1287bc563021566ab1231c343b8cc37d0aff1458fc6ccd7773f4cb97e0",
+        "summary": "none/A-only/B-only/A+C/A+B+C all passed across two distinct Thunderbird processes on the same exact disposable profile with permanent add-on persistence, SQLite/settings preservation and natural MV3 wake; A+C restored 34 pins with B absent."
+      }
     }
   ]
 }

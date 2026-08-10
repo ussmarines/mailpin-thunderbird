@@ -24,6 +24,8 @@ assert 'PANEL_ID = "pin-mails-panel"' in HARNESS
 assert 'TOGGLE_ID = "pin-mails-qfb-toggle"' in HARNESS
 assert 'SMOKE_FOLDER_NAME = "MailPerch Smoke"' in HARNESS
 assert "/moz/addon/install" in HARNESS
+assert "temporary: bool = True" in HARNESS
+assert '"temporary": bool(temporary)' in HARNESS
 assert "/moz/addon/uninstall" in HARNESS
 assert "/moz/context" in HARNESS
 assert "PROVISION_MAIL_VIEW_SCRIPT" in HARNESS
@@ -122,6 +124,24 @@ assert 'SEED_DATASET_SCRIPT, [50, []]' in BENCH
 assert '"account1,account2,account3"' in BENCH
 assert '"server1,server2,server3"' in BENCH
 assert "Profile retained:" in BENCH
+assert "editMenuItem.doCommand()" in BENCH
+assert "REMOTE_TAB_ASYNC_SCRIPT" in BENCH
+assert "MarionetteCommands" in BENCH
+assert "OPEN_OPTIONS_CONTENT_SCRIPT" in BENCH
+assert "runtime.openOptionsPage" in BENCH
+assert "dashboard-dom-runtime" in BENCH
+assert "options-dom-runtime" in BENCH
+assert "theme-geometry-and-contrast" in BENCH
+assert "contrastRatios" in BENCH
+assert "ordinaryTwoFit" in BENCH
+assert "ordinaryCardHeights" in BENCH
+assert "listClientHeight" in BENCH
+assert "temporary=False" in BENCH
+assert "persistent-addon-loaded-after-restart" in BENCH
+assert "WAKE_PERSISTED_EXTENSION_SCRIPT" in BENCH
+assert "natural-tab-activation-wake" in BENCH
+assert "internal Dashboard and Options tabs are not exposed" not in BENCH
+assert "untrusted synthetic XUL menuitem commands" not in BENCH
 assert "userDisabled" not in BENCH
 assert '"results.json"' in BENCH
 

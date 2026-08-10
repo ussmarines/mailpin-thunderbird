@@ -24,8 +24,19 @@ const ACTION_MESSAGES = Object.freeze({
   snooze: ["dashboardActionSnooze", "Message mis en veille."], wake: ["dashboardActionWake", "Message réveillé."], dismissReminder: ["dashboardActionDismissReminder", "Rappel ignoré."]
 });
 
-function msg(key, fallback) {
-  try { return api.i18n.getMessage(key) || fallback; } catch { return fallback; }
+function msg(key, fallback, substitutions = undefined) {
+  const values = substitutions === undefined
+    ? undefined
+    : (Array.isArray(substitutions) ? substitutions : [substitutions]);
+  try {
+    const localized = api.i18n.getMessage(key, values);
+    if (localized) return localized;
+  } catch {}
+  if (values === undefined) return fallback;
+  return values.reduce(
+    (text, value, index) => String(text).split(`$${index + 1}`).join(String(value ?? "")),
+    String(fallback || "")
+  );
 }
 
 function safeErrorName(error) {
@@ -100,7 +111,7 @@ function checklistElement(item) {
   const stats = item.checklistStats || {total: 0, completed: 0, pending: 0};
   if (!stats.total) return null;
   const host = node("div", "item-checklist");
-  const title = node("div", "item-checklist-title", msg("checklistProgress", "Sous-tâches · $1/$2").replace("$1", stats.completed).replace("$2", stats.total));
+  const title = node("div", "item-checklist-title", msg("checklistProgress", "Sous-tâches · $1/$2", [displayCount(stats.completed), displayCount(stats.total)]));
   host.append(title);
   const list = node("div", "item-checklist-list");
   const visible = (item.checklist || []).filter(entry => !entry.completed).slice(0, 4);
@@ -240,7 +251,7 @@ function badgesFor(item) {
   badge(host, item.responseState === "needsReply", msg("needsReply", "Je dois répondre"), "reply-needed");
   badge(host, item.workflowStatus === "waiting", msg("statusWaiting", "En attente"), "waiting");
   badge(host, item.workflowStatus === "planned", msg("statusPlanned", "Planifié"), "planned");
-  badge(host, Number(item.snoozeUntil || 0) > Date.now(), msg("snoozedUntil", "En veille jusqu’au $1").replace("$1", formatDate(item.snoozeUntil)), "snoozed");
+  badge(host, Number(item.snoozeUntil || 0) > Date.now(), msg("snoozedUntil", "En veille jusqu’au $1", [formatDate(item.snoozeUntil)]), "snoozed");
   badge(host, item.noReplyTracking, item.noReplyAt && item.noReplyAt <= Date.now()
     ? msg("noReplyDue", "Sans réponse · à relancer")
     : `${msg("noReplyTracking", "Sans réponse")} · ${formatDate(item.noReplyAt)}`, "no-reply");
@@ -262,7 +273,7 @@ function badgesFor(item) {
 function updateSelectionBar() {
   const count = selected.size;
   $("selection-bar").hidden = count === 0 || configuration?.settings?.enableBulkActions === false;
-  $("selection-count").textContent = msg(count === 1 ? "selectedMessageOne" : "selectedMessageMany", count === 1 ? "1 message sélectionné" : "$1 messages sélectionnés").replace("$1", count);
+  $("selection-count").textContent = msg(count === 1 ? "selectedMessageOne" : "selectedMessageMany", count === 1 ? "1 message sélectionné" : "$1 messages sélectionnés", count === 1 ? undefined : [displayCount(count)]);
   for (const input of document.querySelectorAll('.item input[type="checkbox"]')) {
     const card = input.closest(".item");
     input.checked = selected.has(card?.dataset.key || "");
@@ -280,7 +291,7 @@ function createCard(item, {compact = false, selectable = true} = {}) {
     const check = document.createElement("input");
     check.type = "checkbox";
     check.checked = selected.has(item.stableKey);
-    check.setAttribute("aria-label", msg("selectMessage", "Sélectionner $1").replace("$1", item.subject || msg("thisMessage", "ce message")));
+    check.setAttribute("aria-label", msg("selectMessage", "Sélectionner $1", [item.subject || msg("thisMessage", "ce message")]));
     check.addEventListener("click", event => {
       const key = item.stableKey;
       if (event.shiftKey && lastSelectedKey && lastSelectedKey !== key) {
@@ -400,7 +411,7 @@ function commandDefinitions() {
     {label: msg("viewReview", "Revue"), run: () => { current.view="review"; current.savedViewId=""; return load({silent:true}); }},
     {label: msg("searchPins", "Rechercher"), run: () => $("search").focus()},
     {label: msg("saveCurrentView", "Enregistrer la vue"), run: openSavedViewDialog},
-    configuration?.settings?.enableThunderbirdTagSync ? {label: msg("syncTags", "Synchroniser les tags"), run: async () => { const result=await api.pinInbox.syncTags([]); setStatus(msg("tagSyncComplete", "Tags synchronisés : $1 message(s), $2 erreur(s).").replace("$1",result.synced||0).replace("$2",result.errors||0), result.errors ? "error" : "success"); }} : null,
+    configuration?.settings?.enableThunderbirdTagSync ? {label: msg("syncTags", "Synchroniser les tags"), run: async () => { const result=await api.pinInbox.syncTags([]); setStatus(msg("tagSyncComplete", "Tags synchronisés : $1 message(s), $2 erreur(s).", [displayCount(result.synced), displayCount(result.errors)]), result.errors ? "error" : "success"); }} : null,
     {label: msg("settings", "Paramètres"), run: () => api.runtime.openOptionsPage()}
   ].filter(Boolean);
 }
@@ -493,7 +504,7 @@ function renderToday() {
   const hero = node("header", "board-intro");
   const copy = node("div", "");
   copy.append(node("h2", "", msg("todayHeading", "Votre journée")), node("p", "", msg("todayIntro", "Les messages qui demandent une action aujourd’hui, regroupés par priorité de suivi.")));
-  hero.append(copy, node("strong", "board-total", msg("reviewActionable", "$1 élément(s) demandent votre attention.").replace("$1", displayCount(plan.actionable))));
+  hero.append(copy, node("strong", "board-total", msg("reviewActionable", "$1 élément(s) demandent votre attention.", [displayCount(plan.actionable)])));
   host.append(hero);
   let visible = 0;
   for (const id of ["overdue", "today", "noReply", "waking"]) {
@@ -599,7 +610,7 @@ function renderCases() {
     const card = node("article", "case-card");
     card.style.setProperty("--case-color", caseItem.color || "var(--accent)");
     card.append(node("h2", "", caseItem.name || msg("case", "Affaire")));
-    card.append(node("p", "case-meta", `${msg("messageCount", "$1 message(s)").replace("$1", refs.length)} · ${caseItem.status || "active"}${caseItem.dueAt ? ` · ${formatDate(caseItem.dueAt)}` : ""}`));
+    card.append(node("p", "case-meta", `${msg("messageCount", "$1 message(s)", [displayCount(refs.length)])} · ${caseItem.status || "active"}${caseItem.dueAt ? ` · ${formatDate(caseItem.dueAt)}` : ""}`));
     if (caseItem.note) card.append(node("p", "", caseItem.note));
     const actions = node("div", "item-actions");
     const selectCase = actionButton("select-case", msg("selectMessages", "Sélectionner les messages"));
@@ -632,11 +643,11 @@ function renderHealth() {
   score.append(node("strong", "", `${report.score || 0}/100`));
   const copy = node("div", "");
   copy.append(node("h2", "", report.status === "healthy" ? msg("healthHealthy", "MailPerch est en bonne santé") : report.status === "attention" ? msg("healthAttention", "Quelques points sont à surveiller") : msg("healthCritical", "Une intervention est recommandée")));
-  copy.append(node("p", "", msg("healthSummary", "$1 point(s) détecté(s) · $2 événement(s) diagnostic récent(s).").replace("$1", report.issues?.length || 0).replace("$2", current.diagnostics?.total || 0)));
+  copy.append(node("p", "", msg("healthSummary", "$1 point(s) détecté(s) · $2 événement(s) diagnostic récent(s).", [displayCount(report.issues?.length), displayCount(current.diagnostics?.total)])));
   const pinCount = displayCount(current.stats?.total);
   copy.append(node("p", "volume-guidance", pinCount >= 2000
-    ? msg("pinsBeyondRecommendedVolume", "$1 pins — beyond the currently validated volume.").replace("$1", formatCount(pinCount))
-    : msg("pinsWithinRecommendedVolume", "$1 / 2,000 recommended pins").replace("$1", formatCount(pinCount))));
+    ? msg("pinsBeyondRecommendedVolume", "$1 pins — beyond the currently validated volume.", [formatCount(pinCount)])
+    : msg("pinsWithinRecommendedVolume", "$1 / 2,000 recommended pins", [formatCount(pinCount)])));
   const actions = node("div", "item-actions");
   actions.classList.add("health-tools");
   actions.append(actionButton("health-refresh", msg("runHealthCheck", "Analyser")), actionButton("health-repair", msg("repairSafeIssues", "Réparer les anomalies sûres")), actionButton("provider-check", msg("checkProviders", "Tester les fournisseurs")), actionButton("diagnostic-export", msg("exportDiagnostic", "Exporter le diagnostic")), actionButton("diagnostic-clear", msg("clearDiagnostics", "Vider le journal")));
@@ -792,7 +803,7 @@ async function perform(keys, action, options = {}, {reload = true, control = nul
   if (destructive(action) && configuration?.settings?.confirmBulkDestructiveActions !== false) {
     const promptKey = action === "delete" ? "confirmBulkDelete" : action === "archive" ? "confirmBulkArchive" : "confirmBulkUnpin";
     const fallbackPrompt = action === "delete" ? "Supprimer ces $1 message(s) ?" : action === "archive" ? "Archiver ces $1 message(s) ?" : "Désépingler ces $1 message(s) ?";
-    if (!confirm(msg(promptKey, fallbackPrompt).replace("$1", safeKeys.length))) return null;
+    if (!confirm(msg(promptKey, fallbackPrompt, [displayCount(safeKeys.length)]))) return null;
   }
   setButtonBusy(control, true);
   setStatus(msg("actionInProgress", "Action en cours…"), "busy", {persistent: true});
@@ -801,7 +812,7 @@ async function perform(keys, action, options = {}, {reload = true, control = nul
     if (action !== "open" && action !== "reply") safeKeys.forEach(key => selected.delete(key));
     if (reload) await load({silent: true});
     const actionMessage = ACTION_MESSAGES[action];
-    setStatus(actionMessage ? msg(...actionMessage) : msg("itemsUpdated", "$1 élément(s) mis à jour.").replace("$1", result?.count || safeKeys.length), "success");
+    setStatus(actionMessage ? msg(...actionMessage) : msg("itemsUpdated", "$1 élément(s) mis à jour.", [displayCount(result?.count || safeKeys.length)]), "success");
     return result;
   } catch (error) {
     setStatus(failureMessage("actionFailed", "Action impossible", error), "error", {persistent: true});
@@ -843,7 +854,7 @@ async function refreshHealth(control = null) {
   try {
     current.health = await api.pinInbox.getHealthReport();
     renderHealth();
-    setStatus(msg("healthCheckComplete", "Analyse terminée : score $1/100.").replace("$1", current.health.score), "success");
+    setStatus(msg("healthCheckComplete", "Analyse terminée : score $1/100.", [displayCount(current.health.score)]), "success");
   } catch (error) { setStatus(failureMessage("healthCheckFailed", "Analyse impossible", error), "error", {persistent: true}); }
   finally { setButtonBusy(control, false); }
 }
@@ -864,7 +875,7 @@ async function handleActionClick(event) {
   if (action === "merge-related") {
     const group = (current?.relatedGroups || []).find(item => item.id === card?.dataset.relatedId);
     if (!group) return;
-    const prompt = msg("mergeRelatedConfirm", "Fusionner ces $1 épingles en une seule conversation ?").replace("$1", group.count);
+    const prompt = msg("mergeRelatedConfirm", "Fusionner ces $1 épingles en une seule conversation ?", [displayCount(group.count)]);
     if (!confirm(prompt)) return;
     setButtonBusy(control, true);
     setStatus(msg("mergeRelatedBusy", "Fusion de la conversation…"), "busy", {persistent: true});
@@ -988,7 +999,7 @@ function bindEvents() {
         const result = await api.pinInbox.repairHealthIssues({actions: ["orphan-links", "repair-references"]});
         current.health = result.health;
         await load({silent: true});
-        setStatus(msg("healthRepairComplete", "$1 élément(s) réparé(s).").replace("$1", result.repaired || 0), "success");
+        setStatus(msg("healthRepairComplete", "$1 élément(s) réparé(s).", [displayCount(result.repaired)]), "success");
       } catch (error) { setStatus(failureMessage("healthRepairFailed", "Réparation impossible", error), "error", {persistent: true}); }
       finally { setButtonBusy(control, false); }
     }

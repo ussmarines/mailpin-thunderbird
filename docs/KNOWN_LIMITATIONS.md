@@ -1,53 +1,54 @@
 # Limites connues
 
-## Version 1.5.1 et portée de validation
+## Version 1.5.2 et portée de validation
 
-La version **1.5.1** est corrective : elle modifie du code privilégié de l’éditeur et de l’adaptateur Messages, donc les preuves runtime antérieures ne sont pas extrapolées à ces chemins. Les validations fraîches de cette release sont consignées dans `VALIDATION_REPORT_1.5.1.md`.
+La version **1.5.2** est une release corrective de couverture runtime et de finition. Elle ne modifie ni la frontière privilégiée `PinCompatibility`, ni les permissions, ni les schémas de stockage. Les validations fraîches sont consignées dans `VALIDATION_REPORT_1.5.2.md`.
 
-Une matrice exhaustive de tous les systèmes, versions Thunderbird, fournisseurs réels, types de dossiers, calendriers, lecteurs d’écran et configurations de profil reste hors de portée d’un banc automatisé unique. Les éléments non observés sont conservés comme limites explicites plutôt que déclarés fonctionnels par supposition.
+Une matrice exhaustive de tous les systèmes, versions Thunderbird, fournisseurs réels, types de dossiers, calendriers, lecteurs d’écran et configurations de profil reste hors de portée d’un banc automatisé unique. Les éléments non observés restent explicitement documentés.
 
 ## Compatibilité Thunderbird
 
-- Le manifeste 1.5.1 déclare Thunderbird `153.0` à `153.*`. Les essais exhaustifs du 10 août 2026 ont volontairement retiré 128/140 de la plage supportée : le panneau s’y injecte après activation, mais l’ouverture du Dashboard via le pont MV3 Experiment → background n’y est pas fiable. La release ne revendique donc pas ces versions.
-- MailPerch utilise une API Experiment privilégiée. Une évolution interne de Thunderbird peut donc exiger une adaptation même si les APIs WebExtension publiques restent compatibles.
-- Les opérations Messages, Tags et Agenda sont désormais isolées dans des adaptateurs dédiés ; cela réduit la surface d’adaptation future mais ne supprime pas la nécessité des tests réels.
-- Le DOM `about:3pane`, la structure `ThreadCard`, les fenêtres et menus natifs restent orchestrés dans `implementation.js`. Cette zone est volontairement extraite progressivement plutôt que réécrite en bloc.
-- Les dossiers virtuels, actions supprimer/archiver et comportements de fournisseurs doivent toujours être observés dans les environnements réellement utilisés.
+- Le manifeste 1.5.2 déclare Thunderbird `153.0` à `153.*`.
+- MailPerch utilise une API Experiment privilégiée ; une évolution interne de Thunderbird peut exiger une adaptation.
+- Messages, Tags et Agenda restent isolés dans leurs adaptateurs dédiés.
+- Le DOM `about:3pane`, `ThreadCard`, les fenêtres et menus natifs restent des surfaces internes à surveiller.
+- Les comportements propres aux fournisseurs et dossiers réels doivent toujours être validés dans les environnements concernés.
 
-## Agenda et tags
+## Agenda, tags et fournisseurs réseau
 
-- La synchronisation Agenda dépend des capacités et ACL du calendrier. Un calendrier local, CalDAV ou un fournisseur tiers peut exposer des comportements différents.
-- La synchronisation Tags est facultative et ne doit gérer que les définitions dont la propriété MailPerch est démontrée par clé et libellé exacts.
-- Une indisponibilité Agenda ou Tags doit dégrader uniquement la fonction concernée ; cette politique est testée par contrat, mais les comportements propres aux fournisseurs exigent encore une validation réelle.
+- Les comptes POP/IMAP synthétiques du banc valident la logique locale et les portées sans utiliser de secret ni de service externe. Ils ne remplacent pas un test contre Gmail, Microsoft, un serveur IMAP réel ou un autre fournisseur.
+- La synchronisation Agenda dépend des capacités et ACL du calendrier. Un fournisseur CalDAV ou tiers réel peut se comporter différemment du scénario local.
+- La synchronisation Tags reste facultative et ne doit gérer que les définitions dont la propriété MailPerch est démontrée par clé et libellé exacts.
+- Aucun compte, jeton ou credential réel n’est incorporé au dépôt ou au banc.
 
 ## Banc de test Thunderbird
 
-- Les gardes statiques et contrats de la branche sont exécutables sans Thunderbird.
-- Le workflow `.github/workflows/thunderbird-smoke.yml` a réussi le 8 août 2026 sur Thunderbird **153.0.1 ESR** Linux avec un profil Local Folders synthétique : installation, background `Startup: Complete`, injection unique, désinstallation/cleanup et réinstallation propre ont été observés. Cette preuve est limitée à ce scénario local sans fournisseur réseau.
-- Un smoke Linux sur une version épinglée ne prouve pas Windows/macOS, les extrêmes de version, les fournisseurs réels, le zoom 200 %, l’accessibilité ni les performances à grande échelle.
-- Les tests XPCShell/Mochitest fournis nécessitent un checkout/build Thunderbird et ne sont pas exécutés par la CI générique du dépôt.
+- Les gardes statiques et contrats restent exécutables sans Thunderbird.
+- Le smoke réel vérifie le XPI construit, le background MV3, l’injection unique, l’ouverture du Dashboard, le cleanup et la réinstallation.
+- Le banc 1.5.2 exécute les scénarios DOM Dashboard et Options dans leurs vrais onglets Thunderbird via le `BrowsingContext`/acteur Marionette du processus de contenu.
+- L’éditeur de carte est ouvert via la commande XUL native `doCommand()` ; notes, checklist, priorité, groupe, échéances, statut et relance sont modifiés dans le runtime réel.
+- Le banc mesure automatiquement en clair et sombre le clipping, le débordement horizontal, l’alignement des contrôles et le contraste texte de base.
+- La persistance est testée avec une extension non temporaire sur le même profil jetable à travers deux processus Thunderbird distincts ; SQLite et les réglages sont contrôlés avant réveil naturel du background MV3 par activation d’onglet.
+- Le smoke/banc Linux sur Thunderbird 153.0.1 ESR ne prouve pas à lui seul Windows/macOS, tous les extrêmes de version ni les fournisseurs réseau externes.
 
 ## Interface et accessibilité
 
-- Options et dashboard sont disponibles en français et en anglais ; les codes de diagnostic internes restent volontairement techniques.
-- Le mode **Recommandé** masque les réglages avancés mais ne supprime pas leurs fonctions. Le stockage conserve la valeur historique `guided` afin d’éviter une migration.
-- Le plancher CSS de 12 px est contrôlé automatiquement, mais le rendu effectif à zoom 200 %, avec polices système différentes, contraste élevé et lecteurs d’écran doit être observé manuellement.
-- Les gardes DOM/Playwright utilisent des actifs réels mais une API synthétique ; elles ne remplacent pas les interactions dans `about:3pane`.
-- Les scénarios Chromium ont validé Options et dashboard après les corrections finales, mais ils ne prouvent ni le rendu dans un onglet Thunderbird ni le zoom navigateur réel à 200 %.
+- Le plancher CSS de 12 px, le clipping, les débordements et le contraste texte de base sont contrôlés automatiquement.
+- Le jugement esthétique pixel par pixel, le rendu exact à zoom 200 %, les polices système atypiques, le contraste élevé OS et l’usage complet avec lecteurs d’écran conservent une part d’inspection humaine.
+- Les scénarios Chromium restent utiles pour les contrats DOM mais ne sont plus la seule preuve des onglets Dashboard/Options.
 
 ## Cycle de vie et stockage
 
-- La purge immédiate repose sur des écouteurs de cycle de vie enregistrés lorsque l’Experiment est chargé. Si l’extension est restée désactivée depuis le démarrage, l’Experiment ne peut pas exécuter lui-même cette purge au moment exact de la suppression.
-- La sentinelle stockée dans la zone locale que Gecko efface normalement force toutefois la purge des résidus avant une réinstallation normale. Les préférences de développement qui demandent volontairement à Gecko de conserver le stockage à la désinstallation sont hors configuration utilisateur normale.
+- La purge immédiate dépend du cycle de vie de l’Experiment lorsqu’il est chargé ; la sentinelle Gecko continue de protéger la réinstallation normale.
 - Les sauvegardes exportées manuellement hors des dossiers gérés par MailPerch ne peuvent ni ne doivent être effacées automatiquement.
-- Le propriétaire du profil local et toute personne disposant de la Browser Toolbox contrôlent déjà le processus Thunderbird ; MailPerch ne peut pas créer une frontière d’autorisation contre cet acteur.
+- Le propriétaire du profil local et toute personne disposant de la Browser Toolbox contrôlent déjà le processus Thunderbird ; MailPerch ne crée pas une frontière d’autorisation contre cet acteur.
 
 ## Build et publication
 
 - Les builds ZIP répétés sur un même environnement sont binaires identiques, mais Python `zipfile`/zlib peut produire des conteneurs différents entre Windows et Linux malgré des entrées décompressées identiques. `MP-2026-018` suit cette reproductibilité inter-plateforme.
 - Les SHA-256 de la release GitHub sont autoritatifs pour les artefacts publiés.
-- Les actions GitHub sont épinglées à des commits précis et suivies par Dependabot ; une mise à jour doit être relue avant fusion.
-- Le portail ATN doit encore accepter l’identifiant, le nom, la licence et la matrice de compatibilité réelle avant toute diffusion catalogue.
+- Les actions GitHub sont épinglées à des commits précis et suivies par Dependabot.
+- Le portail ATN doit encore accepter l’identifiant, le nom, la licence et la matrice de compatibilité réelle avant diffusion catalogue.
 
 ## Sécurité
 

@@ -1,35 +1,30 @@
-# Passage de relais Codex — MailPerch 1.5.1
+# Passage de relais Codex — MailPerch 1.5.2
 
 ## Référence
 
 - source de vérité après publication : `main` ;
-- base de la passe exhaustive : `c87a46de4141e09f2e0b29c0ec6996b2693fc2b1` (1.5.0) ;
-- branche de travail : `audit/full-release-hardening-2026-08-10` jusqu’à fusion ;
-- version préparée : **1.5.1** ;
+- base de la passe : `e5fe966a4beff4755bd727ad4d79fb81148e3b36` (1.5.1) ;
+- branche de travail : `release/1.5.2-runtime-coverage` jusqu’à fusion ;
+- version préparée : **1.5.2** ;
 - identifiant canonique : `pin-mails@MailPerch.local`.
 
-## Objet de 1.5.1
+## Objet de 1.5.2
 
-Release corrective et de durcissement après diagnostic Thunderbird 153.0.2 :
+- fermer les limites automatisables du banc Dashboard/Options, XUL, thèmes et persistance multi-processus ;
+- corriger les substitutions localisées paramétrées découvertes par le Dashboard Thunderbird réel ;
+- ajuster la densité/hauteur du panneau seulement là où la preuve runtime l’exige ;
+- conserver les fournisseurs réseau réels et le jugement esthétique pixel par pixel comme limites explicites.
 
-- réparer l’éditeur de carte/checklist ;
-- terminer la frontière `PinCompatibility.messages` ;
-- réaligner Settings schéma 8 / Data schéma 7 ;
-- fiabiliser les indicateurs `secure`/offline du diagnostic fournisseur ;
-- refaire les validations code, sécurité, runtime et release sur l’arbre final ;
-- resynchroniser documentation, README, checklist ATN et livrables.
+Aucune fonction métier, permission WebExtension, dépendance runtime, migration ou connexion réseau n’est ajoutée.
 
-Aucune fonction métier, permission WebExtension, dépendance runtime ou connexion réseau n’est ajoutée.
+## Preuves de release
 
-## Preuves exigées avant publication
+1. `npm run ci` Linux et contrôles Windows ;
+2. smoke Thunderbird réel 153.0.1 ESR sur XPI 1.5.2 ;
+3. banc réel 50/100/500/1000/2000 ;
+4. Dashboard/Options DOM réels, commande XUL native, thèmes clair/sombre ;
+5. persistance extension non temporaire + SQLite/réglages sur deux processus avec réveil MV3 naturel ;
+6. build reproductible, XPI/ZIP source et SHA-256 ;
+7. PR vers `main`, squash conforme au ruleset, puis tag/release sur le SHA fusionné.
 
-1. `npm run ci` sur l’arbre final ;
-2. deux inventaires exhaustifs indépendants de tous les fichiers suivis ;
-3. audit sécurité standard avec garde historique, Gitleaks, Opengrep, Trivy/SBOM et zizmor ;
-4. smoke Thunderbird réel sur la version cible ;
-5. banc fonctionnel/charge réel quand le runtime privilégié change ;
-6. CI GitHub Linux/Windows verte ;
-7. build reproductible, XPI/ZIP source et SHA-256 ;
-8. PR vers `main`, squash conforme au ruleset, puis tag/release sur le SHA fusionné.
-
-Les résultats réellement obtenus sont consignés dans `SECURITY_AUDIT_1.5.1.md`, `VALIDATION_REPORT_1.5.1.md` et `docs/AI_VALIDATION_STATE.json`.
+Les preuves finales sont consignées dans `VALIDATION_REPORT_1.5.2.md`, `SECURITY_AUDIT_1.5.2.md` et `docs/AI_VALIDATION_STATE.json`.

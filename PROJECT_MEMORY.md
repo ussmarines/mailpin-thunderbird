@@ -1,13 +1,13 @@
 # Mémoire opérationnelle — MailPerch
 
-> Version publique : **1.5.1**
-> Branche de référence : `main` ; préparation 1.5.1 effectuée sur une branche dédiée
-> Base GitHub de la passe 1.5.1 : `main` au commit `c87a46de4141e09f2e0b29c0ec6996b2693fc2b1`
+> Version publique : **1.5.2**
+> Branche de référence : `main` ; préparation 1.5.2 effectuée sur `release/1.5.2-runtime-coverage`
+> Base GitHub de la passe 1.5.2 : `main` au commit `e5fe966a4beff4755bd727ad4d79fb81148e3b36`
 > Extension ID : `pin-mails@MailPerch.local`
 
 ## Résumé
 
-MailPerch est une extension Thunderbird Manifest V3 locale qui ajoute un panneau de messages épinglés et transforme ces épingles en suivis actionnables sans remplacer la liste native. La version 1.5.1 corrige l’éditeur de métadonnées/checklists, réaligne le schéma de paramètres, fiabilise le diagnostic de sécurité des comptes et termine l’isolation des opérations Messages dans `PinCompatibility`. Elle ne rajoute aucune permission, dépendance runtime ni connexion réseau.
+MailPerch est une extension Thunderbird Manifest V3 locale qui ajoute un panneau de messages épinglés et transforme ces épingles en suivis actionnables sans remplacer la liste native. La version 1.5.2 corrige les substitutions localisées paramétrées du Dashboard, améliore la densité du panneau et surtout étend le banc Thunderbird réel aux DOM Dashboard/Options, commandes XUL natives, thèmes clair/sombre et persistance multi-processus. Elle ne rajoute aucune permission, dépendance runtime, migration ni connexion réseau.
 
 Les futures fonctions **Prochaine action**, **Timeline de conversation**, **Follow-up récurrent** et **Résultat du suivi** restent hors périmètre de cette release.
 
@@ -81,7 +81,7 @@ Les réglages sont présentés par familles : **Essentiel**, **Automatisation**,
 
 L’action « appliquer les réglages recommandés » produit uniquement un brouillon et conserve les valeurs personnelles/environnementales telles que calendrier préféré, groupe d’attente, dossier de sauvegarde, couleurs de comptes, activation des boîtes et comptes sélectionnés. L’utilisateur doit encore cliquer sur Enregistrer.
 
-La sélection de comptes apparaît uniquement pour la portée « Comptes sélectionnés », conserve le brouillon lors d’un changement temporaire de portée et affiche les comptes Thunderbird avec leurs libellés lisibles. La sauvegarde Options → panneau a été validée manuellement sur le profil de test multi-comptes.
+La sélection de comptes apparaît uniquement pour la portée « Comptes sélectionnés », conserve le brouillon lors d’un changement temporaire de portée et affiche les comptes Thunderbird avec leurs libellés lisibles. Le banc 1.5.2 valide automatiquement la sauvegarde Options → panneau et la persistance A+C (34 épingles, B absent) après redémarrage sur le même profil.
 
 `@fluentui/web-components` 3.0.3 a été évalué puis retiré : aucun fichier de l’extension ne l’importait, le build XPI n’a pas de bundler, le paquet exige Node 22/24 alors que le dépôt conserve Node 20 dans sa matrice, et son arbre n’apportait donc aucun composant au produit livré. MailPerch garde le langage Fluent 2 local, sans dépendance npm runtime ni lockfile.
 
@@ -89,7 +89,7 @@ La sélection de comptes apparaît uniquement pour la portée « Comptes sélect
 
 Le workflow `.github/workflows/thunderbird-smoke.yml` télécharge un binaire Thunderbird officiel et geckodriver, vérifie leurs empreintes, construit l’XPI, prépare un profil local synthétique, installe temporairement l’extension, contrôle le background MV3 et l’injection, vérifie l’ouverture unique du Dashboard, désinstalle, contrôle le nettoyage puis réinstalle. La PR #24 a repassé ce smoke sur Thunderbird **153.0.1 ESR** Linux avec succès.
 
-Le banc fonctionnel `.github/workflows/thunderbird-functional-bench.yml` / `tests/thunderbird/functional_bench.py` couvre les volumes 50, 100, 500, 1 000 et 2 000 épingles. La passe réelle Windows sur Thunderbird 153.0.2/geckodriver 0.37.1 a validé les cinq volumes, la pagination sans doublon et les scénarios multi-comptes. La persistance entre deux processus avec une extension temporaire reste limitée par le harness : le stockage SQLite peut être supprimé lors de la fermeture de l’extension temporaire ; ce point n’est pas présenté comme un défaut produit.
+Le banc fonctionnel `.github/workflows/thunderbird-functional-bench.yml` / `tests/thunderbird/functional_bench.py` couvre les volumes 50, 100, 500, 1 000 et 2 000 épingles. En 1.5.2, il sait aussi installer l’extension de façon non temporaire dans un profil jetable exact, redémarrer Thunderbird dans un second processus, vérifier SQLite et les réglages persistés, réveiller naturellement le background MV3 par activation d’onglet et revalider le panneau sans réinstallation artificielle.
 
 Le 10 août 2026, une nouvelle passe Linux sur Thunderbird 153.0.1 ESR/geckodriver 0.37.1 a revalidé la matrice 50/100/500/1000/2000 après correction d’une assertion erronée du harness : le compteur du panneau reste volontairement le total de la portée pendant une recherche, tandis que seules les cartes rendues sont filtrées. Les cinq volumes passent sans timeout ni exception JavaScript ; à 500/1000/2000, toute la pagination est chargée sans doublon et les positions début/milieu/fin sont présentes.
 
@@ -99,7 +99,7 @@ La source de vérité visuelle demeure `docs/UI_SPEC.md`; aucun `PRODUCT.md` ou 
 
 Diagnostiquer l’environnement avec `npx skills ls -g` et le hook avec `node C:\Users\ussma\.agents\skills\impeccable\scripts\hook-admin.mjs status`. Pour une mise à jour, vérifier d’abord le dépôt officiel, la version et les écritures prévues ; utiliser `npx skills update -g` pour les sources suivies et l’installateur officiel Impeccable avec le fournisseur Codex explicite.
 
-## État 1.5.1
+## État 1.5.2
 
 - schéma SQLite : 5 ; schéma paramètres : 8 ; schéma données : 7 ;
 - compatibilité déclarée : Thunderbird 153.0 à 153.* ;
@@ -111,7 +111,7 @@ Diagnostiquer l’environnement avec `npx skills ls -g` et le hook avec `node C:
 - détection fournisseurs par domaine exact ou sous-domaine légitime ;
 - portée multi-comptes basée sur `account.key`, sélection maximale bornée à 50 comptes ;
 - volume conseillé : jusqu’à 2 000 épingles, sans blocage technique au-delà ;
-- aucune nouvelle permission, dépendance runtime ou connexion réseau introduite par la 1.5.1.
+- aucune nouvelle permission, dépendance runtime ou connexion réseau introduite par la 1.5.2.
 
 ## Commandes obligatoires
 
@@ -133,7 +133,7 @@ python tests/test_thunderbird_test_bench.py
 
 ## Définition de terminé
 
-- branche de release propre et déclarations 1.5.1 synchronisées avant toute publication ;
+- branche de release propre et déclarations 1.5.2 synchronisées avant toute publication ;
 - tests, scans de secrets et builds reproductibles verts ;
 - frontière Thunderbird vérifiée sans réintroduction d’accès direct ;
 - Options Recommandé/Avancé et portée multi-comptes cohérentes en FR/EN ;

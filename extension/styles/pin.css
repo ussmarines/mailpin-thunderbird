@@ -15,9 +15,9 @@
   --pin-mails-card-bg: var(--layout-background-0);
   --pin-mails-card-hover: var(--layout-background-2);
   --pin-mails-soft: var(--mp-brand-subtle);
-  --pin-mails-max-height: 460px;
+  --pin-mails-max-height: 640px;
   --pin-mails-card-gap: 5px;
-  --pin-mails-card-padding: 9px 11px 9px 12px;
+  --pin-mails-card-padding: 7px 11px 7px 12px;
   --pin-mails-card-min-height: 56px;
 }
 
@@ -43,7 +43,7 @@
   min-block-size: 0;
   font-family: var(--mp-font-family);
   font-size: max(1em, var(--mp-font-size-caption));
-  max-block-size: min(65vh, var(--pin-mails-max-height));
+  max-block-size: min(calc(100vh - 96px), var(--pin-mails-max-height));
   background: var(--pin-mails-panel-bg);
   border-block-end: 1px solid var(--pin-mails-border);
 }
@@ -608,6 +608,31 @@
 @container threadPane (max-width: 600px) {
   .pin-mails-header-select { max-inline-size: 105px; }
   .pin-mails-header-select[data-secondary] { display: none; }
+}
+
+@container threadPane (max-width: 390px) {
+  .pin-mails-panel-header {
+    gap: 4px;
+    padding-inline: 6px;
+  }
+
+  .pin-mails-header-icon {
+    inline-size: 20px;
+    block-size: 20px;
+  }
+
+  .pin-mails-collapse-button,
+  .pin-mails-header-action {
+    inline-size: 28px;
+    block-size: 28px;
+    min-inline-size: 28px;
+  }
+
+  .pin-mails-header-select {
+    max-inline-size: 82px;
+    min-inline-size: 0;
+    padding-inline: 5px 18px;
+  }
 }
 
 

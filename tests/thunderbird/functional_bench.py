@@ -54,6 +54,8 @@ def _new_session_with_profile(
                         "mail.shell.checkDefaultClient": False,
                         "mailnews.start_page.enabled": False,
                         "toolkit.telemetry.enabled": False,
+                        "xpinstall.signatures.required": False,
+                        "extensions.autoDisableScopes": 0,
                     },
                 },
             }
@@ -540,26 +542,23 @@ const scopeExpected = arguments[2] || {};
     if (!contextMenu) throw new Error("Card action menu is unavailable");
     const editMenuItem = contextMenu.querySelector('[data-context-action="edit"]');
     if (!editMenuItem) throw new Error("Card metadata menu action is unavailable");
-    editMenuItem.dispatchEvent(new pane.Event("command", {bubbles:true, composed:true}));
-    functional.push("card-action-menu");
-    await sleep(300);
+    if (typeof editMenuItem.doCommand !== "function") throw new Error("Native XUL menu command API is unavailable");
+    editMenuItem.doCommand();
+    functional.push("card-action-menu-native-command");
+    await waitFor(() => Boolean(doc.getElementById("pin-mails-editor")?.open), "card editor opened by native XUL command");
     const editor = doc.getElementById("pin-mails-editor");
-    if (!editor?.open) {
-      functionalLimitations.push("Thunderbird ignored the untrusted XUL menuitem command used to open the card metadata editor.");
-    } else {
-      editor.querySelector(".pin-mails-editor-note").value = "Note modifiée par le banc fonctionnel";
-      const checklistInput = editor.querySelector(".pin-mails-editor-checklist-input");
-      checklistInput.value = "Sous-tâche ajoutée par le banc";
-      editor.querySelector(".pin-mails-editor-checklist-add button").click();
-      editor.querySelector(".pin-mails-editor-priority").value = "urgent";
-      editor.querySelector(".pin-mails-editor-workflow").value = "waiting";
-      editor.querySelector(".pin-mails-editor-group").value = [...editor.querySelector(".pin-mails-editor-group").options].at(-1).value;
-      editor.querySelector(".pin-mails-editor-due").value = "2030-01-02T10:00";
-      editor.querySelector(".pin-mails-editor-follow-up").value = "2030-01-01T09:00";
-      editor.querySelector("form").requestSubmit();
-      await sleep(250);
-      functional.push("group-assign", "notes-checklist-priority-deadline-status-followup-editor");
-    }
+    editor.querySelector(".pin-mails-editor-note").value = "Note modifiée par le banc fonctionnel";
+    const checklistInput = editor.querySelector(".pin-mails-editor-checklist-input");
+    checklistInput.value = "Sous-tâche ajoutée par le banc";
+    editor.querySelector(".pin-mails-editor-checklist-add button").click();
+    editor.querySelector(".pin-mails-editor-priority").value = "urgent";
+    editor.querySelector(".pin-mails-editor-workflow").value = "waiting";
+    editor.querySelector(".pin-mails-editor-group").value = [...editor.querySelector(".pin-mails-editor-group").options].at(-1).value;
+    editor.querySelector(".pin-mails-editor-due").value = "2030-01-02T10:00";
+    editor.querySelector(".pin-mails-editor-follow-up").value = "2030-01-01T09:00";
+    editor.querySelector("form").requestSubmit();
+    await sleep(250);
+    functional.push("group-assign", "notes-checklist-priority-deadline-status-followup-editor");
   }
 
   scope.value = "global";
@@ -595,6 +594,29 @@ try {
   done({__mailperchSmokeError: `${error?.name || "Error"}: ${error?.message || error}`});
 }
 """
+
+WAKE_PERSISTED_EXTENSION_SCRIPT = r"""
+const done = arguments[arguments.length - 1];
+(async () => {
+  const win = Services.wm.getMostRecentWindow("mail:3pane");
+  const tabmail = win?.document.getElementById("tabmail");
+  if (!win || !tabmail) throw new Error("mail:3pane tabmail is unavailable");
+  const mailTab = Array.from(tabmail.tabInfo || []).find(tab =>
+    tab.mode?.name === "mail3PaneTab" ||
+    String(tab.browser?.currentURI?.spec || tab.chromeBrowser?.currentURI?.spec || "") === "about:3pane"
+  );
+  if (!mailTab) throw new Error("mail tab is unavailable for MV3 wake validation");
+  const probe = tabmail.openTab("contentTab", {url:"about:blank", background:false});
+  await new Promise(resolve => win.setTimeout(resolve, 150));
+  if (probe && typeof tabmail.switchToTab === "function") tabmail.switchToTab(probe);
+  await new Promise(resolve => win.setTimeout(resolve, 150));
+  tabmail.switchToTab(mailTab);
+  await new Promise(resolve => win.setTimeout(resolve, 150));
+  try { if (probe) tabmail.closeTab(probe); } catch {}
+  done({opened:true, reactivatedMailTab:true});
+})().catch(error => done({__mailperchSmokeError: `${error?.name || "Error"}: ${error?.message || error}\n${error?.stack || ""}`}));
+"""
+
 
 PROFILE_STATE_SCRIPT = r"""
 const done = arguments[arguments.length - 1];
@@ -735,6 +757,36 @@ const done = arguments[arguments.length - 1];
 """
 
 
+REMOTE_TAB_ASYNC_SCRIPT = r"""
+const done = arguments[arguments.length - 1];
+const needle = String(arguments[0] || "");
+const script = String(arguments[1] || "");
+const scriptArgs = Array.isArray(arguments[2]) ? arguments[2] : [];
+(async () => {
+  const win = Services.wm.getMostRecentWindow("mail:3pane");
+  const tabmail = win?.document.getElementById("tabmail");
+  const tab = Array.from(tabmail?.tabInfo || []).find(item =>
+    String(item.browser?.currentURI?.spec || item.chromeBrowser?.currentURI?.spec || "").includes(needle)
+  );
+  const browser = tab?.browser || tab?.chromeBrowser || null;
+  const browsingContext = browser?.browsingContext;
+  if (!browsingContext || browsingContext.isDiscarded) throw new Error(`Remote tab browsing context is unavailable: ${needle}`);
+  const actor = browsingContext.currentWindowGlobal?.getActor("MarionetteCommands");
+  if (!actor) throw new Error(`MarionetteCommands actor is unavailable: ${needle}`);
+  const result = await actor.executeScript(script, scriptArgs, {
+    timeout: 30000, sandboxName: null, newSandbox: false,
+    file: "mailperch-functional-bench", line: 0, async: true,
+  });
+  done(result);
+})().catch(error => done({__mailperchSmokeError: `${error?.name || "Error"}: ${error?.message || error}\n${error?.stack || ""}`}));
+"""
+
+OPEN_OPTIONS_CONTENT_SCRIPT = r"""
+const done = arguments[arguments.length - 1];
+browser.runtime.openOptionsPage().then(() => done({opened:true}), error => done({error:String(error)}));
+"""
+
+
 DASHBOARD_CONTENT_SCRIPT = r"""
 const done = arguments[arguments.length - 1];
 const expected = Number(arguments[0]);
@@ -793,10 +845,11 @@ const done = arguments[arguments.length - 1];
   const deadline = Date.now() + 30000;
   while (Date.now() < deadline) {
     tab = Array.from(tabmail?.tabInfo || []).find(item => String(item.browser?.currentURI?.spec || item.chromeBrowser?.currentURI?.spec || "").includes("options/options.html"));
-    if (tab) break;
+    const browser = tab?.browser || tab?.chromeBrowser || null;
+    if (tab && !tab.busy && String(browser?.currentURI?.spec || "").includes("options/options.html") && browser?.browsingContext?.currentWindowGlobal) break;
     await new Promise(resolve => win.setTimeout(resolve, 100));
   }
-  if (!tab) throw new Error("Options tab did not open");
+  if (!tab || tab.busy) throw new Error("Options tab did not finish loading");
   tabmail.switchToTab(tab);
   done({selected:true});
 })().catch(error => done({__mailperchSmokeError: `${error?.name || "Error"}: ${error?.message || error}\n${error?.stack || ""}`}));
@@ -871,7 +924,8 @@ const dark = Boolean(arguments[0]);
   const panel = pane?.document.getElementById("pin-mails-panel");
   const cards = [...(panel?.querySelectorAll(".pin-mails-card") || [])];
   if (!panel || cards.length < 2) throw new Error("Two panel cards are not available for theme evidence");
-  const listRect = panel.querySelector(".pin-mails-panel-list").getBoundingClientRect();
+  const list = panel.querySelector(".pin-mails-panel-list");
+  const listRect = list.getBoundingClientRect();
   const firstRect = cards[0].getBoundingClientRect();
   const secondRect = cards[1].getBoundingClientRect();
   const searchRect = panel.querySelector(".pin-mails-search").getBoundingClientRect();
@@ -879,6 +933,17 @@ const dark = Boolean(arguments[0]);
   const pin = cards[0].querySelector(".pin-mails-card-pin");
   const pinStyle = pane.getComputedStyle(pin);
   const pinMask = pane.getComputedStyle(pin, "::before");
+  const parseRgb = value => { const match=String(value||"").match(/rgba?\((\d+(?:\.\d+)?)[, ]+(\d+(?:\.\d+)?)[, ]+(\d+(?:\.\d+)?)/i); return match ? match.slice(1,4).map(Number) : null; };
+  const luminance = rgb => { if(!rgb) return null; const values=rgb.map(value=>{const c=value/255; return c<=0.04045?c/12.92:((c+0.055)/1.055)**2.4;}); return 0.2126*values[0]+0.7152*values[1]+0.0722*values[2]; };
+  const effectiveBackground = element => { for(let current=element; current; current=current.parentElement){ const value=pane.getComputedStyle(current).backgroundColor; if(value && value!=="transparent" && !/^rgba\([^)]*,\s*0(?:\.0+)?\)$/.test(value)) return value; } return pane.getComputedStyle(doc.documentElement).backgroundColor; };
+  const contrast = element => { const fg=luminance(parseRgb(pane.getComputedStyle(element).color)); const bg=luminance(parseRgb(effectiveBackground(element))); if(fg==null||bg==null)return 0; return (Math.max(fg,bg)+0.05)/(Math.min(fg,bg)+0.05); };
+  const searchElement=panel.querySelector(".pin-mails-search");
+  const filterElement=panel.querySelector(".pin-mails-smart-view-select");
+  const ordinaryCards=cards.filter(card => !card.querySelector(".pin-mails-note") && !card.querySelector(".pin-mails-checklist"));
+  const listStyle=pane.getComputedStyle(list);
+  const ordinaryGap=parseFloat(listStyle.rowGap || listStyle.gap || "0") || 0;
+  const ordinaryCardHeights=ordinaryCards.slice(0,2).map(card => card.getBoundingClientRect().height);
+  const ordinaryTwoFit=ordinaryCardHeights.length >= 2 && ordinaryCardHeights[0] + ordinaryCardHeights[1] + ordinaryGap <= list.clientHeight + 1;
   const sameRow = Math.abs(searchRect.top - filterRect.top) <= 2;
   const sameColumn = Math.abs(searchRect.left - filterRect.left) <= 4 && Math.abs(searchRect.width - filterRect.width) <= 4;
   done({
@@ -889,6 +954,8 @@ const dark = Boolean(arguments[0]);
     controlGeometry:{search:{left:searchRect.left,width:searchRect.width,top:searchRect.top},filter:{left:filterRect.left,width:filterRect.width,top:filterRect.top}},
     pinColor:pinStyle.color, pinBackground:pinStyle.backgroundColor,
     pinMaskColor:pinMask.backgroundColor, pinMaskImage:pinMask.maskImage || pinMask.webkitMaskImage || "",
+    contrastRatios:{cardText:contrast(cards[0]),searchText:contrast(searchElement),filterText:contrast(filterElement)},
+    ordinaryTwoFit, ordinaryCardHeights, ordinaryGap, listClientHeight:list.clientHeight,
     dashboardVisible:!panel.querySelector(".pin-mails-action-dashboard").hidden,
   });
 })().catch(error => done({__mailperchSmokeError: `${error?.name || "Error"}: ${error?.message || error}\n${error?.stack || ""}`}));
@@ -974,7 +1041,7 @@ def _run_scope_case(
                 excluded_accounts = [account for account in all_accounts if account["label"] not in selected_labels]
                 selected_account_keys = [account["key"] for account in selected_accounts]
                 selected_count = sum(account["pinnedCount"] for account in selected_accounts)
-                client.install_addon(args.xpi_path)
+                client.install_addon(args.xpi_path, temporary=False)
                 _wait_for_state(client, _panel_is_ready, "MailPerch panel in Session 1", args.timeout)
                 initial_panel = client.execute_async(
                     ACCOUNT_SCOPE_PANEL_SCRIPT,
@@ -1012,9 +1079,14 @@ def _run_scope_case(
                     seed, first_state, second_state, profile, selected_account_keys, volume
                 )
                 result["checks"].append("same-profile-distinct-thunderbird-processes")
+                wake = client.execute_async(WAKE_PERSISTED_EXTENSION_SCRIPT)
+                if not wake.get("reactivatedMailTab"):
+                    raise SmokeFailure(f"Persisted MV3 wake interaction failed: {wake!r}")
+                result["session2Wake"] = wake
+                result["checks"].append("natural-tab-activation-wake")
 
-                client.install_addon(args.xpi_path)
-                _wait_for_state(client, _panel_is_ready, "MailPerch panel in Session 2", args.timeout)
+                _wait_for_state(client, _panel_is_ready, "Persisted MailPerch add-on after tab activation", args.timeout)
+                result["checks"].append("persistent-addon-loaded-after-restart")
                 selected_panel = client.execute_async(
                     ACCOUNT_SCOPE_PANEL_SCRIPT,
                     [selected_count, "selectedAccounts", selected_accounts, excluded_accounts],
@@ -1174,9 +1246,11 @@ def _run_volume(args: argparse.Namespace, volume: int, output_dir: pathlib.Path,
             result["dashboard"] = dashboard_open
             result["checks"].append("dashboard-runtime")
             if full_functional:
-                result.setdefault("runtimeLimitations", []).append(
-                    "Thunderbird internal content tabs are not exposed as Marionette WebDriver content handles; Dashboard and Options DOM scenarios were not observed."
-                )
+                dashboard_content=client.execute_async(REMOTE_TAB_ASYNC_SCRIPT,["dashboard/dashboard.html",DASHBOARD_CONTENT_SCRIPT,[volume,True]])
+                if dashboard_content.get("badText") or len(dashboard_content.get("checks",[])) < 10:
+                    raise SmokeFailure(f"Dashboard DOM runtime validation failed: {dashboard_content!r}")
+                result["dashboard"]["content"]=dashboard_content
+                result["checks"].append("dashboard-dom-runtime")
                 # Capture both real Thunderbird color-scheme variants and keep
                 # machine-readable geometry/style observations beside them.
                 light = client.execute_async(THEME_BENCH_SCRIPT, [False])
@@ -1185,8 +1259,24 @@ def _run_volume(args: argparse.Namespace, volume: int, output_dir: pathlib.Path,
                 dark = client.execute_async(THEME_BENCH_SCRIPT, [True])
                 image = client.full_screenshot()
                 if image: (output_dir / "thunderbird-dark.png").write_bytes(image)
-                result["themeEvidence"] = {"light": light, "dark": dark}
-                result["screenshots"] = {"light": bool((output_dir / "thunderbird-light.png").is_file()), "dark": bool((output_dir / "thunderbird-dark.png").is_file())}
+                for label,evidence in (("light",light),("dark",dark)):
+                    if not evidence.get("ordinaryTwoFit") or not evidence.get("controlsAligned") or not evidence.get("noPanelClipping") or evidence.get("horizontalOverflowPx",2) > 1 or not evidence.get("dashboardVisible"):
+                        raise SmokeFailure(f"{label} theme geometry validation failed: {evidence!r}")
+                    ratios=evidence.get("contrastRatios",{})
+                    if any(float(ratios.get(key,0)) < 4.5 for key in ("cardText","searchText","filterText")):
+                        raise SmokeFailure(f"{label} theme contrast validation failed: {evidence!r}")
+                result["themeEvidence"]={"light":light,"dark":dark}
+                result["screenshots"]={"light":bool((output_dir/"thunderbird-light.png").is_file()),"dark":bool((output_dir/"thunderbird-dark.png").is_file())}
+                result["checks"].append("theme-geometry-and-contrast")
+                options_open=client.execute_async(REMOTE_TAB_ASYNC_SCRIPT,["dashboard/dashboard.html",OPEN_OPTIONS_CONTENT_SCRIPT,[]])
+                if not options_open.get("opened"):
+                    raise SmokeFailure(f"Options runtime opening failed: {options_open!r}")
+                options_tab=client.execute_async(SELECT_OPTIONS_BENCH_SCRIPT)
+                options_content=client.execute_async(REMOTE_TAB_ASYNC_SCRIPT,["options/options.html",OPTIONS_CONTENT_SCRIPT,[]])
+                if options_content.get("badText") or not all(options_content.get(key) for key in ("guidedAndAdvanced","search","scope","saveCancel","tags","agenda","health","paypalOnly")):
+                    raise SmokeFailure(f"Options DOM runtime validation failed: {options_content!r}")
+                result["options"]={"tab":options_tab,"content":options_content}
+                result["checks"].append("options-dom-runtime")
             else:
                 client.set_context("chrome")
             result["jsExceptions"] = client.execute_async(CONSOLE_ERRORS_SCRIPT)
@@ -1256,10 +1346,8 @@ def run(args: argparse.Namespace) -> int:
         "volumes": list(args.volumes), "startedAt": int(started * 1000),
         "durationMs": int((time.time() - started) * 1000), "results": results,
         "limits": [
-            "Visual contrast and clipping still require human inspection of the light/dark screenshots.",
-            "Thunderbird internal Dashboard and Options tabs are not exposed as Marionette content handles; only real tab opening is observed externally.",
-            "Thunderbird ignores untrusted synthetic XUL menuitem commands, so card-editor mutations remain manual runtime checks.",
-            "Agenda actions are inspected only when Thunderbird exposes a writable local calendar; no network calendar is created.",
+            "Pixel-level aesthetics remain a human-review concern; clipping, overflow, control alignment and baseline text contrast are asserted automatically in light and dark modes.",
+            "External provider-specific behavior (for example Gmail/Microsoft/remote CalDAV services) still requires provider-backed testing; the repository must not embed real credentials.",
             "The selected-account scenario requires three offline synthetic POP accounts; it fails explicitly when Thunderbird cannot create them.",
             "The selected-account scenario reuses one exact disposable profile across two distinct Thunderbird processes; it fails explicitly if GeckoDriver substitutes another profile.",
         ],

@@ -1,5 +1,15 @@
 # Journal des modifications
 
+## 1.5.2 — couverture runtime automatisée et finition du panneau
+
+- exécution des scénarios DOM Dashboard et Options directement dans les vrais onglets Thunderbird via le `BrowsingContext`/acteur Marionette du processus de contenu ;
+- remplacement de la commande XUL synthétique de l’éditeur par `menuitem.doCommand()`, avec modification réelle des notes, checklists, priorité, groupe, échéances, statut et relance dans Thunderbird ;
+- validation multi-processus avec extension non temporaire, profil exact réutilisé, stockage SQLite et sélection de comptes conservés, puis réveil MV3 par une activation d’onglet utilisateur locale ;
+- contrôle automatique clair/sombre du clipping, débordement horizontal, alignement des contrôles et contraste texte de base, les choix esthétiques pixel par pixel restant une inspection humaine ;
+- correction des substitutions localisées paramétrées du Dashboard dans le contexte WebExtension Thunderbird ;
+- ajustement de la hauteur maximale du panneau et de la densité des cartes afin de conserver deux cartes ordinaires complètes dans la zone testée, y compris sur panneau étroit ;
+- aucune nouvelle permission WebExtension, dépendance runtime, connexion réseau, télémétrie, publicité, migration ou modification de schéma.
+
 ## 1.5.1 — audit complet et durcissement correctif
 
 - correction du crash `ReferenceError: assignment to undeclared variable checklistItems` lors de l’ouverture de l’éditeur de carte ;

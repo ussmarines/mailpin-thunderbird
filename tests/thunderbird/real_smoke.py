@@ -130,11 +130,11 @@ class WebDriverClient:
     def set_context(self, context: str) -> None:
         self.request("POST", self._session_path("/moz/context"), {"context": context})
 
-    def install_addon(self, xpi: pathlib.Path) -> str:
+    def install_addon(self, xpi: pathlib.Path, *, temporary: bool = True) -> str:
         response = self.request(
             "POST",
             self._session_path("/moz/addon/install"),
-            {"path": str(xpi), "temporary": True},
+            {"path": str(xpi), "temporary": bool(temporary)},
         )
         addon_id = (response or {}).get("value")
         if addon_id != ADDON_ID:
