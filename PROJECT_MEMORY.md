@@ -1,6 +1,6 @@
 # Mémoire opérationnelle — MailPerch
 
-> Version publique : **1.5.2**
+> Version publique : **1.5.3**
 > Branche de référence : `main` ; préparation 1.5.2 effectuée sur `release/1.5.2-runtime-coverage`
 > Base GitHub de la passe 1.5.2 : `main` au commit `e5fe966a4beff4755bd727ad4d79fb81148e3b36`
 > Extension ID : `pin-mails@MailPerch.local`

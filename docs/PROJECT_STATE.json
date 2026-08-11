@@ -2,7 +2,7 @@
   "format": "mailperch-project-state",
   "version": 1,
   "project": "MailPerch — Email Pins & Follow-up",
-  "extensionVersion": "1.5.2",
+  "extensionVersion": "1.5.3",
   "baseGitHub": {
     "branch": "main",
     "commit": "e5fe966a4beff4755bd727ad4d79fb81148e3b36"

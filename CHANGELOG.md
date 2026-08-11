@@ -1,5 +1,14 @@
 # Journal des modifications
 
+## 1.5.3 — durcissement des imports et correction de lisibilité des automatisations
+
+- neutralisation, lors d’un import de sauvegarde, des réglages automatiques ou destructifs `autoRemoveCompleted`, rétention des terminés, désépinglage après suppression et sauvegardes automatiques ;
+- `safeMode` bloque désormais la rétention des éléments terminés avant toute mutation locale des données importées ;
+- conservation explicite des épingles lors d’un déplacement importé et maintien des confirmations destructives existantes ;
+- correction du chevauchement entre le titre « Activer les règles » et son texte d’aide dans Options → Automatisation → Règles et actions automatiques ;
+- les cartes de réglage mises en avant empilent désormais titre et aide avec une hiérarchie typographique lisible sur les largeurs testées de 360 à 1 200 px ;
+- aucune nouvelle permission WebExtension, dépendance runtime, connexion réseau, télémétrie, publicité, migration de schéma ou extension d’API Thunderbird.
+
 ## 1.5.2 — couverture runtime automatisée et finition du panneau
 
 - exécution des scénarios DOM Dashboard et Options directement dans les vrais onglets Thunderbird via le `BrowsingContext`/acteur Marionette du processus de contenu ;
