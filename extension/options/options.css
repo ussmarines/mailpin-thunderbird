@@ -433,6 +433,15 @@ h1 {
 }
 .setting-toggle[data-enabled="true"]:hover { background: var(--accent-soft-hover); }
 .setting-toggle.featured { border-color: var(--border); background: var(--surface-2); }
+.setting-toggle.featured > span {
+  display: grid;
+  gap: .2rem;
+}
+.setting-toggle.featured > span > small {
+  color: var(--muted);
+  font-weight: 400;
+  line-height: 1.4;
+}
 .setting-toggle.featured[data-enabled="true"] {
   border-color: color-mix(in srgb, var(--accent-foreground) 55%, var(--border));
   background: var(--accent-soft);
