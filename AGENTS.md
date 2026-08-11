@@ -132,6 +132,13 @@ Le XPI est construit dans `dist/`. Aucun outil de compilation externe n’est re
 
 Une correction n’est pas considérée terminée sur la seule base de contrôles statiques. Il faut indiquer explicitement quels tests Thunderbird réels ont été exécutés lorsque la surface exige une preuve runtime. Ne jamais affirmer qu’un comportement graphique fonctionne sans l’avoir observé dans Thunderbird. La restitution doit distinguer les tests exécutés, les preuves réutilisées car encore valides et les contrôles non relancés.
 
+## Navigation structurelle
+
+- Pour une architecture transversale, un chemin d'appel, des relations multi-modules, une analyse d'impact ou une zone inconnue, utiliser le skill projet `graphify` seulement s'il économise des lectures ; ne pas l'invoquer pour une petite tâche déjà localisée.
+- Graphify fournit une carte, jamais la preuve finale : vérifier le code avec la recherche et la lecture directes avant toute modification ou conclusion.
+- Graphify complète `PROJECT_MEMORY.md`, Brain et `mailperch-project-knowledge`. Ne pas activer strict mode, hook ou watcher ; garder `graphify-out/` local et régénérable.
+- Les règles canoniques Headroom compression-only et l'échelle de simplicité sont dans `MAILPERCH_AI_RULES.md`.
+
 <!-- BEGIN brain.md -->
 ## Project Brain
 

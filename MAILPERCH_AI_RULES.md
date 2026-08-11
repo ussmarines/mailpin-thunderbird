@@ -1,6 +1,6 @@
 # MAILPERCH — RÈGLES DE PILOTAGE IA
 
-Version de référence : 2026-08-08
+Version de référence : 2026-08-12
 Révision modèles Codex : GPT-5.6 Luna / Terra / Sol
 Projet : `ussmarines/mailperch-thunderbird`
 
@@ -215,6 +215,14 @@ Règles finales :
 Les règles MailPerch et `docs/UI_SPEC.md` priment toujours. Pour l’UI produit, les réglages, formulaires, audits, finitions, responsive et accessibilité, charger `impeccable`. Pour la recherche amont d’une direction ou d’un design system, charger `ui-ux-pro-max`. Réserver `design-taste-frontend` à un changement artistique ou une surface expressive explicitement demandée. Ne combiner plusieurs skills que si leurs responsabilités sont réellement complémentaires.
 
 Impeccable reste différentiel : contrôles mécaniques immédiats sur les seuls fichiers UI édités, règles complètes au `Stop`, aucun passage complet à chaque édition et silence quand le résultat est propre. Les collections `awesome-design-md` et `awesome-design-skills` servent uniquement de références ponctuelles pour enrichir la source de vérité du projet ; elles ne sont pas installées globalement. `img2threejs` ne fait pas partie de l’environnement MailPerch.
+
+## 5.3 Navigation structurelle, compression et simplicité
+
+Graphify complète les outils existants sans les remplacer. Utiliser le skill projet pour une architecture transversale, un chemin d'appel, des dépendances multi-modules, une analyse d'impact ou l'orientation dans une zone inconnue uniquement si cela économise réellement des lectures. Ne pas l'utiliser pour une petite tâche ou un fichier déjà identifié. Le code lu directement reste la preuve avant modification ou conclusion ; `PROJECT_MEMORY.md`, Brain et `mailperch-project-knowledge` conservent leurs rôles de décision, d'invariant et de connaissance produit. Les sorties `graphify-out/` restent locales et régénérables ; strict mode, hooks et watchers Graphify sont interdits.
+
+Headroom est un outil global facultatif de compression process-local pour Codex, jamais une dépendance du projet. Avant chaque utilisation, vérifier le `--help` courant et désactiver le context tool, MCP de récupération, tokensave, Serena, memory, cross-agent memory, learning, output shaper, télémétrie et toute modification du reasoning effort. Ne pas écrire de règles apprises ni persister de configuration Headroom ; préférer le mode stateless et lossless/fail-open. Si la compression échoue, ne produit pas de gain utile ou dégrade la stabilité, utiliser Codex normal.
+
+Après compréhension du flux réel, appliquer cette échelle et s'arrêter au premier niveau suffisant : ne rien ajouter si le changement est inutile ; réutiliser l'existant du dépôt ; utiliser la bibliothèque standard ; utiliser une fonction native de la plateforme ou du runtime ; réutiliser une dépendance déjà installée ; préférer une solution locale courte, claire et testable ; seulement ensuite écrire le minimum de nouveau code. Cette simplicité ne doit jamais réduire la sécurité ou la validation des trust boundaries, l'intégrité et l'atomicité des données, la gestion des erreurs et des pertes, l'accessibilité, la lisibilité, les tests pertinents ni les invariants MailPerch.
 
 ---
 

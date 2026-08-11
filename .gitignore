@@ -35,6 +35,7 @@ Thumbs.db
 output/playwright/
 /.impeccable/config.local.json
 /.impeccable/cache/
+/graphify-out/
 
 CI_LOG_*.txt
 ROUNDTRIP_CI_LOG_*.txt
