@@ -510,15 +510,20 @@ function hardenImportedConfiguration(settingsValue, dataValue, currentBackupDire
   settings.moveToWaitingOnReply = false;
   settings.reopenOnConversationReply = false;
   settings.enableRecurringFollowUps = false;
+  settings.autoRemoveCompleted = false;
+  settings.completedRetentionDays = 0;
   settings.autoUnpinOnArchive = false;
   settings.autoCompleteOnArchive = false;
+  settings.autoUnpinOnDelete = false;
   settings.autoUnpinOnRead = false;
   settings.autoUnpinOnReply = false;
+  settings.keepPinOnMove = true;
   settings.enableBidirectionalCalendarSync = false;
   settings.enableThunderbirdTagSync = false;
   settings.calendarDeleteOnUnpin = false;
   settings.calendarCompleteOnPinComplete = false;
   settings.autoCleanup = false;
+  settings.enableAutomaticBackups = false;
   settings.confirmDelete = true;
   settings.confirmBulkDestructiveActions = true;
   settings.preferredCalendarId = "";
@@ -2006,8 +2011,9 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
   _checkReminders() {
+    if (this._settings?.safeMode) return;
     this._applyCompletedRetention();
-    if (!this._settings?.enableReminders || this._settings.safeMode) return;
+    if (!this._settings?.enableReminders) return;
     const now = Date.now();
     let changed = false;
     for (const ref of Object.values(this._data.refs || {})) {

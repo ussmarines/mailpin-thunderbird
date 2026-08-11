@@ -64,11 +64,16 @@ for token in (
     "settings.moveToWaitingOnReply = false",
     "settings.reopenOnConversationReply = false",
     "settings.enableRecurringFollowUps = false",
+    "settings.autoRemoveCompleted = false",
+    "settings.completedRetentionDays = 0",
     "settings.autoCompleteOnArchive = false",
+    "settings.autoUnpinOnDelete = false",
+    "settings.keepPinOnMove = true",
     "settings.enableBidirectionalCalendarSync = false",
     "settings.calendarDeleteOnUnpin = false",
     "settings.calendarCompleteOnPinComplete = false",
     "settings.autoCleanup = false",
+    "settings.enableAutomaticBackups = false",
     "settings.confirmDelete = true",
     "settings.confirmBulkDestructiveActions = true",
     "settings.autoPinSenders = []",
@@ -77,6 +82,12 @@ for token in (
     'settings.backupDirectory = String(currentBackupDirectory || "")',
 ):
     assert token in IMPLEMENTATION, token
+
+reminder_start = IMPLEMENTATION.index("  _checkReminders() {")
+safe_mode_guard = IMPLEMENTATION.index("if (this._settings?.safeMode) return;", reminder_start)
+retention_call = IMPLEMENTATION.index("this._applyCompletedRetention();", reminder_start)
+reminders_guard = IMPLEMENTATION.index("if (!this._settings?.enableReminders) return;", reminder_start)
+assert safe_mode_guard < retention_call < reminders_guard
 
 for token in (
     "ref.noReplyTracking = false",
