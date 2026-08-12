@@ -1,13 +1,13 @@
 # Mémoire opérationnelle — MailPerch
 
-> Version publique : **1.5.3** ; candidat local : **1.5.4**
-> Branche de travail : `fix/pre-store-manual-findings-1.5.4`
-> Base GitHub de l’audit : `main` au commit `afff4b6338f19c45e6c949d1d4628fcd58373ebc`
+> Version publique : **1.5.4**
+> Branche de référence : `main` ; runtime 1.5.4 intégré par la PR #33
+> Base GitHub de validation : `main` au commit `ca7206329045b58aff3384e7bd4c3b99eeecd2b3`
 > Extension ID : `pin-mails@MailPerch.local`
 
 ## Résumé
 
-MailPerch est une extension Thunderbird Manifest V3 locale qui ajoute un panneau de messages épinglés et transforme ces épingles en suivis actionnables sans remplacer la liste native. Le candidat 1.5.4 corrige les constats manuels de 1.5.3 : épinglage canonique entre entrées, responsive réel du panneau, géométrie Options, états du Dashboard, transitions workflow cohérentes et préparation date/heure Agenda. Il n’ajoute aucune permission, dépendance runtime, migration ni connexion réseau.
+MailPerch est une extension Thunderbird Manifest V3 locale qui ajoute un panneau de messages épinglés et transforme ces épingles en suivis actionnables sans remplacer la liste native. La version 1.5.4 corrige les constats manuels de 1.5.3 : épinglage canonique entre entrées, responsive réel du panneau, géométrie Options, états du Dashboard, transitions workflow cohérentes, planification Agenda et gestion explicite des calendriers incompatibles avec les tâches. Les nouvelles créations Agenda démarrent sur **Événement**. Elle n’ajoute aucune permission, dépendance runtime, migration ni connexion réseau.
 
 Les futures fonctions **Prochaine action**, **Timeline de conversation**, **Follow-up récurrent** et **Résultat du suivi** restent hors périmètre de cette release.
 
@@ -93,6 +93,8 @@ Le banc fonctionnel `.github/workflows/thunderbird-functional-bench.yml` / `test
 
 Le 10 août 2026, une nouvelle passe Linux sur Thunderbird 153.0.1 ESR/geckodriver 0.37.1 a revalidé la matrice 50/100/500/1000/2000 après correction d’une assertion erronée du harness : le compteur du panneau reste volontairement le total de la portée pendant une recherche, tandis que seules les cartes rendues sont filtrées. Les cinq volumes passent sans timeout ni exception JavaScript ; à 500/1000/2000, toute la pagination est chargée sans doublon et les positions début/milieu/fin sont présentes.
 
+Pour la 1.5.4, le banc ciblé 50 références sous Thunderbird 153.0.3 a revalidé les chemins modifiés : réconciliation cross-entry, transitions workflow, relance, Agenda, Dashboard/Options, cleanup et réinstallation. La PR #33 puis le commit squash intégré à `main` ont ensuite repassé les workflows QA Linux/Windows et le smoke Thunderbird réel avec succès.
+
 ### Outillage UI Codex
 
 La source de vérité visuelle demeure `docs/UI_SPEC.md`; aucun `PRODUCT.md` ou `DESIGN.md` concurrent n’est nécessaire. Le skill global Impeccable pilote l’UX/UI produit et ses finitions, UI UX Pro Max sert à la recherche de système, et `design-taste-frontend` à une direction artistique explicitement demandée. Le hook projet est silencieux sur les résultats propres, limité aux fichiers UI modifiés et réserve sa passe profonde à la fin de session.
@@ -111,8 +113,8 @@ Diagnostiquer l’environnement avec `npx skills ls -g` et le hook avec `node C:
 - détection fournisseurs par domaine exact ou sous-domaine légitime ;
 - portée multi-comptes basée sur `account.key`, sélection maximale bornée à 50 comptes ;
 - volume conseillé : jusqu’à 2 000 épingles, sans blocage technique au-delà ;
-- aucune nouvelle permission, dépendance runtime ou connexion réseau introduite par la 1.5.4.
-- recette utilisateur du XPI 1.5.4 encore requise avant toute publication.
+- aucune nouvelle permission, dépendance runtime ou connexion réseau introduite par la 1.5.4 ;
+- recette utilisateur finale verte ; QA Linux/Windows et smoke Thunderbird 153 réel verts sur la PR #33 puis sur `main`.
 
 ## Commandes obligatoires
 
@@ -141,4 +143,4 @@ python tests/test_thunderbird_test_bench.py
 - README, changelog, état projet, registre, architecture, sécurité et handoff à jour lorsque leur contenu est affecté ;
 - aucune permission, URL distante d’exécution, dépendance runtime ou schéma nouveau non justifié ;
 - résultats runtime décrits honnêtement : preuve réelle verte ou limite documentée, jamais supposée ;
-- aucun tag ni release sans autorisation explicite de l’utilisateur.
+- tag/release uniquement après autorisation explicite de l’utilisateur — autorisation reçue le 12 août 2026 pour la release GitHub 1.5.4.

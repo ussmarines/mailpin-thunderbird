@@ -16,7 +16,7 @@ Les cases cochées sont vérifiées automatiquement ou directement dans les sour
 - [x] Manifest V3 et clés de manifeste contrôlés ;
 - [x] plage déclarée Thunderbird 153.0 à 153.* ;
 - [x] thèmes clair/sombre : clipping, overflow, alignement et contraste texte de base automatisés ;
-- [ ] recette utilisateur fraîche des surfaces corrigées sur l’arbre produit 1.5.4 ;
+- [x] recette utilisateur fraîche des surfaces corrigées sur l’arbre produit 1.5.4 ;
 - [ ] matrice fonctionnelle/charge 50/100/500/1000/2000 fraîche sur 1.5.4 (non requise pour le retest ciblé) ;
 - [ ] matrice Windows/Linux/macOS Thunderbird réelle complète ;
 - [ ] Gmail/Microsoft/IMAP et calendriers réseau réels.
@@ -40,16 +40,17 @@ Les cases cochées sont vérifiées automatiquement ou directement dans les sour
 
 ## Validation 1.5.4 spécifique
 
-- [x] création événement/tâche Agenda observée dans le vrai Dashboard Thunderbird ; attente/relance restent à retester humainement ;
+- [x] création événement/tâche Agenda observée dans le vrai Dashboard Thunderbird ; attente/relance et dernier comportement Agenda ont aussi été retestés manuellement par l’utilisateur ;
 - [x] réconciliation message/conversation observée dans Thunderbird réel ;
 - [ ] resize continu du splitter 800–280 px observé dans Thunderbird réel ;
 - [x] géométrie ciblée Options/Dashboard/panneau contrôlée sous Chromium ;
-- [x] une passe `npm run ci` tentée, puis smoke réel et banc 50 ciblé réussis ; l’arrêt CI documentaire est détaillé dans le rapport.
+- [x] PR #33 : QA Linux/Windows et Thunderbird runtime smoke verts ;
+- [x] commit squash intégré à `main` : QA Linux/Windows et Thunderbird runtime smoke verts à nouveau.
 
 ## Livrables
 
 - [x] XPI 1.5.4 et archive source produits par le build de validation ;
 - [x] SHA-256 générés par le build ;
 - [x] CHANGELOG et déclarations de version préparés ;
-- [ ] publication GitHub v1.5.4 (non autorisée pendant cette passe) ;
+- [ ] publication GitHub v1.5.4 — étape de release à déclencher après intégration de cette préparation documentaire ;
 - [ ] soumission et validation par les reviewers ATN.

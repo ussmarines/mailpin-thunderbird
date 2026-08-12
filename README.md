@@ -6,7 +6,7 @@
 **Épinglez, organisez et suivez vos e-mails importants dans Thunderbird.**
 
 [![QA](https://github.com/ussmarines/mailperch-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailperch-thunderbird/actions/workflows/ci.yml)
-![Candidate](https://img.shields.io/badge/candidate-v1.5.4-0078D4)
+![Release](https://img.shields.io/badge/release-v1.5.4-0078D4)
 ![Licence](https://img.shields.io/badge/licence-MailPerch%20Source--Available%201.1-6A5ACD)
 </div>
 
@@ -44,9 +44,9 @@ Les accès internes Messages, Tags et Agenda sont isolés derrière une couche d
 
 ## Installation
 
-### Candidat local 1.5.4
+### Depuis la release GitHub
 
-1. Utilisez le fichier local vérifié `dist/MailPerch_v1.5.4.xpi` ; cette version n’est pas publiée.
+1. Téléchargez `MailPerch_v1.5.4.xpi` depuis la release `v1.5.4`.
 2. Dans Thunderbird, ouvrez **Extensions et thèmes**.
 3. Dans le menu de l’engrenage, choisissez **Installer un module depuis un fichier**.
 4. Sélectionnez le fichier XPI, puis redémarrez Thunderbird si nécessaire.

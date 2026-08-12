@@ -5,7 +5,7 @@
   "extensionVersion": "1.5.4",
   "baseGitHub": {
     "branch": "main",
-    "commit": "afff4b6338f19c45e6c949d1d4628fcd58373ebc"
+    "commit": "ca7206329045b58aff3384e7bd4c3b99eeecd2b3"
   },
   "extensionId": "pin-mails@MailPerch.local",
   "thunderbird": {
@@ -109,7 +109,7 @@
     "uiDependencyPolicy": "native HTML plus local Fluent 2 CSS tokens; no npm runtime dependency, bundler, CDN or remote asset",
     "runtimeTestSupplyChain": "test-only Thunderbird/geckodriver downloads are checksum-verified and are not runtime dependencies of the extension"
   },
-  "developmentBranch": "fix/pre-store-manual-findings-1.5.4",
+  "developmentBranch": "main",
   "testing": {
     "contract": [
       "tests/test_thunderbird_compatibility_boundary.py",
@@ -120,6 +120,6 @@
     "runtimeWorkflow": ".github/workflows/thunderbird-smoke.yml",
     "runtimeScript": "tests/thunderbird/real_smoke.py",
     "browserStatus": "1.5.4 has current Chromium DOM-flow and geometry evidence for Dashboard, Options and the 280-800 px panel container; real Thunderbird observation remains authoritative.",
-    "runtimeStatus": "1.5.4 passed the targeted 50-pin bench on Windows Thunderbird 153.0.3, including cross-entry reconciliation, centralized workflow cleanup through complete/template transitions, native memory-calendar event/task creation, zero JavaScript exceptions, cleanup and clean reinstall. User manual retest is still pending."
+    "runtimeStatus": "1.5.4 passed targeted real Thunderbird validation on Windows Thunderbird 153.0.3, the user manual retest is green, PR #33 QA and Thunderbird smoke are green, and the same QA plus real Thunderbird smoke are green again on the squash-integrated main runtime commit ca7206329045b58aff3384e7bd4c3b99eeecd2b3."
   }
 }

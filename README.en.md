@@ -6,7 +6,7 @@
 **Pin, organize and follow up on important email in Thunderbird.**
 
 [![QA](https://github.com/ussmarines/mailperch-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailperch-thunderbird/actions/workflows/ci.yml)
-![Candidate](https://img.shields.io/badge/candidate-v1.5.4-0078D4)
+![Release](https://img.shields.io/badge/release-v1.5.4-0078D4)
 ![License](https://img.shields.io/badge/license-MailPerch%20Source--Available%201.1-6A5ACD)
 </div>
 
@@ -44,9 +44,9 @@ Internal Messages, Tags, and Calendar access is isolated behind a dedicated comp
 
 ## Installation
 
-### Local 1.5.4 candidate
+### From the GitHub release
 
-1. Use the verified local file `dist/MailPerch_v1.5.4.xpi`; this version is not published.
+1. Download `MailPerch_v1.5.4.xpi` from release `v1.5.4`.
 2. In Thunderbird, open **Add-ons and Themes**.
 3. From the gear menu, select **Install Add-on From File**.
 4. Select the XPI and restart Thunderbird if required.

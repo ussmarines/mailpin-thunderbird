@@ -1,20 +1,14 @@
 {
   "schema_version": 1,
   "purpose": "Cache machine-readable des dernières preuves de validation réutilisables. Ce fichier ne remplace ni AGENTS.md ni les règles de sécurité et ne doit jamais servir à inventer un test non exécuté.",
-  "recorded_at": "2026-08-12T21:58:53+02:00",
+  "recorded_at": "2026-08-12T22:12:00+02:00",
   "baseline": {
     "repository": "ussmarines/mailperch-thunderbird",
-    "branch": "fix/pre-store-manual-findings-1.5.4",
-    "commit_sha": "038a8df5a9930894e9e6487cf9630c9d13fd399f",
-    "tree_sha": "f88b733a48a8df8224baa8f965682abc59af322d",
-    "working_tree_patch_id": "f759c88f08abd4c5568b63a41316b93fe2d99594",
-    "untracked_candidate_files": [
-      "SECURITY_AUDIT_1.5.4.md",
-      "VALIDATION_REPORT_1.5.4.md",
-      "tests/fixtures/panel_responsive_153.html",
-      "tests/panel_container_geometry.playwright.js",
-      "tests/test_pre_store_manual_findings_1_5_4.py"
-    ]
+    "branch": "main",
+    "commit_sha": "ca7206329045b58aff3384e7bd4c3b99eeecd2b3",
+    "tree_sha": "0af6f704db659a5c3191f9a7e1a6c5a6d84a998f",
+    "working_tree_patch_id": "",
+    "untracked_candidate_files": []
   },
   "policy": {
     "mode": "latest-valid-evidence-only",
@@ -34,30 +28,49 @@
   },
   "repository_checks": [
     {
-      "id": "local-windows-candidate-checks-1.5.4",
+      "id": "github-main-release-gate-1.5.4",
       "result": "success",
-      "validated_commit": "038a8df5a9930894e9e6487cf9630c9d13fd399f",
-      "working_tree_patch_id": "f759c88f08abd4c5568b63a41316b93fe2d99594",
-      "validated_at": "2026-08-12T21:58:53+02:00",
-      "command": "python tests/test_pre_store_manual_findings_1_5_4.py; node tests/dashboard_browser_test_contract.mjs; node tests/thunderbird_compatibility_contract.mjs; npm run check; git diff --check; npm run build; XPI manifest/package inspection",
-      "environment": {"os":"Windows 11","node":"24.19.0","npm":"11.17.0","python":"3.14.6"},
+      "validated_commit": "ca7206329045b58aff3384e7bd4c3b99eeecd2b3",
+      "working_tree_patch_id": "",
+      "validated_at": "2026-08-12T22:10:00+02:00",
+      "command": "GitHub Actions QA run 31636100660 + Thunderbird runtime smoke run 31636100646",
+      "environment": {"ci":"GitHub Actions","linux":"ubuntu-24.04","windows":"windows-latest","node":"24","python":"3.12"},
       "invalidates_on": ["**"],
       "evidence": {
-        "kind": "local-candidate-gate",
-        "summary": "Repository checks, targeted Agenda/dashboard/localization and compatibility guards, diff check and candidate build passed after the final Agenda delta. The earlier full suite and standard full security scan are not claimed for this newer patch; npm run ci was not repeated.",
+        "kind": "github-main-release-gate",
+        "summary": "On the squash-integrated main runtime commit: Full verification Linux succeeded including npm run ci and XPI layout; security guard regression succeeded; Windows source/model checks succeeded; real Thunderbird runtime smoke succeeded.",
+        "xpi_sha256": "13de009d165ea6eb33ef4319be22a0731dfe317cab0d409272c6cd92919e54ff"
+      }
+    },
+    {
+      "id": "local-windows-final-candidate-1.5.4",
+      "result": "success",
+      "validated_commit": "c225441ad8bc19ce2efe914b0a95022d76ad0c75",
+      "working_tree_patch_id": "",
+      "validated_at": "2026-08-12T22:00:00+02:00",
+      "command": "targeted final Agenda/dashboard guards; npm run check; git diff --check; npm run build",
+      "environment": {"os":"Windows 11","node":"24.19.0","npm":"11.17.0","python":"3.14.6"},
+      "invalidates_on": ["extension/**","tests/**","scripts/**","package.json"],
+      "evidence": {
+        "kind": "local-final-candidate-gate",
+        "summary": "Final Agenda default/event compatibility behavior and Dashboard refresh behavior passed targeted checks before commit and push.",
         "xpi_sha256": "9ebaa2a49db29ec28339be9d99f4de85f53dec298c84a56912d5765f6d84eb3f"
       }
     }
   ],
   "targeted_checks": [
     {
-      "id": "options-playwright-dom-flow-1.5.4",
+      "id": "manual-user-retest-1.5.4",
       "result": "success",
-      "validated_at": "2026-08-12T21:28:00+02:00",
-      "command": "playwright-cli --raw run-code --filename tests/options_dom_flow.playwright.js",
-      "environment": {"os":"Windows 11","browser":"Chromium","playwright_cli":"0.1.18"},
-      "invalidates_on": ["extension/options/**","extension/_locales/**","tests/options_dom_flow.playwright.js"],
-      "evidence": {"kind":"local-browser-flow","summary":"106 controls and 12 startup stages; FR/EN geometry at 360, 420, 520, 760, 820, 1000 and 1200 px plus 125 and 200 percent zoom; no responsive overflow."}
+      "validated_at": "2026-08-12T22:05:00+02:00",
+      "command": "manual Thunderbird recipe by the user on the final Windows 1.5.4 candidate",
+      "environment": {"os":"Windows","thunderbird":"153.0.3"},
+      "invalidates_on": ["extension/**"],
+      "evidence": {
+        "kind": "manual-user-runtime",
+        "artifact_sha256": "9ebaa2a49db29ec28339be9d99f4de85f53dec298c84a56912d5765f6d84eb3f",
+        "summary": "User reported the final recipe green. New Calendar creation defaults to Event; switching to Task with no task-compatible calendar is explained, the empty selector is hidden, creation is disabled, and no additional problem was observed."
+      }
     },
     {
       "id": "dashboard-playwright-dom-flow-1.5.4",
@@ -66,7 +79,16 @@
       "command": "npx --yes @playwright/cli@latest run-code --filename tests/dashboard_dom_flow.playwright.js",
       "environment": {"os":"Windows 11","browser":"Chromium","playwright_cli":"0.1.18"},
       "invalidates_on": ["extension/dashboard/**","extension/_locales/**","tests/dashboard_dom_flow.playwright.js"],
-      "evidence": {"kind":"local-browser-flow","summary":"7 views, 9 statistics and 11 cards passed; a new Calendar dialog starts on Event despite an older task preference, keeps the compatible event target and creates only after range validation. Failed post-action refresh remains explicit and preserves selection."}
+      "evidence": {"kind":"local-browser-flow","summary":"7 views, 9 statistics and 11 cards passed; new Calendar dialog defaults to Event and failed post-action refresh remains explicit while preserving selection."}
+    },
+    {
+      "id": "options-playwright-dom-flow-1.5.4",
+      "result": "success",
+      "validated_at": "2026-08-12T21:28:00+02:00",
+      "command": "playwright-cli --raw run-code --filename tests/options_dom_flow.playwright.js",
+      "environment": {"os":"Windows 11","browser":"Chromium","playwright_cli":"0.1.18"},
+      "invalidates_on": ["extension/options/**","extension/_locales/**","tests/options_dom_flow.playwright.js"],
+      "evidence": {"kind":"local-browser-flow","summary":"106 controls and 12 startup stages; FR/EN geometry at targeted widths and 125/200 percent zoom; no responsive overflow."}
     },
     {
       "id": "panel-container-geometry-1.5.4",
@@ -76,15 +98,6 @@
       "environment": {"os":"Windows 11","browser":"Chromium","playwright_cli":"0.1.18"},
       "invalidates_on": ["extension/styles/pin.css","tests/fixtures/panel_responsive_153.html","tests/panel_container_geometry.playwright.js"],
       "evidence": {"kind":"local-browser-geometry","summary":"27 continuous samples from 800 to 280 px; zero horizontal overflow and zero escaped controls."}
-    },
-    {
-      "id": "thunderbird-153-targeted-bench-1.5.4",
-      "result": "success",
-      "validated_at": "2026-08-12T21:20:00+02:00",
-      "command": "python tests/thunderbird/functional_bench.py --binary <Thunderbird 153.0.3> --xpi dist/MailPerch_v1.5.4.xpi --geckodriver <0.37.1> --volumes 50 --timeout 180",
-      "environment": {"os":"Windows 11","thunderbird":"153.0.3","geckodriver":"0.37.1","python":"3.14.6"},
-      "invalidates_on": ["extension/**","tests/thunderbird/functional_bench.py","tests/test_thunderbird_test_bench.py","scripts/build.py","package.json"],
-      "evidence": {"kind":"local-real-thunderbird","artifact_sha256":"ef0b02a59cc3024be37e45c0b5a5da901119a27c23aaba474735cad62fa935f3","summary":"50 pins passed in 16.761 seconds with centralized workflow transitions across panel, metadata, template and Calendar entry points; no-reply cleanup on active, completed and template; Calendar event/task creation; real Dashboard/Options; light/dark geometry; zero JavaScript exceptions; cleanup and clean reinstall."}
     }
   ]
 }
