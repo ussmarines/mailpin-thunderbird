@@ -1,18 +1,20 @@
 {
   "schema_version": 1,
   "purpose": "Cache machine-readable des dernières preuves de validation réutilisables. Ce fichier ne remplace ni AGENTS.md ni les règles de sécurité et ne doit jamais servir à inventer un test non exécuté.",
-  "recorded_at": "2026-08-12T22:12:00+02:00",
+  "recorded_at": "2026-08-13T01:06:28+02:00",
   "baseline": {
     "repository": "ussmarines/mailperch-thunderbird",
     "branch": "main",
-    "commit_sha": "ca7206329045b58aff3384e7bd4c3b99eeecd2b3",
-    "tree_sha": "0af6f704db659a5c3191f9a7e1a6c5a6d84a998f",
+    "commit_sha": "4fdb978e1828325001f95951c115059a931b8b6e",
+    "tree_sha": "ac9178baf462cadd6206199330e6644c243672d5",
     "working_tree_patch_id": "",
     "untracked_candidate_files": []
   },
   "policy": {
     "mode": "latest-valid-evidence-only",
-    "ignore_for_invalidation": ["docs/AI_VALIDATION_STATE.json"],
+    "ignore_for_invalidation": [
+      "docs/AI_VALIDATION_STATE.json"
+    ],
     "reuse_requires": [
       "result == success",
       "aucun chemin modifie depuis validated_commit ne correspond a invalidates_on",
@@ -28,76 +30,32 @@
   },
   "repository_checks": [
     {
-      "id": "github-main-release-gate-1.5.4",
+      "id": "github-main-release-gate-1.6.0",
       "result": "success",
-      "validated_commit": "ca7206329045b58aff3384e7bd4c3b99eeecd2b3",
+      "validated_commit": "4fdb978e1828325001f95951c115059a931b8b6e",
       "working_tree_patch_id": "",
-      "validated_at": "2026-08-12T22:10:00+02:00",
-      "command": "GitHub Actions QA run 31636100660 + Thunderbird runtime smoke run 31636100646",
-      "environment": {"ci":"GitHub Actions","linux":"ubuntu-24.04","windows":"windows-latest","node":"24","python":"3.12"},
-      "invalidates_on": ["**"],
+      "validated_at": "2026-08-13T01:05:22+02:00",
+      "command": "GitHub Actions QA run 31649530267 + Thunderbird runtime smoke run 31649530256",
+      "environment": {
+        "ci": "GitHub Actions",
+        "linux": "ubuntu-24.04",
+        "windows": "windows-latest",
+        "node": "24",
+        "python": "3.12",
+        "thunderbird": "153.0.1esr",
+        "geckodriver": "0.37.1"
+      },
+      "invalidates_on": [
+        "**"
+      ],
       "evidence": {
         "kind": "github-main-release-gate",
-        "summary": "On the squash-integrated main runtime commit: Full verification Linux succeeded including npm run ci and XPI layout; security guard regression succeeded; Windows source/model checks succeeded; real Thunderbird runtime smoke succeeded.",
-        "xpi_sha256": "13de009d165ea6eb33ef4319be22a0731dfe317cab0d409272c6cd92919e54ff"
-      }
-    },
-    {
-      "id": "local-windows-final-candidate-1.5.4",
-      "result": "success",
-      "validated_commit": "c225441ad8bc19ce2efe914b0a95022d76ad0c75",
-      "working_tree_patch_id": "",
-      "validated_at": "2026-08-12T22:00:00+02:00",
-      "command": "targeted final Agenda/dashboard guards; npm run check; git diff --check; npm run build",
-      "environment": {"os":"Windows 11","node":"24.19.0","npm":"11.17.0","python":"3.14.6"},
-      "invalidates_on": ["extension/**","tests/**","scripts/**","package.json"],
-      "evidence": {
-        "kind": "local-final-candidate-gate",
-        "summary": "Final Agenda default/event compatibility behavior and Dashboard refresh behavior passed targeted checks before commit and push.",
-        "xpi_sha256": "9ebaa2a49db29ec28339be9d99f4de85f53dec298c84a56912d5765f6d84eb3f"
+        "summary": "Sur le commit squash intégré de MailPin 1.6.0 : npm run ci complet et contrôle de structure XPI verts sous Linux ; garde sécurité historique verte ; contrôles source/modèles Windows verts ; smoke réel Thunderbird 153 vert avec téléchargement et vérification des binaires officiels.",
+        "xpi_sha256": "6860e0177795b163cb672edd1a93897260785c4b8eeeeac71d1b3d32dca281ae",
+        "source_archive_sha256": "69e67012ef0bafaf3dcd5db5400cdda9d3238e464928d94dc0be8943c73311e3",
+        "development_artifact_id": 9162031502
       }
     }
   ],
-  "targeted_checks": [
-    {
-      "id": "manual-user-retest-1.5.4",
-      "result": "success",
-      "validated_at": "2026-08-12T22:05:00+02:00",
-      "command": "manual Thunderbird recipe by the user on the final Windows 1.5.4 candidate",
-      "environment": {"os":"Windows","thunderbird":"153.0.3"},
-      "invalidates_on": ["extension/**"],
-      "evidence": {
-        "kind": "manual-user-runtime",
-        "artifact_sha256": "9ebaa2a49db29ec28339be9d99f4de85f53dec298c84a56912d5765f6d84eb3f",
-        "summary": "User reported the final recipe green. New Calendar creation defaults to Event; switching to Task with no task-compatible calendar is explained, the empty selector is hidden, creation is disabled, and no additional problem was observed."
-      }
-    },
-    {
-      "id": "dashboard-playwright-dom-flow-1.5.4",
-      "result": "success",
-      "validated_at": "2026-08-12T21:56:00+02:00",
-      "command": "npx --yes @playwright/cli@latest run-code --filename tests/dashboard_dom_flow.playwright.js",
-      "environment": {"os":"Windows 11","browser":"Chromium","playwright_cli":"0.1.18"},
-      "invalidates_on": ["extension/dashboard/**","extension/_locales/**","tests/dashboard_dom_flow.playwright.js"],
-      "evidence": {"kind":"local-browser-flow","summary":"7 views, 9 statistics and 11 cards passed; new Calendar dialog defaults to Event and failed post-action refresh remains explicit while preserving selection."}
-    },
-    {
-      "id": "options-playwright-dom-flow-1.5.4",
-      "result": "success",
-      "validated_at": "2026-08-12T21:28:00+02:00",
-      "command": "playwright-cli --raw run-code --filename tests/options_dom_flow.playwright.js",
-      "environment": {"os":"Windows 11","browser":"Chromium","playwright_cli":"0.1.18"},
-      "invalidates_on": ["extension/options/**","extension/_locales/**","tests/options_dom_flow.playwright.js"],
-      "evidence": {"kind":"local-browser-flow","summary":"106 controls and 12 startup stages; FR/EN geometry at targeted widths and 125/200 percent zoom; no responsive overflow."}
-    },
-    {
-      "id": "panel-container-geometry-1.5.4",
-      "result": "success",
-      "validated_at": "2026-08-12T18:51:30+02:00",
-      "command": "npx --yes @playwright/cli@latest run-code --filename tests/panel_container_geometry.playwright.js",
-      "environment": {"os":"Windows 11","browser":"Chromium","playwright_cli":"0.1.18"},
-      "invalidates_on": ["extension/styles/pin.css","tests/fixtures/panel_responsive_153.html","tests/panel_container_geometry.playwright.js"],
-      "evidence": {"kind":"local-browser-geometry","summary":"27 continuous samples from 800 to 280 px; zero horizontal overflow and zero escaped controls."}
-    }
-  ]
+  "targeted_checks": []
 }
