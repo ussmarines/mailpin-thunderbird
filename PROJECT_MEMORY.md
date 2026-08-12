@@ -1,13 +1,13 @@
 # Mémoire opérationnelle — MailPin
 
-> Version publique : **1.6.0**
-> Branche de référence : `main` ; runtime 1.6.0 intégré par la PR #33
-> Base GitHub de validation : `main` au commit `ca7206329045b58aff3384e7bd4c3b99eeecd2b3`
+> Version publique : **1.6.1**
+> Branche de référence : `main` ; runtime MailPin intégré par la PR #35
+> Base runtime validée : `4fdb978e1828325001f95951c115059a931b8b6e` ; préparation 1.6.1 dérivée de `6d582da0cf729b1a93df348e4845430fbfb7fad2`
 > Extension ID : `ussmarines.mailpin@addons.thunderbird.net`
 
 ## Résumé
 
-MailPin est une extension Thunderbird Manifest V3 locale qui ajoute un panneau de messages épinglés et transforme ces épingles en suivis actionnables sans remplacer la liste native. La version 1.6.0 corrige les constats manuels de 1.5.3 : épinglage canonique entre entrées, responsive réel du panneau, géométrie Options, états du Dashboard, transitions workflow cohérentes, planification Agenda et gestion explicite des calendriers incompatibles avec les tâches. Les nouvelles créations Agenda démarrent sur **Événement**. Elle n’ajoute aucune permission, dépendance runtime, migration ni connexion réseau.
+MailPin est une extension Thunderbird Manifest V3 locale qui ajoute un panneau de messages épinglés et transforme ces épingles en suivis actionnables sans remplacer la liste native. Le métier actuellement distribué reprend les corrections fonctionnelles consolidées avant le rebranding. La 1.6.0 a introduit l’identité MailPin et la 1.6.1 fiabilise uniquement le dossier de publication/review. Les corrections métier héritées couvrent : épinglage canonique entre entrées, responsive réel du panneau, géométrie Options, états du Dashboard, transitions workflow cohérentes, planification Agenda et gestion explicite des calendriers incompatibles avec les tâches. Les nouvelles créations Agenda démarrent sur **Événement**. La 1.6.1 n’ajoute aucune permission, dépendance runtime, migration de stockage ni connexion réseau. Le changement d’ID a été introduit volontairement en 1.6.0 avant la première publication ATN.
 
 Les futures fonctions **Prochaine action**, **Timeline de conversation**, **Follow-up récurrent** et **Résultat du suivi** restent hors périmètre de cette release.
 
@@ -93,7 +93,7 @@ Le banc fonctionnel `.github/workflows/thunderbird-functional-bench.yml` / `test
 
 Le 10 août 2026, une nouvelle passe Linux sur Thunderbird 153.0.1 ESR/geckodriver 0.37.1 a revalidé la matrice 50/100/500/1000/2000 après correction d’une assertion erronée du harness : le compteur du panneau reste volontairement le total de la portée pendant une recherche, tandis que seules les cartes rendues sont filtrées. Les cinq volumes passent sans timeout ni exception JavaScript ; à 500/1000/2000, toute la pagination est chargée sans doublon et les positions début/milieu/fin sont présentes.
 
-Pour la 1.6.0, le banc ciblé 50 références sous Thunderbird 153.0.3 a revalidé les chemins modifiés : réconciliation cross-entry, transitions workflow, relance, Agenda, Dashboard/Options, cleanup et réinstallation. La PR #33 puis le commit squash intégré à `main` ont ensuite repassé les workflows QA Linux/Windows et le smoke Thunderbird réel avec succès.
+Avant rebranding, le banc ciblé 50 références sous Thunderbird 153.0.3 a revalidé les chemins métier ensuite conservés : réconciliation cross-entry, transitions workflow, relance, Agenda, Dashboard/Options, cleanup et réinstallation. Le rebranding a été intégré par la PR #35. Le commit runtime `4fdb978e1828325001f95951c115059a931b8b6e` a repassé les workflows QA Linux/Windows, la garde sécurité et le smoke Thunderbird réel avec succès.
 
 ### Outillage UI Codex
 
@@ -114,7 +114,9 @@ Diagnostiquer l’environnement avec `npx skills ls -g` et le hook avec `node C:
 - portée multi-comptes basée sur `account.key`, sélection maximale bornée à 50 comptes ;
 - volume conseillé : jusqu’à 2 000 épingles, sans blocage technique au-delà ;
 - aucune nouvelle permission, dépendance runtime ou connexion réseau introduite par la 1.6.0 ;
-- recette utilisateur finale verte ; QA Linux/Windows et smoke Thunderbird 153 réel verts sur la PR #33 puis sur `main`.
+- recette utilisateur pré-rebranding 1.5.4 verte pour le métier inchangé ; cette preuve n’est pas renommée recette 1.6.1 ;
+- runtime MailPin `4fdb978e1828325001f95951c115059a931b8b6e` : QA Linux/Windows, garde sécurité et smoke Thunderbird 153 réel verts ;
+- 1.6.1 ne modifie que la version du manifeste et les métadonnées de publication, et exige ses propres gates automatisés avant release.
 
 ## Commandes obligatoires
 

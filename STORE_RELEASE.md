@@ -1,10 +1,10 @@
-# Publication MailPin 1.6.0
+# Publication MailPin 1.6.1
 
 ## Identité
 
 - **Nom :** MailPin
 - **Nom complet :** MailPin — Email Follow-up & Productivity for Thunderbird
-- **Version publique :** 1.6.0
+- **Version publique :** 1.6.1
 - **Sous-titre FR :** Suivi d’e-mails & productivité pour Thunderbird.
 - **Subtitle EN:** Email Follow-up & Productivity for Thunderbird
 - **Auteur public :** ussmarines
@@ -12,27 +12,36 @@
 - **Compatibilité déclarée :** Thunderbird 153.0 à 153.*
 - **Licence :** MailPin Source-Available License 1.1
 
-L’identifiant propre au produit doit conserver exactement la même casse et ne plus être modifié après signature ou publication.
+L’identifiant a été adopté volontairement en 1.6.0 avant la première publication ATN. Il doit conserver exactement la même casse et ne plus être modifié après publication ATN.
 
-## État de préparation
+## Pourquoi 1.6.1
 
-MailPin 1.6.0 corrige les défauts observés pendant la recette de 1.5.3 : géométrie des règles Options, Agenda planifiable avant création, toggle d’attente, relance sans réponse configurable, épinglage canonique entre entrées et responsive du panneau fondé sur son conteneur réel. La passe finale centralise aussi les transitions workflow, empêche les faux succès Dashboard après échec de rafraîchissement et gère explicitement l’absence de calendrier compatible avec les tâches. Les nouvelles créations Agenda démarrent sur **Événement**.
+La 1.6.0 a réalisé le rebranding **MailPerch → MailPin**, l’adoption de l’ID public définitif et la nouvelle direction artistique. Son runtime intégré par la PR #35 (`4fdb978e1828325001f95951c115059a931b8b6e`) a passé QA Linux/Windows, garde sécurité et smoke Thunderbird 153 réel. La release GitHub v1.6.0 a ensuite été publiée depuis `main`.
 
-La recette utilisateur finale du XPI 1.6.0 est verte. La PR #33 a été fusionnée par squash dans `main`; les workflows GitHub Actions **QA** et **Thunderbird runtime smoke** sont verts sur le commit intégré. Aucune nouvelle permission, dépendance runtime, connexion réseau, télémétrie, publicité, migration de stockage ou modification d’identité n’est introduite.
+Un contrôle reviewer post-publication a détecté que certains documents actifs de l’archive source 1.6.0 contenaient encore des preuves textuelles héritées de la préparation 1.5.4 (ancien numéro de PR/SHA, ancien hash XPI et une phrase niant à tort le changement d’identité). **Aucun défaut runtime n’a été trouvé.**
 
-La **publication GitHub 1.6.0 est autorisée et prête**. La soumission Add-ons for Thunderbird reste une action distincte et manuelle : seul le portail ATN et ses reviewers peuvent valider ou refuser la publication. Avant l’envoi ATN, le propriétaire doit terminer les cases manuelles de `docs/ATN_RELEASE_CHECKLIST.md`, confirmer que support et politique de confidentialité sont accessibles publiquement, puis tester les fournisseurs/systèmes restant hors preuve.
+La 1.6.1 corrige uniquement cette cohérence de publication et le numéro de version. Aucun comportement métier, permission, schéma, stockage, dépendance runtime, réseau, télémétrie, publicité ou code distant n’est modifié.
+
+## Preuves correctement attribuées
+
+- recette manuelle utilisateur : dernière preuve fraîche sur le candidat pré-rebranding 1.5.4 ; réutilisable uniquement pour les comportements métier inchangés ;
+- rebranding/runtime MailPin 1.6.0 : PR #35 puis commit `4fdb978e1828325001f95951c115059a931b8b6e`, QA Linux/Windows + garde sécurité + smoke Thunderbird réel verts ;
+- release 1.6.0 : XPI publié SHA-256 `6860e0177795b163cb672edd1a93897260785c4b8eeeeac71d1b3d32dca281ae` ;
+- 1.6.1 : la PR et la release doivent refaire la QA complète et le smoke Thunderbird car le manifeste/version est modifié ; les résultats publiés par GitHub Actions et `SHA256SUMS.txt` constituent la preuve fraîche de cette version.
+
+Aucune recette manuelle fraîche du XPI 1.6.1 n’est revendiquée tant qu’elle n’a pas été réellement effectuée.
 
 ## Livrables GitHub / ATN
 
-Le workflow `Release` exécute `npm run ci`, puis publie :
+Le workflow Release publie, après `npm run ci` :
 
-- `dist/MailPin_v1.6.0.xpi` — extension ;
-- `dist/MailPin_GitHub_Repository_v1.6.0.zip` — sources complètes pour review ;
-- `dist/SHA256SUMS.txt` — empreintes des deux archives ;
-- `release/ATN_REVIEW_NOTES_TEMPLATE.md` — informations de test et justification de l’Experiment ;
-- `release/BUILD_INSTRUCTIONS.md` — reproduction exacte du build.
+- `dist/MailPin_v1.6.1.xpi` — extension ;
+- `dist/MailPin_GitHub_Repository_v1.6.1.zip` — sources complètes pour review ;
+- `dist/SHA256SUMS.txt` — empreintes définitives ;
+- `release/ATN_REVIEW_NOTES_TEMPLATE.md` — informations reviewers ;
+- `release/BUILD_INSTRUCTIONS.md` — reproduction du build.
 
-Le build Linux final de `main` avant la préparation documentaire a produit un XPI SHA-256 `13de009d165ea6eb33ef4319be22a0731dfe317cab0d409272c6cd92919e54ff`, identique octet pour octet au build Linux de la PR. Les sommes publiées par `SHA256SUMS.txt` dans la release restent la référence définitive.
+Pour une soumission ATN, **les sommes du `SHA256SUMS.txt` attaché à la release v1.6.1 sont la référence définitive** ; aucun ancien hash 1.5.x/1.6.0 ne doit être recopié dans le dossier reviewer.
 
 ## Informations de fiche ATN
 
@@ -50,11 +59,12 @@ MailPin ne transmet aucune donnée. Aucun corps complet de message ni contenu de
 
 ### Permission privilégiée
 
-L’API Experiment `pinInbox` est nécessaire pour intégrer le panneau dans `about:3pane`, résoudre les messages déplacés, utiliser SQLite, écouter les changements de dossiers, gérer les tags MailPin et créer/synchroniser des tâches ou événements Agenda. Cette API explique l’avertissement d’accès complet affiché par Thunderbird.
+L’API Experiment `pinInbox` est nécessaire pour intégrer le panneau dans `about:3pane`, résoudre les messages déplacés, utiliser SQLite, écouter les changements de dossiers, gérer les tags MailPin et créer/synchroniser les tâches ou événements Agenda compatibles. Cette API explique l’avertissement d’accès complet affiché par Thunderbird.
 
-## Blocages externes restant pour ATN
+## Limites restant externes à GitHub
 
-- validation manuelle complète Windows, Linux et macOS sur les versions Thunderbird réellement annoncées ;
-- validation des fournisseurs/comptes réels restant au plan ATN ;
-- création/accès au compte développeur et soumission dans le portail Add-ons for Thunderbird ;
-- décision finale des reviewers ATN.
+- recette humaine ciblée du XPI 1.6.1 avant ATN ;
+- matrice Windows/Linux/macOS Thunderbird réelle exhaustive ;
+- Gmail/Microsoft/IMAP et calendriers réseau réels hors banc ;
+- validation humaine complète zoom 200 %, contraste OS élevé et lecteurs d’écran ;
+- accès au compte développeur et décision finale des reviewers ATN.

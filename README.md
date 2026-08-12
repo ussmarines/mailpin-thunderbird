@@ -6,7 +6,7 @@
 **Email Follow-up & Productivity for Thunderbird**
 
 [![QA](https://github.com/ussmarines/mailperch-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailperch-thunderbird/actions/workflows/ci.yml)
-![Release](https://img.shields.io/badge/release-v1.6.0-4F7F75)
+![Release](https://img.shields.io/badge/release-v1.6.1-4F7F75)
 ![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x-3D536B)
 ![Licence](https://img.shields.io/badge/licence-MailPin%20Source--Available%201.1-1A1D21)
 </div>
@@ -32,7 +32,7 @@ La 1.6.0 inaugure l’identité **MailPin** : symbole enveloppe + pin, palette I
 
 ## Compatibilité
 
-- **MailPin :** `1.6.0`
+- **MailPin :** `1.6.1`
 - **Thunderbird :** `153.0` à `153.*`
 - **Format :** MailExtension Manifest V3
 - **Langues :** français et anglais
@@ -44,7 +44,7 @@ MailPin utilise une API Experiment privilégiée pour l’intégration `about:3p
 
 ### Release GitHub
 
-1. Téléchargez `MailPin_v1.6.0.xpi` depuis la release `v1.6.0`.
+1. Téléchargez `MailPin_v1.6.1.xpi` depuis la release `v1.6.1`.
 2. Thunderbird → **Extensions et thèmes** → engrenage → **Installer un module depuis un fichier**.
 3. Sélectionnez le XPI.
 
@@ -60,8 +60,8 @@ npm run ci
 
 Livrables reproductibles :
 
-- `dist/MailPin_v1.6.0.xpi`
-- `dist/MailPin_GitHub_Repository_v1.6.0.zip`
+- `dist/MailPin_v1.6.1.xpi`
+- `dist/MailPin_GitHub_Repository_v1.6.1.zip`
 - `dist/SHA256SUMS.txt`
 
 ## Confidentialité & sécurité

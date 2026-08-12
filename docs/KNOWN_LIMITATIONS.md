@@ -1,14 +1,14 @@
 # Limites connues
 
-## Version 1.6.0 et portée de validation
+## Version 1.6.1 et portée de validation
 
-Le candidat **1.6.0** modifie l’API Agenda bornée, la résolution des identités d’épinglage et plusieurs surfaces UI. Il ne modifie ni les permissions ni les schémas de stockage. Les validations automatisées fraîches sont consignées dans `VALIDATION_REPORT_1.6.0.md` et `docs/AI_VALIDATION_STATE.json`; la recette manuelle utilisateur reste requise.
+MailPin **1.6.1** ne change pas la logique métier de 1.6.0 : le delta distribué est le champ `version` du manifeste et les métadonnées/documentations de publication. Le rebranding MailPin, la nouvelle identité ATN, l’icône SVG et la palette ont été introduits en 1.6.0 et ont passé QA Linux/Windows, garde sécurité et smoke Thunderbird 153 réel sur le runtime intégré. La recette manuelle utilisateur reste une preuve héritée de la dernière build pré-rebranding 1.5.4 pour les comportements métier inchangés ; elle n’est pas présentée comme une recette manuelle fraîche du XPI 1.6.1. Les validations automatisées fraîches de 1.6.1 sont consignées dans `VALIDATION_REPORT_1.6.1.md`.
 
 Une matrice exhaustive de tous les systèmes, versions Thunderbird, fournisseurs réels, types de dossiers, calendriers, lecteurs d’écran et configurations de profil reste hors de portée d’un banc automatisé unique. Les éléments non observés restent explicitement documentés.
 
 ## Compatibilité Thunderbird
 
-- Le manifeste 1.6.0 déclare Thunderbird `153.0` à `153.*`.
+- Le manifeste 1.6.1 déclare Thunderbird `153.0` à `153.*`.
 - MailPin utilise une API Experiment privilégiée ; une évolution interne de Thunderbird peut exiger une adaptation.
 - Messages, Tags et Agenda restent isolés dans leurs adaptateurs dédiés.
 - Le DOM `about:3pane`, `ThreadCard`, les fenêtres et menus natifs restent des surfaces internes à surveiller.

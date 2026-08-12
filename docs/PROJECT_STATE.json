@@ -2,10 +2,11 @@
   "format": "mailperch-project-state",
   "version": 1,
   "project": "MailPin — Email Follow-up & Productivity for Thunderbird",
-  "extensionVersion": "1.6.0",
+  "extensionVersion": "1.6.1",
   "baseGitHub": {
     "branch": "main",
-    "commit": "ca7206329045b58aff3384e7bd4c3b99eeecd2b3"
+    "commit": "6d582da0cf729b1a93df348e4845430fbfb7fad2",
+    "role": "pre-1.6.1 release-metadata baseline"
   },
   "extensionId": "ussmarines.mailpin@addons.thunderbird.net",
   "thunderbird": {
@@ -119,7 +120,7 @@
     ],
     "runtimeWorkflow": ".github/workflows/thunderbird-smoke.yml",
     "runtimeScript": "tests/thunderbird/real_smoke.py",
-    "browserStatus": "1.5.4 has current Chromium DOM-flow and geometry evidence for Dashboard, Options and the 280-800 px panel container; real Thunderbird observation remains authoritative.",
-    "runtimeStatus": "1.5.4 passed targeted real Thunderbird validation on Windows Thunderbird 153.0.3, the user manual retest is green, PR #33 QA and Thunderbird smoke are green, and the same QA plus real Thunderbird smoke are green again on the squash-integrated main runtime commit ca7206329045b58aff3384e7bd4c3b99eeecd2b3."
+    "browserStatus": "Chromium DOM-flow and geometry evidence predates the branding-only release delta and remains applicable to unchanged business/layout behavior; MailPin identity/palette are covered by current static/UI guards.",
+    "runtimeStatus": "MailPin 1.6.0 rebrand runtime commit 4fdb978e1828325001f95951c115059a931b8b6e passed Linux/Windows QA, security guard and real Thunderbird 153 smoke. MailPin 1.6.1 changes only manifest version plus publication/reviewer metadata; its release process must rerun full QA and real Thunderbird smoke. No fresh manual 1.6.1 XPI acceptance is claimed."
   }
 }

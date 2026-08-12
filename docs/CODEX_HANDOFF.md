@@ -1,33 +1,29 @@
-# Passage de relais Codex — MailPin 1.6.0
+# Passage de relais Codex — MailPin 1.6.1
 
 ## Référence
 
-- référence runtime intégrée : `main` au commit `ca7206329045b58aff3384e7bd4c3b99eeecd2b3` ;
-- PR d’intégration : #33, fusionnée par squash ;
-- version publique : **1.6.0** ;
+- runtime MailPin intégré par la PR #35 : `4fdb978e1828325001f95951c115059a931b8b6e` ;
+- baseline `main` avant préparation 1.6.1 : `6d582da0cf729b1a93df348e4845430fbfb7fad2` ;
+- version cible publique : **1.6.1** ;
 - identifiant canonique : `ussmarines.mailpin@addons.thunderbird.net` ;
-- branche de préparation runtime : `fix/pre-store-manual-findings-1.6.0` ;
-- branche de finalisation documentaire : `release/finalize-1.6.0-metadata`.
+- branche de préparation : `release/mailpin-1.6.1-store-metadata`.
 
 ## État produit
 
-La 1.6.0 corrige les constats de recette 1.5.3 : règles Options comprimées, modale Agenda et planification, toggle et badges d’attente, délai de relance individuel, doublons message/conversation et responsive du panneau selon le splitter Thunderbird. La passe transversale pré-store aligne aussi les transitions workflow de l’éditeur, des templates, des règles et d’Agenda, supprime les états `noReply*`/relance orphelins et empêche le Dashboard d’annoncer un succès si son état post-mutation n’a pas pu être rechargé. Le dernier constat Agenda est consolidé : toute nouvelle création commence sur **Événement** et une tâche sans calendrier compatible est expliquée sans tentative de création.
+MailPin 1.6.0 a introduit le nouveau nom, l’ID ATN définitif, l’icône SVG et la palette professionnelle sans modifier la logique métier validée avant rebranding. Le runtime rebrand intégré par #35 a ensuite repassé QA Linux/Windows, garde sécurité et smoke Thunderbird 153 réel sur le commit exact `4fdb978e1828325001f95951c115059a931b8b6e`.
 
-La recette utilisateur finale est verte. La PR #33 puis le commit intégré ont repassé les workflows GitHub Actions **QA** et **Thunderbird runtime smoke** avec succès. Les preuves détaillées sont consignées dans `VALIDATION_REPORT_1.6.0.md`.
+La 1.6.1 ne corrige pas un bug runtime. Elle retire des métadonnées de publication 1.5.4 restées actives dans l’archive source 1.6.0 et évite d’attribuer à tort une recette manuelle fraîche à un XPI qui ne l’avait pas reçue. Le seul delta XPI prévu est `manifest.version = 1.6.1`.
 
-## Artefacts
+## Preuves
 
-Le build Linux final de `main` avant la finalisation documentaire a produit :
-
-- `MailPin_v1.6.0.xpi` — SHA-256 `13de009d165ea6eb33ef4319be22a0731dfe317cab0d409272c6cd92919e54ff` ;
-- l’artefact Linux de la PR est identique octet pour octet ;
-- le XPI Windows utilisé pour la recette manuelle avait le SHA-256 `9ebaa2a49db29ec28339be9d99f4de85f53dec298c84a56912d5765f6d84eb3f`, différence de conteneur ZIP multiplateforme déjà suivie sous MP-2026-018.
-
-Les sommes de la release publiées dans `SHA256SUMS.txt` restent l’autorité finale.
+- recette manuelle : dernière preuve fraîche sur le candidat 1.5.4 avant rebranding, réutilisée uniquement pour le métier inchangé ;
+- QA/sécurité/smoke réel MailPin 1.6.0 : verts sur `4fdb978e1828325001f95951c115059a931b8b6e` ;
+- XPI v1.6.0 public : `6860e0177795b163cb672edd1a93897260785c4b8eeeeac71d1b3d32dca281ae` ;
+- 1.6.1 : exiger QA Linux/Windows + sécurité + `npm run ci` + smoke Thunderbird réel sur la PR et le `main` final avant release.
 
 ## Readiness
 
-- **GitHub release 1.6.0 : GO** ;
-- **ATN : encore séparé**, avec fournisseurs réseau, matrice multi-OS complète et contrôles humains/accessibilité restant hors preuve.
+- **GitHub 1.6.1 : GO uniquement après les gates ci-dessus** ;
+- **ATN : candidat officiel après release GitHub**, avec recette humaine ciblée, fournisseurs réseau/matrice multi-OS et contrôles accessibilité humains restant explicitement hors preuve.
 
-Aucune nouvelle permission, dépendance runtime, connexion réseau, télémétrie, publicité, migration de stockage ou modification d’identité n’est introduite par la 1.6.0. Codex Security n’a pas été utilisé.
+Aucune nouvelle permission, dépendance runtime, connexion réseau, télémétrie, publicité ou migration de stockage n’est introduite en 1.6.1. Le changement d’identité a eu lieu volontairement en 1.6.0 et reste immuable pour la publication ATN. Codex Security n’a pas été utilisé.

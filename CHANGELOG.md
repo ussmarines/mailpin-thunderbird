@@ -1,5 +1,14 @@
 # Journal des modifications
 
+## 1.6.1 — métadonnées de publication et dossier ATN fiabilisés
+
+- corrige les documents actifs de publication/review qui avaient conservé des preuves 1.5.4 sous des libellés 1.6.0 après le rebranding ;
+- distingue explicitement la recette manuelle pré-rebranding 1.5.4 des validations fraîches MailPin 1.6.0/1.6.1 ;
+- synchronise `PROJECT_MEMORY.md`, `docs/PROJECT_STATE.json`, `STORE_RELEASE.md`, la checklist ATN, le handoff et les instructions reviewers sur les vrais commits/runs MailPin ;
+- conserve l’identité publique définitive `ussmarines.mailpin@addons.thunderbird.net` et documente que la migration d’ID a été introduite volontairement en 1.6.0 ;
+- passe la version distribuée à 1.6.1 afin que l’archive source remise aux reviewers contienne des métadonnées exactes ;
+- aucune modification de logique métier, permission, schéma, dépendance runtime, réseau, télémétrie ou code distant ; seul le champ `version` du manifeste change dans le XPI.
+
 ## 1.6.0 — nouvelle identité MailPin et préparation ATN
 
 - renommage public complet de MailPerch vers **MailPin — Email Follow-up & Productivity for Thunderbird** ;

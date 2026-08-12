@@ -1,10 +1,10 @@
-# Notes pour les reviewers ATN — MailPin 1.6.0
+# Notes pour les reviewers ATN — MailPin 1.6.1
 
 ## Identité
 
 - **Nom :** MailPin — Email Follow-up & Productivity for Thunderbird
 - **Nom court :** MailPin
-- **Version :** 1.6.0
+- **Version :** 1.6.1
 - **ID :** `ussmarines.mailpin@addons.thunderbird.net`
 - **Compatibilité :** Thunderbird 153.0 à 153.*
 - **Langues :** français et anglais
