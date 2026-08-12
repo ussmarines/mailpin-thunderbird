@@ -24,7 +24,8 @@
     "update_rules": [
       "enregistrer uniquement des controles reellement executes ou des preuves GitHub verifiees",
       "conserver seulement la preuve la plus recente utile par identifiant de controle",
-      "ne jamais transformer une passe interrompue en succes"
+      "ne jamais transformer une passe interrompue en succes",
+      "ne jamais enregistrer dans ce fichier le hash de l archive source qui le contient ; ce hash est publie seulement avec l artefact de release"
     ],
     "max_targeted_checks": 32
   },
@@ -52,7 +53,6 @@
         "kind": "github-main-release-gate",
         "summary": "Sur le commit squash intégré de MailPin 1.6.0 : npm run ci complet et contrôle de structure XPI verts sous Linux ; garde sécurité historique verte ; contrôles source/modèles Windows verts ; smoke réel Thunderbird 153 vert avec téléchargement et vérification des binaires officiels.",
         "xpi_sha256": "6860e0177795b163cb672edd1a93897260785c4b8eeeeac71d1b3d32dca281ae",
-        "source_archive_sha256": "69e67012ef0bafaf3dcd5db5400cdda9d3238e464928d94dc0be8943c73311e3",
         "development_artifact_id": 9162031502
       }
     }
