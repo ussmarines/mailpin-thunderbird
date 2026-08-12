@@ -1,9 +1,9 @@
 ---
-name: mailperch-project-knowledge
-description: Project knowledge for the MailPerch Thunderbird extension. Use when a task requires current context about MailPerch architecture, the privileged Experiment and Thunderbird compatibility layer, pin and workflow features, local data model, Options/dashboard/panel UI, Fluent 2 branding, security boundaries, testing evidence, or release constraints. Do not use for generic Git work, isolated edits fully explained by the touched files, or procedures governed by AGENTS.md, MAILPERCH_AI_RULES.md, Superpowers, or another dedicated skill.
+name: mailpin-project-knowledge
+description: Project knowledge for the MailPin Thunderbird extension. Use when a task requires current context about MailPin architecture, the privileged Experiment and Thunderbird compatibility layer, pin and workflow features, local data model, Options/dashboard/panel UI, Fluent 2 branding, security boundaries, testing evidence, or release constraints. Do not use for generic Git work, isolated edits fully explained by the touched files, or procedures governed by AGENTS.md, MAILPERCH_AI_RULES.md, Superpowers, or another dedicated skill.
 ---
 
-# MailPerch Project Knowledge
+# MailPin Project Knowledge
 
 Use this skill to locate current product and architecture facts. It does not replace the repository's governance or live implementation.
 
@@ -17,7 +17,7 @@ Apply this order when sources disagree:
 4. `PROJECT_MEMORY.md` and current architecture/functional documentation.
 5. Historical reports, handoffs, archived audits, and changelogs only when history is explicitly needed.
 
-The first three layers remain authoritative; never restate their agent instructions as secondary knowledge. Superpowers supplies optional method, not MailPerch facts.
+The first three layers remain authoritative; never restate their agent instructions as secondary knowledge. Superpowers supplies optional method, not MailPin facts.
 
 ## Load only what is needed
 

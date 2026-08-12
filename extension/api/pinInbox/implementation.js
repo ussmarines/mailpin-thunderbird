@@ -123,11 +123,11 @@ async function removePathIfPresent(path, options = {}) {
   try {
     if (await IOUtils.exists(path)) await IOUtils.remove(path, options);
   } catch (error) {
-    console.warn("MailPerch : suppression locale incomplète", safeErrorName(error));
+    console.warn("MailPin : suppression locale incomplète", safeErrorName(error));
   }
 }
 
-async function isVerifiedMailPerchBackup(path) {
+async function isVerifiedMailPinBackup(path) {
   try {
     const info = await IOUtils.stat(path);
     if (!info || info.type !== "regular" || info.size > MAX_IMPORT_BYTES * 4) return false;
@@ -143,7 +143,7 @@ async function isVerifiedMailPerchBackup(path) {
   }
 }
 
-async function removeMailPerchBackupFiles(directory, {removeDirectory = false} = {}) {
+async function removeMailPinBackupFiles(directory, {removeDirectory = false} = {}) {
   if (!directory) return;
   try {
     if (!(await IOUtils.exists(directory))) return;
@@ -153,16 +153,16 @@ async function removeMailPerchBackupFiles(directory, {removeDirectory = false} =
     }
     for (const child of await IOUtils.getChildren(directory)) {
       if (MAILPERCH_BACKUP_FILE_RE.test(PathUtils.filename(child)) &&
-          await isVerifiedMailPerchBackup(child)) {
+          await isVerifiedMailPinBackup(child)) {
         await removePathIfPresent(child);
       }
     }
   } catch (error) {
-    console.warn("MailPerch : nettoyage des sauvegardes incomplet", safeErrorName(error));
+    console.warn("MailPin : nettoyage des sauvegardes incomplet", safeErrorName(error));
   }
 }
 
-async function hasMailPerchProfileData() {
+async function hasMailPinProfileData() {
   try {
     if (Services.prefs.getBranch(PREF_BRANCH).getChildList("").length) return true;
   } catch {}
@@ -175,7 +175,7 @@ async function hasMailPerchProfileData() {
 }
 
 async function shouldPreservePreSentinelData(extensionId) {
-  if (!(await hasMailPerchProfileData())) return false;
+  if (!(await hasMailPinProfileData())) return false;
   try {
     const addon = await lazy.AddonManager.getAddonByID(extensionId);
     const installedAt = Number(addon?.installDate?.getTime?.()) || 0;
@@ -192,7 +192,7 @@ async function shouldPreservePreSentinelData(extensionId) {
   }
 }
 
-async function ensureMailPerchInstallationState(extensionId) {
+async function ensureMailPinInstallationState(extensionId) {
   const id = String(extensionId || "");
   if (!id) return {fresh: false, storageAvailable: false};
   try {
@@ -202,16 +202,16 @@ async function ensureMailPerchInstallationState(extensionId) {
       return {fresh: false, storageAvailable: true};
     }
     const preserveExisting = await shouldPreservePreSentinelData(id);
-    if (!preserveExisting) await purgeMailPerchProfileData();
+    if (!preserveExisting) await purgeMailPinProfileData();
     await lazy.ExtensionStorage.set(id, {[INSTALL_SENTINEL_KEY]: INSTALL_SENTINEL_VALUE});
     return {fresh: !preserveExisting, storageAvailable: true};
   } catch (error) {
-    console.warn("MailPerch : état d’installation impossible à vérifier", safeErrorName(error));
+    console.warn("MailPin : état d’installation impossible à vérifier", safeErrorName(error));
     return {fresh: false, storageAvailable: false};
   }
 }
 
-async function purgeMailPerchProfileData() {
+async function purgeMailPinProfileData() {
   const stored = parseStored(PREF_SETTINGS, {});
   const customBackupDirectory = typeof stored?.backupDirectory === "string" ? stored.backupDirectory : "";
   const internalBackupDirectory = PathUtils.join(PathUtils.profileDir, DEFAULT_BACKUP_FOLDER);
@@ -226,18 +226,18 @@ async function purgeMailPerchProfileData() {
   for (const filename of profileFiles) {
     await removePathIfPresent(PathUtils.join(PathUtils.profileDir, filename));
   }
-  await removeMailPerchBackupFiles(internalBackupDirectory, {removeDirectory: true});
+  await removeMailPinBackupFiles(internalBackupDirectory, {removeDirectory: true});
   if (customBackupDirectory && customBackupDirectory !== internalBackupDirectory) {
     // A user-selected directory may contain unrelated files. Remove only the
-    // files created by MailPerch and never delete the directory itself.
-    await removeMailPerchBackupFiles(customBackupDirectory);
+    // files created by MailPin and never delete the directory itself.
+    await removeMailPinBackupFiles(customBackupDirectory);
   }
   try { Services.prefs.getBranch(PREF_BRANCH).deleteBranch(""); } catch {}
   Services.obs.notifyObservers(null, "startupcache-invalidate");
 }
 
 
-function registerMailPerchLifecycle(extensionId) {
+function registerMailPinLifecycle(extensionId) {
   const id = String(extensionId || "");
   if (!id || MAILPERCH_LIFECYCLE_HANDLERS.has(id)) return;
 
@@ -262,7 +262,7 @@ function registerMailPerchLifecycle(extensionId) {
       try {
         await this.beginPreparation();
         ACTIVE_PIN_INBOX_INSTANCES.clear();
-        await purgeMailPerchProfileData();
+        await purgeMailPinProfileData();
       } finally {
         this.unregister();
       }
@@ -491,7 +491,7 @@ function uniqueEntityId(prefix, values) {
 
 function normalizeSettings(value) {
   if (!PIN_MODULES.PinSettings) {
-    throw new Error("Le module de recommandations MailPerch n'est pas chargé.");
+    throw new Error("Le module de recommandations MailPin n'est pas chargé.");
   }
   return PIN_MODULES.PinSettings.normalize(value);
 }
@@ -1597,7 +1597,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     this._states ??= new Set();
     ACTIVE_PIN_INBOX_INSTANCES.add(this);
     this._context = context;
-    registerMailPerchLifecycle(context.extension.id);
+    registerMailPinLifecycle(context.extension.id);
     this._rootURI = context.extension.rootURI;
     this._extensionVersion = String(context.extension.manifest?.version || "0.0.0");
     this._locale = String(context.extension.localeData?.selectedLocale || Services.locale?.appLocaleAsBCP47 || "fr");
@@ -1606,7 +1606,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         Services.scriptloader.loadSubScript(context.extension.rootURI.resolve(`api/pinInbox/modules/${name}`), PIN_MODULES, "UTF-8");
       }
       if (!PIN_MODULES.PinSettings?.DEFAULTS) {
-        throw new Error("Le registre de recommandations MailPerch est indisponible.");
+        throw new Error("Le registre de recommandations MailPin est indisponible.");
       }
       DEFAULT_SETTINGS = PIN_MODULES.PinSettings.DEFAULTS;
       this._modulesLoaded = true;
@@ -1622,7 +1622,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     THUNDERBIRD_COMPAT = this._thunderbird;
     if (!this._readyPromise) {
       this._readyPromise = (async () => {
-        await ensureMailPerchInstallationState(context.extension.id);
+        await ensureMailPinInstallationState(context.extension.id);
         const rawSettings = parseStored(PREF_SETTINGS, DEFAULT_SETTINGS);
         const rawData = parseStored(PREF_DATA, DEFAULT_DATA);
         this._settings = normalizeSettings(rawSettings);
@@ -1966,10 +1966,10 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     this._saveData("undo");
     this._applyRuntimeSettings();
     if (this._settings.enableThunderbirdTagSync) {
-      try { this._ensureMailPerchTags(); this._syncTags([]).catch(error => this._recordDiagnostic("warning", "Restauration de la synchronisation des tags impossible", error, {component: "tags"})); }
+      try { this._ensureMailPinTags(); this._syncTags([]).catch(error => this._recordDiagnostic("warning", "Restauration de la synchronisation des tags impossible", error, {component: "tags"})); }
       catch (error) { this._recordDiagnostic("warning", "Restauration de la synchronisation des tags impossible", error, {component: "tags"}); }
     } else if (previousTagSync) {
-      this._removeMailPerchTagDefinitions();
+      this._removeMailPinTagDefinitions();
     }
     this._refreshAllStates(true);
     this._showToastAll(`${action.label} annulée.`, false);
@@ -2160,7 +2160,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     if (configuration.settings) {
       const currentBackupDirectory = this._settings.backupDirectory || "";
       const nextSettings = normalizeSettings({...this._settings, ...configuration.settings});
-      if (!previousTagSync && nextSettings.enableThunderbirdTagSync) this._ensureMailPerchTags();
+      if (!previousTagSync && nextSettings.enableThunderbirdTagSync) this._ensureMailPinTags();
       this._settings = nextSettings;
       // Arbitrary filesystem paths are not accepted through page JavaScript.
       // Only the native folder picker may update this privileged setting.
@@ -2267,7 +2267,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       this._settings.backupDirectory || ""
     );
     if (previousTagSync) this._clearManagedTagsForReferences(Object.values(this._data.refs));
-    if (hardened.settings.enableThunderbirdTagSync) this._ensureMailPerchTags();
+    if (hardened.settings.enableThunderbirdTagSync) this._ensureMailPinTags();
     this._settings = hardened.settings;
     this._data = hardened.data;
     // Undo payloads can contain privileged message operations. They are local
@@ -2282,7 +2282,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     this._saveData("import");
     this._applyRuntimeSettings();
     if (this._settings.enableThunderbirdTagSync) await this._syncTags([]);
-    else if (previousTagSync) this._removeMailPerchTagDefinitions();
+    else if (previousTagSync) this._removeMailPinTagDefinitions();
     this._refreshAllStates(true);
     await this._storage?.flush();
     return this._getConfiguration();
@@ -2475,7 +2475,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       } catch (error) {
         errors += 1;
         ref.tagSyncError = boundedText(error?.message || error, 500);
-        this._recordDiagnostic("warning", "Nettoyage des tags MailPerch impossible", error, {component: "tags", stableKey: ref.stableKey});
+        this._recordDiagnostic("warning", "Nettoyage des tags MailPin impossible", error, {component: "tags", stableKey: ref.stableKey});
       }
     }
     return {cleared, errors};
@@ -2485,29 +2485,29 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     const currentEnabled = Boolean(this._settings.enableThunderbirdTagSync);
     if (Boolean(previousEnabled) === currentEnabled) return {changed: false};
     if (currentEnabled) {
-      this._ensureMailPerchTags();
+      this._ensureMailPinTags();
       return {...(await this._syncTags([])), changed: true, enabled: true};
     }
     const {cleared, errors} = this._clearManagedTagsForReferences(Object.values(this._data.refs));
-    const definitionsRemoved = this._removeMailPerchTagDefinitions();
+    const definitionsRemoved = this._removeMailPinTagDefinitions();
     this._saveData("tag-sync-disabled");
     return {changed: true, enabled: false, cleared, errors, definitionsRemoved};
   }
 
-  _ensureMailPerchTags() {
+  _ensureMailPinTags() {
     const definitions = PIN_MODULES.PinTagSync?.DEFINITIONS || [];
     this._thunderbird?.tags?.ensureDefinitions?.(definitions);
     return definitions;
   }
 
-  _ownedMailPerchTagKeys() {
+  _ownedMailPinTagKeys() {
     return this._thunderbird?.tags?.ownedKeys?.(PIN_MODULES.PinTagSync?.DEFINITIONS || []) || new Set();
   }
 
-  _removeMailPerchTagDefinitions() {
+  _removeMailPinTagDefinitions() {
     return this._thunderbird?.tags?.removeDefinitions?.(
       PIN_MODULES.PinTagSync?.DEFINITIONS || [],
-      (key, error) => this._recordDiagnostic("warning", "Suppression d’un tag MailPerch impossible", error, {component: "tags", tagKey: key})
+      (key, error) => this._recordDiagnostic("warning", "Suppression d’un tag MailPin impossible", error, {component: "tags", tagKey: key})
     ) || 0;
   }
 
@@ -2528,7 +2528,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   _clearReferenceTags(ref) {
     const headers = this._tagHeadersForReference(ref);
     if (!headers.length) return {removed: 0, messages: 0};
-    const managed = this._ownedMailPerchTagKeys();
+    const managed = this._ownedMailPinTagKeys();
     if (!managed.size) return {removed: 0, messages: 0};
     const byKeywords = new Map();
     for (const hdr of headers) {
@@ -2552,7 +2552,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     const headers = this._tagHeadersForReference(ref);
     if (!headers.length) return {synced: false, reason: "missing"};
     const desired = new Set(PIN_MODULES.PinTagSync?.desiredKeys(ref) || []);
-    const managed = this._ownedMailPerchTagKeys();
+    const managed = this._ownedMailPinTagKeys();
     const addGroups = new Map();
     const removeGroups = new Map();
     let added = 0;
@@ -2582,7 +2582,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   async _syncTags(stableKeys = []) {
     const requested = normalizeStableKeyList(stableKeys).slice(0, 500);
     if (!this._settings.enableThunderbirdTagSync) return {synced: 0, skipped: requested.length || Object.keys(this._data.refs).length, errors: 0, disabled: true};
-    this._ensureMailPerchTags();
+    this._ensureMailPinTags();
     const refs = (requested.length ? requested : Object.keys(this._data.refs)).map(key => this._data.refs[key]).filter(Boolean);
     let synced = 0, skipped = 0, errors = 0;
     for (const ref of refs) {
@@ -2728,7 +2728,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       throw new ExtensionError("Aucune fenêtre Thunderbird active ne permet d’ouvrir le sélecteur de dossier.");
     }
     const picker=Cc["@mozilla.org/filepicker;1"].createInstance(Ci.nsIFilePicker);
-    picker.init(browsingContext, "Choisir le dossier des sauvegardes MailPerch", Ci.nsIFilePicker.modeGetFolder);
+    picker.init(browsingContext, "Choisir le dossier des sauvegardes MailPin", Ci.nsIFilePicker.modeGetFolder);
     if (this._settings.backupDirectory) {
       try {
         const currentDirectory=Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsIFile);
@@ -2828,7 +2828,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     const ref=this._data.refs[stableKey];if(!ref)return false;
     if(archiveAction)this._archiveReferenceHistory(ref,archiveAction);
     if(deleteCalendar&&ref.calendarItemId){this._deleteLinkedCalendarItem(ref).catch(error=>this._recordDiagnostic("warning","Suppression de l’élément Agenda impossible",error));}
-    if(this._settings.enableThunderbirdTagSync){try{this._clearReferenceTags(ref);}catch(error){this._recordDiagnostic("warning","Nettoyage des tags MailPerch impossible",error,{component:"tags",stableKey});}}
+    if(this._settings.enableThunderbirdTagSync){try{this._clearReferenceTags(ref);}catch(error){this._recordDiagnostic("warning","Nettoyage des tags MailPin impossible",error,{component:"tags",stableKey});}}
     delete this._data.refs[stableKey];this._data.manualOrder=this._data.manualOrder.filter(key=>key!==stableKey);return true;
   }
 
@@ -3717,7 +3717,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     const preview = this._previewImport(configuration);
     const selectedStrategy = ["replace", "merge"].includes(strategy) ? strategy : "replace";
     if (!preview.valid) throw new ExtensionError(`Cette sauvegarde ne peut pas être restaurée${preview.errors?.length ? ` : ${preview.errors.join(", ")}` : "."}`);
-    if (!this._storage) throw new ExtensionError("Le stockage local MailPerch n’est pas disponible pour sécuriser la restauration.");
+    if (!this._storage) throw new ExtensionError("Le stockage local MailPin n’est pas disponible pour sécuriser la restauration.");
 
     let safetyBackup;
     try {
@@ -3741,10 +3741,10 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       } else {
         result = await this._importConfiguration(configuration);
       }
-      this._recordDiagnostic("info", "Restauration MailPerch terminée", `${selectedStrategy} · ${preview.incoming?.refs || 0} référence(s)`, {component: "migration", action: selectedStrategy});
+      this._recordDiagnostic("info", "Restauration MailPin terminée", `${selectedStrategy} · ${preview.incoming?.refs || 0} référence(s)`, {component: "migration", action: selectedStrategy});
       return {...result, strategy: selectedStrategy, safetyBackup: safetyBackup?.path || "", preview};
     } catch (error) {
-      this._recordDiagnostic("error", "Restauration MailPerch interrompue", error, {component: "migration", action: selectedStrategy});
+      this._recordDiagnostic("error", "Restauration MailPin interrompue", error, {component: "migration", action: selectedStrategy});
       throw error;
     }
   }
@@ -4955,7 +4955,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       if (this._settings.confirmDelete) {
         const accepted = about3Pane?.confirm
           ? about3Pane.confirm(`Supprimer ${usable.length} message(s) ?`)
-          : Services.prompt.confirm(null, "MailPerch", `Supprimer ${usable.length} message(s) ?`);
+          : Services.prompt.confirm(null, "MailPin", `Supprimer ${usable.length} message(s) ?`);
         if (!accepted) return {count: 0, cancelled: true};
       }
       const byFolder = new Map();
@@ -5165,7 +5165,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       }
       // Never inherit Thunderbird's generic icon-button classes here. In
       // Thunderbird 153 those classes can paint their own icon in addition to
-      // MailPerch's masked pin, which makes the control look like a duplicated
+      // MailPin's masked pin, which makes the control look like a duplicated
       // star. Existing virtualized rows are normalized on every patch.
       button.classList.remove("button", "icon-button", "icon-only", "button-star", "tree-button-flag");
       button.classList.add(INDEPENDENT_BUTTON_CLASS);
@@ -5955,7 +5955,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       const healthIndicator = createNode("button", "pin-mails-health-indicator");
       healthIndicator.type = "button";
       healthIndicator.hidden = true;
-      healthIndicator.setAttribute("aria-label", this._t("healthAttention", "Santé MailPerch à vérifier"));
+      healthIndicator.setAttribute("aria-label", this._t("healthAttention", "Santé MailPin à vérifier"));
       const scope = createNode("select", "pin-mails-header-select"); scope.setAttribute("aria-label", this._t("panelScope", "Portée du panneau"));
       for (const [value, label] of [["currentInbox", this._t("currentInbox", "Cette boîte")], ["selectedAccounts", this._t("scopeSelectedAccounts", "Comptes sélectionnés")], ["global", this._t("allAccounts", "Tous les comptes")]]) {
         const option = createNode("option", "", label); option.value = value; scope.appendChild(option);
@@ -6793,7 +6793,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     this._uninstallPreparationPromise ??= (async () => {
       try { await this._readyPromise; } catch {}
       this._clearManagedTagsForReferences(Object.values(this._data?.refs || {}));
-      this._removeMailPerchTagDefinitions();
+      this._removeMailPinTagDefinitions();
       this._stopRuntimeResources();
       const storage = this._storage;
       this._storage = null;

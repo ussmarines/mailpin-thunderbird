@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title data-i18n="dashboardTitle">Tableau de bord MailPerch</title>
+  <title data-i18n="dashboardTitle">Tableau de bord MailPin</title>
   <script src="../styles/theme.js"></script>
   <link rel="stylesheet" href="../styles/tokens.css">
   <link rel="stylesheet" href="./dashboard.css">
@@ -19,8 +19,8 @@
   <main id="dashboard-main" class="dashboard-shell" tabindex="-1">
     <header class="dashboard-header">
       <div class="brand-lockup">
-        <span class="brand-mark" aria-hidden="true"><img src="../icons/mailperch-icon.svg" width="88" height="88" alt=""></span>
-        <div class="brand-copy"><span class="brand-overline">MailPerch</span><div class="title-line"><h1 data-i18n="dashboardHeading">Tableau de bord</h1><span id="app-version" class="version"></span></div><p data-i18n="dashboardIntro">Retrouvez rapidement ce qui demande votre attention, sans parcourir tous vos dossiers.</p></div>
+        <span class="brand-mark" aria-hidden="true"><img src="../icons/mailpin-icon.svg" width="88" height="88" alt=""></span>
+        <div class="brand-copy"><span class="brand-overline">MailPin</span><div class="title-line"><h1 data-i18n="dashboardHeading">Tableau de bord</h1><span id="app-version" class="version"></span></div><p data-i18n="dashboardIntro">Retrouvez rapidement ce qui demande votre attention, sans parcourir tous vos dossiers.</p></div>
       </div>
       <div class="header-actions">
         <div class="header-primary-actions"><button id="commands" type="button" class="button secondary" data-i18n="commandPalette">Commandes</button><button id="settings" type="button" class="button secondary" data-i18n="settings">Paramètres</button><button id="refresh" type="button" class="button primary" data-i18n="refresh">Actualiser</button></div>
@@ -28,7 +28,7 @@
       </div>
     </header>
 
-    <section id="stats" class="stats-grid" aria-label="Résumé MailPerch" data-i18n-aria-label="ariaMailPerchSummary"></section>
+    <section id="stats" class="stats-grid" aria-label="Résumé MailPin" data-i18n-aria-label="ariaMailPinSummary"></section>
     <section id="reminder-center" class="reminder-center" aria-labelledby="reminder-center-title" hidden></section>
 
     <nav class="view-tabs" aria-label="Vues principales" data-i18n-aria-label="ariaMainViews">
@@ -151,7 +151,7 @@
     <div class="command-palette-shell">
       <header><div><h2 data-i18n="commandPalette">Commandes</h2><p data-i18n="commandPaletteHelp">Accédez rapidement aux vues et actions principales.</p></div><button id="command-close" type="button" class="icon-button" aria-label="Fermer" data-i18n-aria-label="close">×</button></header>
       <label class="search-field"><span class="visually-hidden" data-i18n="commandPalette">Commandes</span><input id="command-search" type="search" autocomplete="off" placeholder="Rechercher une commande…" data-i18n-placeholder="commandPalettePlaceholder"></label>
-      <div id="command-list" class="command-list" role="list" aria-label="Commandes MailPerch" data-i18n-aria-label="commandPalette"></div>
+      <div id="command-list" class="command-list" role="list" aria-label="Commandes MailPin" data-i18n-aria-label="commandPalette"></div>
     </div>
   </dialog>
   <noscript>JavaScript doit être activé pour afficher le tableau de bord.</noscript>

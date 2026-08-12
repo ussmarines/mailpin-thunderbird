@@ -87,7 +87,7 @@
 
 ## Étoile native et punaise
 
-- en mode indépendant : conserver l’étoile Thunderbird intacte et ajouter uniquement la punaise MailPerch ;
+- en mode indépendant : conserver l’étoile Thunderbird intacte et ajouter uniquement la punaise MailPin ;
 - en mode `nativeStar` : transformer un seul contrôle canonique, masquer uniquement ses doublons et restaurer exactement l’état natif en quittant ce mode ;
 - ne jamais positionner un contrôle marqué `data-pin-mails-native-star` si la racine ne porte pas `pin-mails-native-star`.
 

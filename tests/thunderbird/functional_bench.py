@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Functional and scale bench for MailPerch in a disposable Thunderbird profile.
+"""Functional and scale bench for MailPin in a disposable Thunderbird profile.
 
 The bench uses chrome-context WebDriver only to provision synthetic local mail and
-inspect Thunderbird-owned windows. MailPerch itself is the unmodified built XPI:
+inspect Thunderbird-owned windows. MailPin itself is the unmodified built XPI:
 its normal startup migrates the seeded legacy preference into the structured
 SQLite store before the UI scenarios run.
 """
@@ -105,7 +105,7 @@ const initialPanelScope = arguments[2] === "selectedAccounts" ? "selectedAccount
   const benchCalendar = cal.manager.createCalendar("memory", Services.io.newURI(`moz-memory-calendar://mailperch-bench-${volume}`));
   if (!benchCalendar) throw new Error("Writable memory calendar could not be created");
   benchCalendar.id = `mailperch-bench-calendar-${volume}`;
-  benchCalendar.name = "MailPerch Bench Calendar";
+  benchCalendar.name = "MailPin Bench Calendar";
   benchCalendar.setProperty("requiresNetwork", false);
   cal.manager.registerCalendar(benchCalendar);
 
@@ -135,7 +135,7 @@ const initialPanelScope = arguments[2] === "selectedAccounts" ? "selectedAccount
   for (let serverIndex = 0; serverIndex < servers.length; serverIndex++) {
     const root = servers[serverIndex].rootFolder;
     for (let folderIndex = 0; folderIndex < 2; folderIndex++) {
-      const name = `MailPerch Bench ${serverIndex + 1}-${folderIndex + 1}`;
+      const name = `MailPin Bench ${serverIndex + 1}-${folderIndex + 1}`;
       let folder = null;
       try { folder = root.getChildNamed(name); } catch {}
       if (!folder) {
@@ -187,7 +187,7 @@ const initialPanelScope = arguments[2] === "selectedAccounts" ? "selectedAccount
       "MIME-Version: 1.0",
       "Content-Type: text/plain; charset=UTF-8",
       "",
-      `Synthetic MailPerch bench message ${index}. No real mailbox data.`,
+      `Synthetic MailPin bench message ${index}. No real mailbox data.`,
       "",
     ].join("\r\n");
     addMessage(folder, raw);
@@ -252,7 +252,7 @@ const initialPanelScope = arguments[2] === "selectedAccounts" ? "selectedAccount
   addMessage(controlFolder, [
     "From: Control <control@example.invalid>",
     "To: bench@example.invalid",
-    "Subject: MailPerch Bench Control Unpinned",
+    "Subject: MailPin Bench Control Unpinned",
     `Message-ID: <${controlMessageId}>`,
     `Date: ${new Date(now + 60_000).toUTCString()}`,
     "X-Mozilla-Status: 0000",
@@ -287,7 +287,7 @@ const initialPanelScope = arguments[2] === "selectedAccounts" ? "selectedAccount
     safeMode: false, hideCompleted: false, confirmBulkDestructiveActions: false,
     preferredCalendarId: benchCalendar.id,
   };
-  await ExtensionStorage.set("pin-mails@MailPerch.local", {"mailperch.installation":"mailperch-installation-v1"});
+  await ExtensionStorage.set("ussmarines.mailpin@addons.thunderbird.net", {"mailperch.installation":"mailperch-installation-v1"});
   Services.prefs.setStringPref("extensions.pinMails.settings", JSON.stringify(settings));
   Services.prefs.setBoolPref("extensions.pinMails.structuredMigrated", true);
 
@@ -393,7 +393,7 @@ const scopeExpected = arguments[2] || {};
   const pane = win?.document.getElementById("tabmail")?.currentAbout3Pane;
   const doc = pane?.document;
   const panel = doc?.getElementById("pin-mails-panel");
-  if (!panel) throw new Error("MailPerch panel is unavailable");
+  if (!panel) throw new Error("MailPin panel is unavailable");
   const sleep = ms => new Promise(resolve => win.setTimeout(resolve, ms));
   const waitFor = async (test, label, timeout = 30000) => {
     const deadline = Date.now() + timeout;
@@ -692,7 +692,7 @@ const done = arguments[arguments.length - 1];
     .filter(({server}) => /^mailperch-bench-[abc]$/i.test(String(server?.username || server?.userName || "")))
     .map(({account, server}) => {
       const folders = childFolders(server.rootFolder)
-        .filter(folder => String(folder.prettyName || folder.name || "").startsWith("MailPerch Bench "))
+        .filter(folder => String(folder.prettyName || folder.name || "").startsWith("MailPin Bench "))
         .map(folder => ({
           uri: String(folder.URI),
           messageCount: Number(folder.getTotalMessages(false)),
@@ -708,7 +708,7 @@ const done = arguments[arguments.length - 1];
     })
     .sort((left, right) => left.key.localeCompare(right.key));
   const settings = JSON.parse(Services.prefs.getStringPref("extensions.pinMails.settings", "{}"));
-  const jsonFile = await ExtensionStorage.getFile("pin-mails@MailPerch.local");
+  const jsonFile = await ExtensionStorage.getFile("ussmarines.mailpin@addons.thunderbird.net");
   const installationMarker = jsonFile?.data?.get("mailperch.installation") || "";
   const profileDirectory = Services.dirsvc.get("ProfD", Ci.nsIFile);
   const databaseFile = profileDirectory.clone();
@@ -753,7 +753,7 @@ const excludedAccounts = Array.isArray(arguments[3]) ? arguments[3] : [];
   const win = Services.wm.getMostRecentWindow("mail:3pane");
   const pane = win?.document.getElementById("tabmail")?.currentAbout3Pane;
   const panel = pane?.document.getElementById("pin-mails-panel");
-  if (!panel) throw new Error("MailPerch panel is unavailable");
+  if (!panel) throw new Error("MailPin panel is unavailable");
   const sleep = ms => new Promise(resolve => win.setTimeout(resolve, ms));
   const count = () => Number(panel.querySelector(".pin-mails-count")?.textContent || -1);
   for (let attempt = 0; attempt < 300 && count() !== expectedCount; attempt++) await sleep(100);
@@ -1131,11 +1131,11 @@ def _validate_reused_profile(
         if state.get("totalMessageCount") != volume + 1:
             raise SmokeFailure(f"{label} synthetic messages were not preserved: {state!r}")
         if state.get("sqliteRefCount") != volume:
-            raise SmokeFailure(f"{label} MailPerch SQLite refs were not preserved: {state!r}")
+            raise SmokeFailure(f"{label} MailPin SQLite refs were not preserved: {state!r}")
         if state.get("installationMarker") != "mailperch-installation-v1":
-            raise SmokeFailure(f"{label} MailPerch installation storage was not preserved: {state!r}")
+            raise SmokeFailure(f"{label} MailPin installation storage was not preserved: {state!r}")
         if not state.get("settingsUserValue"):
-            raise SmokeFailure(f"{label} MailPerch settings preference is not persisted: {state!r}")
+            raise SmokeFailure(f"{label} MailPin settings preference is not persisted: {state!r}")
         settings = state.get("settings", {})
         if settings.get("panelScope") != "selectedAccounts" or settings.get("selectedAccountKeys") != selected_account_keys:
             raise SmokeFailure(f"{label} selected-account settings were not preserved: {state!r}")
@@ -1175,7 +1175,7 @@ def _run_scope_case(
                 client.wait_ready(time.monotonic() + args.timeout)
 
                 # Session 1 provisions the disposable profile and persists the
-                # exact production preference consumed by MailPerch at startup.
+                # exact production preference consumed by MailPin at startup.
                 first_capabilities = _new_session_with_profile(client, args.binary_path, profile)
                 client.request("POST", client._session_path("/timeouts"), {"script": int(args.timeout * 1000)})
                 client.set_context("chrome")
@@ -1190,7 +1190,7 @@ def _run_scope_case(
                 selected_account_keys = [account["key"] for account in selected_accounts]
                 selected_count = sum(account["pinnedCount"] for account in selected_accounts)
                 client.install_addon(args.xpi_path, temporary=False)
-                _wait_for_state(client, _panel_is_ready, "MailPerch panel in Session 1", args.timeout)
+                _wait_for_state(client, _panel_is_ready, "MailPin panel in Session 1", args.timeout)
                 initial_panel = client.execute_async(
                     ACCOUNT_SCOPE_PANEL_SCRIPT,
                     [selected_count, "selectedAccounts", selected_accounts, excluded_accounts],
@@ -1233,7 +1233,7 @@ def _run_scope_case(
                 result["session2Wake"] = wake
                 result["checks"].append("natural-tab-activation-wake")
 
-                _wait_for_state(client, _panel_is_ready, "Persisted MailPerch add-on after tab activation", args.timeout)
+                _wait_for_state(client, _panel_is_ready, "Persisted MailPin add-on after tab activation", args.timeout)
                 result["checks"].append("persistent-addon-loaded-after-restart")
                 selected_panel = client.execute_async(
                     ACCOUNT_SCOPE_PANEL_SCRIPT,
@@ -1250,7 +1250,7 @@ def _run_scope_case(
                     result["checks"].append("A-and-C-settings-and-render-persistence")
                 result["jsExceptions"] = client.execute_async(CONSOLE_ERRORS_SCRIPT)
                 if result["jsExceptions"]:
-                    raise SmokeFailure(f"MailPerch JavaScript errors were recorded: {result['jsExceptions']!r}")
+                    raise SmokeFailure(f"MailPin JavaScript errors were recorded: {result['jsExceptions']!r}")
                 result["finalPinnedCount"] = selected_panel["count"]
                 result["status"] = "passed"
                 return result
@@ -1260,7 +1260,7 @@ def _run_scope_case(
             if result["profileReused"] and "SQLite refs were not preserved" in str(error):
                 result["harnessLimit"] = (
                     "The exact profile reopened, but the temporary add-on shutdown did not preserve "
-                    "the MailPerch structured SQLite store for Session 2."
+                    "the MailPin structured SQLite store for Session 2."
                 )
             if "Timeout" in str(error) or "timed out" in str(error).lower():
                 result["timeouts"] += 1
@@ -1311,8 +1311,8 @@ def _prepare_manual_scope_validation(args: argparse.Namespace, output_dir: pathl
             if seed.get("currentFolderPinnedCount") != 9:
                 raise SmokeFailure(f"Manual current-folder volume is not 9: {seed!r}")
             client.install_addon(args.xpi_path)
-            _wait_for_state(client, _panel_is_ready, "MailPerch panel for manual scope validation", args.timeout)
-            print("\nMailPerch manual selected-account validation is ready.", flush=True)
+            _wait_for_state(client, _panel_is_ready, "MailPin panel for manual scope validation", args.timeout)
+            print("\nMailPin manual selected-account validation is ready.", flush=True)
             print(f"Disposable profile: {profile}", flush=True)
             print("A: account.key=account1; incomingServer.key=server1; 18 pins", flush=True)
             print("B: account.key=account2; incomingServer.key=server2; 16 pins", flush=True)
@@ -1370,7 +1370,7 @@ def _run_volume(args: argparse.Namespace, volume: int, output_dir: pathlib.Path,
             result["seed"] = seed
             result["checks"].append("synthetic-local-dataset")
             client.install_addon(args.xpi_path)
-            _wait_for_state(client, _panel_is_ready, "MailPerch panel", args.timeout)
+            _wait_for_state(client, _panel_is_ready, "MailPin panel", args.timeout)
             result["checks"].append("real-xpi-installed")
             full_functional = volume == min(args.volumes)
             selected_accounts = [account for account in seed["accounts"] if account["label"] in selected_labels]
@@ -1429,13 +1429,13 @@ def _run_volume(args: argparse.Namespace, volume: int, output_dir: pathlib.Path,
                 client.set_context("chrome")
             result["jsExceptions"] = client.execute_async(CONSOLE_ERRORS_SCRIPT)
             if result["jsExceptions"]:
-                raise SmokeFailure(f"MailPerch JavaScript errors were recorded: {result['jsExceptions']!r}")
+                raise SmokeFailure(f"MailPin JavaScript errors were recorded: {result['jsExceptions']!r}")
             result["finalPinnedCount"] = panel["total"]
             if full_functional:
                 client.uninstall_addon(ADDON_ID)
-                _wait_for_state(client, _panel_is_cleaned, "MailPerch cleanup", args.timeout)
+                _wait_for_state(client, _panel_is_cleaned, "MailPin cleanup", args.timeout)
                 client.install_addon(args.xpi_path)
-                reinstalled = _wait_for_state(client, _panel_is_ready, "MailPerch clean reinstall", args.timeout)
+                reinstalled = _wait_for_state(client, _panel_is_ready, "MailPin clean reinstall", args.timeout)
                 result["lifecycle"] = {
                     "cleanup": True,
                     "reinstall": True,
@@ -1465,7 +1465,7 @@ def _run_volume(args: argparse.Namespace, volume: int, output_dir: pathlib.Path,
 
 def run(args: argparse.Namespace) -> int:
     args.binary_path = _validate_path(args.binary, "Thunderbird binary", executable=True)
-    args.xpi_path = _validate_path(args.xpi, "MailPerch XPI")
+    args.xpi_path = _validate_path(args.xpi, "MailPin XPI")
     args.geckodriver_path = _validate_path(args.geckodriver, "geckodriver", executable=True)
     output_dir = pathlib.Path(args.output_dir).resolve()
     output_dir.mkdir(parents=True, exist_ok=True)

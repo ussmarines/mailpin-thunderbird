@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="MailPin">
+  <style>
+    .ink{fill:none;stroke:#1A1D21;stroke-width:9;stroke-linecap:round;stroke-linejoin:round}
+    .pin{fill:#4F7F75}
+    @media (prefers-color-scheme: dark){.ink{stroke:#F7F5F0}}
+  </style>
+  <path class="ink" d="M16 53v51c0 5 4 8 9 8h78c5 0 9-3 9-8V53L78 79c-8 6-20 6-28 0L16 53Z"/>
+  <path class="ink" d="m18 55 37 30c5 4 13 4 18 0l37-30"/>
+  <path class="pin" fill-rule="evenodd" d="M64 8c-19 0-34 15-34 34 0 25 34 59 34 59s34-34 34-59C98 23 83 8 64 8Zm0 18a16 16 0 1 0 0 32 16 16 0 0 0 0-32Z"/>
+</svg>

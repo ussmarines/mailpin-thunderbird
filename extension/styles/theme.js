@@ -1,4 +1,4 @@
-/* MailPerch theme bridge: keeps extension pages aligned with Thunderbird. */
+/* MailPin theme bridge: keeps extension pages aligned with Thunderbird. */
 (() => {
   "use strict";
 

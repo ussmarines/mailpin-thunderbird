@@ -55,4 +55,4 @@ for bug_id in ("MP-2026-005", "MP-2026-007"):
     row = next(line for line in TRACKER.splitlines() if line.startswith(f"| {bug_id} |"))
     assert "| CORRIGÉ | 3.2.10 |" in row
 
-print("MailPerch 3.2.8 defaults, persistence and action-rail guards: OK")
+print("MailPin 3.2.8 defaults, persistence and action-rail guards: OK")

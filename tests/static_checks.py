@@ -11,7 +11,7 @@ version = manifest["version"]
 
 assert manifest["manifest_version"] == 3
 assert manifest["permissions"] == ["menus"]
-assert manifest["browser_specific_settings"]["gecko"]["id"] == "pin-mails@MailPerch.local"
+assert manifest["browser_specific_settings"]["gecko"]["id"] == "ussmarines.mailpin@addons.thunderbird.net"
 assert manifest["browser_specific_settings"]["gecko"]["strict_min_version"] == "153.0"
 assert manifest["browser_specific_settings"]["gecko"]["strict_max_version"] == "153.*"
 assert manifest["default_locale"] == "fr"
@@ -19,12 +19,12 @@ package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
 assert package["version"] == version
 fr_locale = json.loads((EXT / "_locales/fr/messages.json").read_text(encoding="utf-8"))
 en_locale = json.loads((EXT / "_locales/en/messages.json").read_text(encoding="utf-8"))
-assert package["name"] == "mailperch-thunderbird"
-assert fr_locale["extensionName"]["message"] == "MailPerch — Email Pins & Follow-up"
-assert en_locale["extensionName"]["message"] == "MailPerch — Email Pins & Follow-up"
-assert fr_locale["brandSubtitle"]["message"] == "Épinglez, organisez et suivez vos e-mails dans Thunderbird."
-assert en_locale["brandSubtitle"]["message"] == "Pin, organize and follow up on your emails in Thunderbird."
-assert en_locale["brandSlogan"]["message"] == "Keep important mail within reach."
+assert package["name"] == "mailpin-thunderbird"
+assert fr_locale["extensionName"]["message"] == "MailPin — Email Follow-up & Productivity for Thunderbird"
+assert en_locale["extensionName"]["message"] == "MailPin — Email Follow-up & Productivity for Thunderbird"
+assert fr_locale["brandSubtitle"]["message"] == "Suivi d’e-mails & productivité pour Thunderbird."
+assert en_locale["brandSubtitle"]["message"] == "Email Follow-up & Productivity for Thunderbird"
+assert en_locale["brandSlogan"]["message"] == "Stay on top. Follow through. Get results."
 assert manifest["options_ui"]["page"] == "options/options.html"
 assert manifest["content_security_policy"]["extension_pages"] == "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; connect-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'"
 
@@ -62,11 +62,11 @@ required_runtime = [
     "options/options-bootstrap.js", "options/options.js", "dashboard/dashboard.html", "dashboard/dashboard.css",
     "dashboard/dashboard.js", "styles/tokens.css", "styles/pin.css", "icons/pin.svg",
     "icons/pin-regular.svg", "icons/pin-filled.svg", "icons/conversation.svg",
-    "icons/dashboard.svg", "icons/add.svg", "icons/mailperch-icon.svg",
-    "icons/mailperch-icon-mono.svg", "icons/mailperch-icon-16.png",
-    "icons/mailperch-icon-24.png", "icons/mailperch-icon-32.png",
-    "icons/mailperch-icon-48.png", "icons/mailperch-icon-64.png",
-    "icons/mailperch-icon-96.png", "icons/mailperch-icon-128.png", "_locales/fr/messages.json",
+    "icons/dashboard.svg", "icons/add.svg", "icons/mailpin-icon.svg",
+    "icons/mailpin-icon-mono.svg", "icons/mailpin-icon.svg",
+    "icons/mailpin-icon.svg", "icons/mailpin-icon.svg",
+    "icons/mailpin-icon.svg", "icons/mailpin-icon.svg",
+    "icons/mailpin-icon.svg", "icons/mailpin-icon.svg", "_locales/fr/messages.json",
     "_locales/en/messages.json"
 ]
 for relative in required_runtime:
@@ -126,15 +126,15 @@ assert 'messenger.tabs.create({' in background
 
 for icon in EXT.glob("icons/*.svg"):
     text = icon.read_text(encoding="utf-8")
-    expected_viewbox = 'viewBox="0 0 64 64"' if icon.name.startswith("mailperch-icon") else 'viewBox="0 0 24 24"'
+    expected_viewbox = 'viewBox="0 0 128 128"' if icon.name.startswith("mailpin-icon") else 'viewBox="0 0 24 24"'
     assert expected_viewbox in text, icon
     assert "<script" not in text.lower()
     assert "foreignObject" not in text
 
 tokens = (EXT / "styles/tokens.css").read_text(encoding="utf-8")
 for token in [
-    "--mp-brand-background: #0f6cbd", "--mp-secondary-background: #0e8f8f",
-    "--mp-color-neutral-background-canvas: #f4f7fb", "--mp-color-neutral-background-canvas: #111315",
+    "--mp-brand-background: #4f7f75", "--mp-secondary-background: #3d536b",
+    "--mp-color-neutral-background-canvas: #f7f5f0", "--mp-color-neutral-background-canvas: #111315",
     "--mp-color-neutral-foreground-1: #ffffff", ":root[data-mp-theme=\"dark\"]",
     "@media (prefers-color-scheme: dark)", "--mp-brand: var(--mp-brand-background)",
     "--mp-font-family", "--mp-radius-md: var(--mp-radius-xlarge)",
@@ -145,14 +145,14 @@ for html_name in ["options/options.html", "dashboard/dashboard.html"]:
     html = (EXT / html_name).read_text(encoding="utf-8")
     assert "../styles/theme.js" in html, html_name
     assert "../styles/tokens.css" in html, html_name
-    assert "../icons/mailperch-icon.svg" in html, html_name
+    assert "../icons/mailpin-icon.svg" in html, html_name
 
 theme_bridge = (EXT / "styles/theme.js").read_text(encoding="utf-8")
 for token in ("getCurrent", "prefers-color-scheme: dark", "dataset.mpTheme", "onUpdated"):
     assert token in theme_bridge, token
 assert '@import url("./tokens.css")' in css
 for size in (16, 24, 32, 48, 64, 96, 128):
-    assert manifest["icons"][str(size)] == f"icons/mailperch-icon-{size}.png"
+    assert manifest["icons"][str(size)] == "icons/mailpin-icon.svg"
 
 for path in ROOT.rglob("*"):
     if path.is_file() and ".git" not in path.parts:

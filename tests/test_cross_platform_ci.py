@@ -52,7 +52,7 @@ assert release.count("persist-credentials: false") == 1
 assert "retention-days: 14" in ci
 assert "--latest" in release
 assert "include-hidden-files: false" in ci
-assert "MailPerch_GitHub_Repository_v${VERSION}.zip" in release
+assert "MailPin_GitHub_Repository_v${VERSION}.zip" in release
 assert "package-ecosystem: github-actions" in dependabot
 assert "default-days: 7" in dependabot
 assert 'targetRules = ["private-key"]' in gitleaks
@@ -76,6 +76,6 @@ assert '["git", "ls-files", "-z"]' in deep_audit
 assert 'raw.decode("utf-8", "surrogateescape")' in deep_audit
 assert '".playwright-cli"' in deep_audit
 assert 'path.relative_to(ROOT).parts[:2] != ("output", "playwright")' in deep_audit
-assert 'path.name != ".mailperch-source-files.json"' in deep_audit
+assert 'path.name != ".mailpin-source-files.json"' in deep_audit
 
 print("Cross-platform CI tooling guards: OK")

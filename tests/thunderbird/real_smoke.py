@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Launch a real Thunderbird binary through geckodriver and smoke-test MailPerch.
+"""Launch a real Thunderbird binary through geckodriver and smoke-test MailPin.
 
 This harness deliberately uses only Python's standard library. It is a
 release-binary smoke test, not a replacement for Thunderbird's own mach
 xpcshell/mochitest harness.
 
-The WebDriver profile is disposable. Before MailPerch is installed, the harness
+The WebDriver profile is disposable. Before MailPin is installed, the harness
 creates a local-only Thunderbird account and a synthetic folder so about:3pane
 has a real message-list view. No network account, credential, or user profile is
 ever configured.
@@ -27,10 +27,10 @@ import urllib.request
 from dataclasses import dataclass
 from typing import Any
 
-ADDON_ID = "pin-mails@MailPerch.local"
+ADDON_ID = "ussmarines.mailpin@addons.thunderbird.net"
 PANEL_ID = "pin-mails-panel"
 TOGGLE_ID = "pin-mails-qfb-toggle"
-SMOKE_FOLDER_NAME = "MailPerch Smoke"
+SMOKE_FOLDER_NAME = "MailPin Smoke"
 
 
 class SmokeFailure(RuntimeError):
@@ -244,7 +244,7 @@ const done = arguments[arguments.length - 1];
   }
 
   const root = localServer.rootFolder;
-  const folderName = "MailPerch Smoke";
+  const folderName = "MailPin Smoke";
   let folder = null;
   try {
     folder = root.getChildNamed(folderName);
@@ -320,11 +320,11 @@ const { classes: Cc, interfaces: Ci } = Components;
 const windowMediator = Cc["@mozilla.org/appshell/window-mediator;1"].getService(
   Ci.nsIWindowMediator
 );
-const addon = await AddonManager.getAddonByID("pin-mails@MailPerch.local");
+const addon = await AddonManager.getAddonByID("ussmarines.mailpin@addons.thunderbird.net");
 let extensionInternals = null;
 try {
   const extension = ExtensionParent.GlobalManager.getExtension(
-    "pin-mails@MailPerch.local"
+    "ussmarines.mailpin@addons.thunderbird.net"
   );
   if (extension) {
     extensionInternals = {
@@ -438,7 +438,7 @@ const done = arguments[arguments.length - 1];
   const win = windowMediator.getMostRecentWindow("mail:3pane");
   const pane = win?.document.getElementById("tabmail")?.currentAbout3Pane;
   const button = pane?.document?.querySelector(".pin-mails-action-dashboard");
-  if (!button || button.hidden) throw new Error("MailPerch dashboard button is unavailable");
+  if (!button || button.hidden) throw new Error("MailPin dashboard button is unavailable");
   button.click();
   const deadline = Date.now() + 10000;
   let dashboardTabs = [];
@@ -540,7 +540,7 @@ def _write_json(path: pathlib.Path, value: Any) -> None:
 
 def run(args: argparse.Namespace) -> int:
     binary = _validate_path(args.binary, "Thunderbird binary", executable=True)
-    xpi = _validate_path(args.xpi, "MailPerch XPI")
+    xpi = _validate_path(args.xpi, "MailPin XPI")
     geckodriver = _validate_path(args.geckodriver, "geckodriver", executable=True)
     output_dir = pathlib.Path(args.output_dir).resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -587,7 +587,7 @@ def run(args: argparse.Namespace) -> int:
             result["checks"].append("chrome-context")
 
             # A pristine Thunderbird profile opens about:3pane without an active
-            # message folder. MailPerch intentionally waits for gViewWrapper and
+            # message folder. MailPin intentionally waits for gViewWrapper and
             # quickFilterBar before touching Thunderbird's DOM, so create a
             # local-only folder first. This mirrors the precondition present on
             # a configured user profile without introducing network traffic.
@@ -617,7 +617,7 @@ def run(args: argparse.Namespace) -> int:
             first = _wait_for_state(
                 client,
                 _panel_is_ready,
-                "MailPerch panel injection",
+                "MailPin panel injection",
                 args.timeout,
             )
             result["firstInstall"] = first
@@ -635,7 +635,7 @@ def run(args: argparse.Namespace) -> int:
             cleaned = _wait_for_state(
                 client,
                 _panel_is_cleaned,
-                "MailPerch runtime cleanup after temporary uninstall",
+                "MailPin runtime cleanup after temporary uninstall",
                 args.timeout,
             )
             result["afterUninstall"] = cleaned
@@ -645,7 +645,7 @@ def run(args: argparse.Namespace) -> int:
             reinstalled = _wait_for_state(
                 client,
                 _panel_is_ready,
-                "MailPerch panel reinjection after reinstall",
+                "MailPin panel reinjection after reinstall",
                 args.timeout,
             )
             result["afterReinstall"] = reinstalled
@@ -691,7 +691,7 @@ def run(args: argparse.Namespace) -> int:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--binary", required=True, help="Path to the Thunderbird executable")
-    parser.add_argument("--xpi", required=True, help="Path to the MailPerch XPI")
+    parser.add_argument("--xpi", required=True, help="Path to the MailPin XPI")
     parser.add_argument("--geckodriver", required=True, help="Path to geckodriver")
     parser.add_argument("--output-dir", default="artifacts/thunderbird-smoke")
     parser.add_argument("--timeout", type=float, default=45.0)

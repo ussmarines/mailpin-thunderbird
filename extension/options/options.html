@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title data-i18n="optionsTitle">Paramètres de MailPerch</title>
+  <title data-i18n="optionsTitle">Paramètres de MailPin</title>
   <script src="../styles/theme.js"></script>
   <link rel="stylesheet" href="../styles/tokens.css">
   <link rel="stylesheet" href="options.css">
@@ -14,11 +14,11 @@
   <main class="settings-app">
     <header class="page-header">
       <div class="brand-lockup">
-        <span class="brand-mark" aria-hidden="true"><img src="../icons/mailperch-icon.svg" alt="" width="96" height="96"></span>
+        <span class="brand-mark" aria-hidden="true"><img src="../icons/mailpin-icon.svg" alt="" width="96" height="96"></span>
         <div class="brand-copy">
-          <span class="brand-overline" data-i18n="optionsTitle">Paramètres de MailPerch</span>
-          <div class="title-line"><h1 data-i18n="optionsHeading">MailPerch</h1><span id="app-version" class="app-version"></span></div>
-          <p data-i18n="optionsIntro">Personnalisez MailPerch sans vous perdre : commencez par l’essentiel, puis ouvrez les réglages avancés uniquement lorsque vous en avez besoin.</p>
+          <span class="brand-overline" data-i18n="optionsTitle">Paramètres de MailPin</span>
+          <div class="title-line"><h1 data-i18n="optionsHeading">MailPin</h1><span id="app-version" class="app-version"></span></div>
+          <p data-i18n="optionsIntro">Personnalisez MailPin sans vous perdre : commencez par l’essentiel, puis ouvrez les réglages avancés uniquement lorsque vous en avez besoin.</p>
         </div>
       </div>
       <div class="header-actions">
@@ -27,10 +27,10 @@
       </div>
     </header>
 
-    <section class="quick-overview" aria-label="Résumé MailPerch" data-i18n-aria-label="ariaMailPerchSummary">
+    <section class="quick-overview" aria-label="Résumé MailPin" data-i18n-aria-label="ariaMailPinSummary">
       <article data-tone="brand"><span class="overview-label" data-i18n="overviewPinned">Épingles</span><strong id="overview-pinned">—</strong><small data-i18n="overviewPinnedHelp">messages suivis</small></article>
       <article data-tone="warning"><span class="overview-label" data-i18n="overviewAttention">À traiter</span><strong id="overview-attention">—</strong><small data-i18n="overviewAttentionHelp">retards et relances</small></article>
-      <article data-tone="success"><span class="overview-label" data-i18n="overviewHealth">Santé</span><strong id="overview-health">—</strong><small data-i18n="overviewHealthHelp">état local de MailPerch</small></article>
+      <article data-tone="success"><span class="overview-label" data-i18n="overviewHealth">Santé</span><strong id="overview-health">—</strong><small data-i18n="overviewHealthHelp">état local de MailPin</small></article>
       <article data-tone="teal"><span class="overview-label" data-i18n="overviewBackup">Sauvegarde</span><strong id="overview-backup">—</strong><small data-i18n="overviewBackupHelp">dernière protection locale</small></article>
     </section>
 
@@ -50,11 +50,11 @@
 
       <div id="settings-loading" class="settings-loading" role="status" aria-live="polite">
         <strong data-i18n="loadingSettingsTitle">Chargement des recommandations</strong>
-        <span data-i18n="loadingSettingsHelp">MailPerch vérifie les réglages locaux avant d’afficher les contrôles.</span>
+        <span data-i18n="loadingSettingsHelp">MailPin vérifie les réglages locaux avant d’afficher les contrôles.</span>
       </div>
       <section id="settings-error" class="settings-loading settings-error" role="alert" aria-live="assertive" hidden>
         <strong data-i18n="settingsLoadErrorTitle">Impossible de charger les paramètres</strong>
-        <span data-i18n="settingsLoadErrorHelp">Les réglages MailPerch n’ont pas pu être préparés. Aucune modification n’a été appliquée.</span>
+        <span data-i18n="settingsLoadErrorHelp">Les réglages MailPin n’ont pas pu être préparés. Aucune modification n’a été appliquée.</span>
         <code id="settings-error-diagnostic" class="settings-error-diagnostic">options:init:not-started</code>
         <div class="button-row settings-error-actions">
           <button id="retry-settings-load" type="button" class="primary" data-i18n="retrySettingsLoad">Réessayer</button>
@@ -64,7 +64,7 @@
       <form id="settings-form" class="settings-content" aria-busy="true" hidden>
         <section class="settings-section feature-access-guide" data-nav-icon="⌂" data-nav-group="Essentiel" data-nav-group-i18n="navEssential">
           <div class="section-header">
-            <div><p class="eyebrow" data-i18n="sectionStartEyebrow">Démarrage</p><h2 id="feature-access-title" data-i18n="sectionStart">Bien démarrer</h2><p data-i18n="sectionStartIntro">Choisissez une expérience simple ou avancée, puis laissez MailPerch adapter la densité et les animations.</p></div>
+            <div><p class="eyebrow" data-i18n="sectionStartEyebrow">Démarrage</p><h2 id="feature-access-title" data-i18n="sectionStart">Bien démarrer</h2><p data-i18n="sectionStartIntro">Choisissez une expérience simple ou avancée, puis laissez MailPin adapter la densité et les animations.</p></div>
           </div>
           <div class="setting-grid three-columns">
             <label class="setting-field"><span data-i18n="settingsExperience">Niveau de réglages</span><select id="settingsExperience"><option value="guided" data-i18n="settingsGuided">Recommandé</option><option value="advanced" data-i18n="settingsAdvanced">Avancé</option></select></label>
@@ -77,13 +77,13 @@
             <div><strong data-i18n="featureMapSettings">Dans les paramètres</strong><span data-i18n="featureMapSettingsHelp">Activez les fonctions et consultez immédiatement leur état.</span></div>
           </div>
           <div class="recommended-mode-card">
-            <div><strong data-i18n="recommendedModeTitle">Configuration recommandée</strong><p data-i18n="recommendedModeHelp">MailPerch peut remettre les réglages techniques et d’interface sur une base sûre sans effacer vos groupes, affaires, règles, calendrier choisi ni dossier de sauvegarde.</p></div>
+            <div><strong data-i18n="recommendedModeTitle">Configuration recommandée</strong><p data-i18n="recommendedModeHelp">MailPin peut remettre les réglages techniques et d’interface sur une base sûre sans effacer vos groupes, affaires, règles, calendrier choisi ni dossier de sauvegarde.</p></div>
             <button id="apply-recommended-settings" type="button" class="secondary" data-i18n="applyRecommendedSettings">Appliquer les réglages recommandés</button>
           </div>
         </section>
 
         <section class="settings-section" data-nav-icon="⌖" data-nav-group="Essentiel" data-nav-group-i18n="navEssential">
-          <div class="section-header"><div><p class="eyebrow" data-i18n="sectionPinsEyebrow">Fondations</p><h2 data-i18n="sectionPins">Épinglage et compatibilité</h2><p data-i18n="sectionPinsIntro">Définissez ce qu’est une épingle et la manière dont MailPerch s’intègre à Thunderbird.</p></div><span class="recommended-badge" data-i18n="recommended">Recommandé</span></div>
+          <div class="section-header"><div><p class="eyebrow" data-i18n="sectionPinsEyebrow">Fondations</p><h2 data-i18n="sectionPins">Épinglage et compatibilité</h2><p data-i18n="sectionPinsIntro">Définissez ce qu’est une épingle et la manière dont MailPin s’intègre à Thunderbird.</p></div><span class="recommended-badge" data-i18n="recommended">Recommandé</span></div>
           <div class="setting-grid two-columns">
             <label class="setting-field"><span data-i18n="pinStorage">Stockage des épingles</span><select id="pinMode"><option value="independent" data-i18n="pinIndependent">Indépendant des étoiles — recommandé</option><option value="nativeStar" data-i18n="pinNative">Étoiles natives Thunderbird</option></select></label>
             <label class="setting-field"><span data-i18n="defaultTarget">Cible par défaut</span><select id="defaultPinTarget"><option value="message" data-i18n="targetMessage">Message précis</option><option value="conversation" data-i18n="targetConversation">Conversation complète</option></select></label>
@@ -103,9 +103,9 @@
             <label class="setting-field"><span data-i18n="cardLines">Informations par carte</span><select id="cardLines"><option value="2" data-i18n="cardTwoLines">Essentiel — 2 lignes</option><option value="3" data-i18n="cardThreeLines">Détaillé — 3 lignes</option></select></label>
             <label class="setting-field"><span data-i18n="panelHeight">Hauteur maximale</span><span class="input-with-unit"><input id="panelMaxHeight" type="number" min="160" max="900"><span>px</span></span></label>
           </div>
-          <p class="setting-help" data-i18n="panelScopeHelp">Choisissez les comptes dont les mails épinglés doivent apparaître dans le panneau MailPerch.</p>
+          <p class="setting-help" data-i18n="panelScopeHelp">Choisissez les comptes dont les mails épinglés doivent apparaître dans le panneau MailPin.</p>
           <div id="selected-accounts-setting" class="organization-block" hidden><div class="subsection-header"><div><h3 data-i18n="selectedAccounts">Comptes à afficher</h3><p data-i18n="selectedAccountsHelp">Sélectionnez ci-dessous un ou plusieurs comptes Thunderbird.</p></div><p id="selected-accounts-summary" class="selection-summary" aria-live="polite"></p></div><div id="selected-accounts-list" class="selected-accounts-list"></div><p id="selected-accounts-empty" class="hint" hidden data-i18n="selectedAccountsEmpty">Aucun compte Thunderbird compatible n’est disponible.</p><p id="selected-accounts-unavailable" class="hint" hidden></p></div>
-          <p class="volume-guidance"><strong data-i18n="recommendedPinVolume">Volume conseillé : jusqu’à 2 000 mails épinglés</strong><span data-i18n="recommendedPinVolumeHelp">MailPerch est testé jusqu’à 2 000 épingles. Des volumes supérieurs peuvent fonctionner, mais ne font actuellement pas partie du périmètre de validation.</span></p>
+          <p class="volume-guidance"><strong data-i18n="recommendedPinVolume">Volume conseillé : jusqu’à 2 000 mails épinglés</strong><span data-i18n="recommendedPinVolumeHelp">MailPin est testé jusqu’à 2 000 épingles. Des volumes supérieurs peuvent fonctionner, mais ne font actuellement pas partie du périmètre de validation.</span></p>
           <div class="toggle-grid">
             <label class="setting-toggle"><input id="enableSmartViews" type="checkbox"><span data-i18n="enableSmartViews">Vues intelligentes</span></label>
             <label class="setting-toggle"><input id="showSmartSections" type="checkbox"><span data-i18n="smartSections">Sections intelligentes dans le panneau</span></label>
@@ -123,7 +123,7 @@
         </section>
 
         <section class="settings-section" data-nav-icon="◷" data-nav-group="Essentiel" data-nav-group-i18n="navEssential">
-          <div class="section-header"><div><p class="eyebrow" data-i18n="sectionFollowUpEyebrow">Suivi</p><h2 data-i18n="sectionFollowUp">Relances et absence de réponse</h2><p data-i18n="sectionFollowUpIntro">MailPerch peut vous rappeler automatiquement lorsqu’une conversation reste sans réponse.</p></div></div>
+          <div class="section-header"><div><p class="eyebrow" data-i18n="sectionFollowUpEyebrow">Suivi</p><h2 data-i18n="sectionFollowUp">Relances et absence de réponse</h2><p data-i18n="sectionFollowUpIntro">MailPin peut vous rappeler automatiquement lorsqu’une conversation reste sans réponse.</p></div></div>
           <div class="toggle-grid">
             <label class="setting-toggle featured"><input id="enableAutomaticNoReplyTracking" type="checkbox"><span><strong data-i18n="autoNoReply">Suivi automatique sans réponse</strong><small data-i18n="autoNoReplyHelp">Après un message envoyé, crée une relance locale qui s’annule dès qu’une réponse arrive.</small></span></label>
             <label class="setting-toggle"><input id="noReplyCancelOnIncomingReply" type="checkbox"><span data-i18n="cancelNoReply">Annuler la relance à la réception d’une réponse</span></label>
@@ -156,13 +156,13 @@
         </section>
 
         <section class="settings-section" data-nav-icon="▣" data-nav-group="Essentiel" data-nav-group-i18n="navEssential">
-          <div class="section-header"><div><p class="eyebrow" data-i18n="calendarTitle">Agenda Thunderbird</p><h2 data-i18n="sectionCalendarEssential">Agenda</h2><p data-i18n="calendarIntro">MailPerch contrôle l’écriture, les ACL et les capacités tâches/événements avant chaque création.</p></div><span class="recommended-badge" data-i18n="recommended">Recommandé</span></div>
-          <div class="organization-block"><div class="subsection-header"><div><h3 data-i18n="calendarTargetTitle">Calendrier et synchronisation</h3><p data-i18n="calendarTargetHelp">Choisissez le calendrier à utiliser ou laissez MailPerch vous le demander lors de chaque création.</p></div><button id="sync-calendar" type="button" class="secondary" data-i18n="syncNow">Synchroniser maintenant</button></div><div class="toggle-grid"><label class="setting-toggle"><input id="enableCalendarIntegration" type="checkbox"><span data-i18n="enableCalendar">Activer Agenda/Tâches</span></label><label class="setting-toggle"><input id="enableBidirectionalCalendarSync" type="checkbox"><span data-i18n="bidirectionalCalendar">Synchronisation bidirectionnelle</span></label><label class="setting-toggle"><input id="calendarCompleteOnPinComplete" type="checkbox"><span data-i18n="completeCalendar">Terminer la tâche avec l’épingle</span></label><label class="setting-toggle"><input id="calendarDeleteOnUnpin" type="checkbox"><span data-i18n="deleteCalendarOnUnpin">Supprimer l’élément au désépinglage</span></label></div><div class="setting-grid two-columns"><label class="setting-field"><span data-i18n="defaultCalendarType">Type par défaut</span><select id="calendarItemType"><option value="task" data-i18n="task">Tâche</option><option value="event" data-i18n="event">Événement</option></select></label><label class="setting-field"><span data-i18n="preferredCalendar">Calendrier préféré</span><select id="preferredCalendarId"><option value="" data-i18n="askWhenCreating">Demander lors de la création</option></select></label></div><div id="calendar-info" class="capability-list" aria-live="polite"></div></div>
+          <div class="section-header"><div><p class="eyebrow" data-i18n="calendarTitle">Agenda Thunderbird</p><h2 data-i18n="sectionCalendarEssential">Agenda</h2><p data-i18n="calendarIntro">MailPin contrôle l’écriture, les ACL et les capacités tâches/événements avant chaque création.</p></div><span class="recommended-badge" data-i18n="recommended">Recommandé</span></div>
+          <div class="organization-block"><div class="subsection-header"><div><h3 data-i18n="calendarTargetTitle">Calendrier et synchronisation</h3><p data-i18n="calendarTargetHelp">Choisissez le calendrier à utiliser ou laissez MailPin vous le demander lors de chaque création.</p></div><button id="sync-calendar" type="button" class="secondary" data-i18n="syncNow">Synchroniser maintenant</button></div><div class="toggle-grid"><label class="setting-toggle"><input id="enableCalendarIntegration" type="checkbox"><span data-i18n="enableCalendar">Activer Agenda/Tâches</span></label><label class="setting-toggle"><input id="enableBidirectionalCalendarSync" type="checkbox"><span data-i18n="bidirectionalCalendar">Synchronisation bidirectionnelle</span></label><label class="setting-toggle"><input id="calendarCompleteOnPinComplete" type="checkbox"><span data-i18n="completeCalendar">Terminer la tâche avec l’épingle</span></label><label class="setting-toggle"><input id="calendarDeleteOnUnpin" type="checkbox"><span data-i18n="deleteCalendarOnUnpin">Supprimer l’élément au désépinglage</span></label></div><div class="setting-grid two-columns"><label class="setting-field"><span data-i18n="defaultCalendarType">Type par défaut</span><select id="calendarItemType"><option value="task" data-i18n="task">Tâche</option><option value="event" data-i18n="event">Événement</option></select></label><label class="setting-field"><span data-i18n="preferredCalendar">Calendrier préféré</span><select id="preferredCalendarId"><option value="" data-i18n="askWhenCreating">Demander lors de la création</option></select></label></div><div id="calendar-info" class="capability-list" aria-live="polite"></div></div>
         </section>
 
         <section class="settings-section" data-nav-icon="⚡" data-nav-group="Automatisation" data-nav-group-i18n="navAutomation">
-          <div class="section-header"><div><p class="eyebrow" data-i18n="tagSyncTitle">Tags Thunderbird</p><h2 data-i18n="sectionTagsAutomation">Tags Thunderbird</h2><p data-i18n="tagSyncIntro">Facultatif : reflète l’état MailPerch dans des tags Thunderbird dédiés, sans toucher à vos tags personnels.</p></div></div>
-          <div class="organization-block"><div class="subsection-header"><div><h3 data-i18n="tagSyncControlTitle">Synchronisation des statuts</h3><p data-i18n="tagSyncControlHelp">Seuls les tags réservés à MailPerch sont créés, modifiés ou supprimés.</p></div><button id="sync-tags" type="button" class="secondary" data-i18n="syncTags">Synchroniser les tags</button></div><div class="toggle-grid"><label class="setting-toggle"><input id="enableThunderbirdTagSync" type="checkbox"><span data-i18n="enableThunderbirdTagSync">Synchroniser les statuts avec les tags Thunderbird</span></label></div></div>
+          <div class="section-header"><div><p class="eyebrow" data-i18n="tagSyncTitle">Tags Thunderbird</p><h2 data-i18n="sectionTagsAutomation">Tags Thunderbird</h2><p data-i18n="tagSyncIntro">Facultatif : reflète l’état MailPin dans des tags Thunderbird dédiés, sans toucher à vos tags personnels.</p></div></div>
+          <div class="organization-block"><div class="subsection-header"><div><h3 data-i18n="tagSyncControlTitle">Synchronisation des statuts</h3><p data-i18n="tagSyncControlHelp">Seuls les tags réservés à MailPin sont créés, modifiés ou supprimés.</p></div><button id="sync-tags" type="button" class="secondary" data-i18n="syncTags">Synchroniser les tags</button></div><div class="toggle-grid"><label class="setting-toggle"><input id="enableThunderbirdTagSync" type="checkbox"><span data-i18n="enableThunderbirdTagSync">Synchroniser les statuts avec les tags Thunderbird</span></label></div></div>
         </section>
 
         <section class="settings-section" data-experience="advanced" data-nav-icon="◇" data-nav-group="Avancé" data-nav-group-i18n="navAdvanced">
@@ -187,13 +187,13 @@
           <div class="toggle-grid"><label class="setting-toggle"><input id="enableAutomaticBackups" type="checkbox"><span data-i18n="automaticBackups">Sauvegardes automatiques</span></label><label class="setting-toggle"><input id="backupBeforeMigration" type="checkbox"><span data-i18n="backupMigration">Sauvegarder avant migration ou restauration</span></label><label class="setting-toggle"><input id="backupIncludeHistory" type="checkbox"><span data-i18n="backupHistory">Inclure l’historique</span></label><label class="setting-toggle"><input id="autoCleanup" type="checkbox"><span data-i18n="automaticCleanup">Nettoyage automatique</span></label><label class="setting-toggle"><input id="enableGlobalDashboard" type="checkbox"><span data-i18n="globalDashboard">Tableau de bord global</span></label></div>
           <div class="setting-grid three-columns"><label class="setting-field"><span data-i18n="backupInterval">Intervalle</span><span class="input-with-unit"><input id="backupIntervalHours" type="number" min="1" max="8760"><span data-i18n="hours">heures</span></span></label><label class="setting-field"><span data-i18n="backupRetention">Conservation</span><span class="input-with-unit"><input id="backupRetention" type="number" min="1" max="100"><span data-i18n="files">fichiers</span></span></label><label class="setting-field"><span data-i18n="cleanupDelay">Délai avant nettoyage</span><span class="input-with-unit"><input id="cleanupGraceDays" type="number" min="0" max="90"><span data-i18n="days">jours</span></span></label></div>
           <label class="setting-field full-width"><span data-i18n="backupFolder">Dossier de sauvegarde</span><input id="backupDirectory" type="text" readonly></label><div class="button-row"><button id="choose-backup" type="button" class="secondary" data-i18n="chooseFolder">Choisir le dossier</button><button id="run-backup" type="button" class="primary" data-i18n="backupNow">Sauvegarder maintenant</button></div><div id="backup-info" class="info-box"></div>
-          <div class="import-export-panel"><div><h3 data-i18n="transferTitle">Exporter ou restaurer</h3><p data-i18n="transferHelp">Avant une restauration, MailPerch affiche le contenu, les conflits et propose Fusionner ou Remplacer.</p></div><div class="button-row"><button id="export" type="button" class="secondary" data-i18n="exportBackup">Exporter</button><label class="file-button secondary"><span data-i18n="previewRestore">Prévisualiser une restauration</span><input id="import-file" type="file" accept="application/json,.json"></label></div><div id="import-preview" class="import-preview" hidden></div></div>
+          <div class="import-export-panel"><div><h3 data-i18n="transferTitle">Exporter ou restaurer</h3><p data-i18n="transferHelp">Avant une restauration, MailPin affiche le contenu, les conflits et propose Fusionner ou Remplacer.</p></div><div class="button-row"><button id="export" type="button" class="secondary" data-i18n="exportBackup">Exporter</button><label class="file-button secondary"><span data-i18n="previewRestore">Prévisualiser une restauration</span><input id="import-file" type="file" accept="application/json,.json"></label></div><div id="import-preview" class="import-preview" hidden></div></div>
           <details class="advanced-group"><summary data-i18n="resetMaintenance">Réinitialisation et maintenance</summary><div class="advanced-content"><div class="button-row"><button id="undo" type="button" class="secondary" data-i18n="undoLast">Annuler la dernière action</button><button id="reset-interface" type="button" class="secondary" data-i18n="resetInterface">Réinitialiser l’interface</button><button id="reset" type="button" class="danger-quiet" data-i18n="resetSettings">Réinitialiser les réglages</button></div></div></details>
         </section>
 
         <section class="settings-section" data-nav-icon="⌨" data-nav-group="Essentiel" data-nav-group-i18n="navEssential">
           <div class="section-header"><div><p class="eyebrow" data-i18n="sectionShortcutEyebrow">Accès rapide</p><h2 data-i18n="sectionShortcut">Raccourci clavier</h2><p data-i18n="sectionShortcutIntro">Épinglez ou désépinglez la sélection sans quitter le clavier.</p></div></div>
-          <div id="shortcut-list" class="shortcut-list" aria-label="Raccourcis MailPerch" data-i18n-aria-label="ariaMailPerchShortcuts"></div><div class="shortcut-row"><button id="save-shortcut" type="button" class="secondary" data-i18n="saveShortcut">Enregistrer les raccourcis</button></div>
+          <div id="shortcut-list" class="shortcut-list" aria-label="Raccourcis MailPin" data-i18n-aria-label="ariaMailPinShortcuts"></div><div class="shortcut-row"><button id="save-shortcut" type="button" class="secondary" data-i18n="saveShortcut">Enregistrer les raccourcis</button></div>
         </section>
 
         <footer class="form-footer"><div><strong data-i18n="readyToSave">Résumé local</strong><span id="stats"></span></div><span class="hint" data-i18n="saveDockHint">Utilisez la barre Enregistrer/Annuler qui apparaît uniquement après une modification.</span></footer>
@@ -206,6 +206,6 @@
     </div>
   </main>
   <aside id="status" class="status-toast" role="status" aria-live="polite" aria-atomic="true" hidden><span class="status-icon" aria-hidden="true"></span><span id="status-message"></span><button id="status-close" class="status-close" type="button" aria-label="Fermer" data-i18n-aria-label="close">×</button></aside>
-  <noscript>JavaScript doit être activé pour configurer MailPerch.</noscript>
+  <noscript>JavaScript doit être activé pour configurer MailPin.</noscript>
 </body>
 </html>

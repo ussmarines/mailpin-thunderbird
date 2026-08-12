@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: mailperch-release
+  group: mailpin-release
   cancel-in-progress: false
 
 jobs:
@@ -65,10 +65,10 @@ jobs:
             exit 0
           fi
           gh release create "$TAG" \
-            "dist/MailPerch_v${VERSION}.xpi" \
-            "dist/MailPerch_GitHub_Repository_v${VERSION}.zip" \
+            "dist/MailPin_v${VERSION}.xpi" \
+            "dist/MailPin_GitHub_Repository_v${VERSION}.zip" \
             "dist/SHA256SUMS.txt" \
             --target "$GITHUB_SHA" \
-            --title "MailPerch ${VERSION}" \
+            --title "MailPin ${VERSION}" \
             --notes-file release-notes.md \
             --latest

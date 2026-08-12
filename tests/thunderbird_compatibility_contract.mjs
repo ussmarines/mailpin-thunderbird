@@ -191,8 +191,8 @@ assert.deepEqual(MessageArchiver.last.headers, [msgHeader]);
 
 // Tags: collision validation is atomic, ownership is label-based, user tags are never removed.
 const definitions = [
-  {key: "mailperch-active", label: "MailPerch / Active", color: "#0f6cbd"},
-  {key: "mailperch-waiting", label: "MailPerch / Waiting", color: "#8a3700"},
+  {key: "mailperch-active", label: "MailPin / Active", color: "#0f6cbd"},
+  {key: "mailperch-waiting", label: "MailPin / Waiting", color: "#8a3700"},
 ];
 compatibility.tags.ensureDefinitions(definitions);
 assert.deepEqual([...compatibility.tags.ownedKeys(definitions)].sort(), ["mailperch-active", "mailperch-waiting"]);
@@ -212,7 +212,7 @@ compatibility.tags.removeDefinitions(definitions);
 assert.equal(tagRegistry.get("personal"), "Personnel");
 
 tagRegistry.set("mailperch-active", "Un autre tag");
-assert.throws(() => compatibility.tags.ensureDefinitions(definitions), /n’appartient pas à MailPerch/);
+assert.throws(() => compatibility.tags.ensureDefinitions(definitions), /n’appartient pas à MailPin/);
 assert.equal(tagRegistry.has("mailperch-waiting"), false, "collision validation must not partially create tags");
 tagRegistry.delete("mailperch-active");
 

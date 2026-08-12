@@ -1,8 +1,8 @@
 {
-  "note": "Référence de métadonnées pour la publication 1.5.4. Les valeurs doivent rester synchronisées avec extension/manifest.json.",
+  "note": "Référence de métadonnées pour la publication 1.6.0. Les valeurs doivent rester synchronisées avec extension/manifest.json.",
   "browser_specific_settings": {
     "gecko": {
-      "id": "pin-mails@MailPerch.local",
+      "id": "ussmarines.mailpin@addons.thunderbird.net",
       "strict_min_version": "153.0",
       "strict_max_version": "153.*"
     }

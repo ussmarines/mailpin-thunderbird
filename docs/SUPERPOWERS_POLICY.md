@@ -1,4 +1,4 @@
-# Superpowers — politique d’utilisation MailPerch
+# Superpowers — politique d’utilisation MailPin
 
 Date de référence : 2026-08-08
 
@@ -6,11 +6,11 @@ Date de référence : 2026-08-08
 
 `Superpowers` est installé au niveau de Codex comme plugin global. Il n’est ni vendored, ni copié, ni épinglé dans ce dépôt.
 
-MailPerch autorise son utilisation de manière sélective uniquement lorsque le gain de méthode ou de réduction du risque justifie le coût supplémentaire en contexte, outils, agents et validations.
+MailPin autorise son utilisation de manière sélective uniquement lorsque le gain de méthode ou de réduction du risque justifie le coût supplémentaire en contexte, outils, agents et validations.
 
 ## Priorité des règles
 
-Pour MailPerch, appliquer dans cet ordre :
+Pour MailPin, appliquer dans cet ordre :
 
 1. instruction explicite de l’utilisateur ;
 2. état Git/GitHub réellement observé ;
@@ -24,7 +24,7 @@ Superpowers ne peut jamais contourner les invariants produit, les règles de sé
 
 ## Opt-in explicite
 
-Le comportement générique de Superpowers qui pousse à invoquer un skill dès qu’il pourrait être applicable est explicitement restreint pour MailPerch.
+Le comportement générique de Superpowers qui pousse à invoquer un skill dès qu’il pourrait être applicable est explicitement restreint pour MailPin.
 
 La simple présence d’un skill ne justifie pas son utilisation. Un workflow Superpowers doit apporter une valeur matérielle au problème courant.
 
@@ -43,7 +43,7 @@ Les tâches simples, locales ou déterministes ne nécessitent pas par défaut :
 | Situation | Skill(s) Superpowers envisageables |
 |---|---|
 | Bug difficile ou intermittent dont la cause n’est pas établie | `systematic-debugging` |
-| Nouvelle feature transversale touchant plusieurs surfaces MailPerch avec décisions encore ouvertes | `brainstorming`, puis éventuellement `writing-plans` |
+| Nouvelle feature transversale touchant plusieurs surfaces MailPin avec décisions encore ouvertes | `brainstorming`, puis éventuellement `writing-plans` |
 | Logique métier, stockage ou contrat où le test-first réduit réellement le risque | `test-driven-development` |
 | Diff sensible touchant plusieurs modules, l’API privilégiée, le manifeste, les permissions, le stockage ou une migration | `requesting-code-review` |
 | Plan déjà validé avec plusieurs tâches réellement indépendantes et coût multi-agent justifié | `subagent-driven-development` |
@@ -70,7 +70,7 @@ Quand un comportement dépend réellement de Thunderbird, les exigences de preuv
 
 ## Sous-agents et coût
 
-`subagent-driven-development` est exceptionnel pour MailPerch.
+`subagent-driven-development` est exceptionnel pour MailPin.
 
 S’il est justifié :
 
@@ -90,7 +90,7 @@ Superpowers ne donne aucune autorisation Git supplémentaire.
 - Un worktree n’est pas obligatoire et ne doit pas être créé pour une tâche simple.
 - Ne jamais perturber un travail concurrent ou écraser un état local non identifié.
 
-## Invariants MailPerch
+## Invariants MailPin
 
 L’utilisation de Superpowers ne modifie aucun invariant canonique, notamment :
 

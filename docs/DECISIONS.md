@@ -2,7 +2,7 @@
 
 ## D001 — ID produit canonique avant première publication
 
-`pin-mails@MailPerch.local` remplace les identifiants utilisés uniquement dans des builds locales antérieures. MailPerch n’ayant jamais été publié avant cette décision, aucune continuité publique n’était à préserver ; cet ID propre au produit devient néanmoins immuable dès la première signature ou publication. Une installation locale antérieure doit passer par export, réinstallation et import contrôlé selon `docs/IDENTITY_MIGRATION_REQUIRED.md`.
+`ussmarines.mailpin@addons.thunderbird.net` remplace les identifiants utilisés uniquement dans des builds locales antérieures. MailPin n’ayant jamais été publié avant cette décision, aucune continuité publique n’était à préserver ; cet ID propre au produit devient néanmoins immuable dès la première signature ou publication. Une installation locale antérieure doit passer par export, réinstallation et import contrôlé selon `docs/IDENTITY_MIGRATION_REQUIRED.md`.
 
 ## D002 — Dashboard ouvert par le background
 
@@ -24,14 +24,14 @@ Le build repose uniquement sur Python et Node pour faciliter la revue, réduire 
 
 Le propriétaire ne souhaite ni vente ni redistribution publique du code. Le projet n’est donc pas présenté comme open source. Une revue juridique est requise avant publication publique.
 
-## D007 — MailPerch comme identité publique
+## D007 — MailPin comme identité publique
 
-Le nom public canonique est **MailPerch** et le nom complet du store est **MailPerch — Email Pins & Follow-up**. Les anciens noms faisant référence à Outlook sont retirés des surfaces publiques. Les identifiants techniques `pin-mails-*` restent conservés jusqu’à une migration dédiée afin de préserver les données et les mises à niveau.
+Le nom public canonique est **MailPin** et le nom complet du store est **MailPin — Email Follow-up & Productivity for Thunderbird**. Les anciens noms faisant référence à Outlook sont retirés des surfaces publiques. Les identifiants techniques `pin-mails-*` restent conservés jusqu’à une migration dédiée afin de préserver les données et les mises à niveau.
 
 ## 2026-07-31 — séparation des densités
 
 `uiPreset` ne concerne que la page Paramètres. `density` ne concerne que les cartes épinglées.
-Aucun réglage MailPerch ne redimensionne les lignes natives Thunderbird.
+Aucun réglage MailPin ne redimensionne les lignes natives Thunderbird.
 
 ## 2026-07-31 — mémoire projet unique
 
@@ -45,7 +45,7 @@ La hauteur virtuelle native reste inchangée.
 
 ## 2026-07-31 — aucune notion d’administrateur client
 
-MailPerch est une extension locale mono-utilisateur. Aucun `admin`, `isAdmin`, rôle caché, jeton maître ou permission simulée dans le DOM n’est ajouté. Toute autorisation réelle est définie par le manifeste, le schéma de l’API Experiment et les contrôles privilégiés. Le propriétaire du profil Thunderbird reste un acteur de confiance.
+MailPin est une extension locale mono-utilisateur. Aucun `admin`, `isAdmin`, rôle caché, jeton maître ou permission simulée dans le DOM n’est ajouté. Toute autorisation réelle est définie par le manifeste, le schéma de l’API Experiment et les contrôles privilégiés. Le propriétaire du profil Thunderbird reste un acteur de confiance.
 
 ## 2026-07-31 — imports traités comme hostiles
 
@@ -57,7 +57,7 @@ Le chemin de sauvegarde n’est jamais accepté depuis `setConfiguration` ni dep
 
 ## 2026-07-31 — purge à la désinstallation
 
-Les API Experiment ne pouvant pas utiliser les événements statiques `uninstall`, MailPerch s’abonne au cycle cœur `Management` pendant son activité. `onUninstalling` marque la désinstallation avant l’arrêt et `onOperationCancelled` annule ce marquage si nécessaire ; l’événement cœur `uninstall`, attendu par Gecko, ferme SQLite puis purge les données de profil et préférences. Une mise à jour retire l’ancien écouteur sans purge. Les exports téléchargés manuellement sont hors périmètre. Dans un dossier externe, seules les enveloppes MailPerch munies d’un checksum local vérifiable sont candidates à la suppression.
+Les API Experiment ne pouvant pas utiliser les événements statiques `uninstall`, MailPin s’abonne au cycle cœur `Management` pendant son activité. `onUninstalling` marque la désinstallation avant l’arrêt et `onOperationCancelled` annule ce marquage si nécessaire ; l’événement cœur `uninstall`, attendu par Gecko, ferme SQLite puis purge les données de profil et préférences. Une mise à jour retire l’ancien écouteur sans purge. Les exports téléchargés manuellement sont hors périmètre. Dans un dossier externe, seules les enveloppes MailPin munies d’un checksum local vérifiable sont candidates à la suppression.
 
 Une sentinelle primitive est en plus enregistrée dans `ExtensionStorage`, effacé par Gecko à la désinstallation. Son absence est contrôlée avant toute ouverture de la base. Pour éviter une perte de données lors du premier déploiement 3.2.4, une vraie mise à jour depuis une installation plus ancienne conserve une seule fois les données préexistantes et initialise la sentinelle ; une installation neuve ou une réinstallation purge les résidus.
 ## 2026-07-31 — chaîne CI immuable et autonome
@@ -67,7 +67,7 @@ Les contrôles HTML/CSS reposent sur la bibliothèque standard Python. Les workf
 
 ## Les étoiles natives restent intactes en mode indépendant
 
-MailPerch ne déplace, ne masque et ne relabellise aucun contrôle étoile lorsque `pinMode = independent`. Les transformations de l’étoile sont autorisées uniquement en mode `nativeStar`, avec instantané et restauration exacte du parent et des attributs natifs.
+MailPin ne déplace, ne masque et ne relabellise aucun contrôle étoile lorsque `pinMode = independent`. Les transformations de l’étoile sont autorisées uniquement en mode `nativeStar`, avec instantané et restauration exacte du parent et des attributs natifs.
 
 ## Les actions globales des paramètres utilisent le formulaire natif
 
@@ -83,7 +83,7 @@ Les fonctions Aujourd’hui, Revue, veille, rappels interactifs, capture rapide,
 
 ## 2026-08-04 — fusion uniquement sur identité forte
 
-MailPerch peut proposer le regroupement d’épingles uniquement lorsqu’elles partagent, dans le même compte, un fil Gmail, un Message-ID racine, un `threadId` Thunderbird ou une clé de conversation dérivée de ces identités. L’objet seul est interdit comme preuve. La fusion reste manuelle, confirmée, bornée à 50 éléments, annulable et refusée en cas de liens Agenda distincts.
+MailPin peut proposer le regroupement d’épingles uniquement lorsqu’elles partagent, dans le même compte, un fil Gmail, un Message-ID racine, un `threadId` Thunderbird ou une clé de conversation dérivée de ces identités. L’objet seul est interdit comme preuve. La fusion reste manuelle, confirmée, bornée à 50 éléments, annulable et refusée en cas de liens Agenda distincts.
 
 ## 2026-08-04 — état explicite des rappels interactifs
 

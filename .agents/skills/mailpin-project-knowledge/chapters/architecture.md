@@ -2,7 +2,7 @@
 
 ## Product shape
 
-MailPerch is a local Thunderbird Manifest V3 MailExtension that adds actionable pinned-message views without filtering, moving or replacing the native message list. Its extension ID is `pin-mails@MailPerch.local`; treat it as immutable across manifest, release metadata, current project state and tests.
+MailPin is a local Thunderbird Manifest V3 MailExtension that adds actionable pinned-message views without filtering, moving or replacing the native message list. Its extension ID is `ussmarines.mailpin@addons.thunderbird.net`; treat it as immutable across manifest, release metadata, current project state and tests.
 
 The main dependency flow is:
 

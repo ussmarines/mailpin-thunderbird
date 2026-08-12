@@ -27,4 +27,4 @@
 - ajout d’un installateur Windows partagé et d’un lanceur local ;
 - conservation des rapports GitHub pendant 30 jours et exclusion des rapports locaux de Git.
 
-Aucune fonctionnalité produit, donnée utilisateur, version, balise, release ou valeur de l’identifiant canonique `pin-mails@MailPerch.local` n’est modifiée par cette intégration.
+Aucune fonctionnalité produit, donnée utilisateur, version, balise, release ou valeur de l’identifiant canonique `ussmarines.mailpin@addons.thunderbird.net` n’est modifiée par cette intégration.

@@ -41,4 +41,4 @@ assert '<label class="file-button secondary" data-i18n="previewRestore">' not in
 row = next(line for line in TRACKER.splitlines() if line.startswith("| MP-2026-008 |"))
 assert "| CORRIGÉ | 3.2.10 |" in row
 
-print("MailPerch terminal Options initialization guards: OK")
+print("MailPin terminal Options initialization guards: OK")

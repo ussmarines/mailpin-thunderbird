@@ -19,7 +19,7 @@
 7. version Thunderbird devenue incompatible ;
 8. fermeture, mise à jour ou désinstallation interrompant une écriture.
 
-Le propriétaire local du profil et un logiciel ayant déjà le contrôle du système sont hors du périmètre d’isolation. Ils ne doivent toutefois trouver aucun secret, jeton maître, rôle admin caché ou exécution arbitraire dans MailPerch.
+Le propriétaire local du profil et un logiciel ayant déjà le contrôle du système sont hors du périmètre d’isolation. Ils ne doivent toutefois trouver aucun secret, jeton maître, rôle admin caché ou exécution arbitraire dans MailPin.
 
 ## Frontières de confiance
 
@@ -27,7 +27,7 @@ Le propriétaire local du profil et un logiciel ayant déjà le contrôle du sys
 - page WebExtension → Experiment : données structurées mais toujours non fiables ;
 - Experiment → `PinCompatibility` → Thunderbird : frontière privilégiée Messages/Tags/Agenda ;
 - Experiment → SQLite/fichiers : frontière privilégiée de stockage ;
-- état MailPerch → tags/Agenda Thunderbird : effet de bord local privilégié, opt-in et réversible ;
+- état MailPin → tags/Agenda Thunderbird : effet de bord local privilégié, opt-in et réversible ;
 - export téléchargé → extérieur du profil : responsabilité explicite utilisateur.
 
 ## Menaces et mesures
@@ -41,10 +41,10 @@ Le propriétaire local du profil et un logiciel ayant déjà le contrôle du sys
 | Prototype pollution | rejet de `__proto__`, `prototype`, `constructor` |
 | Import activant une automatisation | règles, suivi auto, Agenda bidirectionnel et listes auto désactivés |
 | Métadonnée 1.2 surdimensionnée ou incohérente | notes, sous-tâches, vues, identifiants et recherches bornés puis normalisés dans l’Experiment |
-| Collision avec un tag Thunderbird existant | clé **et** libellé MailPerch exacts exigés ; refus en cas de collision, aucun renommage automatique |
-| Suppression d’un tag personnel | nettoyage limité aux définitions possédées par MailPerch et aux mots-clés correspondants sur les messages suivis |
+| Collision avec un tag Thunderbird existant | clé **et** libellé MailPin exacts exigés ; refus en cas de collision, aucun renommage automatique |
+| Suppression d’un tag personnel | nettoyage limité aux définitions possédées par MailPin et aux mots-clés correspondants sur les messages suivis |
 | Recherche exposant le contenu des messages | index local limité aux métadonnées de suivi ; aucun corps de message ni contenu de pièce jointe copié ou indexé |
-| Boucle Agenda ↔ MailPerch ↔ tags | synchronisations bornées, observateurs contrôlés, écritures persistées seulement sur changement utile et erreurs isolées par référence |
+| Boucle Agenda ↔ MailPin ↔ tags | synchronisations bornées, observateurs contrôlés, écritures persistées seulement sur changement utile et erreurs isolées par référence |
 | Chemin disque arbitraire | chemin conservé côté privilégié, sélecteur natif uniquement |
 | Suppression involontaire | confirmation UI, actions fermées et pile d’annulation |
 | Fusion de conversations non liées | identité forte commune obligatoire ; objet seul interdit ; confirmation utilisateur |
@@ -69,7 +69,7 @@ Le propriétaire local du profil et un logiciel ayant déjà le contrôle du sys
 - les dates de veille et rappel sont bornées et normalisées avant persistance ;
 - les libellés issus des messages sont affichés comme texte, jamais interprétés comme balisage ;
 - les sous-tâches et vues enregistrées sont des données locales non fiables : elles sont normalisées et bornées avant persistance et avant usage dans les filtres ;
-- la synchronisation des tags reste désactivée par défaut et ne peut créer/supprimer que les clés explicitement réservées à MailPerch dont la propriété est vérifiée ;
+- la synchronisation des tags reste désactivée par défaut et ne peut créer/supprimer que les clés explicitement réservées à MailPin dont la propriété est vérifiée ;
 - les indicateurs « J’attends / Je dois répondre » sont dérivés des événements locaux et ne déclenchent jamais un envoi automatique.
 
 ## Risque résiduel

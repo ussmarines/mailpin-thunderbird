@@ -1,0 +1,4 @@
+interface:
+  display_name: "MailPin Project Knowledge"
+  short_description: "Current MailPin domain knowledge"
+  default_prompt: "Use $mailpin-project-knowledge to locate the current documented MailPin architecture and product rules for this task."

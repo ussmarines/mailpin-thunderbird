@@ -46,4 +46,4 @@ assert "connect-src 'none'" in json.dumps(manifest)
 assert "REVIEWED_ADDITIONAL_FILES" not in build
 assert '"git", "ls-files", "-z"' in build
 
-print("MailPerch productivity 1.1 feature guards: OK")
+print("MailPin productivity 1.1 feature guards: OK")

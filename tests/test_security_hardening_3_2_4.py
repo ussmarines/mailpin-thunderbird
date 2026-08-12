@@ -1,4 +1,4 @@
-"""Security-boundary and uninstall regression guards for MailPerch 3.2.4."""
+"""Security-boundary and uninstall regression guards for MailPin 3.2.4."""
 from __future__ import annotations
 
 import json
@@ -146,7 +146,7 @@ for token in (
 ):
     assert token in SETTINGS, token
 
-# Experiments cannot use static uninstall manifest events. MailPerch instead
+# Experiments cannot use static uninstall manifest events. MailPin instead
 # listens to Gecko's awaited core Management lifecycle and uses AddonManager
 # only for the early/cancellable `uninstalling` signal.
 for token in (
@@ -157,7 +157,7 @@ for token in (
     'Management.on("uninstall", handlers.onUninstall)',
     'Management.on("update", handlers.onUpdate)',
     'lazy.AddonManager.removeAddonListener(this.addonListener)',
-    'registerMailPerchLifecycle(context.extension.id)',
+    'registerMailPinLifecycle(context.extension.id)',
     'handlers.uninstallPending = true',
     'MAILPERCH_UNINSTALLING = false',
     'await this.beginPreparation()',
@@ -168,12 +168,12 @@ assert "MAILPERCH_UNINSTALLING = true" in IMPLEMENTATION
 assert "Promise.allSettled" in IMPLEMENTATION
 assert "instance._prepareForUninstall()" in IMPLEMENTATION
 assert "await storage.close()" in IMPLEMENTATION
-assert "await purgeMailPerchProfileData()" in IMPLEMENTATION
+assert "await purgeMailPinProfileData()" in IMPLEMENTATION
 lifecycle_start = IMPLEMENTATION.index("async onUninstall(_eventName, details = {})")
-assert IMPLEMENTATION.index("await this.beginPreparation()", lifecycle_start) < IMPLEMENTATION.index("await purgeMailPerchProfileData()", lifecycle_start)
+assert IMPLEMENTATION.index("await this.beginPreparation()", lifecycle_start) < IMPLEMENTATION.index("await purgeMailPinProfileData()", lifecycle_start)
 assert '`${DB_FILENAME}-journal`' in IMPLEMENTATION
 assert "Services.prefs.getBranch(PREF_BRANCH).deleteBranch" in IMPLEMENTATION
-assert "async function isVerifiedMailPerchBackup(path)" in IMPLEMENTATION
+assert "async function isVerifiedMailPinBackup(path)" in IMPLEMENTATION
 assert "PIN_MODULES.PinStorageHelpers?.verifyBackupEnvelope?.(envelope)" in IMPLEMENTATION
 assert "envelope?.checksum" in IMPLEMENTATION
 assert "if (MAILPERCH_UNINSTALLING)" in IMPLEMENTATION
@@ -184,16 +184,16 @@ for token in (
     'ExtensionStorage: "resource://gre/modules/ExtensionStorage.sys.mjs"',
     'const INSTALL_SENTINEL_KEY = "mailperch.installation"',
     'const INSTALL_SENTINEL_VALUE = "mailperch-installation-v1"',
-    'async function ensureMailPerchInstallationState(extensionId)',
+    'async function ensureMailPinInstallationState(extensionId)',
     'const jsonFile = await lazy.ExtensionStorage.getFile(id)',
     'const marker = jsonFile?.data?.get(INSTALL_SENTINEL_KEY)',
     'const preserveExisting = await shouldPreservePreSentinelData(id)',
-    'if (!preserveExisting) await purgeMailPerchProfileData()',
+    'if (!preserveExisting) await purgeMailPinProfileData()',
     'await lazy.ExtensionStorage.set(id, {[INSTALL_SENTINEL_KEY]: INSTALL_SENTINEL_VALUE})',
-    'await ensureMailPerchInstallationState(context.extension.id)',
+    'await ensureMailPinInstallationState(context.extension.id)',
 ):
     assert token in IMPLEMENTATION, token
-assert IMPLEMENTATION.index('await ensureMailPerchInstallationState(context.extension.id)') < IMPLEMENTATION.index('const rawSettings = parseStored(PREF_SETTINGS, DEFAULT_SETTINGS)')
+assert IMPLEMENTATION.index('await ensureMailPinInstallationState(context.extension.id)') < IMPLEMENTATION.index('const rawSettings = parseStored(PREF_SETTINGS, DEFAULT_SETTINGS)')
 
 # The settings page must not fail before Save/Cancel can be used.
 assert "let configurationReady = false;" in OPTIONS
@@ -247,4 +247,4 @@ assert "gh release create" in RELEASE_WORKFLOW
 assert PACKAGE.get("dependencies") is None
 assert PACKAGE.get("devDependencies") is None
 
-print("MailPerch 3.2.4 security hardening guards: OK")
+print("MailPin 3.2.4 security hardening guards: OK")

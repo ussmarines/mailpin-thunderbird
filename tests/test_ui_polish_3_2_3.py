@@ -59,7 +59,7 @@ assert "min-block-size: var(--pin-mails-card-min-height)" in pin_css
 
 # Fluent identity remains shared rather than duplicated by each HTML surface.
 for token in (
-    "--mp-brand-background: #0f6cbd", "--mp-secondary-background: #0e8f8f",
+    "--mp-brand-background: #4f7f75", "--mp-secondary-background: #3d536b",
     ":root[data-mp-theme=\"dark\"]", "--mp-radius-lg: var(--mp-radius-xxlarge)",
     "--mp-shadow-low",
 ):
@@ -67,7 +67,7 @@ for token in (
 assert 'src="../styles/theme.js"' in options_html
 assert 'href="../styles/tokens.css"' in options_html
 assert "--accent: var(--mp-brand-background)" in options_css
-assert 'url("../icons/mailperch-icon.svg")' in pin_css
+assert 'url("../icons/mailpin-icon.svg")' in pin_css
 assert re.search(r"#import-file\s*\{[^}]*width:\s*1px", options_css, re.S)
 
 # The toast close control belongs in the top-right cell, not under the message.
@@ -130,4 +130,4 @@ for path in state["entrypoints"].values():
     assert (ROOT / path).is_file(), path
     assert path in memory, path
 
-print("MailPerch 3.2.8 UI polish and project-memory guards: OK")
+print("MailPin 3.2.8 UI polish and project-memory guards: OK")

@@ -1,9 +1,9 @@
-/* MailPerch Fluent 2 design tokens.
+/* MailPin product design tokens.
  * Global values are separated from semantic aliases so every surface can share
  * the same light, dark and high-contrast behavior without hard-coded overrides. */
 :root {
   color-scheme: light;
-  /* A guaranteed local sans-serif stack. MailPerch intentionally ships no
+  /* A guaranteed local sans-serif stack. MailPin intentionally ships no
    * third-party font until its asset and licence can be reviewed together. */
   --mp-font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI Variable", "Aptos", "Segoe UI", sans-serif;
   --mp-font-size-caption: 12px;
@@ -15,36 +15,36 @@
   --mp-font-weight-semibold: 600;
 
   /* Brand palette */
-  --mp-brand-background: #0f6cbd;
-  --mp-brand-background-hover: #115ea3;
-  --mp-brand-background-pressed: #0e4775;
-  --mp-brand-foreground: #0f6cbd;
-  --mp-brand-foreground-hover: #115ea3;
-  --mp-brand-subtle: #ebf3fc;
-  --mp-brand-subtle-hover: #dcecff;
-  --mp-brand-stroke: #77b7e8;
-  --mp-secondary-background: #0e8f8f;
-  --mp-secondary-background-hover: #0b7777;
-  --mp-secondary-foreground: #087f7f;
-  --mp-secondary-subtle: #e3f7f5;
+  --mp-brand-background: #4f7f75;
+  --mp-brand-background-hover: #426f67;
+  --mp-brand-background-pressed: #355b55;
+  --mp-brand-foreground: #4f7f75;
+  --mp-brand-foreground-hover: #426f67;
+  --mp-brand-subtle: #e8f0ee;
+  --mp-brand-subtle-hover: #d9e8e4;
+  --mp-brand-stroke: #86aaa2;
+  --mp-secondary-background: #3d536b;
+  --mp-secondary-background-hover: #31465a;
+  --mp-secondary-foreground: #3d536b;
+  --mp-secondary-subtle: #e9edf1;
 
   /* Fluent neutral aliases — light */
   --mp-color-neutral-background-1: #ffffff;
-  --mp-color-neutral-background-2: #f7f9fa;
-  --mp-color-neutral-background-3: #f0f4f6;
-  --mp-color-neutral-background-4: #e7edef;
-  --mp-color-neutral-background-canvas: #f4f7fb;
-  --mp-color-neutral-background-inverted: #17232b;
+  --mp-color-neutral-background-2: #f4f1ea;
+  --mp-color-neutral-background-3: #eeeae2;
+  --mp-color-neutral-background-4: #e5e0d7;
+  --mp-color-neutral-background-canvas: #f7f5f0;
+  --mp-color-neutral-background-inverted: #1a1d21;
   --mp-color-neutral-card-background: #ffffff;
   --mp-color-neutral-card-background-hover: #ffffff;
-  --mp-color-neutral-foreground-1: #17232b;
-  --mp-color-neutral-foreground-2: #4e626d;
-  --mp-color-neutral-foreground-3: #657983;
+  --mp-color-neutral-foreground-1: #1a1d21;
+  --mp-color-neutral-foreground-2: #566066;
+  --mp-color-neutral-foreground-3: #6f777b;
   --mp-color-neutral-foreground-inverted: #ffffff;
-  --mp-color-neutral-stroke-1: #d5e0e4;
-  --mp-color-neutral-stroke-2: #e2e9eb;
-  --mp-color-neutral-stroke-accessible: #71848d;
-  --mp-color-neutral-stroke-focus: #07577d;
+  --mp-color-neutral-stroke-1: #d7d3ca;
+  --mp-color-neutral-stroke-2: #e7e2d9;
+  --mp-color-neutral-stroke-accessible: #737b7e;
+  --mp-color-neutral-stroke-focus: #3d536b;
 
   /* Semantic aliases — light */
   --mp-color-success-foreground: #0e700e;
@@ -137,18 +137,18 @@
 
 :root[data-mp-theme="dark"] {
   color-scheme: dark;
-  --mp-brand-background: #115ea3;
-  --mp-brand-background-hover: #0f6cbd;
-  --mp-brand-background-pressed: #2886de;
-  --mp-brand-foreground: #479ef5;
-  --mp-brand-foreground-hover: #62abf5;
-  --mp-brand-subtle: #0c3156;
-  --mp-brand-subtle-hover: #0f3d69;
-  --mp-brand-stroke: #2886de;
-  --mp-secondary-background: #0b7777;
-  --mp-secondary-background-hover: #0e8f8f;
-  --mp-secondary-foreground: #5bd6d1;
-  --mp-secondary-subtle: #123b3a;
+  --mp-brand-background: #426f67;
+  --mp-brand-background-hover: #4f7f75;
+  --mp-brand-background-pressed: #5e8f86;
+  --mp-brand-foreground: #9bc3bb;
+  --mp-brand-foreground-hover: #b0d0c9;
+  --mp-brand-subtle: #203a36;
+  --mp-brand-subtle-hover: #294741;
+  --mp-brand-stroke: #5e8f86;
+  --mp-secondary-background: #31465a;
+  --mp-secondary-background-hover: #3d536b;
+  --mp-secondary-foreground: #aebdcc;
+  --mp-secondary-subtle: #202c36;
 
   --mp-color-neutral-background-1: #292929;
   --mp-color-neutral-background-2: #1f1f1f;
@@ -178,7 +178,7 @@
   --mp-color-danger-stroke: #e05260;
   --mp-color-info-foreground: #75bffc;
   --mp-color-info-background: #123450;
-  --mp-color-info-stroke: #2886de;
+  --mp-color-info-stroke: #5e8f86;
 
   --mp-shadow-2: 0 1px 2px rgb(0 0 0 / 0.32), 0 0 2px rgb(0 0 0 / 0.22);
   --mp-shadow-4: 0 2px 4px rgb(0 0 0 / 0.38), 0 0 2px rgb(0 0 0 / 0.24);
@@ -190,18 +190,18 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-mp-theme="light"]) {
     color-scheme: dark;
-    --mp-brand-background: #115ea3;
-    --mp-brand-background-hover: #0f6cbd;
-    --mp-brand-background-pressed: #2886de;
-    --mp-brand-foreground: #479ef5;
-    --mp-brand-foreground-hover: #62abf5;
-    --mp-brand-subtle: #0c3156;
-    --mp-brand-subtle-hover: #0f3d69;
-    --mp-brand-stroke: #2886de;
-    --mp-secondary-background: #0b7777;
-    --mp-secondary-background-hover: #0e8f8f;
-    --mp-secondary-foreground: #5bd6d1;
-    --mp-secondary-subtle: #123b3a;
+    --mp-brand-background: #426f67;
+    --mp-brand-background-hover: #4f7f75;
+    --mp-brand-background-pressed: #5e8f86;
+    --mp-brand-foreground: #9bc3bb;
+    --mp-brand-foreground-hover: #b0d0c9;
+    --mp-brand-subtle: #203a36;
+    --mp-brand-subtle-hover: #294741;
+    --mp-brand-stroke: #5e8f86;
+    --mp-secondary-background: #31465a;
+    --mp-secondary-background-hover: #3d536b;
+    --mp-secondary-foreground: #aebdcc;
+    --mp-secondary-subtle: #202c36;
     --mp-color-neutral-background-1: #292929;
     --mp-color-neutral-background-2: #1f1f1f;
     --mp-color-neutral-background-3: #141414;
@@ -229,7 +229,7 @@
     --mp-color-danger-stroke: #e05260;
     --mp-color-info-foreground: #75bffc;
     --mp-color-info-background: #123450;
-    --mp-color-info-stroke: #2886de;
+    --mp-color-info-stroke: #5e8f86;
     --mp-shadow-2: 0 1px 2px rgb(0 0 0 / 0.32), 0 0 2px rgb(0 0 0 / 0.22);
     --mp-shadow-4: 0 2px 4px rgb(0 0 0 / 0.38), 0 0 2px rgb(0 0 0 / 0.24);
     --mp-shadow-8: 0 4px 8px rgb(0 0 0 / 0.44), 0 0 3px rgb(0 0 0 / 0.28);

@@ -8,7 +8,7 @@ Utiliser un profil dédié. Ne pas tester les suppressions et règles avec une b
 
 Activer **Outils de développement → Boîte à outils du navigateur**. Rechercher les préfixes :
 
-- `MailPerch` ;
+- `MailPin` ;
 - `pinInbox` ;
 - erreurs `about:3pane`, `Sqlite` ou `calendar`.
 
@@ -25,7 +25,7 @@ Vérifier :
 
 La page Options charge d’abord `options-bootstrap.js`. Celui-ci doit rendre un
 formulaire prêt ou un panneau d’erreur terminal et conserve une trace expurgée
-dans `window.MailPerchOptionsStartup.trace`.
+dans `window.MailPinOptionsStartup.trace`.
 
 1. Rechercher la première erreur `options-bootstrap.js` ou `options.js` dans la
    console du navigateur, avant les erreurs secondaires.

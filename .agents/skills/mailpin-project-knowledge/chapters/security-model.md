@@ -2,7 +2,7 @@
 
 ## Trust boundary
 
-MailPerch has no server, application account or administrator role. Messages, imported JSON and user/page input are untrusted. Non-privileged WebExtension pages cross the structured `pinInbox` API into the privileged Experiment, which validates and normalizes before Thunderbird, SQLite, Agenda, preferences or file operations.
+MailPin has no server, application account or administrator role. Messages, imported JSON and user/page input are untrusted. Non-privileged WebExtension pages cross the structured `pinInbox` API into the privileged Experiment, which validates and normalizes before Thunderbird, SQLite, Agenda, preferences or file operations.
 
 The local profile owner and Browser Toolbox user already control the process and are outside an application-level authorization boundary. Do not invent `admin`, master tokens, hidden roles or DOM-based permission checks.
 
@@ -20,7 +20,7 @@ The local profile owner and Browser Toolbox user already control the process and
 
 ## Destructive and lifecycle behavior
 
-On uninstall, early AddonManager state and the awaited Gecko Management event stop new writes, clean injected resources, flush/close SQLite, and remove MailPerch databases, journals, recovery, managed backups and preferences. In external folders, only checksummed MailPerch envelopes are eligible; user-downloaded exports remain untouched.
+On uninstall, early AddonManager state and the awaited Gecko Management event stop new writes, clean injected resources, flush/close SQLite, and remove MailPin databases, journals, recovery, managed backups and preferences. In external folders, only checksummed MailPin envelopes are eligible; user-downloaded exports remain untouched.
 
 A native storage sentinel detects a normal uninstall/reinstall and purges residue before SQLite/preferences load. Updates remove listeners without purging data.
 

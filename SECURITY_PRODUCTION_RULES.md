@@ -38,7 +38,7 @@ Ces règles s’appliquent au développement, aux tests, à la CI, aux releases 
 - Ne pas introduire de prénom, nom civil, adresse personnelle ou identifiant local nominatif.
 - Le contrôle automatisé du dépôt recherche ces références sans afficher les valeurs interdites.
 - Toute obligation légale ou de publication exigeant une identité civile doit être signalée au propriétaire et validée explicitement avant ajout.
-- L’identifiant technique canonique de MailPerch reste `pin-mails@MailPerch.local` et ne doit pas être remplacé par une identité personnelle.
+- L’identifiant technique canonique de MailPin reste `ussmarines.mailpin@addons.thunderbird.net` et ne doit pas être remplacé par une identité personnelle.
 
 ## 6. Réponse à incident
 

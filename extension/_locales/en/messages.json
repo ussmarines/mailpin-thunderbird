@@ -1,18 +1,18 @@
 {
   "extensionName": {
-    "message": "MailPerch — Email Pins & Follow-up"
+    "message": "MailPin — Email Follow-up & Productivity for Thunderbird"
   },
   "extensionShortName": {
-    "message": "MailPerch"
+    "message": "MailPin"
   },
   "extensionDescription": {
-    "message": "Pin, organize and follow up on your emails in Thunderbird. Includes local tracking, reminders, Kanban, rules, and Calendar integration."
+    "message": "Pin, organize, and follow up on important email in Thunderbird with notes, subtasks, reminders, saved views, Calendar integration, and a local dashboard."
   },
   "brandSubtitle": {
-    "message": "Pin, organize and follow up on your emails in Thunderbird."
+    "message": "Email Follow-up & Productivity for Thunderbird"
   },
   "brandSlogan": {
-    "message": "Keep important mail within reach."
+    "message": "Stay on top. Follow through. Get results."
   },
   "dashboardHeading": {
     "message": "Dashboard"
@@ -21,13 +21,13 @@
     "message": "List, Kanban, cases, history, and activity — stored locally."
   },
   "optionsHeading": {
-    "message": "MailPerch"
+    "message": "MailPin"
   },
   "messageDisplayActionTitle": {
     "message": "Pin or unpin this message"
   },
   "dashboardActionTitle": {
-    "message": "Open the MailPerch dashboard"
+    "message": "Open the MailPin dashboard"
   },
   "commandWait": {
     "message": "Move selected pins to Waiting"
@@ -39,10 +39,10 @@
     "message": "Move selected pins back to To do"
   },
   "optionsTitle": {
-    "message": "MailPerch settings"
+    "message": "MailPin settings"
   },
   "dashboardTitle": {
-    "message": "MailPerch dashboard"
+    "message": "MailPin dashboard"
   },
   "commandToggle": {
     "message": "Pin or unpin selected messages"
@@ -54,19 +54,19 @@
     "message": "Mark selected pins as completed"
   },
   "commandDashboard": {
-    "message": "Open the MailPerch dashboard"
+    "message": "Open the MailPin dashboard"
   },
   "menuDisplayed": {
     "message": "Pin or unpin this message"
   },
   "menuDashboard": {
-    "message": "MailPerch Dashboard"
+    "message": "MailPin Dashboard"
   },
   "menuUndo": {
-    "message": "Undo the last MailPerch action"
+    "message": "Undo the last MailPin action"
   },
   "menuOptions": {
-    "message": "MailPerch Settings"
+    "message": "MailPin Settings"
   },
   "accountColor": {
     "message": "Account color"
@@ -198,7 +198,7 @@
     "message": "Calendar needs attention"
   },
   "calendarIntro": {
-    "message": "MailPerch checks write access, ACLs, and task/event capabilities before each creation."
+    "message": "MailPin checks write access, ACLs, and task/event capabilities before each creation."
   },
   "calendarItemType": {
     "message": "Type"
@@ -588,7 +588,7 @@
     "message": "Open dashboard"
   },
   "optionsIntro": {
-    "message": "Customize MailPerch without getting lost: start with the essentials, then open advanced settings only when needed."
+    "message": "Customize MailPin without getting lost: start with the essentials, then open advanced settings only when needed."
   },
   "overdue": {
     "message": "Overdue"
@@ -609,7 +609,7 @@
     "message": "Health"
   },
   "overviewHealthHelp": {
-    "message": "local MailPerch status"
+    "message": "local MailPin status"
   },
   "overviewPinned": {
     "message": "Pinned"
@@ -624,7 +624,7 @@
     "message": "Scope"
   },
   "panelScopeHelp": {
-    "message": "Choose which accounts’ pinned mail appears in the MailPerch panel."
+    "message": "Choose which accounts’ pinned mail appears in the MailPin panel."
   },
   "performanceMetrics": {
     "message": "Local performance measurements"
@@ -783,7 +783,7 @@
     "message": "Recommended volume: up to 2,000 pinned emails"
   },
   "recommendedPinVolumeHelp": {
-    "message": "MailPerch is tested with up to 2,000 pins. Higher volumes may work, but are not currently within the validated scope."
+    "message": "MailPin is tested with up to 2,000 pins. Higher volumes may work, but are not currently within the validated scope."
   },
   "pinsWithinRecommendedVolume": {
     "message": "$1 / 2,000 recommended pins"
@@ -885,7 +885,7 @@
     "message": "Start"
   },
   "sectionStartIntro": {
-    "message": "Choose a simple or advanced experience, then let MailPerch adjust density and animations."
+    "message": "Choose a simple or advanced experience, then let MailPin adjust density and animations."
   },
   "selectMessages": {
     "message": "Select messages"
@@ -1032,7 +1032,7 @@
     "message": "Remind me if there is no reply"
   },
   "transferHelp": {
-    "message": "Before restoring, MailPerch shows the contents and conflicts and offers Merge or Replace."
+    "message": "Before restoring, MailPin shows the contents and conflicts and offers Merge or Replace."
   },
   "transferTitle": {
     "message": "Export or restore"
@@ -1137,13 +1137,13 @@
     "message": "Loading recommendations"
   },
   "loadingSettingsHelp": {
-    "message": "MailPerch checks local settings before showing the controls."
+    "message": "MailPin checks local settings before showing the controls."
   },
   "settingsLoadErrorTitle": {
     "message": "Could not load settings"
   },
   "settingsLoadErrorHelp": {
-    "message": "MailPerch settings could not be prepared. No changes were applied."
+    "message": "MailPin settings could not be prepared. No changes were applied."
   },
   "retrySettingsLoad": {
     "message": "Try again"
@@ -1151,495 +1151,1477 @@
   "copySettingsDiagnostic": {
     "message": "Copy diagnostic"
   },
-  "dynamicRecommended": {"message": "Recommended"},
-  "dynamicRecommendedDisabled": {"message": "Recommended setting, currently disabled"},
-  "dynamicMoveUp": {"message": "Move this item up"},
-  "dynamicMoveDown": {"message": "Move this item down"},
-  "dynamicSelectedCalendar": {"message": "the selected calendar"},
-  "dynamicChooseCalendar": {"message": "Choose a compatible calendar before creating the Calendar item."},
-  "dynamicTitle": {"message": "Title"},
-  "dynamicColor": {"message": "Color"},
-  "dynamicStatus": {"message": "Status"},
-  "dynamicName": {"message": "Name"},
-  "dynamicCaseTitleHelp": {"message": "Visible case name (120 characters maximum)."},
-  "dynamicCaseDueHelp": {"message": "A date is required to create a task or event."},
-  "dynamicCalendarSync": {"message": "Synchronize Calendar"},
-  "dynamicCalendarTitleRequired": {"message": "Enter the case title before creating a Calendar item."},
-  "dynamicCalendarDueRequired": {"message": "Enter a date and time before creating the Calendar item."},
-  "dynamicNoEventCalendar": {"message": "No writable calendar can accept an event."},
-  "dynamicNoTaskCalendar": {"message": "No writable calendar can accept a task."},
-  "dynamicCalendarBusy": {"message": "Synchronizing the case with Calendar…"},
-  "dynamicCaseCreated": {"message": "Case created in $1 — $2, $3."},
-  "dynamicCaseSynchronized": {"message": "Case synchronized in $1 — $2, $3."},
-  "dynamicTemplateNameHelp": {"message": "Template name (120 characters maximum)."},
-  "dynamicTemplateDeadlineHelp": {"message": "Delay before the deadline, in days (0 to 3650)."},
-  "dynamicFollowUp": {"message": "Follow-up"},
-  "dynamicTemplateFollowUpHelp": {"message": "Delay before follow-up, in days (0 to 365)."},
-  "dynamicLead": {"message": "Advance notice"},
-  "dynamicTemplateLeadHelp": {"message": "Reminder lead time, in minutes (0 to 10,080)."},
-  "dynamicRecurrence": {"message": "Recurrence"},
-  "dynamicInterval": {"message": "Interval"},
-  "dynamicTemplateIntervalHelp": {"message": "Number of units between recurrences (1 to 100)."},
-  "dynamicNotePrefix": {"message": "Note prefix"},
-  "dynamicRuleEnabled": {"message": "Enabled"},
-  "dynamicRuleEnabledHelp": {"message": "A disabled rule is never evaluated."},
-  "dynamicRuleNameHelp": {"message": "Local rule name."},
-  "dynamicRulePriorityHelp": {"message": "Execution order: the smallest number runs first (1 to 10,000)."},
-  "dynamicTrigger": {"message": "Trigger"},
-  "dynamicAction": {"message": "Action"},
-  "dynamicTarget": {"message": "Target"},
-  "dynamicSenderContains": {"message": "Sender contains"},
-  "dynamicSubjectContains": {"message": "Subject contains"},
-  "dynamicTagKey": {"message": "Tag key"},
-  "dynamicAccount": {"message": "Account"},
-  "dynamicFolderHelp": {"message": "Exact URI, optional."},
-  "dynamicGroupTarget": {"message": "Target group"},
-  "dynamicCaseTarget": {"message": "Target case"},
-  "dynamicTemplateTarget": {"message": "Target template"},
-  "dynamicStatusTarget": {"message": "Target status"},
-  "dynamicRuleLimit": {"message": "Limit"},
-  "dynamicRuleLimitHelp": {"message": "Maximum actions per minute for this rule (1 to 1000)."},
-  "calendarWriteAllowed": {"message": "write access is allowed by local checks"},
-  "calendarStateUnknown": {"message": "unknown state"},
-  "calendarWriteRefused": {"message": "Calendar write refused"},
-  "calendarUnknown": {"message": "unknown"},
-  "calendarWriteFailed": {"message": "Could not write {label} to calendar “{calendar}”. Detected state: {state}. Check permissions, read-only state, synchronization, and provider capabilities, then choose another calendar. The technical detail is available in the local diagnostic."},
-  "caseCalendarTitleRequired": {"message": "Enter the case title before creating a Calendar item."},
-  "caseCalendarDueRequired": {"message": "Enter a date and time before creating the Calendar item."},
-  "caseCalendarSelectionRequired": {"message": "Choose a compatible calendar before creating the Calendar item."},
-  "dynamicNewCase": {"message": "New case"},
-  "dynamicNewTemplate": {"message": "New template"},
-  "dynamicNewRule": {"message": "New rule"},
-  "dynamicSimulationSummary": {"message": "$1 match(es) across $2 message(s)."},
-  "dynamicSimulationBusy": {"message": "Simulating rules…"},
-  "dynamicSimulationNoMatch": {"message": "No matches."}
-  ,"supportTitle": {"message": "Support the project"}
-  ,"supportProject": {"message": "Support the project"}
-  ,"supportIntro": {"message": "Enjoying MailPerch? You can support its continued development with a donation."}
-  ,"supportPayPal": {"message": "Support the project via PayPal"}
-  ,"supportAuthor": {"message": "Author’s GitHub profile (external link)"}
-  ,"supportRepository": {"message": "Project GitHub repository (external link)"}
-  ,"supportOpenFailed": {"message": "Could not open this external link. Please try again later."},
-  "commandSnooze": {"message": "Snooze selected pins for one hour"},
-  "commandTrackNoReply": {"message": "Pin the selection and enable no-reply tracking"},
-  "commandQuickToday": {"message": "Pin the selection for today"},
-  "menuQuickCapture": {"message": "Add to follow-up…"},
-  "menuQuickSimple": {"message": "Pin only"},
-  "menuQuickToday": {"message": "Handle today"},
-  "menuQuickTomorrow": {"message": "Handle tomorrow"},
-  "menuQuickWaiting": {"message": "Move to waiting"},
-  "menuQuickNoReply": {"message": "Follow up if no reply"},
-  "smartViewSnoozed": {"message": "Snoozed"},
-  "viewToday": {"message": "Today"},
-  "viewReview": {"message": "Review"},
-  "todayHeading": {"message": "Your day"},
-  "todayIntro": {"message": "Messages that need action today, grouped by follow-up priority."},
-  "reviewHeading": {"message": "Follow-up review"},
-  "reviewIntro": {"message": "Review overdue items, waiting messages, follow-ups, and related conversations without browsing the entire inbox."},
-  "reviewDaily": {"message": "Daily review"},
-  "reviewWeekly": {"message": "Weekly review"},
-  "reviewOverdue": {"message": "Overdue"},
-  "reviewToday": {"message": "Due today"},
-  "reviewNoReply": {"message": "No reply"},
-  "reviewWaking": {"message": "Waking today"},
-  "reviewWaiting": {"message": "Waiting"},
-  "reviewStale": {"message": "No recent activity"},
-  "reviewUpcoming": {"message": "Upcoming"},
-  "reviewEmpty": {"message": "No items in this section."},
-  "reviewActionable": {"message": "$1 item(s) need your attention."},
-  "pendingReminders": {"message": "Reminders to handle"},
-  "reminderCenterHelp": {"message": "Act on recent reminders directly or postpone them without losing context."},
-  "dismissReminder": {"message": "Dismiss reminder"},
-  "snoozeOneHour": {"message": "Snooze for one hour"},
-  "snoozeTomorrow": {"message": "Snooze until tomorrow"},
-  "wakeNow": {"message": "Wake now"},
-  "snoozedUntil": {"message": "Snoozed until $1"},
-  "relatedItems": {"message": "Related conversations"},
-  "relatedItemsHelp": {"message": "MailPerch only offers merging when a reliable conversation identifier is shared."},
-  "mergeRelated": {"message": "Merge into conversation"},
-  "mergeRelatedConfirm": {"message": "Merge these $1 pins into a single conversation?"},
-  "noRelatedItems": {"message": "No reliable conversation duplicates detected."},
-  "bulkSnooze": {"message": "Snooze"},
-  "bulkWake": {"message": "Wake"},
-  "snoozeDuration": {"message": "Snooze duration"},
-  "snoozeOneDay": {"message": "Until tomorrow"},
-  "snoozeOneWeek": {"message": "For one week"},
-  "ariaMailPerchSummary": {"message": "MailPerch summary"},
-  "ariaSettingsNavigation": {"message": "Settings navigation"},
-  "ariaSettingsSections": {"message": "Settings sections"},
-  "ariaMailPerchShortcuts": {"message": "MailPerch shortcuts"},
-  "ariaMainViews": {"message": "Main views"},
-  "ariaPinnedMessages": {"message": "Pinned messages"},
-  "close": {"message": "Close"},
-  "account": {"message": "Account"},
-  "actionInProgress": {"message": "Action in progress…"},
-  "actionFailed": {"message": "Action failed"},
-  "actionSavedRefreshFailed": {"message": "The action was saved, but the dashboard could not refresh. Try again."},
-  "chooseBulkAction": {"message": "Choose a bulk action."},
-  "chooseTemplate": {"message": "Choose a template…"},
-  "confirmBulkDelete": {"message": "Delete these $1 message(s)?"},
-  "confirmBulkArchive": {"message": "Archive these $1 message(s)?"},
-  "confirmBulkUnpin": {"message": "Unpin these $1 message(s)?"},
-  "dashboardActionOpen": {"message": "Message opened."},
-  "dashboardActionReply": {"message": "Reply window opened."},
-  "dashboardActionActive": {"message": "Message returned to active."},
-  "dashboardActionWaiting": {"message": "Message moved to waiting."},
-  "dashboardActionPlanned": {"message": "Message planned."},
-  "dashboardActionComplete": {"message": "Message completed."},
-  "dashboardActionUncomplete": {"message": "Message reopened."},
-  "dashboardActionRead": {"message": "Message marked as read."},
-  "dashboardActionUnread": {"message": "Message marked as unread."},
-  "dashboardActionArchive": {"message": "Message archived."},
-  "dashboardActionDelete": {"message": "Message deleted."},
-  "dashboardActionUnpin": {"message": "Message unpinned."},
-  "dashboardActionTrackNoReply": {"message": "No-reply tracking enabled."},
-  "dashboardActionCancelNoReply": {"message": "No-reply tracking stopped."},
-  "dashboardActionPriority": {"message": "Priority updated."},
-  "dashboardActionDeadline": {"message": "Deadline updated."},
-  "dashboardActionGroup": {"message": "Group updated."},
-  "dashboardActionCase": {"message": "Case updated."},
-  "dashboardActionTemplate": {"message": "Template applied."},
-  "dashboardActionCalendar": {"message": "Calendar item created."},
-  "dashboardActionSnooze": {"message": "Message snoozed."},
-  "dashboardActionWake": {"message": "Message woken."},
-  "dashboardActionDismissReminder": {"message": "Reminder dismissed."},
-  "dashboardLoadFailed": {"message": "Unable to load"},
-  "foldersLimited": {"message": "Limited folders"},
-  "foldersSupported": {"message": "Folders ✓"},
-  "healthAttention": {"message": "A few items need attention"},
-  "healthCheckBusy": {"message": "Checking MailPerch health…"},
-  "healthCheckComplete": {"message": "Check complete: score $1/100."},
-  "healthCheckFailed": {"message": "Health check failed"},
-  "healthCritical": {"message": "Action is recommended"},
-  "healthHealthy": {"message": "MailPerch is healthy"},
-  "healthIssuesHeading": {"message": "Items to review"},
-  "healthNoIssues": {"message": "No issue was detected by the local checks."},
-  "healthRepairBusy": {"message": "Repair in progress…"},
-  "healthRepairComplete": {"message": "$1 item(s) repaired."},
-  "healthRepairConfirm": {"message": "Run the non-destructive repairs?"},
-  "healthRepairFailed": {"message": "Repair failed"},
-  "healthSummary": {"message": "$1 item(s) detected · $2 recent diagnostic event(s)."},
-  "information": {"message": "Information"},
-  "itemsUpdated": {"message": "$1 item(s) updated."},
-  "messageCount": {"message": "$1 message(s)"},
-  "mergeRelatedBusy": {"message": "Merging the conversation…"},
-  "mergeRelatedFailed": {"message": "Merge failed"},
-  "noActivity": {"message": "No activity."},
-  "offlineSupported": {"message": "Offline ✓"},
-  "offlineUnavailable": {"message": "Offline —"},
-  "providerCheckBusy": {"message": "Checking providers…"},
-  "providerCheckComplete": {"message": "Compatibility matrix updated."},
-  "providerCheckFailed": {"message": "Provider check failed"},
-  "providerCompatibilityHeading": {"message": "Account and calendar compatibility"},
-  "providerMatrixNotRun": {"message": "The matrix has not been run yet."},
-  "rule": {"message": "Rule"},
-  "selectedMessageOne": {"message": "1 message selected"},
-  "selectedMessageMany": {"message": "$1 messages selected"},
-  "selectMessage": {"message": "Select $1"},
-  "thisMessage": {"message": "this message"},
-  "unknown": {"message": "unknown"},
-  "withoutCase": {"message": "No case"},
-  "withoutGroup": {"message": "No group"},
-  "controlHelpPinMode": {"message": "Independent mode keeps pins in MailPerch local storage without changing Thunderbird stars."},
-  "controlHelpDefaultPinTarget": {"message": "Determines whether a new pin follows only the selected message or its entire conversation."},
-  "controlHelpCompatibilityMode": {"message": "Automatic adapts the integration to your Thunderbird version. Reduced mode disables the most DOM-sensitive features."},
-  "controlHelpCounterGuard": {"message": "Checks that MailPerch does not change Thunderbird read, unread, or new-message counters."},
-  "controlHelpConcurrentWrites": {"message": "Serializes local writes when several Thunderbird windows use MailPerch at the same time."},
-  "controlHelpSafeMode": {"message": "Hides advanced features that depend more heavily on Thunderbird’s internal interface."},
-  "controlHelpQuickActions": {"message": "Shows Reply, Wait, Complete, and Edit buttons on pinned-message cards."},
-  "controlHelpMultiSelect": {"message": "Enables Ctrl/Cmd, Shift, and bulk actions in the pin panel."},
-  "controlHelpConfirmDelete": {"message": "Requests confirmation before deleting a message from MailPerch."},
-  "controlHelpCalendarIntegration": {"message": "Allows local creation of tasks and events in compatible Thunderbird calendars."},
-  "controlHelpCalendarSync": {"message": "Synchronizes deadlines and completed states between a pin and its linked Calendar item."},
-  "controlHelpCalendarComplete": {"message": "Marks the Calendar task complete when its matching pin is completed."},
-  "controlHelpCalendarDelete": {"message": "Deletes the linked Calendar item when unpinning. This option can be destructive."},
-  "controlHelpCalendarItemType": {"message": "Default item type. You can still select the calendar each time an item is created."},
-  "controlHelpPreferredCalendar": {"message": "Preselected calendar. Leave empty to choose a calendar when creating a task or event."},
-  "controlHelpAutomaticBackups": {"message": "Periodically creates local backups of MailPerch configuration and references."},
-  "controlHelpBackupDirectory": {"message": "Local folder used for automatic and manual backups."},
-  "controlHelpGlobalDashboard": {"message": "Enables the global tab that groups pins from all accounts."},
-  "controlHelpPerformanceMetrics": {"message": "Measures only local render times, with no telemetry or network transfer."},
-  "controlHelpShortcut": {"message": "Thunderbird shortcut used to pin or unpin the current selection."},
-  "controlHelpSettingsExperience": {"message": "Recommended mode hides advanced settings. Advanced mode shows all settings without changing their values."},
-  "controlHelpUiPreset": {"message": "Adjusts only the settings-page spacing. It never changes the message list or main panel."},
-  "controlHelpReduceMotion": {"message": "Reduces animations for comfort without disabling action feedback."},
-  "controlHelpVirtualization": {"message": "Above this pin count, MailPerch limits the initial render to preserve responsiveness."},
-  "controlHelpSmartViews": {"message": "Adds Today, Overdue, No reply, No deadline, and other locally computed views."},
-  "controlHelpBulkActions": {"message": "Applies one action to several selected pins in the panel or dashboard."},
-  "controlHelpBulkConfirm": {"message": "Requests confirmation before bulk deletion, archiving, or unpinning."},
-  "controlHelpAutomaticNoReply": {"message": "After a sent message, creates a local follow-up date and cancels it when a reply arrives."},
-  "controlHelpCancelNoReply": {"message": "Automatically disables no-reply tracking when MailPerch detects a reply in the conversation."},
-  "controlHelpNoReplyDays": {"message": "Number of days before a conversation without a reply appears in the follow-up view."},
-  "controlHelpDefaultSmartView": {"message": "View selected when the dashboard or panel opens."},
-  "controlHelpHealthCenter": {"message": "Computes a local score from integrity, backups, references, Calendar, and performance."},
-  "controlHelpHealthNotifications": {"message": "Shows only useful alerts and avoids repeated notifications."},
-  "controlHelpDiagnostics": {"message": "Keeps a local technical log with addresses, paths, and message content removed."},
-  "controlHelpDiagnosticLevel": {"message": "Higher levels keep fewer events."},
-  "controlHelpDiagnosticEntries": {"message": "Limits the local log to between 50 and 500 events."},
-  "buttonHelpImportStars": {"message": "Copies existing Thunderbird stars to MailPerch pins. Messages are neither moved nor marked as read."},
-  "buttonHelpSimulateRules": {"message": "Analyzes rules without changing messages or pins."},
-  "buttonHelpClearRuleLog": {"message": "Clears only the local rule log, not messages or rules."},
-  "buttonHelpAddRule": {"message": "Adds a local rule that can be disabled before saving."},
-  "buttonHelpAddGroup": {"message": "Adds a local group for organizing pinned-message cards."},
-  "buttonHelpAddCase": {"message": "Adds a local case that can group several messages."},
-  "buttonHelpAddTemplate": {"message": "Adds a reusable follow-up template."},
-  "buttonHelpSyncCalendar": {"message": "Reads and synchronizes existing Calendar links. No new item is created without an explicit action."},
-  "buttonHelpChooseBackup": {"message": "Chooses the local backup folder and immediately saves that path."},
-  "buttonHelpRunBackup": {"message": "Immediately creates a local backup in the configured folder."},
-  "buttonHelpIntegrityCheck": {"message": "Checks SQLite consistency without automatically deleting or repairing data."},
-  "buttonHelpCompatibilityCheck": {"message": "Checks the availability of the Thunderbird features used by MailPerch."},
-  "buttonHelpDashboard": {"message": "Opens the global dashboard in a new Thunderbird tab."},
-  "buttonHelpUndo": {"message": "Undoes the latest MailPerch action still available in local history."},
-  "buttonHelpRepair": {"message": "Tries to find moved or renamed messages without changing Thunderbird counters."},
-  "buttonHelpRescan": {"message": "Rescans pinned references to update their local state."},
-  "buttonHelpCleanup": {"message": "Removes references that remain missing after the configured safety delay."},
-  "buttonHelpResetInterface": {"message": "Resets only interface layout and visual preferences."},
-  "buttonHelpDiagnostic": {"message": "Exports a local technical report without message bodies or attachments."},
-  "buttonHelpExport": {"message": "Downloads a local JSON backup of the MailPerch configuration."},
-  "buttonHelpSaveShortcut": {"message": "Saves only the selected Thunderbird shortcut."},
-  "buttonHelpSaveAll": {"message": "Saves all currently edited fields, groups, rules, cases, and templates."},
-  "buttonHelpReset": {"message": "Resets settings, groups, cases, templates, and rules. Pins are kept."},
-  "buttonHelpProviderCheck": {"message": "Analyzes available account types and calendars without an additional network connection."},
-  "buttonHelpHealthCheck": {"message": "Checks the local database, references, Calendar, backups, and performance."},
-  "buttonHelpHealthRepair": {"message": "Runs only non-destructive repairs and creates a backup first."},
-  "buttonHelpClearDiagnostics": {"message": "Clears the local technical log without changing pins or user history."},
-  "genericCheckboxHelp": {"message": "Enables or disables this feature after the settings are saved."},
-  "genericSelectHelp": {"message": "Choose the MailPerch behavior, then save the settings."},
-  "genericNumberHelp": {"message": "Sets a local limit or duration that applies after saving."},
-  "genericTextareaHelp": {"message": "Enter one value per line. Data stays in local MailPerch storage."},
-  "genericValueHelp": {"message": "This value applies after the settings are saved."},
-  "genericButtonHelp": {"message": "Runs this action locally and displays its result near the button."},
-  "navEssential": {"message": "Essential"},
-  "navFollowUp": {"message": "Follow-up"},
-  "navOrganization": {"message": "Organization"},
-  "navIntegrations": {"message": "Integrations"},
-  "navMaintenance": {"message": "Maintenance"},
-  "navQuickAccess": {"message": "Quick access"},
-  "navOther": {"message": "Other"},
-  "allAccounts": {"message": "All accounts"},
-  "calendarAskOnCreate": {"message": "Ask when creating"},
-  "calendarCapabilityDetails": {"message": "Provider: $1 · Tasks: $2 · Events: $3"},
-  "calendarEventsOnly": {"message": "Events only"},
-  "calendarListFailed": {"message": "The calendar list could not be loaded."},
-  "calendarListTimeout": {"message": "The calendar list did not respond. Try Sync now again when Calendar is available."},
-  "calendarReadOnly": {"message": "Not writable"},
-  "calendarTasksAndEvents": {"message": "Tasks and events"},
-  "calendarTasksOnly": {"message": "Tasks only"},
-  "calendarsUnavailable": {"message": "Thunderbird calendars are unavailable."},
-  "compatible": {"message": "compatible"},
-  "notCompatible": {"message": "not compatible"},
-  "tasksShort": {"message": "tasks"},
-  "eventsShort": {"message": "events"},
-  "deadlineOffsetPlaceholder": {"message": "Deadline D+"},
-  "followUpOffsetPlaceholder": {"message": "Follow-up D+"},
-  "leadMinutesPlaceholder": {"message": "Lead time min"},
-  "defaultButton": {"message": "Default"},
-  "draftEvaluationFailed": {"message": "Unable to evaluate changes"},
-  "folderUriPlaceholder": {"message": "Folder URI (optional)"},
-  "groupColorLabel": {"message": "Color for group $1"},
-  "groupName": {"message": "Group name"},
-  "groupOrder": {"message": "Group order"},
-  "healthNotAnalyzed": {"message": "The health center has not been analyzed yet."},
-  "healthOptionsSummary": {"message": "$1 pin(s) · $2 item(s) to review"},
-  "healthStatusAttention": {"message": "Needs attention"},
-  "healthStatusCritical": {"message": "Action required"},
-  "healthStatusHealthy": {"message": "Healthy"},
-  "healthStatusUnknown": {"message": "Unknown state"},
-  "never": {"message": "Never"},
-  "noCalendarAvailable": {"message": "No Thunderbird calendar is available, or Calendar integration is disabled."},
-  "noCustomGroups": {"message": "No custom groups."},
-  "noCustomRules": {"message": "No custom rules."},
-  "noTemplates": {"message": "No templates."},
-  "none": {"message": "None"},
-  "noneFeminine": {"message": "none"},
-  "notDefined": {"message": "not set"},
-  "providerLastCheck": {"message": "Last check: $1 · $2 account(s) · $3 calendar(s)."},
-  "providerRunPrompt": {"message": "Run the check to build the matrix for your accounts and calendars."},
-  "recurrenceNone": {"message": "None"},
-  "recurrenceDaily": {"message": "Daily"},
-  "recurrenceWeekdays": {"message": "Weekdays"},
-  "recurrenceWeekly": {"message": "Weekly"},
-  "recurrenceMonthly": {"message": "Monthly"},
-  "recurrenceQuarterly": {"message": "Quarterly"},
-  "recurrenceYearly": {"message": "Yearly"},
-  "restoreBusy": {"message": "Restore in progress…"},
-  "restoreCompleted": {"message": "Backup restored successfully."},
-  "restoreFailed": {"message": "Restore failed"},
-  "restoreMerge": {"message": "Merge with current data"},
-  "restoreMerged": {"message": "Backup merged successfully."},
-  "restorePreviewConflicts": {"message": "$1 identifier conflict(s) detected."},
-  "restorePreviewCounts": {"message": "$1 pin(s), $2 group(s), $3 rule(s), $4 case(s), $5 template(s)."},
-  "restorePreviewFormat": {"message": "Format: $1 · version $2"},
-  "restorePreviewTitle": {"message": "Restore preview"},
-  "restoreReplace": {"message": "Replace current data"},
-  "restoreReplaceConfirm": {"message": "Replace the current MailPerch data with this backup? A safety backup will be created first when that option is enabled."},
-  "ruleActionComplete": {"message": "Complete"},
-  "ruleActionKeep": {"message": "Keep"},
-  "ruleActionPin": {"message": "Pin"},
-  "ruleDefaultName": {"message": "Rule $1"},
-  "ruleTargetConversation": {"message": "Conversation"},
-  "ruleTargetMessage": {"message": "Message"},
-  "senderFilterHelp": {"message": "Filter by sender"},
-  "subjectFilterHelp": {"message": "Filter by subject"},
-  "tagFilterHelp": {"message": "Internal Thunderbird tag key"},
-  "settingsSaved": {"message": "Settings saved."},
-  "stopProcessing": {"message": "Stop"},
-  "technicalIdentifier": {"message": "Technical identifier: $1"},
-  "templateNamePlaceholder": {"message": "Template name"},
-  "thunderbirdAccount": {"message": "Thunderbird account"},
-  "triggerArchive": {"message": "Archive"},
-  "triggerCalendar": {"message": "Calendar"},
-  "triggerComplete": {"message": "Complete"},
-  "triggerDelete": {"message": "Delete"},
-  "triggerMessageAdded": {"message": "New message"},
-  "triggerMove": {"message": "Move"},
-  "triggerRead": {"message": "Read"},
-  "triggerReply": {"message": "Reply"},
-  "withoutTemplate": {"message": "No template"},
-  "runtimeStats": {"message": "$1 pin(s) · $2 waiting · $3 overdue · $4 history"},
-  "runtimeStorage": {"message": "Storage: $1 · $2 · schema $3"},
-  "runtimeCompatibility": {"message": "Compatibility: $1"},
-  "runtimePerformance": {"message": "Renders: $1 · average $2 ms · max $3 ms"},
-  "runtimeBackup": {"message": "Folder: $1 · last backup: $2"},
-  "saveDockHint": {"message": "Use the Save/Cancel bar that appears only after a change."},
-  "backupCreateBusy": {"message": "Creating the local backup…"},
-  "backupCreated": {"message": "Backup created: $1"},
-  "backupExportBusy": {"message": "Preparing the backup…"},
-  "backupExportFailed": {"message": "Backup export failed"},
-  "backupExported": {"message": "Backup exported."},
-  "backupFolderBusy": {"message": "Selecting the backup folder…"},
-  "backupFolderCancelled": {"message": "Folder selection cancelled."},
-  "backupFolderFailed": {"message": "Folder selection failed"},
-  "backupFolderSaved": {"message": "Backup folder saved."},
-  "calendarSyncBusy": {"message": "Synchronizing with Calendar…"},
-  "calendarSyncComplete": {"message": "$1 item(s) synchronized."},
-  "cleanupBusy": {"message": "Cleaning missing references…"},
-  "cleanupComplete": {"message": "Cleanup complete."},
-  "compatibilityCheckBusy": {"message": "Checking Thunderbird compatibility…"},
-  "compatibilityCheckComplete": {"message": "Check complete."},
-  "dashboardOpenBusy": {"message": "Opening the dashboard…"},
-  "dashboardOpenFailed": {"message": "Unable to open the dashboard"},
-  "dashboardOpened": {"message": "Dashboard opened in a new tab."},
-  "diagnosticsClearBusy": {"message": "Clearing the diagnostic log…"},
-  "diagnosticsClearedCount": {"message": "$1 diagnostic event(s) cleared."},
-  "dynamicNewGroup": {"message": "New group"},
-  "healthRepairConfirmWithBackup": {"message": "Run the non-destructive repairs? MailPerch will create a backup first when that option is enabled."},
-  "importAnalyzeBusy": {"message": "Analyzing the backup…"},
-  "importAnalyzed": {"message": "Backup analyzed. Choose Merge or Replace in this section."},
-  "importFileTooLarge": {"message": "File is too large."},
-  "importPreviewFailed": {"message": "Unable to preview the backup"},
-  "interfaceReset": {"message": "Interface reset."},
-  "interfaceResetBusy": {"message": "Resetting the interface…"},
-  "operationBusy": {"message": "Operation in progress…"},
-  "operationFailed": {"message": "Operation failed"},
-  "providerAnalysisResult": {"message": "$1 account(s) and $2 calendar(s) analyzed."},
-  "referencesRepairBusy": {"message": "Repairing references…"},
-  "referencesRepaired": {"message": "$1 repaired, $2 missing."},
-  "rescanBusy": {"message": "Scanning pinned messages…"},
-  "rescanComplete": {"message": "Rescan complete."},
-  "ruleLogClearBusy": {"message": "Clearing the rule log…"},
-  "ruleLogCleared": {"message": "$1 entry or entries cleared."},
-  "settingsDiscardBusy": {"message": "Restoring saved settings…"},
-  "settingsDiscardFailed": {"message": "Unable to cancel changes"},
-  "settingsDiscarded": {"message": "Changes cancelled."},
-  "settingsOperationBusy": {"message": "A settings operation is already in progress."},
-  "settingsReset": {"message": "Settings reset."},
-  "settingsResetBusy": {"message": "Resetting settings…"},
-  "settingsResetConfirm": {"message": "Reset settings, groups, cases, templates, and rules? Pins are kept."},
-  "settingsSaveBusy": {"message": "Saving settings…"},
-  "settingsSaveFailed": {"message": "Unable to save settings"},
-  "settingsStillLoading": {"message": "Settings are still loading."},
-  "shortcutSaveBusy": {"message": "Saving shortcuts…"},
-  "shortcutSaveFailed": {"message": "Shortcut rejected"},
-  "shortcutsSaved": {"message": "Shortcuts saved."},
-  "simulationRuleMatches": {"message": "$1: $2 match(es)"},
-  "simulationTotals": {"message": "$1 rule(s) tested across $2 message(s)."},
-  "simulationTruncated": {"message": "Result truncated: narrow the conditions before enabling the rules."},
-  "sqliteCheckBusy": {"message": "Checking the SQLite database…"},
-  "sqliteHealthy": {"message": "SQLite database is healthy."},
-  "sqliteIssue": {"message": "SQLite issue detected."},
-  "starsImportBusy": {"message": "Importing Thunderbird stars…"},
-  "starsImported": {"message": "$1 star(s) imported."},
-  "undoBusy": {"message": "Undoing the latest action…"},
-  "undoComplete": {"message": "Latest action undone."},
-  "enableThunderbirdTagSync": {"message": "Sync statuses with Thunderbird tags"},
-  "controlHelpThunderbirdTagSync": {"message": "Creates and updates only MailPerch-prefixed tags. Other Thunderbird tags are never changed or removed."},
-  "syncTags": {"message": "Sync tags"},
-  "buttonHelpSyncTags": {"message": "Applies MailPerch tags to pinned messages based on their current status, priority, and follow-up state."},
-  "tagSyncComplete": {"message": "Tags synchronized: $1 message(s), $2 error(s)."},
-  "tagSyncBusy": {"message": "Synchronizing Thunderbird tags…"},
-  "tagSyncTitle": {"message": "Thunderbird tags"},
-  "tagSyncIntro": {"message": "Optional: reflects MailPerch state in dedicated Thunderbird tags without touching your personal tags."},
-  "smartViewWaitingForThem": {"message": "Waiting for a reply"},
-  "smartViewNeedsReply": {"message": "I need to reply"},
-  "smartViewChecklistPending": {"message": "Subtasks to finish"},
-  "savedViews": {"message": "Saved views"},
-  "saveCurrentView": {"message": "Save current view"},
-  "noSavedViews": {"message": "No saved views."},
-  "commandPalette": {"message": "Open the MailPerch command palette"},
-  "commandPalettePlaceholder": {"message": "Search commands…"},
-  "commandPaletteHelp": {"message": "Quickly access the main views and actions."},
-  "closeCommandPalette": {"message": "Close commands"},
-  "viewName": {"message": "View name"},
-  "saveView": {"message": "Save"},
-  "deleteSavedView": {"message": "Delete view"},
-  "waitingForThem": {"message": "Waiting on them"},
-  "needsReply": {"message": "I need to reply"},
-  "checklistProgress": {"message": "Subtasks · $1/$2"},
-  "pendingSubtasks": {"message": "Pending subtasks"},
-  "averageOpenAge": {"message": "Average follow-up age"},
-  "averageWaitingAge": {"message": "Average waiting time"},
-  "completedLast7Days": {"message": "Completed in 7 days"},
-  "daysShort": {"message": "d"},
-  "responseState": {"message": "Reply status"},
-  "navAutomation": {"message": "Automation"},
-  "navAdvanced": {"message": "Advanced"},
-  "recommendedModeTitle": {"message": "Recommended configuration"},
-  "recommendedModeHelp": {"message": "Restores technical and interface settings to a safe baseline without deleting your groups, cases, rules, selected calendar, or backup folder."},
-  "applyRecommendedSettings": {"message": "Apply recommended settings"},
-  "buttonHelpApplyRecommended": {"message": "Prepares recommended values in the form. Nothing is saved until you click Save."},
-  "recommendedDraftApplied": {"message": "Recommended settings have been prepared. Review them, then click Save to apply them."},
-  "settingsSearchMatches": {"message": "$1 section(s) containing “$2”."},
-  "settingsSectionsAvailable": {"message": "$1 sections available."},
-  "workflowSettingsTitle": {"message": "Tracking workflows"},
-  "workflowSettingsHelp": {"message": "Active, Waiting, Planned and Completed states organize the lifecycle without moving your messages."},
-  "organizationChecklistsTitle": {"message": "Checklists"},
-  "organizationChecklistsHelp": {"message": "Add subtasks directly from a pin; no additional setting is required."},
-  "organizationSavedViewsTitle": {"message": "Saved views"},
-  "organizationSavedViewsHelp": {"message": "Combine search and filters in the dashboard, then save the view for reuse."},
-  "sectionCalendarEssential": {"message": "Calendar"},
-  "calendarTargetTitle": {"message": "Calendar and synchronization"},
-  "calendarTargetHelp": {"message": "Choose the calendar to use or let MailPerch ask you each time an item is created."},
-  "sectionTagsAutomation": {"message": "Thunderbird tags"},
-  "tagSyncControlTitle": {"message": "Status synchronization"},
-  "tagSyncControlHelp": {"message": "Only tags reserved for MailPerch are created, changed, or removed."},
-  "sectionThunderbirdTechnicalEyebrow": {"message": "Thunderbird"},
-  "sectionThunderbirdTechnical": {"message": "Compatibility and technical behavior"},
-  "sectionThunderbirdTechnicalIntro": {"message": "These settings are for diagnostics, special compatibility cases, and very large volumes. Recommended mode manages them automatically."},
-  "returnToActive": {"message": "Return to active"},
-  "changeNoReplyTracking": {"message": "Change follow-up"},
-  "eventSchedule": {"message": "Event date and time"},
-  "taskSchedule": {"message": "Task due date"},
-  "startDate": {"message": "Start date"},
-  "startTime": {"message": "Start time"},
-  "endDate": {"message": "End date"},
-  "endTime": {"message": "End time"},
-  "dueDate": {"message": "Due date"},
-  "dueTime": {"message": "Due time"},
-  "calendarRequired": {"message": "Choose a writable calendar."},
-  "eventDatesRequired": {"message": "Enter the start and end dates and times."},
-  "eventEndAfterStart": {"message": "The end must be after the start."},
-  "taskDueRequired": {"message": "Enter the due date and time."},
-  "noReplyDialogTitle": {"message": "Follow up if no reply"},
-  "noReplyDialogHelp": {"message": "Choose when this pin should return to your attention."},
-  "defaultDelay": {"message": "Default delay"},
-  "tomorrowMorning": {"message": "Tomorrow morning"},
-  "inThreeDays": {"message": "In 3 days"},
-  "inFiveDays": {"message": "In 5 days"},
-  "inSevenDays": {"message": "In 7 days"},
-  "customDate": {"message": "Custom date"},
-  "noReplyResult": {"message": "Follow-up scheduled"},
-  "invalidDate": {"message": "Invalid date"},
-  "noReplyDateRequired": {"message": "Choose a valid date and time."},
-  "noReplyDateFuture": {"message": "Choose a future date and time."}
+  "dynamicRecommended": {
+    "message": "Recommended"
+  },
+  "dynamicRecommendedDisabled": {
+    "message": "Recommended setting, currently disabled"
+  },
+  "dynamicMoveUp": {
+    "message": "Move this item up"
+  },
+  "dynamicMoveDown": {
+    "message": "Move this item down"
+  },
+  "dynamicSelectedCalendar": {
+    "message": "the selected calendar"
+  },
+  "dynamicChooseCalendar": {
+    "message": "Choose a compatible calendar before creating the Calendar item."
+  },
+  "dynamicTitle": {
+    "message": "Title"
+  },
+  "dynamicColor": {
+    "message": "Color"
+  },
+  "dynamicStatus": {
+    "message": "Status"
+  },
+  "dynamicName": {
+    "message": "Name"
+  },
+  "dynamicCaseTitleHelp": {
+    "message": "Visible case name (120 characters maximum)."
+  },
+  "dynamicCaseDueHelp": {
+    "message": "A date is required to create a task or event."
+  },
+  "dynamicCalendarSync": {
+    "message": "Synchronize Calendar"
+  },
+  "dynamicCalendarTitleRequired": {
+    "message": "Enter the case title before creating a Calendar item."
+  },
+  "dynamicCalendarDueRequired": {
+    "message": "Enter a date and time before creating the Calendar item."
+  },
+  "dynamicNoEventCalendar": {
+    "message": "No writable calendar can accept an event."
+  },
+  "dynamicNoTaskCalendar": {
+    "message": "No writable calendar can accept a task."
+  },
+  "dynamicCalendarBusy": {
+    "message": "Synchronizing the case with Calendar…"
+  },
+  "dynamicCaseCreated": {
+    "message": "Case created in $1 — $2, $3."
+  },
+  "dynamicCaseSynchronized": {
+    "message": "Case synchronized in $1 — $2, $3."
+  },
+  "dynamicTemplateNameHelp": {
+    "message": "Template name (120 characters maximum)."
+  },
+  "dynamicTemplateDeadlineHelp": {
+    "message": "Delay before the deadline, in days (0 to 3650)."
+  },
+  "dynamicFollowUp": {
+    "message": "Follow-up"
+  },
+  "dynamicTemplateFollowUpHelp": {
+    "message": "Delay before follow-up, in days (0 to 365)."
+  },
+  "dynamicLead": {
+    "message": "Advance notice"
+  },
+  "dynamicTemplateLeadHelp": {
+    "message": "Reminder lead time, in minutes (0 to 10,080)."
+  },
+  "dynamicRecurrence": {
+    "message": "Recurrence"
+  },
+  "dynamicInterval": {
+    "message": "Interval"
+  },
+  "dynamicTemplateIntervalHelp": {
+    "message": "Number of units between recurrences (1 to 100)."
+  },
+  "dynamicNotePrefix": {
+    "message": "Note prefix"
+  },
+  "dynamicRuleEnabled": {
+    "message": "Enabled"
+  },
+  "dynamicRuleEnabledHelp": {
+    "message": "A disabled rule is never evaluated."
+  },
+  "dynamicRuleNameHelp": {
+    "message": "Local rule name."
+  },
+  "dynamicRulePriorityHelp": {
+    "message": "Execution order: the smallest number runs first (1 to 10,000)."
+  },
+  "dynamicTrigger": {
+    "message": "Trigger"
+  },
+  "dynamicAction": {
+    "message": "Action"
+  },
+  "dynamicTarget": {
+    "message": "Target"
+  },
+  "dynamicSenderContains": {
+    "message": "Sender contains"
+  },
+  "dynamicSubjectContains": {
+    "message": "Subject contains"
+  },
+  "dynamicTagKey": {
+    "message": "Tag key"
+  },
+  "dynamicAccount": {
+    "message": "Account"
+  },
+  "dynamicFolderHelp": {
+    "message": "Exact URI, optional."
+  },
+  "dynamicGroupTarget": {
+    "message": "Target group"
+  },
+  "dynamicCaseTarget": {
+    "message": "Target case"
+  },
+  "dynamicTemplateTarget": {
+    "message": "Target template"
+  },
+  "dynamicStatusTarget": {
+    "message": "Target status"
+  },
+  "dynamicRuleLimit": {
+    "message": "Limit"
+  },
+  "dynamicRuleLimitHelp": {
+    "message": "Maximum actions per minute for this rule (1 to 1000)."
+  },
+  "calendarWriteAllowed": {
+    "message": "write access is allowed by local checks"
+  },
+  "calendarStateUnknown": {
+    "message": "unknown state"
+  },
+  "calendarWriteRefused": {
+    "message": "Calendar write refused"
+  },
+  "calendarUnknown": {
+    "message": "unknown"
+  },
+  "calendarWriteFailed": {
+    "message": "Could not write {label} to calendar “{calendar}”. Detected state: {state}. Check permissions, read-only state, synchronization, and provider capabilities, then choose another calendar. The technical detail is available in the local diagnostic."
+  },
+  "caseCalendarTitleRequired": {
+    "message": "Enter the case title before creating a Calendar item."
+  },
+  "caseCalendarDueRequired": {
+    "message": "Enter a date and time before creating the Calendar item."
+  },
+  "caseCalendarSelectionRequired": {
+    "message": "Choose a compatible calendar before creating the Calendar item."
+  },
+  "dynamicNewCase": {
+    "message": "New case"
+  },
+  "dynamicNewTemplate": {
+    "message": "New template"
+  },
+  "dynamicNewRule": {
+    "message": "New rule"
+  },
+  "dynamicSimulationSummary": {
+    "message": "$1 match(es) across $2 message(s)."
+  },
+  "dynamicSimulationBusy": {
+    "message": "Simulating rules…"
+  },
+  "dynamicSimulationNoMatch": {
+    "message": "No matches."
+  },
+  "supportTitle": {
+    "message": "Support the project"
+  },
+  "supportProject": {
+    "message": "Support the project"
+  },
+  "supportIntro": {
+    "message": "Enjoying MailPin? You can support its continued development with a donation."
+  },
+  "supportPayPal": {
+    "message": "Support the project via PayPal"
+  },
+  "supportAuthor": {
+    "message": "Author’s GitHub profile (external link)"
+  },
+  "supportRepository": {
+    "message": "Project GitHub repository (external link)"
+  },
+  "supportOpenFailed": {
+    "message": "Could not open this external link. Please try again later."
+  },
+  "commandSnooze": {
+    "message": "Snooze selected pins for one hour"
+  },
+  "commandTrackNoReply": {
+    "message": "Pin the selection and enable no-reply tracking"
+  },
+  "commandQuickToday": {
+    "message": "Pin the selection for today"
+  },
+  "menuQuickCapture": {
+    "message": "Add to follow-up…"
+  },
+  "menuQuickSimple": {
+    "message": "Pin only"
+  },
+  "menuQuickToday": {
+    "message": "Handle today"
+  },
+  "menuQuickTomorrow": {
+    "message": "Handle tomorrow"
+  },
+  "menuQuickWaiting": {
+    "message": "Move to waiting"
+  },
+  "menuQuickNoReply": {
+    "message": "Follow up if no reply"
+  },
+  "smartViewSnoozed": {
+    "message": "Snoozed"
+  },
+  "viewToday": {
+    "message": "Today"
+  },
+  "viewReview": {
+    "message": "Review"
+  },
+  "todayHeading": {
+    "message": "Your day"
+  },
+  "todayIntro": {
+    "message": "Messages that need action today, grouped by follow-up priority."
+  },
+  "reviewHeading": {
+    "message": "Follow-up review"
+  },
+  "reviewIntro": {
+    "message": "Review overdue items, waiting messages, follow-ups, and related conversations without browsing the entire inbox."
+  },
+  "reviewDaily": {
+    "message": "Daily review"
+  },
+  "reviewWeekly": {
+    "message": "Weekly review"
+  },
+  "reviewOverdue": {
+    "message": "Overdue"
+  },
+  "reviewToday": {
+    "message": "Due today"
+  },
+  "reviewNoReply": {
+    "message": "No reply"
+  },
+  "reviewWaking": {
+    "message": "Waking today"
+  },
+  "reviewWaiting": {
+    "message": "Waiting"
+  },
+  "reviewStale": {
+    "message": "No recent activity"
+  },
+  "reviewUpcoming": {
+    "message": "Upcoming"
+  },
+  "reviewEmpty": {
+    "message": "No items in this section."
+  },
+  "reviewActionable": {
+    "message": "$1 item(s) need your attention."
+  },
+  "pendingReminders": {
+    "message": "Reminders to handle"
+  },
+  "reminderCenterHelp": {
+    "message": "Act on recent reminders directly or postpone them without losing context."
+  },
+  "dismissReminder": {
+    "message": "Dismiss reminder"
+  },
+  "snoozeOneHour": {
+    "message": "Snooze for one hour"
+  },
+  "snoozeTomorrow": {
+    "message": "Snooze until tomorrow"
+  },
+  "wakeNow": {
+    "message": "Wake now"
+  },
+  "snoozedUntil": {
+    "message": "Snoozed until $1"
+  },
+  "relatedItems": {
+    "message": "Related conversations"
+  },
+  "relatedItemsHelp": {
+    "message": "MailPin only offers merging when a reliable conversation identifier is shared."
+  },
+  "mergeRelated": {
+    "message": "Merge into conversation"
+  },
+  "mergeRelatedConfirm": {
+    "message": "Merge these $1 pins into a single conversation?"
+  },
+  "noRelatedItems": {
+    "message": "No reliable conversation duplicates detected."
+  },
+  "bulkSnooze": {
+    "message": "Snooze"
+  },
+  "bulkWake": {
+    "message": "Wake"
+  },
+  "snoozeDuration": {
+    "message": "Snooze duration"
+  },
+  "snoozeOneDay": {
+    "message": "Until tomorrow"
+  },
+  "snoozeOneWeek": {
+    "message": "For one week"
+  },
+  "ariaMailPinSummary": {
+    "message": "MailPin summary"
+  },
+  "ariaSettingsNavigation": {
+    "message": "Settings navigation"
+  },
+  "ariaSettingsSections": {
+    "message": "Settings sections"
+  },
+  "ariaMailPinShortcuts": {
+    "message": "MailPin shortcuts"
+  },
+  "ariaMainViews": {
+    "message": "Main views"
+  },
+  "ariaPinnedMessages": {
+    "message": "Pinned messages"
+  },
+  "close": {
+    "message": "Close"
+  },
+  "account": {
+    "message": "Account"
+  },
+  "actionInProgress": {
+    "message": "Action in progress…"
+  },
+  "actionFailed": {
+    "message": "Action failed"
+  },
+  "actionSavedRefreshFailed": {
+    "message": "The action was saved, but the dashboard could not refresh. Try again."
+  },
+  "chooseBulkAction": {
+    "message": "Choose a bulk action."
+  },
+  "chooseTemplate": {
+    "message": "Choose a template…"
+  },
+  "confirmBulkDelete": {
+    "message": "Delete these $1 message(s)?"
+  },
+  "confirmBulkArchive": {
+    "message": "Archive these $1 message(s)?"
+  },
+  "confirmBulkUnpin": {
+    "message": "Unpin these $1 message(s)?"
+  },
+  "dashboardActionOpen": {
+    "message": "Message opened."
+  },
+  "dashboardActionReply": {
+    "message": "Reply window opened."
+  },
+  "dashboardActionActive": {
+    "message": "Message returned to active."
+  },
+  "dashboardActionWaiting": {
+    "message": "Message moved to waiting."
+  },
+  "dashboardActionPlanned": {
+    "message": "Message planned."
+  },
+  "dashboardActionComplete": {
+    "message": "Message completed."
+  },
+  "dashboardActionUncomplete": {
+    "message": "Message reopened."
+  },
+  "dashboardActionRead": {
+    "message": "Message marked as read."
+  },
+  "dashboardActionUnread": {
+    "message": "Message marked as unread."
+  },
+  "dashboardActionArchive": {
+    "message": "Message archived."
+  },
+  "dashboardActionDelete": {
+    "message": "Message deleted."
+  },
+  "dashboardActionUnpin": {
+    "message": "Message unpinned."
+  },
+  "dashboardActionTrackNoReply": {
+    "message": "No-reply tracking enabled."
+  },
+  "dashboardActionCancelNoReply": {
+    "message": "No-reply tracking stopped."
+  },
+  "dashboardActionPriority": {
+    "message": "Priority updated."
+  },
+  "dashboardActionDeadline": {
+    "message": "Deadline updated."
+  },
+  "dashboardActionGroup": {
+    "message": "Group updated."
+  },
+  "dashboardActionCase": {
+    "message": "Case updated."
+  },
+  "dashboardActionTemplate": {
+    "message": "Template applied."
+  },
+  "dashboardActionCalendar": {
+    "message": "Calendar item created."
+  },
+  "dashboardActionSnooze": {
+    "message": "Message snoozed."
+  },
+  "dashboardActionWake": {
+    "message": "Message woken."
+  },
+  "dashboardActionDismissReminder": {
+    "message": "Reminder dismissed."
+  },
+  "dashboardLoadFailed": {
+    "message": "Unable to load"
+  },
+  "foldersLimited": {
+    "message": "Limited folders"
+  },
+  "foldersSupported": {
+    "message": "Folders ✓"
+  },
+  "healthAttention": {
+    "message": "A few items need attention"
+  },
+  "healthCheckBusy": {
+    "message": "Checking MailPin health…"
+  },
+  "healthCheckComplete": {
+    "message": "Check complete: score $1/100."
+  },
+  "healthCheckFailed": {
+    "message": "Health check failed"
+  },
+  "healthCritical": {
+    "message": "Action is recommended"
+  },
+  "healthHealthy": {
+    "message": "MailPin is healthy"
+  },
+  "healthIssuesHeading": {
+    "message": "Items to review"
+  },
+  "healthNoIssues": {
+    "message": "No issue was detected by the local checks."
+  },
+  "healthRepairBusy": {
+    "message": "Repair in progress…"
+  },
+  "healthRepairComplete": {
+    "message": "$1 item(s) repaired."
+  },
+  "healthRepairConfirm": {
+    "message": "Run the non-destructive repairs?"
+  },
+  "healthRepairFailed": {
+    "message": "Repair failed"
+  },
+  "healthSummary": {
+    "message": "$1 item(s) detected · $2 recent diagnostic event(s)."
+  },
+  "information": {
+    "message": "Information"
+  },
+  "itemsUpdated": {
+    "message": "$1 item(s) updated."
+  },
+  "messageCount": {
+    "message": "$1 message(s)"
+  },
+  "mergeRelatedBusy": {
+    "message": "Merging the conversation…"
+  },
+  "mergeRelatedFailed": {
+    "message": "Merge failed"
+  },
+  "noActivity": {
+    "message": "No activity."
+  },
+  "offlineSupported": {
+    "message": "Offline ✓"
+  },
+  "offlineUnavailable": {
+    "message": "Offline —"
+  },
+  "providerCheckBusy": {
+    "message": "Checking providers…"
+  },
+  "providerCheckComplete": {
+    "message": "Compatibility matrix updated."
+  },
+  "providerCheckFailed": {
+    "message": "Provider check failed"
+  },
+  "providerCompatibilityHeading": {
+    "message": "Account and calendar compatibility"
+  },
+  "providerMatrixNotRun": {
+    "message": "The matrix has not been run yet."
+  },
+  "rule": {
+    "message": "Rule"
+  },
+  "selectedMessageOne": {
+    "message": "1 message selected"
+  },
+  "selectedMessageMany": {
+    "message": "$1 messages selected"
+  },
+  "selectMessage": {
+    "message": "Select $1"
+  },
+  "thisMessage": {
+    "message": "this message"
+  },
+  "unknown": {
+    "message": "unknown"
+  },
+  "withoutCase": {
+    "message": "No case"
+  },
+  "withoutGroup": {
+    "message": "No group"
+  },
+  "controlHelpPinMode": {
+    "message": "Independent mode keeps pins in MailPin local storage without changing Thunderbird stars."
+  },
+  "controlHelpDefaultPinTarget": {
+    "message": "Determines whether a new pin follows only the selected message or its entire conversation."
+  },
+  "controlHelpCompatibilityMode": {
+    "message": "Automatic adapts the integration to your Thunderbird version. Reduced mode disables the most DOM-sensitive features."
+  },
+  "controlHelpCounterGuard": {
+    "message": "Checks that MailPin does not change Thunderbird read, unread, or new-message counters."
+  },
+  "controlHelpConcurrentWrites": {
+    "message": "Serializes local writes when several Thunderbird windows use MailPin at the same time."
+  },
+  "controlHelpSafeMode": {
+    "message": "Hides advanced features that depend more heavily on Thunderbird’s internal interface."
+  },
+  "controlHelpQuickActions": {
+    "message": "Shows Reply, Wait, Complete, and Edit buttons on pinned-message cards."
+  },
+  "controlHelpMultiSelect": {
+    "message": "Enables Ctrl/Cmd, Shift, and bulk actions in the pin panel."
+  },
+  "controlHelpConfirmDelete": {
+    "message": "Requests confirmation before deleting a message from MailPin."
+  },
+  "controlHelpCalendarIntegration": {
+    "message": "Allows local creation of tasks and events in compatible Thunderbird calendars."
+  },
+  "controlHelpCalendarSync": {
+    "message": "Synchronizes deadlines and completed states between a pin and its linked Calendar item."
+  },
+  "controlHelpCalendarComplete": {
+    "message": "Marks the Calendar task complete when its matching pin is completed."
+  },
+  "controlHelpCalendarDelete": {
+    "message": "Deletes the linked Calendar item when unpinning. This option can be destructive."
+  },
+  "controlHelpCalendarItemType": {
+    "message": "Default item type. You can still select the calendar each time an item is created."
+  },
+  "controlHelpPreferredCalendar": {
+    "message": "Preselected calendar. Leave empty to choose a calendar when creating a task or event."
+  },
+  "controlHelpAutomaticBackups": {
+    "message": "Periodically creates local backups of MailPin configuration and references."
+  },
+  "controlHelpBackupDirectory": {
+    "message": "Local folder used for automatic and manual backups."
+  },
+  "controlHelpGlobalDashboard": {
+    "message": "Enables the global tab that groups pins from all accounts."
+  },
+  "controlHelpPerformanceMetrics": {
+    "message": "Measures only local render times, with no telemetry or network transfer."
+  },
+  "controlHelpShortcut": {
+    "message": "Thunderbird shortcut used to pin or unpin the current selection."
+  },
+  "controlHelpSettingsExperience": {
+    "message": "Recommended mode hides advanced settings. Advanced mode shows all settings without changing their values."
+  },
+  "controlHelpUiPreset": {
+    "message": "Adjusts only the settings-page spacing. It never changes the message list or main panel."
+  },
+  "controlHelpReduceMotion": {
+    "message": "Reduces animations for comfort without disabling action feedback."
+  },
+  "controlHelpVirtualization": {
+    "message": "Above this pin count, MailPin limits the initial render to preserve responsiveness."
+  },
+  "controlHelpSmartViews": {
+    "message": "Adds Today, Overdue, No reply, No deadline, and other locally computed views."
+  },
+  "controlHelpBulkActions": {
+    "message": "Applies one action to several selected pins in the panel or dashboard."
+  },
+  "controlHelpBulkConfirm": {
+    "message": "Requests confirmation before bulk deletion, archiving, or unpinning."
+  },
+  "controlHelpAutomaticNoReply": {
+    "message": "After a sent message, creates a local follow-up date and cancels it when a reply arrives."
+  },
+  "controlHelpCancelNoReply": {
+    "message": "Automatically disables no-reply tracking when MailPin detects a reply in the conversation."
+  },
+  "controlHelpNoReplyDays": {
+    "message": "Number of days before a conversation without a reply appears in the follow-up view."
+  },
+  "controlHelpDefaultSmartView": {
+    "message": "View selected when the dashboard or panel opens."
+  },
+  "controlHelpHealthCenter": {
+    "message": "Computes a local score from integrity, backups, references, Calendar, and performance."
+  },
+  "controlHelpHealthNotifications": {
+    "message": "Shows only useful alerts and avoids repeated notifications."
+  },
+  "controlHelpDiagnostics": {
+    "message": "Keeps a local technical log with addresses, paths, and message content removed."
+  },
+  "controlHelpDiagnosticLevel": {
+    "message": "Higher levels keep fewer events."
+  },
+  "controlHelpDiagnosticEntries": {
+    "message": "Limits the local log to between 50 and 500 events."
+  },
+  "buttonHelpImportStars": {
+    "message": "Copies existing Thunderbird stars to MailPin pins. Messages are neither moved nor marked as read."
+  },
+  "buttonHelpSimulateRules": {
+    "message": "Analyzes rules without changing messages or pins."
+  },
+  "buttonHelpClearRuleLog": {
+    "message": "Clears only the local rule log, not messages or rules."
+  },
+  "buttonHelpAddRule": {
+    "message": "Adds a local rule that can be disabled before saving."
+  },
+  "buttonHelpAddGroup": {
+    "message": "Adds a local group for organizing pinned-message cards."
+  },
+  "buttonHelpAddCase": {
+    "message": "Adds a local case that can group several messages."
+  },
+  "buttonHelpAddTemplate": {
+    "message": "Adds a reusable follow-up template."
+  },
+  "buttonHelpSyncCalendar": {
+    "message": "Reads and synchronizes existing Calendar links. No new item is created without an explicit action."
+  },
+  "buttonHelpChooseBackup": {
+    "message": "Chooses the local backup folder and immediately saves that path."
+  },
+  "buttonHelpRunBackup": {
+    "message": "Immediately creates a local backup in the configured folder."
+  },
+  "buttonHelpIntegrityCheck": {
+    "message": "Checks SQLite consistency without automatically deleting or repairing data."
+  },
+  "buttonHelpCompatibilityCheck": {
+    "message": "Checks the availability of the Thunderbird features used by MailPin."
+  },
+  "buttonHelpDashboard": {
+    "message": "Opens the global dashboard in a new Thunderbird tab."
+  },
+  "buttonHelpUndo": {
+    "message": "Undoes the latest MailPin action still available in local history."
+  },
+  "buttonHelpRepair": {
+    "message": "Tries to find moved or renamed messages without changing Thunderbird counters."
+  },
+  "buttonHelpRescan": {
+    "message": "Rescans pinned references to update their local state."
+  },
+  "buttonHelpCleanup": {
+    "message": "Removes references that remain missing after the configured safety delay."
+  },
+  "buttonHelpResetInterface": {
+    "message": "Resets only interface layout and visual preferences."
+  },
+  "buttonHelpDiagnostic": {
+    "message": "Exports a local technical report without message bodies or attachments."
+  },
+  "buttonHelpExport": {
+    "message": "Downloads a local JSON backup of the MailPin configuration."
+  },
+  "buttonHelpSaveShortcut": {
+    "message": "Saves only the selected Thunderbird shortcut."
+  },
+  "buttonHelpSaveAll": {
+    "message": "Saves all currently edited fields, groups, rules, cases, and templates."
+  },
+  "buttonHelpReset": {
+    "message": "Resets settings, groups, cases, templates, and rules. Pins are kept."
+  },
+  "buttonHelpProviderCheck": {
+    "message": "Analyzes available account types and calendars without an additional network connection."
+  },
+  "buttonHelpHealthCheck": {
+    "message": "Checks the local database, references, Calendar, backups, and performance."
+  },
+  "buttonHelpHealthRepair": {
+    "message": "Runs only non-destructive repairs and creates a backup first."
+  },
+  "buttonHelpClearDiagnostics": {
+    "message": "Clears the local technical log without changing pins or user history."
+  },
+  "genericCheckboxHelp": {
+    "message": "Enables or disables this feature after the settings are saved."
+  },
+  "genericSelectHelp": {
+    "message": "Choose the MailPin behavior, then save the settings."
+  },
+  "genericNumberHelp": {
+    "message": "Sets a local limit or duration that applies after saving."
+  },
+  "genericTextareaHelp": {
+    "message": "Enter one value per line. Data stays in local MailPin storage."
+  },
+  "genericValueHelp": {
+    "message": "This value applies after the settings are saved."
+  },
+  "genericButtonHelp": {
+    "message": "Runs this action locally and displays its result near the button."
+  },
+  "navEssential": {
+    "message": "Essential"
+  },
+  "navFollowUp": {
+    "message": "Follow-up"
+  },
+  "navOrganization": {
+    "message": "Organization"
+  },
+  "navIntegrations": {
+    "message": "Integrations"
+  },
+  "navMaintenance": {
+    "message": "Maintenance"
+  },
+  "navQuickAccess": {
+    "message": "Quick access"
+  },
+  "navOther": {
+    "message": "Other"
+  },
+  "allAccounts": {
+    "message": "All accounts"
+  },
+  "calendarAskOnCreate": {
+    "message": "Ask when creating"
+  },
+  "calendarCapabilityDetails": {
+    "message": "Provider: $1 · Tasks: $2 · Events: $3"
+  },
+  "calendarEventsOnly": {
+    "message": "Events only"
+  },
+  "calendarListFailed": {
+    "message": "The calendar list could not be loaded."
+  },
+  "calendarListTimeout": {
+    "message": "The calendar list did not respond. Try Sync now again when Calendar is available."
+  },
+  "calendarReadOnly": {
+    "message": "Not writable"
+  },
+  "calendarTasksAndEvents": {
+    "message": "Tasks and events"
+  },
+  "calendarTasksOnly": {
+    "message": "Tasks only"
+  },
+  "calendarsUnavailable": {
+    "message": "Thunderbird calendars are unavailable."
+  },
+  "compatible": {
+    "message": "compatible"
+  },
+  "notCompatible": {
+    "message": "not compatible"
+  },
+  "tasksShort": {
+    "message": "tasks"
+  },
+  "eventsShort": {
+    "message": "events"
+  },
+  "deadlineOffsetPlaceholder": {
+    "message": "Deadline D+"
+  },
+  "followUpOffsetPlaceholder": {
+    "message": "Follow-up D+"
+  },
+  "leadMinutesPlaceholder": {
+    "message": "Lead time min"
+  },
+  "defaultButton": {
+    "message": "Default"
+  },
+  "draftEvaluationFailed": {
+    "message": "Unable to evaluate changes"
+  },
+  "folderUriPlaceholder": {
+    "message": "Folder URI (optional)"
+  },
+  "groupColorLabel": {
+    "message": "Color for group $1"
+  },
+  "groupName": {
+    "message": "Group name"
+  },
+  "groupOrder": {
+    "message": "Group order"
+  },
+  "healthNotAnalyzed": {
+    "message": "The health center has not been analyzed yet."
+  },
+  "healthOptionsSummary": {
+    "message": "$1 pin(s) · $2 item(s) to review"
+  },
+  "healthStatusAttention": {
+    "message": "Needs attention"
+  },
+  "healthStatusCritical": {
+    "message": "Action required"
+  },
+  "healthStatusHealthy": {
+    "message": "Healthy"
+  },
+  "healthStatusUnknown": {
+    "message": "Unknown state"
+  },
+  "never": {
+    "message": "Never"
+  },
+  "noCalendarAvailable": {
+    "message": "No Thunderbird calendar is available, or Calendar integration is disabled."
+  },
+  "noCustomGroups": {
+    "message": "No custom groups."
+  },
+  "noCustomRules": {
+    "message": "No custom rules."
+  },
+  "noTemplates": {
+    "message": "No templates."
+  },
+  "none": {
+    "message": "None"
+  },
+  "noneFeminine": {
+    "message": "none"
+  },
+  "notDefined": {
+    "message": "not set"
+  },
+  "providerLastCheck": {
+    "message": "Last check: $1 · $2 account(s) · $3 calendar(s)."
+  },
+  "providerRunPrompt": {
+    "message": "Run the check to build the matrix for your accounts and calendars."
+  },
+  "recurrenceNone": {
+    "message": "None"
+  },
+  "recurrenceDaily": {
+    "message": "Daily"
+  },
+  "recurrenceWeekdays": {
+    "message": "Weekdays"
+  },
+  "recurrenceWeekly": {
+    "message": "Weekly"
+  },
+  "recurrenceMonthly": {
+    "message": "Monthly"
+  },
+  "recurrenceQuarterly": {
+    "message": "Quarterly"
+  },
+  "recurrenceYearly": {
+    "message": "Yearly"
+  },
+  "restoreBusy": {
+    "message": "Restore in progress…"
+  },
+  "restoreCompleted": {
+    "message": "Backup restored successfully."
+  },
+  "restoreFailed": {
+    "message": "Restore failed"
+  },
+  "restoreMerge": {
+    "message": "Merge with current data"
+  },
+  "restoreMerged": {
+    "message": "Backup merged successfully."
+  },
+  "restorePreviewConflicts": {
+    "message": "$1 identifier conflict(s) detected."
+  },
+  "restorePreviewCounts": {
+    "message": "$1 pin(s), $2 group(s), $3 rule(s), $4 case(s), $5 template(s)."
+  },
+  "restorePreviewFormat": {
+    "message": "Format: $1 · version $2"
+  },
+  "restorePreviewTitle": {
+    "message": "Restore preview"
+  },
+  "restoreReplace": {
+    "message": "Replace current data"
+  },
+  "restoreReplaceConfirm": {
+    "message": "Replace the current MailPin data with this backup? A safety backup will be created first when that option is enabled."
+  },
+  "ruleActionComplete": {
+    "message": "Complete"
+  },
+  "ruleActionKeep": {
+    "message": "Keep"
+  },
+  "ruleActionPin": {
+    "message": "Pin"
+  },
+  "ruleDefaultName": {
+    "message": "Rule $1"
+  },
+  "ruleTargetConversation": {
+    "message": "Conversation"
+  },
+  "ruleTargetMessage": {
+    "message": "Message"
+  },
+  "senderFilterHelp": {
+    "message": "Filter by sender"
+  },
+  "subjectFilterHelp": {
+    "message": "Filter by subject"
+  },
+  "tagFilterHelp": {
+    "message": "Internal Thunderbird tag key"
+  },
+  "settingsSaved": {
+    "message": "Settings saved."
+  },
+  "stopProcessing": {
+    "message": "Stop"
+  },
+  "technicalIdentifier": {
+    "message": "Technical identifier: $1"
+  },
+  "templateNamePlaceholder": {
+    "message": "Template name"
+  },
+  "thunderbirdAccount": {
+    "message": "Thunderbird account"
+  },
+  "triggerArchive": {
+    "message": "Archive"
+  },
+  "triggerCalendar": {
+    "message": "Calendar"
+  },
+  "triggerComplete": {
+    "message": "Complete"
+  },
+  "triggerDelete": {
+    "message": "Delete"
+  },
+  "triggerMessageAdded": {
+    "message": "New message"
+  },
+  "triggerMove": {
+    "message": "Move"
+  },
+  "triggerRead": {
+    "message": "Read"
+  },
+  "triggerReply": {
+    "message": "Reply"
+  },
+  "withoutTemplate": {
+    "message": "No template"
+  },
+  "runtimeStats": {
+    "message": "$1 pin(s) · $2 waiting · $3 overdue · $4 history"
+  },
+  "runtimeStorage": {
+    "message": "Storage: $1 · $2 · schema $3"
+  },
+  "runtimeCompatibility": {
+    "message": "Compatibility: $1"
+  },
+  "runtimePerformance": {
+    "message": "Renders: $1 · average $2 ms · max $3 ms"
+  },
+  "runtimeBackup": {
+    "message": "Folder: $1 · last backup: $2"
+  },
+  "saveDockHint": {
+    "message": "Use the Save/Cancel bar that appears only after a change."
+  },
+  "backupCreateBusy": {
+    "message": "Creating the local backup…"
+  },
+  "backupCreated": {
+    "message": "Backup created: $1"
+  },
+  "backupExportBusy": {
+    "message": "Preparing the backup…"
+  },
+  "backupExportFailed": {
+    "message": "Backup export failed"
+  },
+  "backupExported": {
+    "message": "Backup exported."
+  },
+  "backupFolderBusy": {
+    "message": "Selecting the backup folder…"
+  },
+  "backupFolderCancelled": {
+    "message": "Folder selection cancelled."
+  },
+  "backupFolderFailed": {
+    "message": "Folder selection failed"
+  },
+  "backupFolderSaved": {
+    "message": "Backup folder saved."
+  },
+  "calendarSyncBusy": {
+    "message": "Synchronizing with Calendar…"
+  },
+  "calendarSyncComplete": {
+    "message": "$1 item(s) synchronized."
+  },
+  "cleanupBusy": {
+    "message": "Cleaning missing references…"
+  },
+  "cleanupComplete": {
+    "message": "Cleanup complete."
+  },
+  "compatibilityCheckBusy": {
+    "message": "Checking Thunderbird compatibility…"
+  },
+  "compatibilityCheckComplete": {
+    "message": "Check complete."
+  },
+  "dashboardOpenBusy": {
+    "message": "Opening the dashboard…"
+  },
+  "dashboardOpenFailed": {
+    "message": "Unable to open the dashboard"
+  },
+  "dashboardOpened": {
+    "message": "Dashboard opened in a new tab."
+  },
+  "diagnosticsClearBusy": {
+    "message": "Clearing the diagnostic log…"
+  },
+  "diagnosticsClearedCount": {
+    "message": "$1 diagnostic event(s) cleared."
+  },
+  "dynamicNewGroup": {
+    "message": "New group"
+  },
+  "healthRepairConfirmWithBackup": {
+    "message": "Run the non-destructive repairs? MailPin will create a backup first when that option is enabled."
+  },
+  "importAnalyzeBusy": {
+    "message": "Analyzing the backup…"
+  },
+  "importAnalyzed": {
+    "message": "Backup analyzed. Choose Merge or Replace in this section."
+  },
+  "importFileTooLarge": {
+    "message": "File is too large."
+  },
+  "importPreviewFailed": {
+    "message": "Unable to preview the backup"
+  },
+  "interfaceReset": {
+    "message": "Interface reset."
+  },
+  "interfaceResetBusy": {
+    "message": "Resetting the interface…"
+  },
+  "operationBusy": {
+    "message": "Operation in progress…"
+  },
+  "operationFailed": {
+    "message": "Operation failed"
+  },
+  "providerAnalysisResult": {
+    "message": "$1 account(s) and $2 calendar(s) analyzed."
+  },
+  "referencesRepairBusy": {
+    "message": "Repairing references…"
+  },
+  "referencesRepaired": {
+    "message": "$1 repaired, $2 missing."
+  },
+  "rescanBusy": {
+    "message": "Scanning pinned messages…"
+  },
+  "rescanComplete": {
+    "message": "Rescan complete."
+  },
+  "ruleLogClearBusy": {
+    "message": "Clearing the rule log…"
+  },
+  "ruleLogCleared": {
+    "message": "$1 entry or entries cleared."
+  },
+  "settingsDiscardBusy": {
+    "message": "Restoring saved settings…"
+  },
+  "settingsDiscardFailed": {
+    "message": "Unable to cancel changes"
+  },
+  "settingsDiscarded": {
+    "message": "Changes cancelled."
+  },
+  "settingsOperationBusy": {
+    "message": "A settings operation is already in progress."
+  },
+  "settingsReset": {
+    "message": "Settings reset."
+  },
+  "settingsResetBusy": {
+    "message": "Resetting settings…"
+  },
+  "settingsResetConfirm": {
+    "message": "Reset settings, groups, cases, templates, and rules? Pins are kept."
+  },
+  "settingsSaveBusy": {
+    "message": "Saving settings…"
+  },
+  "settingsSaveFailed": {
+    "message": "Unable to save settings"
+  },
+  "settingsStillLoading": {
+    "message": "Settings are still loading."
+  },
+  "shortcutSaveBusy": {
+    "message": "Saving shortcuts…"
+  },
+  "shortcutSaveFailed": {
+    "message": "Shortcut rejected"
+  },
+  "shortcutsSaved": {
+    "message": "Shortcuts saved."
+  },
+  "simulationRuleMatches": {
+    "message": "$1: $2 match(es)"
+  },
+  "simulationTotals": {
+    "message": "$1 rule(s) tested across $2 message(s)."
+  },
+  "simulationTruncated": {
+    "message": "Result truncated: narrow the conditions before enabling the rules."
+  },
+  "sqliteCheckBusy": {
+    "message": "Checking the SQLite database…"
+  },
+  "sqliteHealthy": {
+    "message": "SQLite database is healthy."
+  },
+  "sqliteIssue": {
+    "message": "SQLite issue detected."
+  },
+  "starsImportBusy": {
+    "message": "Importing Thunderbird stars…"
+  },
+  "starsImported": {
+    "message": "$1 star(s) imported."
+  },
+  "undoBusy": {
+    "message": "Undoing the latest action…"
+  },
+  "undoComplete": {
+    "message": "Latest action undone."
+  },
+  "enableThunderbirdTagSync": {
+    "message": "Sync statuses with Thunderbird tags"
+  },
+  "controlHelpThunderbirdTagSync": {
+    "message": "Creates and updates only MailPin-prefixed tags. Other Thunderbird tags are never changed or removed."
+  },
+  "syncTags": {
+    "message": "Sync tags"
+  },
+  "buttonHelpSyncTags": {
+    "message": "Applies MailPin tags to pinned messages based on their current status, priority, and follow-up state."
+  },
+  "tagSyncComplete": {
+    "message": "Tags synchronized: $1 message(s), $2 error(s)."
+  },
+  "tagSyncBusy": {
+    "message": "Synchronizing Thunderbird tags…"
+  },
+  "tagSyncTitle": {
+    "message": "Thunderbird tags"
+  },
+  "tagSyncIntro": {
+    "message": "Optional: reflects MailPin state in dedicated Thunderbird tags without touching your personal tags."
+  },
+  "smartViewWaitingForThem": {
+    "message": "Waiting for a reply"
+  },
+  "smartViewNeedsReply": {
+    "message": "I need to reply"
+  },
+  "smartViewChecklistPending": {
+    "message": "Subtasks to finish"
+  },
+  "savedViews": {
+    "message": "Saved views"
+  },
+  "saveCurrentView": {
+    "message": "Save current view"
+  },
+  "noSavedViews": {
+    "message": "No saved views."
+  },
+  "commandPalette": {
+    "message": "Open the MailPin command palette"
+  },
+  "commandPalettePlaceholder": {
+    "message": "Search commands…"
+  },
+  "commandPaletteHelp": {
+    "message": "Quickly access the main views and actions."
+  },
+  "closeCommandPalette": {
+    "message": "Close commands"
+  },
+  "viewName": {
+    "message": "View name"
+  },
+  "saveView": {
+    "message": "Save"
+  },
+  "deleteSavedView": {
+    "message": "Delete view"
+  },
+  "waitingForThem": {
+    "message": "Waiting on them"
+  },
+  "needsReply": {
+    "message": "I need to reply"
+  },
+  "checklistProgress": {
+    "message": "Subtasks · $1/$2"
+  },
+  "pendingSubtasks": {
+    "message": "Pending subtasks"
+  },
+  "averageOpenAge": {
+    "message": "Average follow-up age"
+  },
+  "averageWaitingAge": {
+    "message": "Average waiting time"
+  },
+  "completedLast7Days": {
+    "message": "Completed in 7 days"
+  },
+  "daysShort": {
+    "message": "d"
+  },
+  "responseState": {
+    "message": "Reply status"
+  },
+  "navAutomation": {
+    "message": "Automation"
+  },
+  "navAdvanced": {
+    "message": "Advanced"
+  },
+  "recommendedModeTitle": {
+    "message": "Recommended configuration"
+  },
+  "recommendedModeHelp": {
+    "message": "Restores technical and interface settings to a safe baseline without deleting your groups, cases, rules, selected calendar, or backup folder."
+  },
+  "applyRecommendedSettings": {
+    "message": "Apply recommended settings"
+  },
+  "buttonHelpApplyRecommended": {
+    "message": "Prepares recommended values in the form. Nothing is saved until you click Save."
+  },
+  "recommendedDraftApplied": {
+    "message": "Recommended settings have been prepared. Review them, then click Save to apply them."
+  },
+  "settingsSearchMatches": {
+    "message": "$1 section(s) containing “$2”."
+  },
+  "settingsSectionsAvailable": {
+    "message": "$1 sections available."
+  },
+  "workflowSettingsTitle": {
+    "message": "Tracking workflows"
+  },
+  "workflowSettingsHelp": {
+    "message": "Active, Waiting, Planned and Completed states organize the lifecycle without moving your messages."
+  },
+  "organizationChecklistsTitle": {
+    "message": "Checklists"
+  },
+  "organizationChecklistsHelp": {
+    "message": "Add subtasks directly from a pin; no additional setting is required."
+  },
+  "organizationSavedViewsTitle": {
+    "message": "Saved views"
+  },
+  "organizationSavedViewsHelp": {
+    "message": "Combine search and filters in the dashboard, then save the view for reuse."
+  },
+  "sectionCalendarEssential": {
+    "message": "Calendar"
+  },
+  "calendarTargetTitle": {
+    "message": "Calendar and synchronization"
+  },
+  "calendarTargetHelp": {
+    "message": "Choose the calendar to use or let MailPin ask you each time an item is created."
+  },
+  "sectionTagsAutomation": {
+    "message": "Thunderbird tags"
+  },
+  "tagSyncControlTitle": {
+    "message": "Status synchronization"
+  },
+  "tagSyncControlHelp": {
+    "message": "Only tags reserved for MailPin are created, changed, or removed."
+  },
+  "sectionThunderbirdTechnicalEyebrow": {
+    "message": "Thunderbird"
+  },
+  "sectionThunderbirdTechnical": {
+    "message": "Compatibility and technical behavior"
+  },
+  "sectionThunderbirdTechnicalIntro": {
+    "message": "These settings are for diagnostics, special compatibility cases, and very large volumes. Recommended mode manages them automatically."
+  },
+  "returnToActive": {
+    "message": "Return to active"
+  },
+  "changeNoReplyTracking": {
+    "message": "Change follow-up"
+  },
+  "eventSchedule": {
+    "message": "Event date and time"
+  },
+  "taskSchedule": {
+    "message": "Task due date"
+  },
+  "startDate": {
+    "message": "Start date"
+  },
+  "startTime": {
+    "message": "Start time"
+  },
+  "endDate": {
+    "message": "End date"
+  },
+  "endTime": {
+    "message": "End time"
+  },
+  "dueDate": {
+    "message": "Due date"
+  },
+  "dueTime": {
+    "message": "Due time"
+  },
+  "calendarRequired": {
+    "message": "Choose a writable calendar."
+  },
+  "eventDatesRequired": {
+    "message": "Enter the start and end dates and times."
+  },
+  "eventEndAfterStart": {
+    "message": "The end must be after the start."
+  },
+  "taskDueRequired": {
+    "message": "Enter the due date and time."
+  },
+  "noReplyDialogTitle": {
+    "message": "Follow up if no reply"
+  },
+  "noReplyDialogHelp": {
+    "message": "Choose when this pin should return to your attention."
+  },
+  "defaultDelay": {
+    "message": "Default delay"
+  },
+  "tomorrowMorning": {
+    "message": "Tomorrow morning"
+  },
+  "inThreeDays": {
+    "message": "In 3 days"
+  },
+  "inFiveDays": {
+    "message": "In 5 days"
+  },
+  "inSevenDays": {
+    "message": "In 7 days"
+  },
+  "customDate": {
+    "message": "Custom date"
+  },
+  "noReplyResult": {
+    "message": "Follow-up scheduled"
+  },
+  "invalidDate": {
+    "message": "Invalid date"
+  },
+  "noReplyDateRequired": {
+    "message": "Choose a valid date and time."
+  },
+  "noReplyDateFuture": {
+    "message": "Choose a future date and time."
+  }
 }

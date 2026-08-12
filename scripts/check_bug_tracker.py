@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate the persistent MailPerch bug register."""
+"""Validate the persistent MailPin bug register."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -13,7 +13,7 @@ ALLOWED = {"OUVERT", "EN COURS", "BLOQUÉ", "À VALIDER", "CORRIGÉ"}
 def main() -> None:
     text = TRACKER.read_text(encoding="utf-8")
     required = [
-        "# Registre des bugs MailPerch",
+        "# Registre des bugs MailPin",
         "## Bugs ouverts",
         "## Bugs corrigés ou en validation",
         "## Procédure",

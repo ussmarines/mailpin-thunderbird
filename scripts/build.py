@@ -16,7 +16,7 @@ DIST = ROOT / "dist"
 FIXED_TIME = (2026, 1, 1, 0, 0, 0)
 SOURCE_EXCLUDED_GLOBS = ("CI_LOG_*.txt", "ROUNDTRIP_CI_LOG_*.txt")
 XPI_EXCLUDED_NAMES = {"AGENTS.md"}
-SOURCE_FILE_MANIFEST = ".mailperch-source-files.json"
+SOURCE_FILE_MANIFEST = ".mailpin-source-files.json"
 
 
 def sha256(path: Path) -> str:
@@ -109,11 +109,11 @@ def main() -> None:
     manifest = json.loads((EXTENSION / "manifest.json").read_text(encoding="utf-8"))
     version = manifest["version"]
     DIST.mkdir(exist_ok=True)
-    xpi = DIST / f"MailPerch_v{version}.xpi"
+    xpi = DIST / f"MailPin_v{version}.xpi"
     create_xpi(xpi)
     outputs = [xpi]
     if args.source:
-        source_zip = DIST / f"MailPerch_GitHub_Repository_v{version}.zip"
+        source_zip = DIST / f"MailPin_GitHub_Repository_v{version}.zip"
         create_source_zip(source_zip)
         outputs.append(source_zip)
 

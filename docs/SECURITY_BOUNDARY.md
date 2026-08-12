@@ -1,8 +1,8 @@
-# Frontière de sécurité MailPerch
+# Frontière de sécurité MailPin
 
 ## Principe
 
-MailPerch n’a ni serveur, ni compte applicatif, ni rôle administrateur. Toutes les données sont locales au profil Thunderbird. Il ne doit donc jamais exister de paramètre `admin`, `isAdmin`, rôle caché, jeton maître ou contrôle d’autorisation reposant uniquement sur l’interface.
+MailPin n’a ni serveur, ni compte applicatif, ni rôle administrateur. Toutes les données sont locales au profil Thunderbird. Il ne doit donc jamais exister de paramètre `admin`, `isAdmin`, rôle caché, jeton maître ou contrôle d’autorisation reposant uniquement sur l’interface.
 
 La frontière de confiance réelle est la suivante :
 
@@ -62,13 +62,13 @@ La protection correcte consiste donc à :
 4. limiter les actions à l’ensemble explicitement supporté ;
 5. considérer les imports et contenus de messages comme non fiables.
 
-Un logiciel malveillant ayant déjà accès au profil Thunderbird, au système de fichiers ou à la Boîte à outils privilégiée est hors du modèle de menace de l’extension. MailPerch ne doit cependant pas faciliter son action par un secret, un jeton maître ou une porte dérobée : aucun de ces mécanismes n’existe.
+Un logiciel malveillant ayant déjà accès au profil Thunderbird, au système de fichiers ou à la Boîte à outils privilégiée est hors du modèle de menace de l’extension. MailPin ne doit cependant pas faciliter son action par un secret, un jeton maître ou une porte dérobée : aucun de ces mécanismes n’existe.
 
 ## Désinstallation
 
-Une API Experiment ne peut pas recevoir l’événement statique `uninstall` du manifeste. MailPerch utilise donc un écouteur AddonManager pour le signal précoce et annulable `onUninstalling`, puis l’événement cœur WebExtension `Management.uninstall`, dont la promesse est attendue par le bootstrap Gecko. L’ancien écouteur se retire sur `update` afin d’éviter une purge lors d’une mise à niveau.
+Une API Experiment ne peut pas recevoir l’événement statique `uninstall` du manifeste. MailPin utilise donc un écouteur AddonManager pour le signal précoce et annulable `onUninstalling`, puis l’événement cœur WebExtension `Management.uninstall`, dont la promesse est attendue par le bootstrap Gecko. L’ancien écouteur se retire sur `update` afin d’éviter une purge lors d’une mise à niveau.
 
-Lors d’une désinstallation réelle, MailPerch :
+Lors d’une désinstallation réelle, MailPin :
 
 1. bloque les nouvelles écritures de récupération ;
 2. arrête observateurs, minuteries et interfaces injectées ;
@@ -77,7 +77,7 @@ Lors d’une désinstallation réelle, MailPerch :
 5. retire uniquement les enveloppes `pin-mails-*.json` vérifiables d’un dossier externe choisi ;
 6. supprime toute la branche de préférences `extensions.pinMails.*`.
 
-En complément, une sentinelle primitive est conservée dans le stockage local natif de l’extension. Gecko efface ce stockage pendant sa propre procédure de désinstallation. Avant d’ouvrir SQLite, MailPerch vérifie cette sentinelle : si elle manque et qu’il ne s’agit pas de la migration unique depuis une version antérieure à 3.2.4, les éventuels résidus sont purgés et les valeurs recommandées sont recréées.
+En complément, une sentinelle primitive est conservée dans le stockage local natif de l’extension. Gecko efface ce stockage pendant sa propre procédure de désinstallation. Avant d’ouvrir SQLite, MailPin vérifie cette sentinelle : si elle manque et qu’il ne s’agit pas de la migration unique depuis une version antérieure à 3.2.4, les éventuels résidus sont purgés et les valeurs recommandées sont recréées.
 
 Les exports téléchargés manuellement par l’utilisateur ne sont pas suivis et ne peuvent pas être supprimés automatiquement sans risquer d’effacer des fichiers qui ne relèvent plus du profil Thunderbird.
 
@@ -101,7 +101,7 @@ Les tests de contrat injectent de faux services uniquement pendant les tests. Il
 
 Le workflow de smoke Thunderbird télécharge un binaire Thunderbird et geckodriver uniquement dans GitHub Actions. Ces outils ne sont ni empaquetés dans l’extension ni appelés par elle à l’exécution. Le workflow vérifie les SHA-256 obtenus depuis les sources officielles avant lancement et utilise un profil de test éphémère.
 
-Cette activité réseau appartient à la chaîne CI, pas au produit installé ; la promesse « aucun réseau/télémétrie dans MailPerch » reste inchangée.
+Cette activité réseau appartient à la chaîne CI, pas au produit installé ; la promesse « aucun réseau/télémétrie dans MailPin » reste inchangée.
 
 ## Dépendances de l’interface
 
@@ -124,6 +124,6 @@ Le XPI ne contient aucune dépendance npm runtime, aucun composant chargé depui
 - Les vues enregistrées sont limitées à 30 et n’acceptent que des critères fermés et bornés.
 - La recherche globale n’accède pas au corps du message ni au contenu des pièces jointes.
 - La synchronisation de tags n’ajoute aucune permission WebExtension. Elle passe par l’Experiment déjà privilégié, avec un ensemble fermé de clés `mailperch-*`.
-- Une clé existante portant un autre libellé est une collision bloquante ; MailPerch ne la renomme pas, ne l’adopte pas et ne la supprime pas.
+- Une clé existante portant un autre libellé est une collision bloquante ; MailPin ne la renomme pas, ne l’adopte pas et ne la supprime pas.
 - À la désactivation ou désinstallation, les mots-clés sont retirés des messages avant la suppression des seules définitions de tags reconnues comme possédées.
 - Les états **J’attends / Je dois répondre** sont dérivés d’horodatages locaux et ne déclenchent ni envoi ni appel réseau.

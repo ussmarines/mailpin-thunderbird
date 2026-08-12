@@ -1,90 +1,90 @@
 <div align="center">
-  <img src="extension/icons/mailperch-icon.svg" width="128" height="128" alt="MailPerch logo">
+  <img src="assets/brand/mailpin-hero.svg" width="100%" alt="MailPin — Email Follow-up & Productivity for Thunderbird">
 
-# MailPerch
+# MailPin
 
-**Pin, organize and follow up on important email in Thunderbird.**
+**Email Follow-up & Productivity for Thunderbird**
 
 [![QA](https://github.com/ussmarines/mailperch-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailperch-thunderbird/actions/workflows/ci.yml)
-![Release](https://img.shields.io/badge/release-v1.5.4-0078D4)
-![License](https://img.shields.io/badge/license-MailPerch%20Source--Available%201.1-6A5ACD)
+![Release](https://img.shields.io/badge/release-v1.6.0-4F7F75)
+![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x-3D536B)
+![License](https://img.shields.io/badge/license-MailPin%20Source--Available%201.1-1A1D21)
 </div>
 
-MailPerch adds a dedicated pinned-message panel above Thunderbird’s native message list. It keeps important mail visible, supports follow-up planning, and organizes work without replacing Thunderbird’s normal workflow.
+MailPin turns important email into actionable follow-up **without replacing Thunderbird’s native inbox**. Pin a message, add notes or subtasks, schedule a reminder, organize saved views, and create Calendar items when the selected calendar supports them — all locally.
 
-## Features
+## Why MailPin
 
-- pin a message or conversation independently from Thunderbird’s native star;
-- scope the panel to the current folder, selected Thunderbird accounts, or all accounts;
-- automatic reply follow-up, deadlines, interactive reminders, and snoozing;
-- **Today** and **Review** views, bulk actions, and quick capture from a message;
-- groups, cases, templates, local rules with preview, and smart views;
-- Thunderbird calendar tasks and events where supported;
-- personal notes and checklists/subtasks attached to messages and conversations;
-- global MailPerch search, saved custom views, and a command palette;
-- separate **Waiting for them** / **Needs reply** indicators and richer follow-up statistics;
-- optional synchronization with Thunderbird tags owned exclusively by MailPerch;
-- bidirectional synchronization with compatible Thunderbird Calendar tasks/events;
-- dashboard, Kanban, history, and a local health center;
-- backup, restore, and redacted diagnostics.
+- **Pin without changing Thunderbird state** — pinning never marks messages read/unread and never mutates native counters.
+- **Move follow-up forward** — Active, Waiting, Planned and Completed states, reminders, snooze and no-reply tracking.
+- **Add context** — personal notes, subtasks, groups, cases, templates and local rules.
+- **Find work quickly** — global search, saved views, Dashboard, Kanban and command palette.
+- **Use Calendar safely** — events/tasks are offered only when Thunderbird reports the matching calendar capability.
+- **Stay local-first** — no telemetry, ads, remote API, CDN or remote code.
+
+## Brand & interface
+
+Version 1.6.0 introduces the **MailPin** identity: envelope + pin mark, Ink / Slate / Sage / Brass palette, warm canvas, local typography, and restrained accents. No gradients and no remote assets. Light/dark themes, forced colors, keyboard focus, and reduced motion remain supported.
+
+<div align="center">
+  <img src="assets/brand/mailpin-brand-board.svg" width="92%" alt="MailPin brand system">
+</div>
 
 ## Compatibility
 
-- **MailPerch:** `1.5.4`;
-- **Thunderbird:** `153.0` through `153.*`;
-- **Format:** Manifest V3 MailExtension;
-- **Languages:** French and English;
-- **Target systems:** Windows, Linux, and macOS.
+- **MailPin:** `1.6.0`
+- **Thunderbird:** `153.0` to `153.*`
+- **Format:** MailExtension Manifest V3
+- **Locales:** French and English
+- **Public ID:** `ussmarines.mailpin@addons.thunderbird.net`
 
-The manifest declares this compatibility range, but the full Windows/Linux/macOS matrix and the range endpoints still require manual validation before store submission.
+MailPin uses a privileged Thunderbird Experiment for `about:3pane`, local SQLite storage, and selected Messages/Tags/Calendar integration. Thunderbird may therefore show a full-access warning at install time. Messages, Tags and Calendar internals remain isolated behind `PinCompatibility`.
 
-MailPerch includes a privileged Experiment API to integrate its panel into Thunderbird, manage its local SQLite storage, and access required Calendar features. Thunderbird therefore displays the full-access warning during installation.
+## Install
 
-Internal Messages, Tags, and Calendar access is isolated behind a dedicated compatibility layer to reduce coupling to Thunderbird internals. The `about:3pane` DOM integration remains deliberately incremental.
+### GitHub release
 
-## Installation
+1. Download `MailPin_v1.6.0.xpi` from release `v1.6.0`.
+2. Thunderbird → **Add-ons and Themes** → gear menu → **Install Add-on From File**.
+3. Select the XPI.
 
-### From the GitHub release
-
-1. Download `MailPerch_v1.5.4.xpi` from release `v1.5.4`.
-2. In Thunderbird, open **Add-ons and Themes**.
-3. From the gear menu, select **Install Add-on From File**.
-4. Select the XPI and restart Thunderbird if required.
-
-> Internal `3.2.x` development builds used a version number higher than the current public versions. To test `1.5.4` after a development build, use a clean test profile or uninstall the previous build after exporting your MailPerch data.
+> **Migrating from 1.5.4 or a MailPerch build:** 1.6.0 adopts MailPin’s final public ID before the first ATN publication. Export a backup from the previous installation, uninstall it, install MailPin, then import the backup. See [identity migration](docs/IDENTITY_MIGRATION_REQUIRED.md).
 
 ### From source
 
-Requirements: Python 3.11+ and Node.js 20+. No third-party npm or Python dependency is downloaded.
+Requires Python 3.11+ and Node.js 20+. No third-party npm/Python dependency is downloaded.
 
 ```bash
 npm run ci
 ```
 
-Reproducible release artifacts are generated in `dist/`: XPI, source archive, and SHA-256 checksums.
+Reproducible outputs:
 
-## Privacy and security
+- `dist/MailPin_v1.6.0.xpi`
+- `dist/MailPin_GitHub_Repository_v1.6.0.zip`
+- `dist/SHA256SUMS.txt`
 
-MailPerch is local-first: no network calls, telemetry, advertising, or remotely loaded code. Metadata required for pinned messages remains in the Thunderbird profile; complete message bodies and attachment contents are not copied into the MailPerch database.
+## Privacy & security
 
-- [Privacy policy](PRIVACY.md)
-- [Security policy](SECURITY.md)
-- [1.5.4 security audit](SECURITY_AUDIT_1.5.4.md)
-- [1.5.4 validation report](VALIDATION_REPORT_1.5.4.md)
+MailPin has no runtime network call, telemetry, advertising or remote code. Full message bodies and attachment contents are not copied into the MailPin database.
+
+- [Privacy](PRIVACY.md)
+- [Security](SECURITY.md)
+- [Security audit 1.6.0](SECURITY_AUDIT_1.6.0.md)
+- [Validation report 1.6.0](VALIDATION_REPORT_1.6.0.md)
 - [Known limitations](docs/KNOWN_LIMITATIONS.md)
 
-## Documentation and support
+## Documentation & support
 
-- [Architecture guide](docs/ARCHITECTURE.md)
-- [Thunderbird compatibility layer](docs/THUNDERBIRD_COMPATIBILITY.md)
+- [Architecture](docs/ARCHITECTURE.md)
+- [Thunderbird compatibility](docs/THUNDERBIRD_COMPATIBILITY.md)
 - [Thunderbird test bench](docs/THUNDERBIRD_TEST_BENCH.md)
-- [Manual test plan](docs/MANUAL_TEST_PLAN.md)
 - [Reviewer build instructions](release/BUILD_INSTRUCTIONS.md)
-- [Thunderbird Add-ons submission preparation](STORE_RELEASE.md)
+- [ATN preparation](STORE_RELEASE.md)
 - [Report an issue](https://github.com/ussmarines/mailperch-thunderbird/issues)
 
-MailPerch is maintained by [ussmarines](https://github.com/ussmarines). Donations through [PayPal](https://paypal.me/ussmarinesdot) are optional and do not unlock features.
+Maintained by [ussmarines](https://github.com/ussmarines). [PayPal](https://paypal.me/ussmarinesdot) donations are optional and unlock no functionality.
 
 ## License
 
-MailPerch is distributed under the **MailPerch Source-Available License 1.1**. The public repository may be inspected and any rights granted directly by GitHub remain applicable; the MailPerch license grants no additional right to sell, redistribute, publish a fork, continue the project independently, or exploit it commercially without written permission. See [LICENSE](LICENSE).
+MailPin is distributed under the **MailPin Source-Available License 1.1**. See [LICENSE](LICENSE).

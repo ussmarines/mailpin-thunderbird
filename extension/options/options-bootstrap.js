@@ -169,7 +169,7 @@
     setRetry,
     getTrace: () => [...trace]
   });
-  Object.defineProperty(globalThis, "MailPerchOptionsStartup", {
+  Object.defineProperty(globalThis, "MailPinOptionsStartup", {
     value: startup,
     configurable: false,
     enumerable: false,
@@ -215,7 +215,7 @@
         await new Promise(resolve => document.addEventListener("DOMContentLoaded", resolve, {once: true}));
       }
       mark("dom:ready");
-      const main = globalThis.MailPerchOptionsMain;
+      const main = globalThis.MailPinOptionsMain;
       if (typeof main?.startOptions !== "function") {
         const error = new Error("Options module has no startup entry point.");
         error.name = "OptionsEntryPointError";

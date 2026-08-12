@@ -18,7 +18,7 @@ paypal_url = "https://paypal.me/ussmarinesdot"
 assert manifest["author"] == "ussmarines"
 assert manifest["developer"] == {"name": "ussmarines", "url": author_url}
 assert manifest["homepage_url"] == repository_url
-assert manifest["browser_specific_settings"]["gecko"]["id"] == "pin-mails@MailPerch.local"
+assert manifest["browser_specific_settings"]["gecko"]["id"] == "ussmarines.mailpin@addons.thunderbird.net"
 assert manifest["permissions"] == ["menus"]
 assert "paypal.me" not in json.dumps(manifest)
 assert "github.com" not in json.dumps(manifest["content_security_policy"])
@@ -36,8 +36,8 @@ assert 'id="support-repository"' not in html
 assert html.count('data-support-link') == 2
 assert 'target="_blank"' in html and 'rel="noopener noreferrer"' in html
 for visible_french_string in (
-    "Soutenir MailPerch",
-    "Vous appréciez MailPerch ? Vous pouvez contribuer à la poursuite de son développement en faisant un don.",
+    "Soutenir MailPin",
+    "Vous appréciez MailPin ? Vous pouvez contribuer à la poursuite de son développement en faisant un don.",
     "Soutenir le projet via PayPal",
 ):
     assert visible_french_string not in html, visible_french_string

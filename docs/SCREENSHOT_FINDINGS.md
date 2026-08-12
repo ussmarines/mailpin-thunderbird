@@ -22,7 +22,7 @@ Ces correctifs restent à confirmer dans une session Thunderbird réelle.
 
 ## Captures du 31 juillet 2026 — passe 3.2.3
 
-- l’étoile native et la punaise MailPerch étaient réparties entre deux sous-lignes et trop proches des bordures ;
+- l’étoile native et la punaise MailPin étaient réparties entre deux sous-lignes et trop proches des bordures ;
   elles sont regroupées avec le bouton « Plus » dans un rail centré ;
 - le réglage de confort visuel modifiait également le panneau principal ; il est désormais limité aux paramètres ;
 - les toggles plaçaient l’aide comme troisième colonne flex, provoquant des chevauchements ;
@@ -66,6 +66,6 @@ possède une règle CSS.
 ## Captures du 31 juillet 2026 — bugs rouverts après 3.2.5
 
 - plusieurs symboles apparaissent à droite des cartes malgré le mode indépendant ;
-- la punaise héritait encore de classes d’icône Thunderbird et l’étoile était déplacée par le CSS MailPerch ;
+- la punaise héritait encore de classes d’icône Thunderbird et l’étoile était déplacée par le CSS MailPin ;
 - la barre Enregistrer/Annuler était visible mais les contrôles restaient hors du formulaire et dépendaient de `form=`, non fiable dans l’onglet Options ;
 - ces constats correspondent à MP-2026-004 et MP-2026-005 dans `docs/BUG_TRACKER.md`.

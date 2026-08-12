@@ -1,17 +1,17 @@
-# Notes pour les reviewers ATN — MailPerch 1.5.4
+# Notes pour les reviewers ATN — MailPin 1.6.0
 
 ## Identité
 
-- **Nom :** MailPerch — Email Pins & Follow-up
-- **Nom court :** MailPerch
-- **Version :** 1.5.4
-- **ID :** `pin-mails@MailPerch.local`
+- **Nom :** MailPin — Email Follow-up & Productivity for Thunderbird
+- **Nom court :** MailPin
+- **Version :** 1.6.0
+- **ID :** `ussmarines.mailpin@addons.thunderbird.net`
 - **Compatibilité :** Thunderbird 153.0 à 153.*
 - **Langues :** français et anglais
 
 ## Fonction principale
 
-MailPerch ajoute un panneau local de messages épinglés au-dessus de la liste native, avec portée par boîte courante, comptes Thunderbird sélectionnés ou tous les comptes, suivis, échéances, rappels, notes, sous-tâches, vues enregistrées, groupes, règles, Agenda et tableau de bord. La liste native des messages et ses compteurs ne sont pas remplacés.
+MailPin ajoute un panneau local de messages épinglés au-dessus de la liste native, avec portée par boîte courante, comptes Thunderbird sélectionnés ou tous les comptes, suivis, échéances, rappels, notes, sous-tâches, vues enregistrées, groupes, règles, Agenda et tableau de bord. La liste native des messages et ses compteurs ne sont pas remplacés.
 
 ## Permission et API privilégiée
 
@@ -22,7 +22,7 @@ La permission WebExtension déclarée est uniquement `menus`. L’extension emba
 - gérer le stockage SQLite local ;
 - écouter les notifications de dossiers ;
 - créer et synchroniser les tâches et événements Agenda compatibles ;
-- gérer les tags MailPerch locaux lorsque cette option est explicitement activée ;
+- gérer les tags MailPin locaux lorsque cette option est explicitement activée ;
 - gérer correctement l’arrêt, la mise à jour et la désinstallation.
 
 L’Experiment possède par nature un accès privilégié et provoque l’avertissement d’accès complet de Thunderbird. Les entrées sont validées par schéma et dans l’implémentation privilégiée.
@@ -36,7 +36,7 @@ L’Experiment possède par nature un accès privilégié et provoque l’averti
 - aucune dépendance d’exécution ou de build tierce ;
 - code source lisible, non minifié et build reproductible.
 
-Voir `PRIVACY.md`, `SECURITY.md`, `SECURITY_AUDIT_1.5.4.md` et `release/BUILD_INSTRUCTIONS.md`.
+Voir `PRIVACY.md`, `SECURITY.md`, `SECURITY_AUDIT_1.6.0.md` et `release/BUILD_INSTRUCTIONS.md`.
 
 ## Scénario de test rapide
 
@@ -48,11 +48,11 @@ Voir `PRIVACY.md`, `SECURITY.md`, `SECURITY_AUDIT_1.5.4.md` et `release/BUILD_IN
 6. Ajouter une échéance et un rappel.
 7. Créer une tâche ou un événement dans un calendrier compatible choisi explicitement.
 8. Ouvrir le dashboard : tester recherche globale, checklist, vues enregistrées, états de réponse et palette de commandes.
-9. Activer les tags MailPerch, modifier statut/priorité puis confirmer qu’un tag personnel témoin reste intact après désactivation.
+9. Activer les tags MailPin, modifier statut/priorité puis confirmer qu’un tag personnel témoin reste intact après désactivation.
 10. Ouvrir les paramètres, puis basculer les thèmes clair et sombre et vérifier le zoom 200 %.
 11. Vérifier que les compteurs natifs de dossiers et l’état lu/non lu ne changent pas.
 12. Exporter une sauvegarde, la prévisualiser et la restaurer en mode sûr.
-13. Désinstaller depuis un profil de test et vérifier la purge des données internes et des seuls tags MailPerch possédés.
+13. Désinstaller depuis un profil de test et vérifier la purge des données internes et des seuls tags MailPin possédés.
 
 ## Validation automatisée
 

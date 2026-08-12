@@ -1,4 +1,4 @@
-# MailPerch knowledge cheatsheet
+# MailPin knowledge cheatsheet
 
 | If the task concerns...         | Read first                            | Verify in current code/state            |
 | ------------------------------- | ------------------------------------- | --------------------------------------- |
@@ -12,7 +12,7 @@
 Decision rules:
 
 - If business code needs a Thunderbird internal, add it through the narrow adapter boundary.
-- If Tags or Agenda are absent, degrade locally; do not disable core MailPerch.
+- If Tags or Agenda are absent, degrade locally; do not disable core MailPin.
 - If two items share only a subject, do not merge them.
 - If Recommended values are applied, keep them as an unsaved draft.
 - If an interface offers an operation, still revalidate it in the Experiment.

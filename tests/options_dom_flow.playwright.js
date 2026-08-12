@@ -197,7 +197,7 @@ async page => {
     }, null, {timeout: 12_000});
   };
   const startupState = () => page.evaluate(() => ({
-    trace: globalThis.MailPerchOptionsStartup?.getTrace?.() || [],
+    trace: globalThis.MailPinOptionsStartup?.getTrace?.() || [],
     stage: document.body.dataset.optionsStartupStage || "",
     failureStage: document.body.dataset.optionsStartupFailureStage || "",
     diagnostic: document.querySelector("#settings-error-diagnostic")?.textContent || ""

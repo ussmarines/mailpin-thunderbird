@@ -2,7 +2,7 @@
 
 ## Evidence levels
 
-MailPerch separates evidence rather than treating one green check as universal proof:
+MailPin separates evidence rather than treating one green check as universal proof:
 
 1. Static/source and model tests.
 2. Compatibility contracts using fake services.

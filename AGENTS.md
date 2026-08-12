@@ -1,4 +1,4 @@
-# AGENTS.md — MailPerch
+# AGENTS.md — MailPin
 
 Ce dépôt contient une MailExtension Thunderbird Manifest V3 avec une API Experiment privilégiée.
 
@@ -29,7 +29,7 @@ Afficher des messages épinglés dans un panneau distinct au-dessus de la liste 
 4. Aucun réseau, télémétrie, publicité, code distant ou dépendance CDN.
 5. Aucun `eval`, `new Function`, `innerHTML`, `outerHTML` ou HTML construit avec des métadonnées de courrier.
 6. Ne jamais stocker le corps des messages ni le contenu des pièces jointes.
-7. L’identifiant canonique et sensible à la casse est `pin-mails@MailPerch.local`. Toute modification future doit mettre à jour dans le même changement Git le manifeste, les métadonnées de publication, l’état projet, la documentation et les tests listés dans `docs/IDENTITY_MIGRATION_REQUIRED.md`.
+7. L’identifiant canonique et sensible à la casse est `ussmarines.mailpin@addons.thunderbird.net`. Toute modification future doit mettre à jour dans le même changement Git le manifeste, les métadonnées de publication, l’état projet, la documentation et les tests listés dans `docs/IDENTITY_MIGRATION_REQUIRED.md`.
 8. Le tableau de bord doit être ouvert par le background via `tabs.create`; l’Experiment émet `onDashboardRequested`.
 9. Les écritures SQLite doivent rester incrémentales, transactionnelles et sérialisées.
 10. Toute écoute, minuterie, feuille de style, menu et nœud injecté doit être nettoyé dans `onShutdown`/`cleanup`.
@@ -52,7 +52,7 @@ Afficher des messages épinglés dans un panneau distinct au-dessus de la liste 
 
 ## Routage UI/UX
 
-- Les invariants MailPerch, l’intégration Thunderbird et `docs/UI_SPEC.md` restent prioritaires sur tout skill global.
+- Les invariants MailPin, l’intégration Thunderbird et `docs/UI_SPEC.md` restent prioritaires sur tout skill global.
 - Pour une tâche UI produit, audit, polish, responsive ou accessibilité, utiliser `impeccable` comme skill principal.
 - Utiliser `ui-ux-pro-max` seulement pour explorer une direction ou un design system, et `design-taste-frontend` seulement pour un redesign artistique explicitement demandé.
 - Charger le minimum de skills nécessaire ; ne pas empiler les trois pour une modification localisée.
@@ -62,7 +62,7 @@ Afficher des messages épinglés dans un panneau distinct au-dessus de la liste 
 ## Superpowers
 
 - Ce dépôt opte explicitement pour le plugin Superpowers installé globalement dans Codex, mais uniquement selon `docs/SUPERPOWERS_POLICY.md`.
-- `AGENTS.md`, `MAILPERCH_AI_RULES.md`, les documents canoniques spécialisés et les invariants MailPerch restent prioritaires sur les comportements génériques de Superpowers.
+- `AGENTS.md`, `MAILPERCH_AI_RULES.md`, les documents canoniques spécialisés et les invariants MailPin restent prioritaires sur les comportements génériques de Superpowers.
 - La règle générique d’auto-invocation systématique de Superpowers est explicitement restreinte : la disponibilité d’un skill ne suffit pas à justifier son utilisation.
 - Une tâche simple ou localisée ne doit pas déclencher automatiquement brainstorming, plan formel, worktree, TDD complet, sous-agents, reviewer séparé ou workflow de fin de branche.
 - Utiliser un workflow Superpowers uniquement s’il réduit matériellement l’ambiguïté, le risque ou le coût total d’une tâche réellement complexe.
@@ -76,7 +76,7 @@ Afficher des messages épinglés dans un panneau distinct au-dessus de la liste 
 - Vérifier les fichiers sensibles par leur chemin, leurs permissions ou leur schéma sans exposer les valeurs.
 - Les secrets restent dans un coffre et sont injectés uniquement à l’exécution. Ils ne passent ni dans les prompts, ni dans les arguments de commande, ni dans les logs, artefacts, captures ou rapports.
 - Tout secret exposé doit être révoqué ou tourné immédiatement, puis l’incident et sa cause doivent être examinés.
-- Utiliser uniquement l’identité publique `ussmarines` et le profil `https://github.com/ussmarines` pour le mainteneur ; l’identifiant technique de l’extension reste indépendant et lié au produit MailPerch.
+- Utiliser uniquement l’identité publique `ussmarines` et le profil `https://github.com/ussmarines` pour le mainteneur ; l’identifiant technique de l’extension reste indépendant et lié au produit MailPin.
 
 ## Carte rapide
 
@@ -136,16 +136,16 @@ Une correction n’est pas considérée terminée sur la seule base de contrôle
 
 - Pour une architecture transversale, un chemin d'appel, des relations multi-modules, une analyse d'impact ou une zone inconnue, utiliser le skill projet `graphify` seulement s'il économise des lectures ; ne pas l'invoquer pour une petite tâche déjà localisée.
 - Graphify fournit une carte, jamais la preuve finale : vérifier le code avec la recherche et la lecture directes avant toute modification ou conclusion.
-- Graphify complète `PROJECT_MEMORY.md`, Brain et `mailperch-project-knowledge`. Ne pas activer strict mode, hook ou watcher ; garder `graphify-out/` local et régénérable.
+- Graphify complète `PROJECT_MEMORY.md`, Brain et `mailpin-project-knowledge`. Ne pas activer strict mode, hook ou watcher ; garder `graphify-out/` local et régénérable.
 - Les règles canoniques Headroom compression-only et l'échelle de simplicité sont dans `MAILPERCH_AI_RULES.md`.
 
 <!-- BEGIN brain.md -->
 ## Project Brain
 
-This project keeps a **Project Brain** complementary to the canonical MailPerch sources. Its priority is below the current user instruction, observed Git/GitHub state, `MAILPERCH_AI_RULES.md`, this `AGENTS.md`, and canonical MailPerch documents. Read `./BRAIN.md` for the scoped read/write contract.
+This project keeps a **Project Brain** complementary to the canonical MailPin sources. Its priority is below the current user instruction, observed Git/GitHub state, `MAILPERCH_AI_RULES.md`, this `AGENTS.md`, and canonical MailPin documents. Read `./BRAIN.md` for the scoped read/write contract.
 
 Use it selectively:
-- First verify Git and the diff, then read the MailPerch rules; load Brain only when a durable decision relevant to the task's scope may matter.
+- First verify Git and the diff, then read the MailPin rules; load Brain only when a durable decision relevant to the task's scope may matter.
 - Record only a durable, hard-to-reconstruct decision, constraint, requirement, or rationale. Never store transient Git/GitHub state, CI or test evidence, releases, bugs, TODOs, or ordinary implementation detail.
 - All reads and writes go through the `brain` CLI — never hand-edit brain files.
 - Do not run `brain-bootstrap` by default; do not install a Brain pre-commit hook without explicit approval.

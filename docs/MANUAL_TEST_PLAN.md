@@ -1,10 +1,10 @@
-# Plan de test manuel MailPerch — 1.5.4
+# Plan de test manuel MailPin — 1.6.0
 
 Utiliser de préférence un profil Thunderbird jetable avec des messages synthétiques pour les scénarios destructifs ou de migration. Pour une validation utilisateur finale, un profil réel peut être utilisé après sauvegarde, en évitant toute opération destructive non nécessaire.
 
-Le présent plan complète les validations automatisées du candidat local 1.5.4. Les preuves historiques restent utiles uniquement pour les surfaces inchangées ; toute zone runtime modifiée doit disposer d’une preuve fraîche avant publication.
+Le présent plan complète les validations automatisées du candidat local 1.6.0. Les preuves historiques restent utiles uniquement pour les surfaces inchangées ; toute zone runtime modifiée doit disposer d’une preuve fraîche avant publication.
 
-## Priorité 1.5.4 — recette des constats utilisateurs
+## Priorité 1.6.0 — recette des constats utilisateurs
 
 1. Dans Options, ouvrir les règles personnalisées en FR puis EN et vérifier à 100/125/200 % que l’aide reste lisible, que les trois actions passent proprement à la ligne et qu’aucun scroll horizontal n’apparaît.
 2. Dans le Dashboard puis le panneau Thunderbird, ouvrir Agenda sur une petite fenêtre : une nouvelle création doit démarrer sur **Événement** ; créer un événement avec début/fin personnalisés, puis choisir Tâche avec et sans calendrier compatible. Sans destination tâche, aucun sélecteur vide ne doit apparaître, l’explication doit être visible et la création désactivée. Vérifier aussi qu’un élément Agenda existant conserve son type réel.
@@ -14,7 +14,7 @@ Le présent plan complète les validations automatisées du candidat local 1.5.4
 6. Utiliser l’action explicitement conversation puis une entrée générique inverse ; vérifier qu’une seule référence logique subsiste et que notes, checklist, échéance, groupe et Agenda ne sont pas perdus.
 7. Avec une fenêtre Thunderbird globalement large, déplacer continûment le splitter du panneau entre environ 800 et 280 px ; vérifier header, recherche, filtres, cartes, actions et absence de scroll horizontal ou sauts de layout.
 
-La readiness reste **NO-GO** tant que ces scénarios n’ont pas été observés sur le XPI 1.5.4 exact fourni pour retest.
+La readiness reste **NO-GO** tant que ces scénarios n’ont pas été observés sur le XPI 1.6.0 exact fourni pour retest.
 
 ## Priorité A — intégration Thunderbird consolidée
 
@@ -25,29 +25,29 @@ La readiness reste **NO-GO** tant que ces scénarios n’ont pas été observés
 5. Ouvrir **Modifier** sur une carte avec et sans checklist, ajouter/cocher une sous-tâche, enregistrer, rouvrir et confirmer l’absence d’exception ainsi que la persistance.
 6. Vérifier qu’un simple épinglage ne change ni état lu/non lu ni compteurs natifs.
 7. Déplacer/copier un message entre dossiers puis vérifier que la référence reste résoluble lorsque Thunderbird fournit les identités nécessaires.
-8. Archiver un message depuis MailPerch et vérifier le résultat natif sans double action.
-9. Ouvrir une réponse depuis MailPerch et confirmer le bon message/conversation.
+8. Archiver un message depuis MailPin et vérifier le résultat natif sans double action.
+9. Ouvrir une réponse depuis MailPin et confirmer le bon message/conversation.
 10. Fermer/réouvrir Thunderbird, puis confirmer que le panneau, les épingles et les listeners reviennent une seule fois.
 11. Désactiver/réactiver l’extension dans un profil de test et contrôler l’absence de nœuds/listeners dupliqués.
 
 ## Priorité B — Tags Thunderbird
 
 1. Créer auparavant au moins un tag personnel Thunderbird et noter sa clé/libellé.
-2. Activer la synchronisation MailPerch Tags.
-3. Vérifier la création des tags MailPerch attendus et leur application selon statut/priorité/relance.
+2. Activer la synchronisation MailPin Tags.
+3. Vérifier la création des tags MailPin attendus et leur application selon statut/priorité/relance.
 4. Changer le statut d’une épingle puis contrôler la mise à jour des mots-clés.
 5. Tester une conversation et, si utilisé, un dossier virtuel.
-6. Désactiver la synchronisation : seuls les mots-clés/définitions possédés par MailPerch doivent être retirés.
+6. Désactiver la synchronisation : seuls les mots-clés/définitions possédés par MailPin doivent être retirés.
 7. Vérifier que le tag personnel est strictement inchangé.
-8. Dans un profil jetable, provoquer une collision de clé avec un autre libellé : MailPerch doit refuser sans créer partiellement les autres définitions.
+8. Dans un profil jetable, provoquer une collision de clé avec un autre libellé : MailPin doit refuser sans créer partiellement les autres définitions.
 
 ## Priorité C — Agenda
 
 1. Tester un calendrier local inscriptible.
 2. Créer explicitement une tâche puis un événement depuis une épingle.
 3. Choisir le calendrier voulu lorsque plusieurs calendriers sont présents.
-4. Modifier échéance/état dans MailPerch puis confirmer Agenda.
-5. Modifier échéance/état dans Agenda puis confirmer le retour MailPerch.
+4. Modifier échéance/état dans MailPin puis confirmer Agenda.
+5. Modifier échéance/état dans Agenda puis confirmer le retour MailPin.
 6. Tester un calendrier lecture seule/non compatible : l’action concernée doit être indisponible ou échouer proprement, sans casser le panneau.
 7. Refaire avec chaque fournisseur Agenda réellement annoncé/utilisé avant publication générale.
 8. Fermer/réouvrir Thunderbird et vérifier que les observateurs ne créent ni doublon ni boucle.
@@ -121,9 +121,9 @@ Pour chaque validation formelle, noter :
 ## Invariants finaux
 
 - l’épinglage ne change pas l’état lu/non lu ni les compteurs ;
-- une seule étoile native et une seule punaise MailPerch sont visibles ;
+- une seule étoile native et une seule punaise MailPin sont visibles ;
 - aucun tag personnel n’est modifié ;
-- une capacité Agenda/Tags absente ne fait pas tomber tout MailPerch ;
+- une capacité Agenda/Tags absente ne fait pas tomber tout MailPin ;
 - aucune action destructive n’est exécutée sans confirmation attendue ;
 - aucune donnée utilisateur ne quitte le poste ;
 - le XPI testé correspond au SHA-256 du commit/release contrôlé.

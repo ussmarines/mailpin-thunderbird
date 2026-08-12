@@ -41,7 +41,7 @@ CI_LOG_*.txt
 ROUNDTRIP_CI_LOG_*.txt
 
 # Generated only inside reviewer source archives
-.mailperch-source-files.json
+.mailpin-source-files.json
 
 # Local Thunderbird test runtime and generated evidence
 /.runtime/

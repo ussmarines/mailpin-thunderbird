@@ -2,12 +2,12 @@
 
 ## Objectif
 
-Cette couche isole les appels aux API internes de Thunderbird du métier MailPerch. Elle ne cherche pas à masquer toutes les différences de version possibles ; elle fournit des contrats petits, testables et explicites pour les fonctions que MailPerch utilise réellement.
+Cette couche isole les appels aux API internes de Thunderbird du métier MailPin. Elle ne cherche pas à masquer toutes les différences de version possibles ; elle fournit des contrats petits, testables et explicites pour les fonctions que MailPin utilise réellement.
 
 Le principe est :
 
 ```text
-Logique MailPerch
+Logique MailPin
   pins / règles / workflows / checklists / vues / analytics
                          │
                          ▼
@@ -61,10 +61,10 @@ L’adaptateur Tags est la seule frontière chargée de manipuler les définitio
 Invariants :
 
 1. toutes les collisions de définitions sont vérifiées **avant** la première création ;
-2. un tag existant dont le libellé ne correspond pas exactement à celui attendu par MailPerch est traité comme une collision ;
-3. MailPerch ne renomme, n’adopte et ne supprime jamais un tag personnel ;
+2. un tag existant dont le libellé ne correspond pas exactement à celui attendu par MailPin est traité comme une collision ;
+3. MailPin ne renomme, n’adopte et ne supprime jamais un tag personnel ;
 4. les opérations par messages sont regroupées par dossier ;
-5. la désactivation retire uniquement les mots-clés et définitions dont la propriété MailPerch est démontrée.
+5. la désactivation retire uniquement les mots-clés et définitions dont la propriété MailPin est démontrée.
 
 ## Contrat Agenda
 
@@ -79,7 +79,7 @@ L’adaptateur Agenda concentre :
 - l’enregistrement et le retrait des observateurs Agenda ;
 - un instantané des capacités disponibles.
 
-Agenda est une capacité facultative. Une indisponibilité de `cal`, `CalEvent` ou `CalTodo` doit dégrader la fonction concernée et apparaître dans la matrice de compatibilité ; elle ne doit pas empêcher le panneau MailPerch de démarrer.
+Agenda est une capacité facultative. Une indisponibilité de `cal`, `CalEvent` ou `CalTodo` doit dégrader la fonction concernée et apparaître dans la matrice de compatibilité ; elle ne doit pas empêcher le panneau MailPin de démarrer.
 
 ## Construction de la façade
 
@@ -100,12 +100,12 @@ La déplacer en une seule passe serait plus risqué que bénéfique. Les futures
 
 ## Politique de dégradation
 
-Une fonction facultative indisponible ne doit pas faire tomber tout MailPerch.
+Une fonction facultative indisponible ne doit pas faire tomber tout MailPin.
 
 - Messages : indispensable au fonctionnement principal ; une absence de services cœur est une incompatibilité bloquante clairement diagnostiquée.
 - Tags : facultatifs et désactivés par défaut ; une absence doit neutraliser uniquement la synchronisation de tags.
 - Agenda : facultatif ; une absence ou un calendrier non inscriptible doit neutraliser uniquement les actions concernées.
-- UI `about:3pane` : si la structure native change, MailPerch doit éviter les doubles injections, nettoyer ce qu’il a créé et produire un diagnostic technique expurgé.
+- UI `about:3pane` : si la structure native change, MailPin doit éviter les doubles injections, nettoyer ce qu’il a créé et produire un diagnostic technique expurgé.
 
 ## Règle pour le nouveau code
 
@@ -123,7 +123,7 @@ Avant d’ajouter une nouvelle capacité Thunderbird :
 
 ## Compatibilité de versions
 
-Depuis 1.5.1, le manifeste déclare Thunderbird `153.0` à `153.*`. Cette plage a été resserrée après des essais réels : 128/140 injectent le panneau après activation mais ne garantissent pas l’ouverture du Dashboard via le pont MV3 Experiment → background. MailPerch ne revendique donc que la branche 153 réellement validée.
+Depuis 1.5.1, le manifeste déclare Thunderbird `153.0` à `153.*`. Cette plage a été resserrée après des essais réels : 128/140 injectent le panneau après activation mais ne garantissent pas l’ouverture du Dashboard via le pont MV3 Experiment → background. MailPin ne revendique donc que la branche 153 réellement validée.
 
 Toute future adaptation de version doit rester localisée autant que possible dans ces adaptateurs et être documentée dans `docs/KNOWN_LIMITATIONS.md` et `docs/BUG_TRACKER.md` si elle corrige une régression observée.
 

@@ -2,7 +2,7 @@
 
 ## But
 
-MailPerch possède plusieurs niveaux de tests. Aucun niveau ne doit être présenté comme une preuve qu’un autre niveau a réussi.
+MailPin possède plusieurs niveaux de tests. Aucun niveau ne doit être présenté comme une preuve qu’un autre niveau a réussi.
 
 ```text
 Tests statiques / modèles
@@ -61,7 +61,7 @@ Le job :
 4. télécharge geckodriver `0.37.1` depuis la release Mozilla officielle ;
 5. vérifie le SHA-256 de l’asset fourni par GitHub ;
 6. lance Thunderbird sous Xvfb dans un profil WebDriver jetable ;
-7. crée uniquement dans ce profil un compte **Local Folders** et un dossier synthétique `MailPerch Smoke`, sans compte réseau ni identifiant utilisateur ;
+7. crée uniquement dans ce profil un compte **Local Folders** et un dossier synthétique `MailPin Smoke`, sans compte réseau ni identifiant utilisateur ;
 8. sélectionne ce dossier dans `about:3pane` et attend la vue native (`threadTree`, `gViewWrapper`, Quick Filter) ;
 9. installe temporairement le XPI par l’extension WebDriver Mozilla ;
 10. passe au contexte privilégié et contrôle l’état runtime, le background MV3 et les injections ;
@@ -70,7 +70,7 @@ Le job :
 13. conserve logs, résultat JSON et captures comme artefacts ;
 14. clique le bouton Dashboard injecté et exige l’ouverture d’un unique onglet Dashboard, sans erreur runtime.
 
-Aucun de ces téléchargements n’est une dépendance d’exécution de MailPerch. Ils existent uniquement dans l’environnement de test.
+Aucun de ces téléchargements n’est une dépendance d’exécution de MailPin. Ils existent uniquement dans l’environnement de test.
 
 ### Ce que le smoke valide
 
@@ -78,7 +78,7 @@ Lorsque le job réussit réellement, il démontre au minimum sur la version épi
 
 - lancement du binaire Thunderbird ;
 - création d’une vue courrier locale synthétique sans réseau ;
-- chargement du XPI et ID exact `pin-mails@MailPerch.local` ;
+- chargement du XPI et ID exact `ussmarines.mailpin@addons.thunderbird.net` ;
 - extension active et background MV3 arrivé à `Startup: Complete` ;
 - présence d’un `about:3pane` prêt ;
 - une seule injection `#pin-mails-panel` ;
@@ -109,7 +109,7 @@ Workflow manuel dédié : `.github/workflows/thunderbird-functional-bench.yml`
 
 Script : `tests/thunderbird/functional_bench.py`
 
-Ce banc reste volontairement hors du smoke PR. Il construit l’XPI inchangé, crée dans chaque profil WebDriver jetable des messages et métadonnées locales variés, puis laisse le démarrage normal de MailPerch migrer ces données vers son stockage structuré. Aucun compte utilisateur, credential ou serveur mail n’est utilisé ; Thunderbird est forcé hors ligne et les éventuels comptes POP supplémentaires pointent vers le domaine réservé `.invalid` sans relever le courrier.
+Ce banc reste volontairement hors du smoke PR. Il construit l’XPI inchangé, crée dans chaque profil WebDriver jetable des messages et métadonnées locales variés, puis laisse le démarrage normal de MailPin migrer ces données vers son stockage structuré. Aucun compte utilisateur, credential ou serveur mail n’est utilisé ; Thunderbird est forcé hors ligne et les éventuels comptes POP supplémentaires pointent vers le domaine réservé `.invalid` sans relever le courrier.
 
 La matrice fixe couvre `50`, `100`, `500`, `1000` et `2000` épingles. Le scénario fonctionnel du Panneau et l’ouverture réelle du Dashboard s’exécutent sur le plus petit volume ; chaque volume contrôle le compte final, la recherche complète, les portées, le rendu, et, à partir de 500, le chargement de toute la pagination avec absence de doublons et actions sur le premier, le milieu et le dernier élément. `artifacts/thunderbird-bench/results.json` conserve les durées de création, rendu/interactions du panneau, recherche, filtre et ouverture du Dashboard, ainsi que les exceptions, timeouts et comptes observés. Les captures `thunderbird-light.png` et `thunderbird-dark.png` restent des preuves à inspecter humainement pour le contraste et le clipping.
 
@@ -118,7 +118,7 @@ Après publication de la branche, lancer **Thunderbird functional and scale benc
 ```bash
 python tests/thunderbird/functional_bench.py \
   --binary /chemin/vers/thunderbird \
-  --xpi dist/MailPerch_v1.5.3.xpi \
+  --xpi dist/MailPin_v1.5.3.xpi \
   --geckodriver /chemin/vers/geckodriver \
   --output-dir artifacts/thunderbird-bench \
   --volumes 50,100,500,1000,2000 \
@@ -136,7 +136,7 @@ Pour préparer cette validation manuelle sans automatiser l’onglet Options, ut
 ```bash
 python tests/thunderbird/functional_bench.py \
   --binary /chemin/vers/thunderbird \
-  --xpi dist/MailPerch_v1.5.3.xpi \
+  --xpi dist/MailPin_v1.5.3.xpi \
   --geckodriver /chemin/vers/geckodriver \
   --output-dir artifacts/thunderbird-manual-scope \
   --prepare-manual-scope-validation \
@@ -146,7 +146,7 @@ python tests/thunderbird/functional_bench.py \
 ```bash
 python tests/thunderbird/functional_bench.py \
   --binary /chemin/vers/thunderbird \
-  --xpi dist/MailPerch_v1.5.3.xpi \
+  --xpi dist/MailPin_v1.5.3.xpi \
   --geckodriver /chemin/vers/geckodriver \
   --output-dir artifacts/thunderbird-multi-account \
   --scope-validation-only \
@@ -155,7 +155,7 @@ python tests/thunderbird/functional_bench.py \
 
 ## 4. Tests officiels dans un checkout Thunderbird
 
-Thunderbird documente l’exécution de tests d’extensions dans un checkout `comm-central` construit. Deux familles sont particulièrement adaptées à MailPerch :
+Thunderbird documente l’exécution de tests d’extensions dans un checkout `comm-central` construit. Deux familles sont particulièrement adaptées à MailPin :
 
 ```bash
 ./mach xpcshell-test comm/mail/components/extensions/test/xpcshell
@@ -164,7 +164,7 @@ Thunderbird documente l’exécution de tests d’extensions dans un checkout `c
 
 Sur Windows, utiliser la forme `./mach` ou la commande recommandée par l’environnement Mozilla Developer Shell du checkout.
 
-Cette voie est la plus adaptée pour tester des interfaces internes et des helpers Thunderbird au plus près du code source, mais elle exige un checkout/build Thunderbird complet ; ce n’est donc pas un prérequis pour développer MailPerch au quotidien.
+Cette voie est la plus adaptée pour tester des interfaces internes et des helpers Thunderbird au plus près du code source, mais elle exige un checkout/build Thunderbird complet ; ce n’est donc pas un prérequis pour développer MailPin au quotidien.
 
 Références officielles :
 
@@ -182,7 +182,7 @@ Sous Windows x64, l’installation utilisateur validée est `C:\Users\ussma\AppD
 ```bash
 python tests/thunderbird/real_smoke.py \
   --binary /chemin/vers/thunderbird \
-  --xpi dist/MailPerch_v1.5.3.xpi \
+  --xpi dist/MailPin_v1.5.3.xpi \
   --geckodriver /chemin/vers/geckodriver \
   --output-dir artifacts/thunderbird-smoke \
   --timeout 45
@@ -200,7 +200,7 @@ Un échec du smoke doit être classé avant correction :
 - **session WebDriver** : compatibilité geckodriver/Thunderbird ;
 - **préparation vue locale** : profil synthétique ou évolution `about:3pane` ;
 - **installation XPI / Startup** : manifeste, background ou Experiment ;
-- **panneau absent/dupliqué** : intégration MailPerch ;
+- **panneau absent/dupliqué** : intégration MailPin ;
 - **cleanup** : cycle de vie/désinstallation ;
 - **timeout** : conserver `result.json`, état MV3, logs et captures avant toute hypothèse.
 
@@ -216,4 +216,4 @@ Le 10 août 2026, le banc a été relancé sous Linux avec Thunderbird 153.0.1 E
 
 Ces preuves ne remplacent pas les tests utilisateur avec fournisseurs réels ni la matrice multi-versions/multi-OS.
 
-Le 12 août 2026, l’audit pré-store 1.5.3 a repassé sous Windows Thunderbird 153.0.2/geckodriver 0.37.1 : smoke, matrice 50/100/500/1000/2000, DOM Dashboard/Options, éditeur XUL, thèmes clair/sombre et cinq portées persistantes sur deux processus. Tous les scénarios ont réussi sans timeout ni exception JavaScript MailPerch ; les détails courants sont enregistrés dans `docs/AI_VALIDATION_STATE.json`.
+Le 12 août 2026, l’audit pré-store 1.5.3 a repassé sous Windows Thunderbird 153.0.2/geckodriver 0.37.1 : smoke, matrice 50/100/500/1000/2000, DOM Dashboard/Options, éditeur XUL, thèmes clair/sombre et cinq portées persistantes sur deux processus. Tous les scénarios ont réussi sans timeout ni exception JavaScript MailPin ; les détails courants sont enregistrés dans `docs/AI_VALIDATION_STATE.json`.

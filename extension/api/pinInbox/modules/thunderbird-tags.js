@@ -27,7 +27,7 @@
         if (!tags?.isValidKey?.(definition.key)) continue;
         const existing = String(tags.getTagForKey(definition.key) || "");
         if (existing !== String(definition.label || "")) {
-          throw new ExtensionError(`Le tag Thunderbird « ${definition.key} » existe déjà et n’appartient pas à MailPerch.`);
+          throw new ExtensionError(`Le tag Thunderbird « ${definition.key} » existe déjà et n’appartient pas à MailPin.`);
         }
       }
       return true;

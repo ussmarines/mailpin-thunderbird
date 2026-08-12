@@ -1,13 +1,13 @@
-# Mémoire opérationnelle — MailPerch
+# Mémoire opérationnelle — MailPin
 
-> Version publique : **1.5.4**
-> Branche de référence : `main` ; runtime 1.5.4 intégré par la PR #33
+> Version publique : **1.6.0**
+> Branche de référence : `main` ; runtime 1.6.0 intégré par la PR #33
 > Base GitHub de validation : `main` au commit `ca7206329045b58aff3384e7bd4c3b99eeecd2b3`
-> Extension ID : `pin-mails@MailPerch.local`
+> Extension ID : `ussmarines.mailpin@addons.thunderbird.net`
 
 ## Résumé
 
-MailPerch est une extension Thunderbird Manifest V3 locale qui ajoute un panneau de messages épinglés et transforme ces épingles en suivis actionnables sans remplacer la liste native. La version 1.5.4 corrige les constats manuels de 1.5.3 : épinglage canonique entre entrées, responsive réel du panneau, géométrie Options, états du Dashboard, transitions workflow cohérentes, planification Agenda et gestion explicite des calendriers incompatibles avec les tâches. Les nouvelles créations Agenda démarrent sur **Événement**. Elle n’ajoute aucune permission, dépendance runtime, migration ni connexion réseau.
+MailPin est une extension Thunderbird Manifest V3 locale qui ajoute un panneau de messages épinglés et transforme ces épingles en suivis actionnables sans remplacer la liste native. La version 1.6.0 corrige les constats manuels de 1.5.3 : épinglage canonique entre entrées, responsive réel du panneau, géométrie Options, états du Dashboard, transitions workflow cohérentes, planification Agenda et gestion explicite des calendriers incompatibles avec les tâches. Les nouvelles créations Agenda démarrent sur **Événement**. Elle n’ajoute aucune permission, dépendance runtime, migration ni connexion réseau.
 
 Les futures fonctions **Prochaine action**, **Timeline de conversation**, **Follow-up récurrent** et **Résultat du suivi** restent hors périmètre de cette release.
 
@@ -20,10 +20,10 @@ Les futures fonctions **Prochaine action**, **Timeline de conversation**, **Foll
 5. SQLite reste transactionnel, incrémental et sérialisé.
 6. Les ressources injectées, observateurs, timers et données gérées sont nettoyés selon leur cycle de vie.
 7. Les actions destructives restent confirmées et les imports automatisés sont neutralisés.
-8. Les tags personnels Thunderbird ne doivent jamais être renommés ou supprimés ; seuls les tags possédés par MailPerch, reconnus par clé et libellé exacts, peuvent être gérés.
+8. Les tags personnels Thunderbird ne doivent jamais être renommés ou supprimés ; seuls les tags possédés par MailPin, reconnus par clé et libellé exacts, peuvent être gérés.
 9. L’identité publique reste `ussmarines`; aucune donnée personnelle ou secrète ne doit être réintroduite.
 10. Aucune permission WebExtension supplémentaire n’est ajoutée sans justification documentée et testée.
-11. Une capacité facultative Tags/Agenda indisponible ne doit pas empêcher le cœur MailPerch de démarrer.
+11. Une capacité facultative Tags/Agenda indisponible ne doit pas empêcher le cœur MailPin de démarrer.
 12. Le métier ne doit pas réintroduire d’appels directs à `MailServices`, `MailUtils`, `MessageArchiver`, `cal`, `CalEvent` ou `CalTodo` en dehors de la frontière de compatibilité.
 13. Le mode **Recommandé** prépare des valeurs sûres mais ne sauvegarde jamais automatiquement ; Enregistrer/Annuler restent explicites.
 14. Toute classe ou service privilégié injecté dans `PinCompatibility` doit être importé/défini explicitement avant la création des adaptateurs ; aucun identifiant global implicite ne doit être requis au bootstrap.
@@ -83,7 +83,7 @@ L’action « appliquer les réglages recommandés » produit uniquement un brou
 
 La sélection de comptes apparaît uniquement pour la portée « Comptes sélectionnés », conserve le brouillon lors d’un changement temporaire de portée et affiche les comptes Thunderbird avec leurs libellés lisibles. Le banc 1.5.2 valide automatiquement la sauvegarde Options → panneau et la persistance A+C (34 épingles, B absent) après redémarrage sur le même profil.
 
-`@fluentui/web-components` 3.0.3 a été évalué puis retiré : aucun fichier de l’extension ne l’importait, le build XPI n’a pas de bundler, le paquet exige Node 22/24 alors que le dépôt conserve Node 20 dans sa matrice, et son arbre n’apportait donc aucun composant au produit livré. MailPerch garde le langage Fluent 2 local, sans dépendance npm runtime ni lockfile.
+`@fluentui/web-components` 3.0.3 a été évalué puis retiré : aucun fichier de l’extension ne l’importait, le build XPI n’a pas de bundler, le paquet exige Node 22/24 alors que le dépôt conserve Node 20 dans sa matrice, et son arbre n’apportait donc aucun composant au produit livré. MailPin garde le langage Fluent 2 local, sans dépendance npm runtime ni lockfile.
 
 ### Banc Thunderbird
 
@@ -93,7 +93,7 @@ Le banc fonctionnel `.github/workflows/thunderbird-functional-bench.yml` / `test
 
 Le 10 août 2026, une nouvelle passe Linux sur Thunderbird 153.0.1 ESR/geckodriver 0.37.1 a revalidé la matrice 50/100/500/1000/2000 après correction d’une assertion erronée du harness : le compteur du panneau reste volontairement le total de la portée pendant une recherche, tandis que seules les cartes rendues sont filtrées. Les cinq volumes passent sans timeout ni exception JavaScript ; à 500/1000/2000, toute la pagination est chargée sans doublon et les positions début/milieu/fin sont présentes.
 
-Pour la 1.5.4, le banc ciblé 50 références sous Thunderbird 153.0.3 a revalidé les chemins modifiés : réconciliation cross-entry, transitions workflow, relance, Agenda, Dashboard/Options, cleanup et réinstallation. La PR #33 puis le commit squash intégré à `main` ont ensuite repassé les workflows QA Linux/Windows et le smoke Thunderbird réel avec succès.
+Pour la 1.6.0, le banc ciblé 50 références sous Thunderbird 153.0.3 a revalidé les chemins modifiés : réconciliation cross-entry, transitions workflow, relance, Agenda, Dashboard/Options, cleanup et réinstallation. La PR #33 puis le commit squash intégré à `main` ont ensuite repassé les workflows QA Linux/Windows et le smoke Thunderbird réel avec succès.
 
 ### Outillage UI Codex
 
@@ -101,7 +101,7 @@ La source de vérité visuelle demeure `docs/UI_SPEC.md`; aucun `PRODUCT.md` ou 
 
 Diagnostiquer l’environnement avec `npx skills ls -g` et le hook avec `node C:\Users\ussma\.agents\skills\impeccable\scripts\hook-admin.mjs status`. Pour une mise à jour, vérifier d’abord le dépôt officiel, la version et les écritures prévues ; utiliser `npx skills update -g` pour les sources suivies et l’installateur officiel Impeccable avec le fournisseur Codex explicite.
 
-## État 1.5.4
+## État 1.6.0
 
 - schéma SQLite : 5 ; schéma paramètres : 8 ; schéma données : 7 ;
 - compatibilité déclarée : Thunderbird 153.0 à 153.* ;
@@ -113,7 +113,7 @@ Diagnostiquer l’environnement avec `npx skills ls -g` et le hook avec `node C:
 - détection fournisseurs par domaine exact ou sous-domaine légitime ;
 - portée multi-comptes basée sur `account.key`, sélection maximale bornée à 50 comptes ;
 - volume conseillé : jusqu’à 2 000 épingles, sans blocage technique au-delà ;
-- aucune nouvelle permission, dépendance runtime ou connexion réseau introduite par la 1.5.4 ;
+- aucune nouvelle permission, dépendance runtime ou connexion réseau introduite par la 1.6.0 ;
 - recette utilisateur finale verte ; QA Linux/Windows et smoke Thunderbird 153 réel verts sur la PR #33 puis sur `main`.
 
 ## Commandes obligatoires
@@ -136,11 +136,11 @@ python tests/test_thunderbird_test_bench.py
 
 ## Définition de terminé
 
-- branche de préparation propre et déclarations 1.5.4 synchronisées avant toute soumission ATN ;
+- branche de préparation propre et déclarations 1.6.0 synchronisées avant toute soumission ATN ;
 - tests, scans de secrets et builds reproductibles verts ;
 - frontière Thunderbird vérifiée sans réintroduction d’accès direct ;
 - Options Recommandé/Avancé et portée multi-comptes cohérentes en FR/EN ;
 - README, changelog, état projet, registre, architecture, sécurité et handoff à jour lorsque leur contenu est affecté ;
 - aucune permission, URL distante d’exécution, dépendance runtime ou schéma nouveau non justifié ;
 - résultats runtime décrits honnêtement : preuve réelle verte ou limite documentée, jamais supposée ;
-- tag/release uniquement après autorisation explicite de l’utilisateur — autorisation reçue le 12 août 2026 pour la release GitHub 1.5.4.
+- tag/release uniquement après autorisation explicite de l’utilisateur — autorisation reçue le 12 août 2026 pour la release GitHub 1.6.0.

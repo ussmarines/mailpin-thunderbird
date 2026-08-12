@@ -1,4 +1,4 @@
-# AGENTS.md — Options MailPerch
+# AGENTS.md — Options MailPin
 
 > Lire d’abord `PROJECT_MEMORY.md`, puis `docs/CODEX_HANDOFF.md` pour la branche de consolidation.
 

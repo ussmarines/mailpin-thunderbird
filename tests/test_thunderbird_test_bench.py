@@ -19,10 +19,10 @@ assert "selenium" not in HARNESS.lower()
 assert "marionette_driver" not in HARNESS
 assert "urllib.request" in HARNESS
 assert "127.0.0.1" in HARNESS
-assert 'ADDON_ID = "pin-mails@MailPerch.local"' in HARNESS
+assert 'ADDON_ID = "ussmarines.mailpin@addons.thunderbird.net"' in HARNESS
 assert 'PANEL_ID = "pin-mails-panel"' in HARNESS
 assert 'TOGGLE_ID = "pin-mails-qfb-toggle"' in HARNESS
-assert 'SMOKE_FOLDER_NAME = "MailPerch Smoke"' in HARNESS
+assert 'SMOKE_FOLDER_NAME = "MailPin Smoke"' in HARNESS
 assert "/moz/addon/install" in HARNESS
 assert "temporary: bool = True" in HARNESS
 assert '"temporary": bool(temporary)' in HARNESS
@@ -119,7 +119,7 @@ assert '("none", ())' in BENCH
 assert "selected-account-runtime-after-process-restart" in BENCH
 assert "A-and-C-settings-and-render-persistence" in BENCH
 assert "--prepare-manual-scope-validation" in BENCH
-assert "MailPerch manual selected-account validation is ready." in BENCH
+assert "MailPin manual selected-account validation is ready." in BENCH
 assert "A: account.key=account1; incomingServer.key=server1; 18 pins" in BENCH
 assert "B: account.key=account2; incomingServer.key=server2; 16 pins" in BENCH
 assert "C: account.key=account3; incomingServer.key=server3; 16 pins" in BENCH

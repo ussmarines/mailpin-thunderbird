@@ -1,4 +1,4 @@
-title = "MailPerch secret scanning"
+title = "MailPin secret scanning"
 
 [extend]
 useDefault = true

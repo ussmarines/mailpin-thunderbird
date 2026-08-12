@@ -36,9 +36,9 @@ assert 'text=False' in DEEP_AUDIT
 assert '"\\n".join(sorted(tracked_names))' not in DEEP_AUDIT
 
 # The bug register is permanent and is checked by the standard validation path.
-assert 'docs/BUG_TRACKER.md' in TRACKER or '# Registre des bugs MailPerch' in TRACKER
+assert 'docs/BUG_TRACKER.md' in TRACKER or '# Registre des bugs MailPin' in TRACKER
 assert 'python scripts/check_bug_tracker.py' in PACKAGE
 for bug_id in ("MP-2026-004", "MP-2026-005", "MP-2026-006"):
     assert bug_id in TRACKER
 
-print("MailPerch 3.2.5 regression guards: OK")
+print("MailPin 3.2.5 regression guards: OK")

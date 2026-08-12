@@ -412,7 +412,7 @@ body[data-loading] .dashboard-shell { opacity: .55; pointer-events: none; }
   .button.primary { background: Highlight; color: HighlightText; }
 }
 
-/* MailPerch 1.2 — saved views, command palette, checklist and calmer Fluent 2 spacing. */
+/* MailPin 1.2 — saved views, command palette, checklist and calmer Fluent 2 spacing. */
 .saved-views { display: grid; gap: .4rem; }
 .saved-view-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: .35rem; }
 .saved-view { min-height: 2.4rem; padding: .45rem .65rem; text-align: left; border: 1px solid transparent; border-radius: var(--radius-sm); background: transparent; color: var(--text); box-shadow: none; }

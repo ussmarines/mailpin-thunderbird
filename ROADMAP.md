@@ -66,7 +66,7 @@ Base historique : `main` / `385815f546968acf721c8cd8486ff48f55f78a32`
 
 - [x] notes étendues et checklists/sous-tâches ;
 - [x] recherche globale sur métadonnées, sans corps de message ;
-- [x] synchronisation facultative de tags MailPerch ;
+- [x] synchronisation facultative de tags MailPin ;
 - [x] synchronisation Agenda bidirectionnelle ;
 - [x] palette de commandes et vues enregistrées ;
 - [x] états **J’attends / Je dois répondre** ;

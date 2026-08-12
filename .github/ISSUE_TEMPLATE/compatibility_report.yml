@@ -4,7 +4,7 @@ body:
   - type: input
     id: mailperch
     attributes:
-      label: Version MailPerch
+      label: Version MailPin
       placeholder: 3.2.0
     validations:
       required: true

@@ -7,7 +7,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: mailperch-thunderbird-functional-bench-${{ github.ref }}
+  group: mailpin-thunderbird-functional-bench-${{ github.ref }}
   cancel-in-progress: false
 
 env:
@@ -33,7 +33,7 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Build the unmodified MailPerch XPI
+      - name: Build MailPin XPI
         run: npm run check && npm run build
 
       - name: Download and verify official Thunderbird
@@ -92,7 +92,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          xpi="$(find dist -maxdepth 1 -type f -name 'MailPerch_v*.xpi' -print -quit)"
+          xpi="$(find dist -maxdepth 1 -type f -name 'MailPin_v*.xpi' -print -quit)"
           test -n "$xpi"
           mkdir -p artifacts/thunderbird-bench
           xvfb-run -a python tests/thunderbird/functional_bench.py \

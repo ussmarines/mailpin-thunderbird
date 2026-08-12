@@ -2,7 +2,7 @@
 
 ## Environnement
 
-Le build 1.5.4 est conçu pour l’environnement reviewer standard et a besoin uniquement de :
+Le build 1.6.0 est conçu pour l’environnement reviewer standard et a besoin uniquement de :
 
 - Ubuntu 24.04 ou système équivalent ;
 - Python 3.11+ ;
@@ -24,11 +24,11 @@ Cette commande exécute les contrôles du dépôt, le scan de secrets, les tests
 Les fichiers produits sont :
 
 ```text
-dist/MailPerch_v1.5.4.xpi
-dist/MailPerch_GitHub_Repository_v1.5.4.zip
+dist/MailPin_v1.6.0.xpi
+dist/MailPin_GitHub_Repository_v1.6.0.zip
 dist/SHA256SUMS.txt
 ```
 
 Le contenu de `extension/` est placé directement à la racine du XPI. Aucun JavaScript ou CSS n’est minifié, transpilé, concaténé, généré ou obfusqué. Les fichiers sont triés et les horodatages ZIP sont fixes afin de permettre une comparaison binaire.
 
-Le packaging sélectionne exclusivement les fichiers suivis par Git ou listés dans `.mailperch-source-files.json` dans l’archive reviewer. Un profil Thunderbird, une sauvegarde, un export, un secret local ou un fichier ignoré ne peut donc pas être inclus accidentellement.
+Le packaging sélectionne exclusivement les fichiers suivis par Git ou listés dans `.mailpin-source-files.json` dans l’archive reviewer. Un profil Thunderbird, une sauvegarde, un export, un secret local ou un fichier ignoré ne peut donc pas être inclus accidentellement.

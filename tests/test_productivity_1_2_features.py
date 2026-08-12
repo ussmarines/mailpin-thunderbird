@@ -47,7 +47,7 @@ assert "messageBody" not in impl and "attachmentContent" not in impl
 
 # 4: optional tag synchronization stays in the existing privileged API and does not widen MV3 permissions.
 assert 'enableThunderbirdTagSync' in options_html and 'sync-tags' in options_html
-assert '_ensureMailPerchTags' in impl and '_clearReferenceTags' in impl and '_tagHeadersForReference' in impl
+assert '_ensureMailPinTags' in impl and '_clearReferenceTags' in impl and '_tagHeadersForReference' in impl
 assert 'this._thunderbird?.tags?.ensureDefinitions' in impl and 'this._thunderbird?.tags?.removeDefinitions' in impl
 assert 'tags.deleteKey' in tag_adapter
 assert re.search(r'hardenImportedConfiguration[\s\S]*?settings\.enableThunderbirdTagSync = false;', impl), "Imported backups must not auto-enable Thunderbird tag side effects"
@@ -114,7 +114,7 @@ for relative in ("dashboard/dashboard.css", "options/options.css", "styles/pin.c
 assert '"enableThunderbirdTagSync"' in options_js
 assert 'buttonHelpSyncTags' in options_js
 
-print("MailPerch productivity 1.2 feature guards: OK")
+print("MailPin productivity 1.2 feature guards: OK")
 
 # 1.5.2 runtime-coverage regressions.
 assert 'function msg(key, fallback, substitutions = undefined)' in dashboard_js

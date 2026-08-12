@@ -46,7 +46,7 @@ def repository_files() -> list[Path]:
                 (
                     ROOT / raw.decode("utf-8", "surrogateescape")
                     for raw in tracked.stdout.split(b"\0")
-                    if raw and not raw.endswith(b"/.mailperch-source-files.json")
+                    if raw and not raw.endswith(b"/.mailpin-source-files.json")
                 ),
                 key=lambda path: path.relative_to(ROOT).as_posix(),
             )
@@ -59,7 +59,7 @@ def repository_files() -> list[Path]:
         path for path in ROOT.rglob("*")
         if (
             path.is_file()
-            and path.name != ".mailperch-source-files.json"
+            and path.name != ".mailpin-source-files.json"
             and path.relative_to(ROOT).parts[:2] != ("output", "playwright")
             and not any(part in excluded for part in path.relative_to(ROOT).parts)
         )

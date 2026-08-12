@@ -63,4 +63,4 @@ const tokenB = context.PinPerformance.cardToken({ref: {stableKey: "a", updatedAt
 assert.notEqual(tokenA, tokenB);
 assert.equal(context.PinPerformance.listSignature([], {mode: "panel"}).startsWith("panel"), true);
 
-console.log("MailPerch 3.2 model tests: OK");
+console.log("MailPin 3.2 model tests: OK");

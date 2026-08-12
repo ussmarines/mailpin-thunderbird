@@ -1,7 +1,7 @@
 "use strict";
 
 const PinSettings = globalThis.PinSettings;
-const startup = globalThis.MailPerchOptionsStartup;
+const startup = globalThis.MailPinOptionsStartup;
 
 let configuration = null;
 let configurationReady = false;
@@ -77,7 +77,7 @@ function withTimeout(operation, timeoutMs, operationName) {
 function pinInboxMethod(name) {
   const method = globalThis.messenger?.pinInbox?.[name];
   if (typeof method !== "function") {
-    throw new Error(`L’API MailPerch « ${name} » n’est pas disponible.`);
+    throw new Error(`L’API MailPin « ${name} » n’est pas disponible.`);
   }
   return method.bind(globalThis.messenger.pinInbox);
 }
@@ -153,7 +153,7 @@ function applyRecommendedDraft(control = null) {
 
 function requireConfiguration() {
   if (!configuration?.settings || typeof configuration.settings !== "object") {
-    throw new Error("Les paramètres MailPerch sont encore en cours de chargement. Réessayez dans un instant.");
+    throw new Error("Les paramètres MailPin sont encore en cours de chargement. Réessayez dans un instant.");
   }
   return configuration;
 }
@@ -183,7 +183,7 @@ async function fetchConfigurationWithRetry(attempts = 1) {
     }
     if (attempt < attempts) await wait(100 * attempt);
   }
-  throw lastError || new Error("La configuration MailPerch est indisponible.");
+  throw lastError || new Error("La configuration MailPin est indisponible.");
 }
 
 const CONTROL_CODECS = Object.freeze({
@@ -311,7 +311,7 @@ const NON_SETTING_CONTROL_IDS = Object.freeze(new Set([
 
 function validateSettingsControlRegistry() {
   if (!SETTINGS_REGISTRY_AVAILABLE) {
-    throw new Error("Le registre de recommandations MailPerch n’est pas chargé.");
+    throw new Error("Le registre de recommandations MailPin n’est pas chargé.");
   }
   const schema = new Map(PinSettings.describe().map(entry => [entry.key, entry]));
   for (const [key, entry] of SETTINGS_CONTROL_REGISTRY) {
@@ -745,7 +745,7 @@ function uniqueEntityId(prefix, items) {
 async function getShortcuts() {
   try {
     const commands = await withTimeout(
-      () => globalThis.messenger?.commands?.getAll?.() || Promise.reject(new Error("Les raccourcis MailPerch sont indisponibles.")),
+      () => globalThis.messenger?.commands?.getAll?.() || Promise.reject(new Error("Les raccourcis MailPin sont indisponibles.")),
       INITIALIZATION_TIMEOUTS.shortcut,
       "shortcut"
     );
@@ -1241,7 +1241,7 @@ async function renderCalendars(selected) {
   } catch (error) {
     availableCalendars = [];
     if (generation !== calendarRenderGeneration) return;
-    console.warn("MailPerch : calendriers indisponibles", initializationDiagnostic(error));
+    console.warn("MailPin : calendriers indisponibles", initializationDiagnostic(error));
     setStatus(msg("calendarsUnavailable"), "error", {control: el});
     info?.appendChild(node(
       "p",
@@ -1397,7 +1397,7 @@ function updateRuntimeSummary(config, backup = null) {
 
 async function applyConfiguration(config) {
   if (!config?.settings || typeof config.settings !== "object") {
-    throw new Error("La configuration MailPerch est incomplète.");
+    throw new Error("La configuration MailPin est incomplète.");
   }
   const recommendedSettings = PinSettings.normalize(
     config.recommendedSettings && typeof config.recommendedSettings === "object"
@@ -1520,7 +1520,7 @@ async function initializeOptions({preserveEdits = false} = {}) {
     clearStatus();
   } catch (error) {
     if (generation !== initializationGeneration) return;
-    console.error("MailPerch : initialisation des paramètres impossible", initializationDiagnostic(error));
+    console.error("MailPin : initialisation des paramètres impossible", initializationDiagnostic(error));
     setInitializationState("error", error);
     startup?.fail("options-initialize", error, lastInitializationDiagnostic);
   } finally {
@@ -1573,7 +1573,7 @@ async function saveAll(event = null) {
       };
       const saved = await messenger.pinInbox.setConfiguration(requested);
       if (!saved?.settings || typeof saved.settings !== "object") {
-        throw new Error("MailPerch n’a pas confirmé l’enregistrement des paramètres.");
+        throw new Error("MailPin n’a pas confirmé l’enregistrement des paramètres.");
       }
       if (stableSnapshot(PinSettings.normalize(requested.settings)) !==
           stableSnapshot(PinSettings.normalize(saved.settings))) {
@@ -1731,7 +1731,7 @@ async function openExternalSupportLink(event) {
   try {
     await messenger.tabs.create({url: link.href});
   } catch (error) {
-    console.warn("MailPerch : ouverture du lien de soutien impossible", error?.name || "Error");
+    console.warn("MailPin : ouverture du lien de soutien impossible", error?.name || "Error");
     setStatus(msg("supportOpenFailed"), "error", {control: link, persistent: true});
   }
 }
@@ -1781,7 +1781,7 @@ async function startOptions() {
     validateSettingsControlRegistry();
     enhanceSettingsPage();
   } catch (error) {
-    console.error("MailPerch : préparation des paramètres impossible", initializationDiagnostic(error));
+    console.error("MailPin : préparation des paramètres impossible", initializationDiagnostic(error));
     setInitializationState("error", error);
     startup?.fail("options-prepare", error, lastInitializationDiagnostic);
     throw error;
@@ -2124,7 +2124,7 @@ async function startOptions() {
   await initializeOptions();
 }
 
-Object.defineProperty(globalThis, "MailPerchOptionsMain", {
+Object.defineProperty(globalThis, "MailPinOptionsMain", {
   value: Object.freeze({startOptions}),
   configurable: false,
   enumerable: false,

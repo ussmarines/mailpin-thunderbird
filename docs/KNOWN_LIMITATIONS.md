@@ -1,15 +1,15 @@
 # Limites connues
 
-## Version 1.5.4 et portée de validation
+## Version 1.6.0 et portée de validation
 
-Le candidat **1.5.4** modifie l’API Agenda bornée, la résolution des identités d’épinglage et plusieurs surfaces UI. Il ne modifie ni les permissions ni les schémas de stockage. Les validations automatisées fraîches sont consignées dans `VALIDATION_REPORT_1.5.4.md` et `docs/AI_VALIDATION_STATE.json`; la recette manuelle utilisateur reste requise.
+Le candidat **1.6.0** modifie l’API Agenda bornée, la résolution des identités d’épinglage et plusieurs surfaces UI. Il ne modifie ni les permissions ni les schémas de stockage. Les validations automatisées fraîches sont consignées dans `VALIDATION_REPORT_1.6.0.md` et `docs/AI_VALIDATION_STATE.json`; la recette manuelle utilisateur reste requise.
 
 Une matrice exhaustive de tous les systèmes, versions Thunderbird, fournisseurs réels, types de dossiers, calendriers, lecteurs d’écran et configurations de profil reste hors de portée d’un banc automatisé unique. Les éléments non observés restent explicitement documentés.
 
 ## Compatibilité Thunderbird
 
-- Le manifeste 1.5.4 déclare Thunderbird `153.0` à `153.*`.
-- MailPerch utilise une API Experiment privilégiée ; une évolution interne de Thunderbird peut exiger une adaptation.
+- Le manifeste 1.6.0 déclare Thunderbird `153.0` à `153.*`.
+- MailPin utilise une API Experiment privilégiée ; une évolution interne de Thunderbird peut exiger une adaptation.
 - Messages, Tags et Agenda restent isolés dans leurs adaptateurs dédiés.
 - Le DOM `about:3pane`, `ThreadCard`, les fenêtres et menus natifs restent des surfaces internes à surveiller.
 - Les comportements propres aux fournisseurs et dossiers réels doivent toujours être validés dans les environnements concernés.
@@ -18,7 +18,7 @@ Une matrice exhaustive de tous les systèmes, versions Thunderbird, fournisseurs
 
 - Les comptes POP/IMAP synthétiques du banc valident la logique locale et les portées sans utiliser de secret ni de service externe. Ils ne remplacent pas un test contre Gmail, Microsoft, un serveur IMAP réel ou un autre fournisseur.
 - La synchronisation Agenda dépend des capacités et ACL du calendrier. Un fournisseur CalDAV ou tiers réel peut se comporter différemment du scénario local.
-- La synchronisation Tags reste facultative et ne doit gérer que les définitions dont la propriété MailPerch est démontrée par clé et libellé exacts.
+- La synchronisation Tags reste facultative et ne doit gérer que les définitions dont la propriété MailPin est démontrée par clé et libellé exacts.
 - Aucun compte, jeton ou credential réel n’est incorporé au dépôt ou au banc.
 
 ## Banc de test Thunderbird
@@ -40,8 +40,8 @@ Une matrice exhaustive de tous les systèmes, versions Thunderbird, fournisseurs
 ## Cycle de vie et stockage
 
 - La purge immédiate dépend du cycle de vie de l’Experiment lorsqu’il est chargé ; la sentinelle Gecko continue de protéger la réinstallation normale.
-- Les sauvegardes exportées manuellement hors des dossiers gérés par MailPerch ne peuvent ni ne doivent être effacées automatiquement.
-- Le propriétaire du profil local et toute personne disposant de la Browser Toolbox contrôlent déjà le processus Thunderbird ; MailPerch ne crée pas une frontière d’autorisation contre cet acteur.
+- Les sauvegardes exportées manuellement hors des dossiers gérés par MailPin ne peuvent ni ne doivent être effacées automatiquement.
+- Le propriétaire du profil local et toute personne disposant de la Browser Toolbox contrôlent déjà le processus Thunderbird ; MailPin ne crée pas une frontière d’autorisation contre cet acteur.
 
 ## Build et publication
 

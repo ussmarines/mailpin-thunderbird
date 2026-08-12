@@ -1,6 +1,6 @@
 # Glossary
 
-**About:3pane** — Thunderbird's internal three-pane mail UI where MailPerch injects its panel and row controls.
+**About:3pane** — Thunderbird's internal three-pane mail UI where MailPin injects its panel and row controls.
 
 **Agenda** — Optional calendar/task integration behind a capability-aware adapter.
 
@@ -14,7 +14,7 @@
 
 **Provider matrix** — Local snapshot of account/calendar capabilities and compatibility observations.
 
-**Stable key** — MailPerch's internal durable identifier for a pinned reference.
+**Stable key** — MailPin's internal durable identifier for a pinned reference.
 
 **State data** — Logical JSON storage for UI and saved-view state alongside SQLite tables.
 

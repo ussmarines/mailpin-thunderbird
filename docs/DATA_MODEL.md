@@ -16,7 +16,7 @@ Une référence contient notamment :
 - `snoozeUntil` pour masquer temporairement l’élément des vues actives ;
 - `reminderFiredAt` et `reminderAcknowledgedAt` pour conserver l’état d’un rappel interactif sans le répéter après acquittement ;
 - identifiants Agenda et éventuelle erreur de synchronisation ;
-- état local de synchronisation des tags MailPerch (`tagLastSyncedAt`, erreur éventuelle) ;
+- état local de synchronisation des tags MailPin (`tagLastSyncedAt`, erreur éventuelle) ;
 - `updatedAt` pour la résolution de concurrence.
 
 Le corps du message et les pièces jointes ne sont pas stockés.
@@ -118,4 +118,4 @@ Une vue enregistrée contient un nom et des critères fermés : vue intelligente
 
 ## Tags Thunderbird
 
-Les clés gérées sont fermées (`mailperch-active`, `mailperch-waiting`, `mailperch-planned`, `mailperch-completed`, `mailperch-important`, `mailperch-follow-up`). MailPerch refuse une collision si une de ces clés existe avec un libellé différent. La suppression ne vise que les définitions dont la clé **et** le libellé correspondent exactement aux valeurs MailPerch.
+Les clés gérées sont fermées (`mailperch-active`, `mailperch-waiting`, `mailperch-planned`, `mailperch-completed`, `mailperch-important`, `mailperch-follow-up`). MailPin refuse une collision si une de ces clés existe avec un libellé différent. La suppression ne vise que les définitions dont la clé **et** le libellé correspondent exactement aux valeurs MailPin.

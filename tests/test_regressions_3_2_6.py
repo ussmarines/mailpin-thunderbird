@@ -9,13 +9,13 @@ OPTIONS_JS = (ROOT / "extension/options/options.js").read_text(encoding="utf-8")
 OPTIONS_HTML = (ROOT / "extension/options/options.html").read_text(encoding="utf-8")
 TRACKER = (ROOT / "docs/BUG_TRACKER.md").read_text(encoding="utf-8")
 
-# The MailPerch pin is a fully custom button. Thunderbird's generic icon
+# The MailPin pin is a fully custom button. Thunderbird's generic icon
 # classes must never be attached because they can paint an additional icon.
 assert 'button = createNode("button", INDEPENDENT_BUTTON_CLASS);' in IMPLEMENTATION
 assert '`${INDEPENDENT_BUTTON_CLASS} button icon-button icon-only`' not in IMPLEMENTATION
 assert 'button.classList.remove("button", "icon-button", "icon-only", "button-star", "tree-button-flag");' in IMPLEMENTATION
 
-# In independent mode, Thunderbird still owns the native star node. MailPerch
+# In independent mode, Thunderbird still owns the native star node. MailPin
 # may align it visually, but implementation.js must never reparent it.
 independent = IMPLEMENTATION.split('const ensureIndependentButton', 1)[1].split('const patchRow', 1)[0]
 assert 'iconInfo?.insertBefore(button, nativeStar || null);' in independent
@@ -47,4 +47,4 @@ assert "| CORRIGÉ | 3.2.8 |" in card_row
 assert "Thunderbird 153.0.1" in card_row and "messages synthétiques" in card_row
 assert "| CORRIGÉ | 3.2.10 |" in options_row
 
-print("MailPerch 3.2.6/3.2.8 real-interaction regression guards: OK")
+print("MailPin 3.2.6/3.2.8 real-interaction regression guards: OK")

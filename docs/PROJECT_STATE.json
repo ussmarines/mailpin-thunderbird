@@ -1,13 +1,13 @@
 {
   "format": "mailperch-project-state",
   "version": 1,
-  "project": "MailPerch — Email Pins & Follow-up",
-  "extensionVersion": "1.5.4",
+  "project": "MailPin — Email Follow-up & Productivity for Thunderbird",
+  "extensionVersion": "1.6.0",
   "baseGitHub": {
     "branch": "main",
     "commit": "ca7206329045b58aff3384e7bd4c3b99eeecd2b3"
   },
-  "extensionId": "pin-mails@MailPerch.local",
+  "extensionId": "ussmarines.mailpin@addons.thunderbird.net",
   "thunderbird": {
     "min": "153.0",
     "max": "153.*"
@@ -52,10 +52,10 @@
     "No remote publication without explicit approval",
     "No client-side administrator role or privilege switch",
     "Privileged API inputs are bounded and normalized",
-    "Uninstall closes storage before deleting all MailPerch profile data",
+    "Uninstall closes storage before deleting all MailPin profile data",
     "Missing native install sentinel triggers residue purge before preferences/SQLite load",
     "CI installs no third-party Python helper and pins GitHub Actions by immutable SHA",
-    "Only exact MailPerch-owned Thunderbird tags may be managed or removed",
+    "Only exact MailPin-owned Thunderbird tags may be managed or removed",
     "Options and dashboard text has a 12px minimum font-size floor",
     "Provider detection uses exact domain or legitimate subdomain boundaries, never arbitrary URL substrings",
     "Optional Thunderbird capabilities fail locally instead of disabling the full extension",
@@ -70,7 +70,7 @@
       "extension/options"
     ],
     "cardDensityAffects": [
-      "MailPerch pinned cards"
+      "MailPin pinned cards"
     ],
     "mustNotAffect": [
       "Thunderbird native thread row height",

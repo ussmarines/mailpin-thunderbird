@@ -8,7 +8,7 @@ Ne jamais joindre de messages, profil ou base utilisateur non expurgés.
 
 ## Périmètre
 
-MailPerch est local, sans serveur et sans rôle administrateur. L’extension utilise
+MailPin est local, sans serveur et sans rôle administrateur. L’extension utilise
 Manifest V3 et une API Experiment privilégiée pour `about:3pane`, les messages,
 SQLite et Agenda. Voir [docs/SECURITY_BOUNDARY.md](docs/SECURITY_BOUNDARY.md).
 
@@ -29,7 +29,7 @@ SQLite et Agenda. Voir [docs/SECURITY_BOUNDARY.md](docs/SECURITY_BOUNDARY.md).
 - sentinelle d’installation effacée par le stockage natif Gecko afin qu’une réinstallation purge les résidus avant toute initialisation ;
 - tests interdisant les compteurs natifs parallèles et les rôles admin client ;
 - CI sans installation Python tierce, actions GitHub épinglées par SHA et identifiants de checkout non persistés ;
-- synchronisation tags facultative, sans permission supplémentaire, avec propriété stricte clé+libellé et nettoyage limité aux tags MailPerch.
+- synchronisation tags facultative, sans permission supplémentaire, avec propriété stricte clé+libellé et nettoyage limité aux tags MailPin.
 
 ## Inspecteur Thunderbird
 
@@ -49,7 +49,7 @@ npm run build
 npm run ci
 ```
 
-Le rapport courant est [SECURITY_AUDIT_1.5.4.md](SECURITY_AUDIT_1.5.4.md).
+Le rapport courant est [SECURITY_AUDIT_1.6.0.md](SECURITY_AUDIT_1.6.0.md).
 
 ## Limite importante
 

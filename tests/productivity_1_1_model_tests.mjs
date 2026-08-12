@@ -75,4 +75,4 @@ assert.equal(context.PinBulk.supported("wake"), true);
 assert.equal(context.PinBulk.normalizeOptions("snooze", {durationMs: 30_000}).durationMs, 60_000);
 assert.equal(context.PinBulk.normalizeOptions("snooze", {until: now + day}).until, now + day);
 
-console.log("MailPerch productivity 1.1 model tests: OK");
+console.log("MailPin productivity 1.1 model tests: OK");

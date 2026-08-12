@@ -52,9 +52,9 @@ Les nouvelles opérations de productivité restent fermées et bornées : 500 r�
 
 ## Désinstallation
 
-Les API Experiment ne peuvent pas déclarer le cycle statique `uninstall` dans leur manifeste. Pendant que l’extension est chargée, MailPerch utilise donc deux signaux du cœur Gecko : AddonManager `onUninstalling` positionne immédiatement l’état de désinstallation avant `onShutdown`, et `onOperationCancelled` le réinitialise si l’utilisateur annule ; l’événement WebExtension `Management.uninstall`, dont la promesse est attendue par Gecko, attend la fermeture SQLite puis supprime la base, les fichiers WAL/SHM/journal, la récupération d’urgence, les sauvegardes internes et toutes les préférences `extensions.pinMails.*`. Lors d’une mise à jour, l’ancien écouteur se retire sans purger les données. Dans un dossier externe choisi par l’utilisateur, seules les enveloppes MailPerch au checksum vérifiable peuvent être supprimées ; le dossier et les autres fichiers sont conservés.
+Les API Experiment ne peuvent pas déclarer le cycle statique `uninstall` dans leur manifeste. Pendant que l’extension est chargée, MailPin utilise donc deux signaux du cœur Gecko : AddonManager `onUninstalling` positionne immédiatement l’état de désinstallation avant `onShutdown`, et `onOperationCancelled` le réinitialise si l’utilisateur annule ; l’événement WebExtension `Management.uninstall`, dont la promesse est attendue par Gecko, attend la fermeture SQLite puis supprime la base, les fichiers WAL/SHM/journal, la récupération d’urgence, les sauvegardes internes et toutes les préférences `extensions.pinMails.*`. Lors d’une mise à jour, l’ancien écouteur se retire sans purger les données. Dans un dossier externe choisi par l’utilisateur, seules les enveloppes MailPin au checksum vérifiable peuvent être supprimées ; le dossier et les autres fichiers sont conservés.
 
-Avant toute lecture de préférences ou ouverture de SQLite, l’Experiment vérifie aussi une sentinelle primitive dans `ExtensionStorage`, la zone locale native de l’extension. Gecko efface cette zone lors d’une désinstallation normale. Si la sentinelle manque, MailPerch distingue la migration initiale depuis une version antérieure à 3.2.4 d’une installation nouvelle ; hors migration, il purge les éventuels résidus puis écrit une nouvelle sentinelle. Cette seconde barrière garantit un redémarrage propre à la réinstallation même si l’Experiment n’était pas chargé au moment d’une désinstallation antérieure.
+Avant toute lecture de préférences ou ouverture de SQLite, l’Experiment vérifie aussi une sentinelle primitive dans `ExtensionStorage`, la zone locale native de l’extension. Gecko efface cette zone lors d’une désinstallation normale. Si la sentinelle manque, MailPin distingue la migration initiale depuis une version antérieure à 3.2.4 d’une installation nouvelle ; hors migration, il purge les éventuels résidus puis écrit une nouvelle sentinelle. Cette seconde barrière garantit un redémarrage propre à la réinstallation même si l’Experiment n’était pas chargé au moment d’une désinstallation antérieure.
 
 ## Panneau `about:3pane`
 
@@ -83,13 +83,13 @@ La détection des éléments associés produit uniquement des propositions. La f
 
 Les paramètres utilisent une navigation groupée, une recherche, des aides sous chaque contrôle, un aperçu des règles avant enregistrement et des notifications fixes mais non bloquantes. La présentation est organisée en **Essentiel**, **Organisation**, **Automatisation** et **Avancé**. Le mode historique `guided` est présenté comme **Recommandé** : il masque les sections techniques avancées sans les supprimer et peut préparer un brouillon de valeurs sûres. Ce brouillon conserve les valeurs propres au profil et exige toujours un clic explicite sur Enregistrer. Le mode `advanced` reste disponible pour exposer tous les contrôles.
 
-Les dix commandes MailPerch sont personnalisables avec l’API `commands` de Thunderbird et sont incluses dans les exports de configuration.
+Les dix commandes MailPin sont personnalisables avec l’API `commands` de Thunderbird et sont incluses dans les exports de configuration.
 
 Le bouton injecté émet `pinInbox.onDashboardRequested`; le background ouvre la page d’extension avec `messenger.tabs.create`, afin de conserver le bon principal de sécurité.
 
 ### Politique de composants UI
 
-MailPerch suit Fluent 2 par ses jetons CSS locaux, sa hiérarchie, ses états et ses contrôles HTML natifs. Le build assemble directement les fichiers suivis sous `extension/` et n’exécute aucun bundler : une dépendance npm non importée ne peut donc pas devenir un composant du XPI. `@fluentui/web-components` 3.0.3 a été évalué puis retiré, notamment parce qu’il exige Node 22/24 alors que la validation du dépôt inclut Node 20. Une future adoption exige simultanément un besoin produit précis, un bundle local déterministe auditable, aucun actif distant et une matrice Node/Thunderbird documentée.
+MailPin suit Fluent 2 par ses jetons CSS locaux, sa hiérarchie, ses états et ses contrôles HTML natifs. Le build assemble directement les fichiers suivis sous `extension/` et n’exécute aucun bundler : une dépendance npm non importée ne peut donc pas devenir un composant du XPI. `@fluentui/web-components` 3.0.3 a été évalué puis retiré, notamment parce qu’il exige Node 22/24 alors que la validation du dépôt inclut Node 20. Une future adoption exige simultanément un besoin produit précis, un bundle local déterministe auditable, aucun actif distant et une matrice Node/Thunderbird documentée.
 
 ## Stockage et migrations
 
@@ -131,7 +131,7 @@ Le workflow runtime reste séparé de la QA obligatoire même après sa premièr
 
 - `uiPreset` est appliqué uniquement à `options/options.html` via `body[data-ui-preset]` ;
 - `density` est appliqué uniquement au panneau d’épingles via `pin-mails-density` ;
-- aucune préférence MailPerch ne doit modifier la hauteur virtuelle `ThreadCard` de Thunderbird ;
+- aucune préférence MailPin ne doit modifier la hauteur virtuelle `ThreadCard` de Thunderbird ;
 - étoile, punaise et menu sont positionnés dans un rail d’actions centré sans changer le modèle de données natif.
 
 La mémoire d’architecture synthétique et la carte des fichiers sont dans
@@ -143,5 +143,5 @@ La mémoire d’architecture synthétique et la carte des fichiers sont dans
 - Les vues enregistrées sont persistées dans `state_data` avec le reste de l’état logique et sont limitées à 30 entrées.
 - La recherche globale assemble uniquement les métadonnées déjà disponibles (objet, auteur, note, sous-tâches, tags, compte/dossier, groupe, affaire, workflow et état de réponse). Elle n’ouvre ni n’indexe les corps ou pièces jointes.
 - `analytics.js` dérive les états **waitingForThem** et **needsReply** à partir des horodatages entrants/sortants et du workflow ; ces états ne sont pas une prédiction IA.
-- La synchronisation Thunderbird tags reste derrière `enableThunderbirdTagSync`, désactivé par défaut. Les tags sont créés via l’Experiment sans nouvelle permission WebExtension et ne sont considérés comme possédés que si leur clé et leur libellé correspondent exactement aux définitions MailPerch.
+- La synchronisation Thunderbird tags reste derrière `enableThunderbirdTagSync`, désactivé par défaut. Les tags sont créés via l’Experiment sans nouvelle permission WebExtension et ne sont considérés comme possédés que si leur clé et leur libellé correspondent exactement aux définitions MailPin.
 - La synchronisation Agenda bidirectionnelle conserve les observateurs et capacités fournisseurs existants ; les changements de statut venant d’Agenda déclenchent aussi la remise en cohérence des tags lorsqu’elle est activée.

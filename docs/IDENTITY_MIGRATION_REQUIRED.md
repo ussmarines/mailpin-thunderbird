@@ -1,65 +1,51 @@
-# Historique de l’identifiant MailPerch
+# Migration d’identité vers MailPin
 
 ## Statut
 
-**Décision résolue le 4 août 2026.**
+**Décision approuvée le 13 août 2026 avant la première publication ATN.**
 
-L’identifiant canonique de l’extension est désormais :
+Identifiant public définitif :
 
-`pin-mails@MailPerch.local`
+`ussmarines.mailpin@addons.thunderbird.net`
 
-Cet identifiant est propre au projet personnel MailPerch et ne crée aucun lien avec Sibylla. Il doit rester synchronisé dans le manifeste, les métadonnées de publication, les contrôles du dépôt et les tests.
+Nom public : **MailPin — Email Follow-up & Productivity for Thunderbird**.
 
-## Contexte de la décision
+## Pourquoi l’identifiant change
 
-- MailPerch n’avait encore jamais été publié sur ATN, AMO ou un autre catalogue.
-- Le projet existait uniquement dans un profil Thunderbird local et dans le dépôt Git privé.
-- Un identifiant intermédiaire lié au pseudonyme GitHub avait été préparé sur la branche de sécurité, mais n’avait jamais été fusionné, signé ni publié.
-- Les anciennes références nominatives ne doivent pas être réintroduites dans le code ou la documentation publique.
-- Le choix final privilégie une identité exclusivement liée au nom du produit.
+Les releases GitHub jusqu’à 1.5.4 utilisaient `pin-mails@MailPerch.local`. Avant la première soumission officielle à addons.thunderbird.net, le produit a été renommé MailPin et l’identifiant a été remplacé par la forme pérenne recommandée lorsque le projet ne s’appuie pas sur son propre domaine public : `<utilisateur>.<module>@addons.thunderbird.net`.
+
+Aucune version utilisant l’ancien identifiant n’a été publiée sur ATN. La 1.6.0 devient donc la première identité destinée au catalogue public.
 
 ## Conséquence technique
 
-Thunderbird utilise l’identifiant comme identité stable de l’extension. Une installation locale qui portait un autre identifiant peut donc être traitée comme une extension distincte. Le nouvel identifiant ne récupère pas automatiquement le stockage privé associé à l’ancienne identité.
+Thunderbird traite un changement d’ID comme une nouvelle extension. Une installation locale 1.5.4 ne doit pas être supposée mise à jour automatiquement vers 1.6.0 et son stockage privé n’est pas automatiquement rattaché au nouvel ID.
 
-Ce comportement a été accepté avant les premières releases GitHub, qui utilisent toutes l’identifiant canonique. Toute modification ultérieure casserait désormais la continuité des mises à jour et n’est pas autorisée sans une migration distribuée complète.
+Les formats de sauvegarde/import, la base logique `pin-mails-v2.sqlite`, les préfixes `pin-mails-*` et l’API Experiment `pinInbox` restent volontairement stables afin de permettre une migration contrôlée des données sans refonte de format.
 
-## Procédure pour le profil local existant
+## Procédure de migration pour les testeurs 1.5.4
 
-1. Depuis l’installation actuellement utilisée, exporter une sauvegarde MailPerch et vérifier que le fichier est lisible.
-2. Conserver une copie du profil Thunderbird avant toute désinstallation.
-3. Désinstaller l’ancienne build locale seulement après la sauvegarde.
-4. Construire puis installer la build portant `pin-mails@MailPerch.local`.
-5. Importer la sauvegarde de façon contrôlée.
-6. Vérifier les épingles, groupes, notes, règles, affaires, rappels, paramètres et liens Agenda.
-7. Redémarrer Thunderbird et contrôler de nouveau les données et le stockage SQLite.
-8. Exécuter `npm run ci` avant toute diffusion ou signature.
+1. Ouvrir l’installation 1.5.4 et exporter une sauvegarde vérifiable.
+2. Conserver une copie du profil Thunderbird avant désinstallation.
+3. Désinstaller l’ancienne extension seulement après la sauvegarde.
+4. Installer `MailPin_v1.6.0.xpi`.
+5. Importer la sauvegarde via l’interface MailPin.
+6. Vérifier épingles, groupes, notes, sous-tâches, affaires, règles, rappels, paramètres et liens Agenda.
+7. Redémarrer Thunderbird et contrôler à nouveau les données.
 
-Ne jamais supposer qu’une installation avec un ancien identifiant sera mise à jour automatiquement.
-
-## Fichiers qui doivent rester synchronisés
+## Fichiers synchronisés dans cette migration
 
 - `extension/manifest.json`
 - `release/manifest-store-template.json`
 - `docs/PROJECT_STATE.json`
-- `PROJECT_MEMORY.md` ou son addendum d’identité prioritaire
+- `PROJECT_MEMORY.md`
 - `docs/CODEX_HANDOFF.md`
 - `AGENTS.md`
 - `scripts/check_repo.py`
 - `tests/static_checks.py`
 - `tests/test_project_metadata.py`
+- `BRANDING.md`
+- `README.md` / `README.en.md`
 
-Toute modification future de l’identifiant doit mettre à jour cette liste dans le même changement Git.
+## Immutabilité après publication
 
-## Publication et immutabilité
-
-Depuis la première release GitHub :
-
-- conserver exactement la même casse et la même chaîne dans toutes les builds ;
-- vérifier les exigences de manifeste et de déclaration de collecte de données applicables au moment de la soumission ;
-- considérer l’identifiant comme immuable pour GitHub et toute future soumission ATN ;
-- vérifier avec le portail ATN que l’identifiant est accepté avant la première soumission au catalogue, sans le remplacer silencieusement.
-
-## Retour arrière
-
-En cas de problème de migration locale, ne pas improviser une nouvelle identité. Restaurer le profil de test et documenter le résultat dans `docs/BUG_TRACKER.md` et `docs/CODEX_HANDOFF.md`. Une release déjà publiée ne doit jamais être remplacée par une build portant un autre identifiant.
+Une fois MailPin soumis ou publié sur ATN avec `ussmarines.mailpin@addons.thunderbird.net`, cet identifiant devient immuable. Toute release ultérieure doit conserver exactement la même chaîne et la même casse.

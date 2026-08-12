@@ -10,11 +10,11 @@ Owns account/folder enumeration, bounded header resolution, folder notifications
 
 ### Tags
 
-Owns Thunderbird tag definitions and message keywords. It checks every collision before the first creation, treats a key with the wrong label as a blocking collision, groups operations by folder, and removes only tags whose key and label prove MailPerch ownership. Tag sync is optional and disabled by default.
+Owns Thunderbird tag definitions and message keywords. It checks every collision before the first creation, treats a key with the wrong label as a blocking collision, groups operations by folder, and removes only tags whose key and label prove MailPin ownership. Tag sync is optional and disabled by default.
 
 ### Agenda
 
-Owns calendar discovery, date conversion, events/tasks, ACL/capability checks and observers. Agenda is optional: missing constructors or a read-only provider disable only affected operations, not MailPerch core.
+Owns calendar discovery, date conversion, events/tasks, ACL/capability checks and observers. Agenda is optional: missing constructors or a read-only provider disable only affected operations, not MailPin core.
 
 ## Orchestrator boundary
 

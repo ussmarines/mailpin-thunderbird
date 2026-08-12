@@ -99,4 +99,4 @@ const insecureProvider = context.PinProviders.descriptor({key: "plain", provider
 assert.equal(insecureProvider.secure, false);
 assert.equal(insecureProvider.offlineSupport, false);
 
-console.log("MailPerch productivity 1.2 model tests: OK");
+console.log("MailPin productivity 1.2 model tests: OK");

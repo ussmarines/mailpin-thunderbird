@@ -1,4 +1,4 @@
-# Checklist de publication Add-ons for Thunderbird — 1.5.4
+# Checklist de publication Add-ons for Thunderbird — 1.6.0
 
 Les cases cochées sont vérifiées automatiquement ou directement dans les sources. Les cases non cochées nécessitent une action humaine, un fournisseur externe ou l’accès au portail ATN.
 
@@ -6,7 +6,7 @@ Les cases cochées sont vérifiées automatiquement ou directement dans les sour
 
 - [x] nom, sous-titres FR/EN, auteur et icônes synchronisés ;
 - [x] identifiant permanent défini ;
-- [x] version 1.5.4 synchronisée dans le manifeste, le package, la documentation et les livrables ;
+- [x] version 1.6.0 synchronisée dans le manifeste, le package, la documentation et les livrables ;
 - [x] licence et mentions de marque explicites ;
 - [ ] recherche juridique finale de disponibilité de la marque ;
 - [ ] support et politique de confidentialité vérifiés sur le portail avant soumission.
@@ -16,8 +16,8 @@ Les cases cochées sont vérifiées automatiquement ou directement dans les sour
 - [x] Manifest V3 et clés de manifeste contrôlés ;
 - [x] plage déclarée Thunderbird 153.0 à 153.* ;
 - [x] thèmes clair/sombre : clipping, overflow, alignement et contraste texte de base automatisés ;
-- [x] recette utilisateur fraîche des surfaces corrigées sur l’arbre produit 1.5.4 ;
-- [ ] matrice fonctionnelle/charge 50/100/500/1000/2000 fraîche sur 1.5.4 (non requise pour le retest ciblé) ;
+- [x] recette utilisateur fraîche des surfaces corrigées sur l’arbre produit 1.6.0 ;
+- [ ] matrice fonctionnelle/charge 50/100/500/1000/2000 fraîche sur 1.6.0 (non requise pour le retest ciblé) ;
 - [ ] matrice Windows/Linux/macOS Thunderbird réelle complète ;
 - [ ] Gmail/Microsoft/IMAP et calendriers réseau réels.
 
@@ -33,12 +33,12 @@ Les cases cochées sont vérifiées automatiquement ou directement dans les sour
 ## Confidentialité et sécurité
 
 - [x] données locales, permissions minimales (`menus`), CSP sans réseau et scans standards contrôlés ;
-- [x] aucune permission, dépendance runtime, télémétrie ou code distant ajouté en 1.5.4 ;
-- [x] scan standard frais du delta 1.5.4 documenté ; Codex Security non utilisé ;
+- [x] aucune permission, dépendance runtime, télémétrie ou code distant ajouté en 1.6.0 ;
+- [x] scan standard frais du delta 1.6.0 documenté ; Codex Security non utilisé ;
 - [ ] validation avec fournisseurs mail/calendrier externes réels ;
 - [ ] validation visuelle humaine à zoom 200 %, contraste OS élevé et lecteurs d’écran.
 
-## Validation 1.5.4 spécifique
+## Validation 1.6.0 spécifique
 
 - [x] création événement/tâche Agenda observée dans le vrai Dashboard Thunderbird ; attente/relance et dernier comportement Agenda ont aussi été retestés manuellement par l’utilisateur ;
 - [x] réconciliation message/conversation observée dans Thunderbird réel ;
@@ -49,8 +49,8 @@ Les cases cochées sont vérifiées automatiquement ou directement dans les sour
 
 ## Livrables
 
-- [x] XPI 1.5.4 et archive source produits par le build de validation ;
+- [x] XPI 1.6.0 et archive source produits par le build de validation ;
 - [x] SHA-256 générés par le build ;
 - [x] CHANGELOG et déclarations de version préparés ;
-- [ ] publication GitHub v1.5.4 — étape de release à déclencher après intégration de cette préparation documentaire ;
+- [ ] publication GitHub v1.6.0 — étape de release à déclencher après intégration de cette préparation documentaire ;
 - [ ] soumission et validation par les reviewers ATN.

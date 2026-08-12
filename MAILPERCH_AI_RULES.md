@@ -4,9 +4,11 @@ Version de référence : 2026-08-12
 Révision modèles Codex : GPT-5.6 Luna / Terra / Sol
 Projet : `ussmarines/mailperch-thunderbird`
 
+> **Compatibilité projet :** le fichier conserve son nom historique `MAILPERCH_AI_RULES.md` afin de ne pas casser les paramètres ChatGPT/Codex existants ; son contenu gouverne désormais MailPin.
+
 ## 1. Objet de ce fichier
 
-Ce fichier est la source de gouvernance pour ChatGPT, Codex et tout agent IA travaillant sur MailPerch.
+Ce fichier est la source de gouvernance pour ChatGPT, Codex et tout agent IA travaillant sur MailPin.
 
 Il complète les règles déjà présentes dans le dépôt sans les remplacer. Il sert surtout à :
 - limiter la consommation de tokens ;
@@ -147,7 +149,7 @@ Ces deux lignes sont destinées à l'utilisateur et ne doivent pas être recopi�
 À la date de référence de cette règle, la famille Codex à utiliser est **GPT-5.6** :
 
 - **GPT-5.6 Luna** : modèle le plus rapide et le plus économique ; à privilégier pour les tâches simples, mécaniques, très ciblées ou principalement en lecture.
-- **GPT-5.6 Terra** : modèle équilibré pour le travail quotidien ; **choix par défaut pour la majorité des tâches de développement MailPerch**.
+- **GPT-5.6 Terra** : modèle équilibré pour le travail quotidien ; **choix par défaut pour la majorité des tâches de développement MailPin**.
 - **GPT-5.6 Sol** : modèle phare et le plus capable ; à réserver aux tâches difficiles, longues, transversales ou à fort enjeu technique.
 
 Ne pas recommander une génération antérieure par défaut lorsqu'un modèle GPT-5.6 adapté est disponible.
@@ -193,7 +195,7 @@ Utiliser cette grille comme point de départ, puis ajuster au périmètre réel 
 |---|---|---|
 | Inspection Git / lecture / documentation | GPT-5.6 Luna | Low |
 | Petite correction évidente | GPT-5.6 Luna | Medium |
-| Développement MailPerch courant | GPT-5.6 Terra | Medium |
+| Développement MailPin courant | GPT-5.6 Terra | Medium |
 | Refactor modéré ou bug multi-fichiers | GPT-5.6 Terra | High |
 | Frontière Thunderbird / stockage / migration / CI sensible | GPT-5.6 Sol | High |
 | Investigation exceptionnellement complexe | GPT-5.6 Sol | XHigh |
@@ -208,21 +210,21 @@ Règles finales :
 - Si Terra suffit, ne pas utiliser Sol.
 - Si Luna suffit, ne pas utiliser Terra.
 - Le choix du modèle ou de la puissance n'autorise jamais l'utilisation de Codex Security ; ses règles d'autorisation restent distinctes.
-- GPT-5.6 supporte aussi un effort `max`, mais **MailPerch ne le recommande pas par défaut** : rester sur `Low`, `Medium`, `High` ou `XHigh`. N'utiliser `max` que sur demande explicite de l'utilisateur pour un cas exceptionnel où `XHigh` ne suffit pas.
+- GPT-5.6 supporte aussi un effort `max`, mais **MailPin ne le recommande pas par défaut** : rester sur `Low`, `Medium`, `High` ou `XHigh`. N'utiliser `max` que sur demande explicite de l'utilisateur pour un cas exceptionnel où `XHigh` ne suffit pas.
 
 ## 5.2 Routage minimal des skills UI
 
-Les règles MailPerch et `docs/UI_SPEC.md` priment toujours. Pour l’UI produit, les réglages, formulaires, audits, finitions, responsive et accessibilité, charger `impeccable`. Pour la recherche amont d’une direction ou d’un design system, charger `ui-ux-pro-max`. Réserver `design-taste-frontend` à un changement artistique ou une surface expressive explicitement demandée. Ne combiner plusieurs skills que si leurs responsabilités sont réellement complémentaires.
+Les règles MailPin et `docs/UI_SPEC.md` priment toujours. Pour l’UI produit, les réglages, formulaires, audits, finitions, responsive et accessibilité, charger `impeccable`. Pour la recherche amont d’une direction ou d’un design system, charger `ui-ux-pro-max`. Réserver `design-taste-frontend` à un changement artistique ou une surface expressive explicitement demandée. Ne combiner plusieurs skills que si leurs responsabilités sont réellement complémentaires.
 
-Impeccable reste différentiel : contrôles mécaniques immédiats sur les seuls fichiers UI édités, règles complètes au `Stop`, aucun passage complet à chaque édition et silence quand le résultat est propre. Les collections `awesome-design-md` et `awesome-design-skills` servent uniquement de références ponctuelles pour enrichir la source de vérité du projet ; elles ne sont pas installées globalement. `img2threejs` ne fait pas partie de l’environnement MailPerch.
+Impeccable reste différentiel : contrôles mécaniques immédiats sur les seuls fichiers UI édités, règles complètes au `Stop`, aucun passage complet à chaque édition et silence quand le résultat est propre. Les collections `awesome-design-md` et `awesome-design-skills` servent uniquement de références ponctuelles pour enrichir la source de vérité du projet ; elles ne sont pas installées globalement. `img2threejs` ne fait pas partie de l’environnement MailPin.
 
 ## 5.3 Navigation structurelle, compression et simplicité
 
-Graphify complète les outils existants sans les remplacer. Utiliser le skill projet pour une architecture transversale, un chemin d'appel, des dépendances multi-modules, une analyse d'impact ou l'orientation dans une zone inconnue uniquement si cela économise réellement des lectures. Ne pas l'utiliser pour une petite tâche ou un fichier déjà identifié. Le code lu directement reste la preuve avant modification ou conclusion ; `PROJECT_MEMORY.md`, Brain et `mailperch-project-knowledge` conservent leurs rôles de décision, d'invariant et de connaissance produit. Les sorties `graphify-out/` restent locales et régénérables ; strict mode, hooks et watchers Graphify sont interdits.
+Graphify complète les outils existants sans les remplacer. Utiliser le skill projet pour une architecture transversale, un chemin d'appel, des dépendances multi-modules, une analyse d'impact ou l'orientation dans une zone inconnue uniquement si cela économise réellement des lectures. Ne pas l'utiliser pour une petite tâche ou un fichier déjà identifié. Le code lu directement reste la preuve avant modification ou conclusion ; `PROJECT_MEMORY.md`, Brain et `mailpin-project-knowledge` conservent leurs rôles de décision, d'invariant et de connaissance produit. Les sorties `graphify-out/` restent locales et régénérables ; strict mode, hooks et watchers Graphify sont interdits.
 
 Headroom est un outil global facultatif de compression process-local pour Codex, jamais une dépendance du projet. Avant chaque utilisation, vérifier le `--help` courant et désactiver le context tool, MCP de récupération, tokensave, Serena, memory, cross-agent memory, learning, output shaper, télémétrie et toute modification du reasoning effort. Ne pas écrire de règles apprises ni persister de configuration Headroom ; préférer le mode stateless et lossless/fail-open. Si la compression échoue, ne produit pas de gain utile ou dégrade la stabilité, utiliser Codex normal.
 
-Après compréhension du flux réel, appliquer cette échelle et s'arrêter au premier niveau suffisant : ne rien ajouter si le changement est inutile ; réutiliser l'existant du dépôt ; utiliser la bibliothèque standard ; utiliser une fonction native de la plateforme ou du runtime ; réutiliser une dépendance déjà installée ; préférer une solution locale courte, claire et testable ; seulement ensuite écrire le minimum de nouveau code. Cette simplicité ne doit jamais réduire la sécurité ou la validation des trust boundaries, l'intégrité et l'atomicité des données, la gestion des erreurs et des pertes, l'accessibilité, la lisibilité, les tests pertinents ni les invariants MailPerch.
+Après compréhension du flux réel, appliquer cette échelle et s'arrêter au premier niveau suffisant : ne rien ajouter si le changement est inutile ; réutiliser l'existant du dépôt ; utiliser la bibliothèque standard ; utiliser une fonction native de la plateforme ou du runtime ; réutiliser une dépendance déjà installée ; préférer une solution locale courte, claire et testable ; seulement ensuite écrire le minimum de nouveau code. Cette simplicité ne doit jamais réduire la sécurité ou la validation des trust boundaries, l'intégrité et l'atomicité des données, la gestion des erreurs et des pertes, l'accessibilité, la lisibilité, les tests pertinents ni les invariants MailPin.
 
 ---
 
@@ -230,7 +232,7 @@ Après compréhension du flux réel, appliquer cette échelle et s'arrêter au p
 
 ## Règle générale
 
-Ne jamais utiliser Codex Security pour une revue, un audit ou une correction standard de MailPerch.
+Ne jamais utiliser Codex Security pour une revue, un audit ou une correction standard de MailPin.
 
 Codex Security est considéré comme un outil exceptionnel à coût élevé.
 
@@ -327,12 +329,12 @@ Rappels absolus :
 
 ---
 
-# 9. Invariants MailPerch à préserver
+# 9. Invariants MailPin à préserver
 
 Toujours respecter les invariants canoniques du dépôt, notamment :
 
 - extension Thunderbird Manifest V3 locale ;
-- identifiant canonique sensible à la casse : `pin-mails@MailPerch.local` ;
+- identifiant canonique sensible à la casse : `ussmarines.mailpin@addons.thunderbird.net` ;
 - aucun réseau runtime, télémétrie, publicité, CDN ou code distant ;
 - ne pas modifier les compteurs natifs de nouveaux messages / non-lus ;
 - ne pas marquer lu/non-lu lors d'un simple épinglage ;
@@ -343,7 +345,7 @@ Toujours respecter les invariants canoniques du dépôt, notamment :
 - aucun `eval`, `new Function`, `innerHTML` ou équivalent avec données mail non fiables ;
 - ne pas contourner `PinCompatibility` pour Messages, Tags ou Agenda déjà extraits ;
 - Tags personnels Thunderbird : ne jamais renommer, adopter ou supprimer ;
-- Tags/Agenda facultatifs : leur indisponibilité ne doit pas empêcher le cœur MailPerch de fonctionner ;
+- Tags/Agenda facultatifs : leur indisponibilité ne doit pas empêcher le cœur MailPin de fonctionner ;
 - pas de nouvelle permission WebExtension sans justification et tests ;
 - pas de dépendance runtime ou connexion distante sans nécessité démontrée et validation explicite ;
 - le mode Recommandé ne sauvegarde jamais automatiquement et ne doit pas écraser les choix propres au profil ;
@@ -422,7 +424,7 @@ Puissance : <Low | Medium | High | XHigh>
 Puis utiliser ce modèle et supprimer les lignes inutiles :
 
 ```text
-Travaille uniquement sur MailPerch.
+Travaille uniquement sur MailPin.
 
 Lis d'abord les règles sources du projet puis `AGENTS.md`.
 Vérifie l'état Git exact avant toute modification.

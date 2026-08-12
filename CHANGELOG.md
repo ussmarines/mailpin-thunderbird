@@ -1,5 +1,15 @@
 # Journal des modifications
 
+## 1.6.0 — nouvelle identité MailPin et préparation ATN
+
+- renommage public complet de MailPerch vers **MailPin — Email Follow-up & Productivity for Thunderbird** ;
+- adoption de l’ID public définitif `ussmarines.mailpin@addons.thunderbird.net` avant la première publication ATN, avec procédure explicite de migration des installations locales 1.5.4 ;
+- nouvelle direction artistique sans dégradé : symbole enveloppe + pin, palette Ink/Slate/Sage/Brass, assets vectoriels et icône SVG scalable ;
+- harmonisation du Dashboard, des Options et du panneau via les tokens de marque existants, sans modifier les fonctions métier ni les frontières Thunderbird ;
+- README, locales, métadonnées, build, notes reviewers, documentation de confidentialité/sécurité et préparation store resynchronisés ;
+- noms des livrables désormais `MailPin_v1.6.0.xpi` et `MailPin_GitHub_Repository_v1.6.0.zip` ;
+- aucune nouvelle permission WebExtension, dépendance runtime, connexion réseau, télémétrie, publicité ou code distant.
+
 ## 1.5.4 — correctifs de recette et préparation du nouveau candidat
 
 - résolution canonique du mode d’épinglage générique et réconciliation sans perte de métadonnées entre représentations message/conversation, afin d’éviter les cartes parallèles entre entrées ;
@@ -87,11 +97,11 @@
 ## 1.2.0 — productivité locale avancée et finition Fluent 2
 
 - notes étendues et checklists/sous-tâches directement liées aux épingles ;
-- recherche globale sur les métadonnées MailPerch, groupes, affaires, tags, notes et sous-tâches, sans indexer le corps des messages ;
+- recherche globale sur les métadonnées MailPin, groupes, affaires, tags, notes et sous-tâches, sans indexer le corps des messages ;
 - vues personnalisées enregistrables et palette de commandes/accès rapides ;
 - indicateurs distincts **J’attends** / **Je dois répondre** et statistiques de suivi enrichies ;
-- synchronisation facultative avec des tags Thunderbird strictement réservés à MailPerch, sans nouvelle permission WebExtension ;
-- consolidation de la synchronisation bidirectionnelle Agenda ↔ MailPerch et propagation des changements de statut ;
+- synchronisation facultative avec des tags Thunderbird strictement réservés à MailPin, sans nouvelle permission WebExtension ;
+- consolidation de la synchronisation bidirectionnelle Agenda ↔ MailPin et propagation des changements de statut ;
 - interface Options/dashboard affinée : pile de polices système locale, alignements et espacements revus, statistiques responsives et texte explicite d’au moins 12 px ;
 - schéma logique paramètres/données 7, migrations et sauvegardes compatibles avec les versions antérieures ;
 - nouvelles gardes automatisées couvrant les fonctions 1.2, la confidentialité, l’accessibilité, les limites d’entrée et l’absence d’élargissement des permissions.

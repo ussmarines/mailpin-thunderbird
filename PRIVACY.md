@@ -6,7 +6,7 @@ Dernière mise à jour / Last updated: 12 août 2026 / August 12, 2026
 
 ### Données traitées localement
 
-MailPerch peut conserver les métadonnées nécessaires à ses fonctions : identifiants techniques, compte et dossier, objet, auteur, date, état lu, notes et sous-tâches saisies, groupes, affaires, vues enregistrées, échéances, règles, historique d’actions, état de suivi et liens Agenda. Lorsque la synchronisation de tags est activée, MailPerch ajoute uniquement ses propres mots-clés de tag aux messages concernés dans Thunderbird.
+MailPin peut conserver les métadonnées nécessaires à ses fonctions : identifiants techniques, compte et dossier, objet, auteur, date, état lu, notes et sous-tâches saisies, groupes, affaires, vues enregistrées, échéances, règles, historique d’actions, état de suivi et liens Agenda. Lorsque la synchronisation de tags est activée, MailPin ajoute uniquement ses propres mots-clés de tag aux messages concernés dans Thunderbird.
 
 L’extension ne copie pas dans sa base :
 
@@ -16,7 +16,7 @@ L’extension ne copie pas dans sa base :
 
 ### Transmission
 
-MailPerch 1.5.4 ne contient aucun appel réseau, télémétrie, publicité, service de licence ni chargement de code distant. Les données restent dans le profil Thunderbird ou dans un fichier de sauvegarde choisi explicitement par l’utilisateur.
+MailPin 1.6.0 ne contient aucun appel réseau, télémétrie, publicité, service de licence ni chargement de code distant. Les données restent dans le profil Thunderbird ou dans un fichier de sauvegarde choisi explicitement par l’utilisateur.
 
 ### Sauvegardes et diagnostics
 
@@ -28,9 +28,9 @@ MailPerch 1.5.4 ne contient aucun appel réseau, télémétrie, publicité, serv
 
 ### Suppression
 
-La désinstallation ferme le stockage puis supprime la base, les fichiers de récupération, les préférences et les sauvegardes internes gérées par MailPerch. Dans un dossier externe choisi avec le sélecteur natif, seules les enveloppes MailPerch munies d’un checksum local vérifiable sont supprimées ; les autres fichiers et le dossier sont conservés.
+La désinstallation ferme le stockage puis supprime la base, les fichiers de récupération, les préférences et les sauvegardes internes gérées par MailPin. Dans un dossier externe choisi avec le sélecteur natif, seules les enveloppes MailPin munies d’un checksum local vérifiable sont supprimées ; les autres fichiers et le dossier sont conservés.
 
-La désactivation de la synchronisation des tags ou la désinstallation retire uniquement les tags dont la clé et le libellé correspondent exactement aux définitions MailPerch ; les tags personnels ne sont pas supprimés.
+La désactivation de la synchronisation des tags ou la désinstallation retire uniquement les tags dont la clé et le libellé correspondent exactement aux définitions MailPin ; les tags personnels ne sont pas supprimés.
 
 Les exports téléchargés manuellement ne sont pas suivis par l’extension et restent sous le contrôle de l’utilisateur.
 
@@ -38,7 +38,7 @@ Les exports téléchargés manuellement ne sont pas suivis par l’extension et 
 
 ### Data processed locally
 
-MailPerch may store metadata required for its features: technical identifiers, account and folder, subject, sender, date, read state, user notes and subtasks, groups, cases, saved views, deadlines, rules, action history, follow-up state, and Calendar links. When tag synchronization is enabled, MailPerch adds only its own tag keywords to the relevant messages in Thunderbird.
+MailPin may store metadata required for its features: technical identifiers, account and folder, subject, sender, date, read state, user notes and subtasks, groups, cases, saved views, deadlines, rules, action history, follow-up state, and Calendar links. When tag synchronization is enabled, MailPin adds only its own tag keywords to the relevant messages in Thunderbird.
 
 The extension does not copy into its database:
 
@@ -48,7 +48,7 @@ The extension does not copy into its database:
 
 ### Transmission
 
-MailPerch 1.5.4 contains no network call, telemetry, advertising, license service, or remotely loaded code. Data remains in the Thunderbird profile or in a backup file explicitly selected by the user.
+MailPin 1.6.0 contains no network call, telemetry, advertising, license service, or remotely loaded code. Data remains in the Thunderbird profile or in a backup file explicitly selected by the user.
 
 ### Backups and diagnostics
 
@@ -60,8 +60,8 @@ MailPerch 1.5.4 contains no network call, telemetry, advertising, license servic
 
 ### Deletion
 
-Uninstalling closes storage and removes the database, recovery files, preferences, and internal backups managed by MailPerch. In an external folder selected through Thunderbird’s native picker, only verifiable MailPerch backup envelopes are removed; other files and the folder remain untouched.
+Uninstalling closes storage and removes the database, recovery files, preferences, and internal backups managed by MailPin. In an external folder selected through Thunderbird’s native picker, only verifiable MailPin backup envelopes are removed; other files and the folder remain untouched.
 
-Disabling tag synchronization or uninstalling removes only tags whose key and label exactly match MailPerch-owned definitions; personal tags are not removed.
+Disabling tag synchronization or uninstalling removes only tags whose key and label exactly match MailPin-owned definitions; personal tags are not removed.
 
 Manually downloaded exports are not tracked by the extension and remain under the user’s control.

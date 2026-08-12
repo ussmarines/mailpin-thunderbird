@@ -37,7 +37,7 @@ TOKEN_RE = re.compile(r"[a-z0-9]+")
 RAW_TOKEN_RE = re.compile(r"[^\W_]+", re.UNICODE)
 EXTENSION_ID_RE = re.compile(r"pin-mails@[^\s`'\"<>]+\.local", re.IGNORECASE)
 PUBLIC_IDENTITY = "ussmarines"
-CANONICAL_EXTENSION_ID = "pin-mails@MailPerch.local"
+CANONICAL_EXTENSION_ID = "ussmarines.mailpin@addons.thunderbird.net"
 ASCII_TOKEN_RE = re.compile(rb"[A-Za-z0-9]{3,}")
 
 @dataclass(frozen=True)

@@ -569,7 +569,7 @@ function renderReview() {
   host.append(buckets);
 
   const related = node("section", "related-section");
-  related.append(node("h2", "", msg("relatedItems", "Conversations associées")), node("p", "", msg("relatedItemsHelp", "MailPerch ne propose une fusion que lorsqu’un identifiant de conversation fiable est partagé.")));
+  related.append(node("h2", "", msg("relatedItems", "Conversations associées")), node("p", "", msg("relatedItemsHelp", "MailPin ne propose une fusion que lorsqu’un identifiant de conversation fiable est partagé.")));
   const groups = current?.relatedGroups || [];
   if (!groups.length) related.append(createEmpty(msg("noRelatedItems", "Aucun doublon de conversation fiable détecté.")));
   for (const group of groups) {
@@ -674,7 +674,7 @@ function renderHealth() {
   score.style.setProperty("--score", String(report.score || 0));
   score.append(node("strong", "", `${report.score || 0}/100`));
   const copy = node("div", "");
-  copy.append(node("h2", "", report.status === "healthy" ? msg("healthHealthy", "MailPerch est en bonne santé") : report.status === "attention" ? msg("healthAttention", "Quelques points sont à surveiller") : msg("healthCritical", "Une intervention est recommandée")));
+  copy.append(node("h2", "", report.status === "healthy" ? msg("healthHealthy", "MailPin est en bonne santé") : report.status === "attention" ? msg("healthAttention", "Quelques points sont à surveiller") : msg("healthCritical", "Une intervention est recommandée")));
   copy.append(node("p", "", msg("healthSummary", "$1 point(s) détecté(s) · $2 événement(s) diagnostic récent(s).", [displayCount(report.issues?.length), displayCount(current.diagnostics?.total)])));
   const pinCount = displayCount(current.stats?.total);
   copy.append(node("p", "volume-guidance", pinCount >= 2000
@@ -982,7 +982,7 @@ function openNoReplyDialog(key) {
 
 async function refreshHealth(control = null) {
   setButtonBusy(control, true);
-  setStatus(msg("healthCheckBusy", "Analyse de la santé MailPerch…"), "busy", {persistent: true});
+  setStatus(msg("healthCheckBusy", "Analyse de la santé MailPin…"), "busy", {persistent: true});
   try {
     current.health = await api.pinInbox.getHealthReport();
     renderHealth();

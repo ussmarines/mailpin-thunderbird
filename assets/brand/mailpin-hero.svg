@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 720" role="img" aria-labelledby="title desc">
+  <title id="title">MailPin — Email Follow-up &amp; Productivity for Thunderbird</title>
+  <desc id="desc">MailPin brand hero with email pin, follow-up card, reminder, checklist and calendar motifs.</desc>
+  <rect width="1600" height="720" fill="#F7F5F0"/>
+  <g transform="translate(90 150)">
+    <g transform="scale(1.45)">
+      <path fill="none" stroke="#1A1D21" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" d="M16 53v51c0 5 4 8 9 8h78c5 0 9-3 9-8V53L78 79c-8 6-20 6-28 0L16 53Z"/>
+      <path fill="none" stroke="#1A1D21" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" d="m18 55 37 30c5 4 13 4 18 0l37-30"/>
+      <path fill="#4F7F75" fill-rule="evenodd" d="M64 8c-19 0-34 15-34 34 0 25 34 59 34 59s34-34 34-59C98 23 83 8 64 8Zm0 18a16 16 0 1 0 0 32 16 16 0 0 0 0-32Z"/>
+    </g>
+    <text x="210" y="95" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="96" font-weight="650" fill="#1A1D21">MailPin</text>
+    <text x="214" y="151" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="29" font-weight="500" fill="#3D536B">Email Follow-up &amp; Productivity for Thunderbird</text>
+    <text x="214" y="205" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="21" fill="#5F696E">Stay on top. Follow through. Get results.</text>
+  </g>
+  <g transform="translate(980 108)" font-family="Inter,Segoe UI,system-ui,sans-serif">
+    <rect x="80" y="38" width="405" height="145" rx="16" fill="#FFFFFF" stroke="#D7D3CA" stroke-width="2"/>
+    <path fill="#4F7F75" d="M128 66c-13 0-23 10-23 23 0 17 23 40 23 40s23-23 23-40c0-13-10-23-23-23Zm0 12a11 11 0 1 0 0 22 11 11 0 0 0 0-22Z"/>
+    <text x="170" y="91" font-size="25" font-weight="650" fill="#1A1D21">Follow up with Alex</text>
+    <text x="170" y="123" font-size="18" fill="#3D536B">Re: Project proposal</text>
+    <text x="170" y="153" font-size="16" fill="#6B7377">Tomorrow · 10:00</text>
+    <rect x="0" y="226" width="325" height="216" rx="16" fill="#FFFFFF" stroke="#D7D3CA" stroke-width="2"/>
+    <rect x="0" y="226" width="58" height="216" rx="16" fill="#4F7F75"/>
+    <path d="M22 275h14m-14 48h14m-14 48h14" stroke="#F7F5F0" stroke-width="4" stroke-linecap="round"/>
+    <text x="84" y="276" font-size="20" fill="#1A1D21">Follow up</text>
+    <text x="84" y="325" font-size="20" fill="#1A1D21">Send recap</text>
+    <text x="84" y="374" font-size="20" fill="#1A1D21">Review proposal</text>
+    <text x="84" y="423" font-size="20" fill="#1A1D21">Schedule call</text>
+    <rect x="352" y="238" width="182" height="66" rx="33" fill="#F7F5F0" stroke="#C79A3A" stroke-width="2"/>
+    <circle cx="387" cy="271" r="11" fill="none" stroke="#C79A3A" stroke-width="3"/>
+    <path d="M387 264v8l6 4" fill="none" stroke="#C79A3A" stroke-width="3" stroke-linecap="round"/>
+    <text x="414" y="280" font-size="19" font-weight="600" fill="#9A6E17">Tomorrow</text>
+    <rect x="355" y="332" width="180" height="174" rx="16" fill="#FFFFFF" stroke="#D7D3CA" stroke-width="2"/>
+    <rect x="355" y="332" width="180" height="40" rx="16" fill="#3D536B"/>
+    <g fill="#D7D3CA">
+      <circle cx="385" cy="399" r="6"/><circle cx="417" cy="399" r="6"/><circle cx="449" cy="399" r="6"/><circle cx="481" cy="399" r="6"/><circle cx="513" cy="399" r="6"/>
+      <circle cx="385" cy="431" r="6"/><circle cx="417" cy="431" r="6"/><circle cx="449" cy="431" r="6"/><circle cx="481" cy="431" r="6"/><circle cx="513" cy="431" r="6"/>
+      <circle cx="385" cy="463" r="6"/><circle cx="417" cy="463" r="6"/><circle cx="449" cy="463" r="6"/><circle cx="481" cy="463" r="6"/><circle cx="513" cy="463" r="6"/>
+    </g>
+    <circle cx="449" cy="431" r="7" fill="#4F7F75"/><circle cx="481" cy="463" r="7" fill="#C79A3A"/>
+    <path d="M325 336h28M485 184v38M325 408h28" fill="none" stroke="#B8B2A7" stroke-width="2" stroke-dasharray="6 7"/>
+  </g>
+</svg>

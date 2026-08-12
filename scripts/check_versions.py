@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Keep all release-facing MailPerch version declarations aligned."""
+"""Keep all release-facing MailPin version declarations aligned."""
 from __future__ import annotations
 import json
 import re
@@ -13,21 +13,21 @@ assert re.fullmatch(r"\d+\.\d+\.\d+", version), version
 assert manifest["version"] == version, (manifest["version"], version)
 
 checks = {
-    "README.md": [f"**MailPerch :** `{version}`", f"MailPerch_v{version}.xpi", f"release-v{version}"],
-    "README.en.md": [f"**MailPerch:** `{version}`", f"MailPerch_v{version}.xpi", f"release-v{version}"],
+    "README.md": [f"**MailPin :** `{version}`", f"MailPin_v{version}.xpi", f"release-v{version}"],
+    "README.en.md": [f"**MailPin:** `{version}`", f"MailPin_v{version}.xpi", f"release-v{version}"],
     "CHANGELOG.md": [f"## {version}"],
-    "THIRD_PARTY_NOTICES.md": [f"MailPerch {version}"],
+    "THIRD_PARTY_NOTICES.md": [f"MailPin {version}"],
     "PROJECT_MEMORY.md": [f"Version publique : **{version}**"],
-    "PRIVACY.md": [f"MailPerch {version} ne contient", f"MailPerch {version} contains"],
+    "PRIVACY.md": [f"MailPin {version} ne contient", f"MailPin {version} contains"],
     "SECURITY.md": [f"SECURITY_AUDIT_{version}.md"],
-    "STORE_RELEASE.md": [f"Version publique :** {version}", f"MailPerch_v{version}.xpi", f"MailPerch_GitHub_Repository_v{version}.zip"],
+    "STORE_RELEASE.md": [f"Version publique :** {version}", f"MailPin_v{version}.xpi", f"MailPin_GitHub_Repository_v{version}.zip"],
     "docs/ATN_RELEASE_CHECKLIST.md": [f"— {version}", f"version {version} synchronisée"],
     "docs/KNOWN_LIMITATIONS.md": [f"Version {version} et portée de validation"],
     "docs/MANUAL_TEST_PLAN.md": [f"— {version}"],
     "docs/PROJECT_STATE.json": [f'"extensionVersion": "{version}"'],
     "docs/BUG_TRACKER.md": [f"Version publique : **{version}**"],
-    "release/ATN_REVIEW_NOTES_TEMPLATE.md": [f"— MailPerch {version}", f"Version :** {version}"],
-    "release/BUILD_INSTRUCTIONS.md": [f"build {version}", f"MailPerch_v{version}.xpi", f"MailPerch_GitHub_Repository_v{version}.zip"],
+    "release/ATN_REVIEW_NOTES_TEMPLATE.md": [f"— MailPin {version}", f"Version :** {version}"],
+    "release/BUILD_INSTRUCTIONS.md": [f"build {version}", f"MailPin_v{version}.xpi", f"MailPin_GitHub_Repository_v{version}.zip"],
     "release/manifest-store-template.json": [f"publication {version}"],
 }
 for relative, tokens in checks.items():

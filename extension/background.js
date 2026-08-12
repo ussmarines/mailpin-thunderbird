@@ -21,7 +21,7 @@ function errorName(error) {
 }
 
 function logError(context, error) {
-  console.error(`MailPerch : ${context}`, errorName(error));
+  console.error(`MailPin : ${context}`, errorName(error));
 }
 
 async function setupTab(tabId) {
@@ -29,7 +29,7 @@ async function setupTab(tabId) {
   try {
     await messenger.pinInbox.setup(tabId);
   } catch (error) {
-    console.debug("MailPerch : onglet non initialisé", errorName(error));
+    console.debug("MailPin : onglet non initialisé", errorName(error));
   }
 }
 
@@ -118,17 +118,17 @@ function createMenus() {
   }
   messenger.menus.create({
     id: MENU_IDS.dashboard,
-    title: translate("menuDashboard", "Tableau de bord MailPerch"),
+    title: translate("menuDashboard", "Tableau de bord MailPin"),
     contexts: ["tools_menu"]
   });
   messenger.menus.create({
     id: MENU_IDS.undo,
-    title: translate("menuUndo", "Annuler la dernière action MailPerch"),
+    title: translate("menuUndo", "Annuler la dernière action MailPin"),
     contexts: ["tools_menu"]
   });
   messenger.menus.create({
     id: MENU_IDS.options,
-    title: translate("menuOptions", "Paramètres de MailPerch"),
+    title: translate("menuOptions", "Paramètres de MailPin"),
     contexts: ["tools_menu"]
   });
 }
@@ -151,7 +151,7 @@ messenger.menus.onShown.addListener(async (_info, tab) => {
     ]);
     await messenger.menus.refresh();
   } catch (error) {
-    console.debug("MailPerch : menu contextuel non actualisé", errorName(error));
+    console.debug("MailPin : menu contextuel non actualisé", errorName(error));
   }
 });
 

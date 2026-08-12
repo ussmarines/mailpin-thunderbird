@@ -1,8 +1,8 @@
 {
-  "name": "mailperch-thunderbird",
-  "version": "1.5.4",
+  "name": "mailpin-thunderbird",
+  "version": "1.6.0",
   "private": true,
-  "description": "Build, test, and release tooling for MailPerch, a Thunderbird email pinning and follow-up extension.",
+  "description": "Build, test, and release tooling for MailPin — Email Follow-up & Productivity for Thunderbird.",
   "author": "ussmarines",
   "repository": {
     "type": "git",
