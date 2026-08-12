@@ -68,6 +68,9 @@
       case "calendar":
         result.itemType = source.itemType === "event" ? "event" : "task";
         result.calendarId = String(source.calendarId || "").slice(0, 256);
+        if (Number(source.startAt) > 0) result.startAt = Number(source.startAt);
+        if (Number(source.endAt) > 0) result.endAt = Number(source.endAt);
+        if (Number(source.dueAt) > 0) result.dueAt = Number(source.dueAt);
         break;
       case "snooze":
         result.durationMs = Math.max(60_000, Math.min(30 * 86400000, Number(source.durationMs) || 3_600_000));

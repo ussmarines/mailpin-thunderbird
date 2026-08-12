@@ -123,7 +123,7 @@ Avant d’ajouter une nouvelle capacité Thunderbird :
 
 ## Compatibilité de versions
 
-Depuis 1.5.1, le manifeste déclare Thunderbird `153.0` à `153.*`. Cette plage a été resserrée après des essais réels : 128/140 injectent le panneau après activation mais ne garantissent pas l’ouverture du Dashboard via le pont MV3 Experiment → background. La release 1.5.1 ne revendique donc que la branche 153 réellement validée.
+Depuis 1.5.1, le manifeste déclare Thunderbird `153.0` à `153.*`. Cette plage a été resserrée après des essais réels : 128/140 injectent le panneau après activation mais ne garantissent pas l’ouverture du Dashboard via le pont MV3 Experiment → background. MailPerch ne revendique donc que la branche 153 réellement validée.
 
 Toute future adaptation de version doit rester localisée autant que possible dans ces adaptateurs et être documentée dans `docs/KNOWN_LIMITATIONS.md` et `docs/BUG_TRACKER.md` si elle corrige une régression observée.
 

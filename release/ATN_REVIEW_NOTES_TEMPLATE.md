@@ -1,10 +1,10 @@
-# Notes pour les reviewers ATN — MailPerch 1.5.1
+# Notes pour les reviewers ATN — MailPerch 1.5.4
 
 ## Identité
 
 - **Nom :** MailPerch — Email Pins & Follow-up
 - **Nom court :** MailPerch
-- **Version :** 1.5.1
+- **Version :** 1.5.4
 - **ID :** `pin-mails@MailPerch.local`
 - **Compatibilité :** Thunderbird 153.0 à 153.*
 - **Langues :** français et anglais
@@ -36,7 +36,7 @@ L’Experiment possède par nature un accès privilégié et provoque l’averti
 - aucune dépendance d’exécution ou de build tierce ;
 - code source lisible, non minifié et build reproductible.
 
-Voir `PRIVACY.md`, `SECURITY.md`, `SECURITY_AUDIT_1.5.1.md` et `release/BUILD_INSTRUCTIONS.md`.
+Voir `PRIVACY.md`, `SECURITY.md`, `SECURITY_AUDIT_1.5.4.md` et `release/BUILD_INSTRUCTIONS.md`.
 
 ## Scénario de test rapide
 

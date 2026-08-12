@@ -1,10 +1,11 @@
-# Publication de MailPerch 1.5.1
+# Préparation du candidat MailPerch 1.5.4
 
 ## Identité
 
 - **Nom :** MailPerch
 - **Nom complet :** MailPerch — Email Pins & Follow-up
-- **Version publique :** 1.5.1
+- **Version publique :** 1.5.3
+- **Version candidate locale :** 1.5.4
 - **Sous-titre FR :** Épinglez, organisez et suivez vos e-mails dans Thunderbird.
 - **Subtitle EN:** Pin, organize and follow up on your emails in Thunderbird.
 - **Auteur public :** ussmarines
@@ -16,9 +17,9 @@ L’identifiant propre au produit doit conserver exactement la même casse et ne
 
 ## État de préparation
 
-La version 1.5.1 conserve le fonctionnement local, les permissions et les fonctions de 1.4.0. Elle harmonise les tokens Fluent locaux et la direction visuelle du Dashboard, des Options et du panneau des épingles, sans changer le logo ni ajouter de fonctionnalité métier. Les contrôles automatisés du dépôt couvrent la syntaxe, les ressources, les permissions, la CSP, l’absence de réseau, les contrats API, les migrations, les compteurs natifs, l’accessibilité, les modèles JavaScript/SQLite, le scan de secrets et le packaging.
+Le candidat 1.5.4 corrige les défauts observés pendant la recette manuelle de 1.5.3 : géométrie des règles Options, Agenda planifiable avant création, toggle d’attente, relance sans réponse configurable, épinglage canonique entre entrées et responsive du panneau fondé sur son conteneur réel. Il conserve les permissions, le stockage local, les schémas et l’absence de dépendance runtime ou de connexion réseau.
 
-Le banc fonctionnel réel a validé 50, 100, 500, 1 000 et 2 000 épingles. La portée multi-comptes a été validée avec vide=0, A=18, B=16, A+C=34 et A+B+C=50 ; la sauvegarde Options → panneau et les icônes clair/sombre ont été confirmées manuellement. La persistance automatisée entre deux processus avec une extension temporaire reste une limite du harness et n’est pas présentée comme un défaut produit.
+La preuve runtime 1.5.3 a été invalidée par le delta 1.5.4. Les contrôles réels frais du candidat sont consignés dans `VALIDATION_REPORT_1.5.4.md`; la recette utilisateur des scénarios corrigés reste obligatoire et maintient la readiness à **NO-GO**.
 
 La soumission Add-ons for Thunderbird reste une action manuelle : seul le portail ATN et ses reviewers peuvent valider ou refuser la publication. Avant l’envoi, le propriétaire doit terminer les cases manuelles de `docs/ATN_RELEASE_CHECKLIST.md`, confirmer que support et politique de confidentialité sont accessibles publiquement, puis tester le XPI dans les versions et systèmes annoncés.
 
@@ -26,8 +27,8 @@ La soumission Add-ons for Thunderbird reste une action manuelle : seul le portai
 
 Après `npm run ci` :
 
-- `dist/MailPerch_v1.5.1.xpi` — extension à téléverser ;
-- `dist/MailPerch_GitHub_Repository_v1.5.1.zip` — sources complètes pour review ;
+- `dist/MailPerch_v1.5.4.xpi` — extension à téléverser ;
+- `dist/MailPerch_GitHub_Repository_v1.5.4.zip` — sources complètes pour review ;
 - `dist/SHA256SUMS.txt` — empreintes des deux archives ;
 - `release/ATN_REVIEW_NOTES_TEMPLATE.md` — informations de test et justification de l’Experiment ;
 - `release/BUILD_INSTRUCTIONS.md` — reproduction exacte du build.

@@ -372,6 +372,11 @@
             "type": "string",
             "optional": true,
             "maxLength": 512
+          },
+          {
+            "name": "options",
+            "$ref": "ReferenceActionOptions",
+            "optional": true
           }
         ]
       },
@@ -894,6 +899,14 @@
             "maxLength": 4000
           },
           "dueAt": {
+            "type": "number",
+            "optional": true
+          },
+          "startAt": {
+            "type": "number",
+            "optional": true
+          },
+          "endAt": {
             "type": "number",
             "optional": true
           },

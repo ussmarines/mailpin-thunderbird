@@ -53,6 +53,56 @@
     return next > now ? next : 0;
   }
 
+  function clearNoReplyState(ref) {
+    ref.noReplyTracking = false;
+    ref.noReplyAt = 0;
+    ref.noReplyStartedAt = 0;
+    ref.noReplyBaselineMessageId = "";
+  }
+
+  function applyStatus(ref, target, options = {}) {
+    if (!ref || typeof ref !== "object") return ref;
+    const allowed = new Set(["active", "waiting", "planned", "completed"]);
+    const status = allowed.has(target) ? target : "active";
+    const now = Math.max(0, Number(options.now) || Date.now());
+
+    if (status === "completed") {
+      ref.completedAt ||= now;
+      ref.workflowStatus = "completed";
+      clearNoReplyState(ref);
+      ref.waitingSince = 0;
+      ref.followUpAt = 0;
+      if (options.enableRecurringFollowUps && ref.recurrenceRule) {
+        const base = ref.dueAt || now;
+        ref.dueAt = nextFutureOccurrence(base, ref.recurrenceRule, ref.recurrenceInterval, now) || 0;
+        ref.completedAt = 0;
+        ref.workflowStatus = "active";
+        ref.reminderAt = ref.dueAt ? Math.max(now, ref.dueAt - (ref.reminderLeadMinutes || 0) * 60000) : 0;
+      }
+      return ref;
+    }
+
+    ref.workflowStatus = status;
+    ref.completedAt = 0;
+    if (options.clearNoReply === true || (status !== "waiting" && options.clearNoReply !== false)) {
+      clearNoReplyState(ref);
+    }
+    if (status === "waiting") {
+      ref.waitingSince ||= now;
+      ref.followUpAt = Number(options.followUpAt) || ref.followUpAt || now + Math.max(1, Number(options.defaultFollowUpDays) || 3) * DAY;
+      return ref;
+    }
+
+    ref.waitingSince = 0;
+    if (status === "planned") {
+      const existingFollowUp = options.preserveFollowUp === false ? 0 : ref.followUpAt;
+      ref.followUpAt = Number(options.followUpAt) || existingFollowUp || ref.dueAt || 0;
+    } else if (options.clearFollowUp !== false) {
+      ref.followUpAt = 0;
+    }
+    return ref;
+  }
+
   function statusForReference(ref) {
     if (ref?.completedAt || ref?.workflowStatus === "completed") return "completed";
     if (ref?.workflowStatus === "waiting") return "waiting";
@@ -85,5 +135,5 @@
     };
   }
 
-  scope.PinWorkflow = Object.freeze({nextOccurrence, nextFutureOccurrence, statusForReference, kanbanColumn, archiveRecord});
+  scope.PinWorkflow = Object.freeze({nextOccurrence, nextFutureOccurrence, clearNoReplyState, applyStatus, statusForReference, kanbanColumn, archiveRecord});
 })(this);

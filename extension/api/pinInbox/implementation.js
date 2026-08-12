@@ -1731,7 +1731,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         performReferenceAction: ready((stableKeys, action, options) => this._performReferenceAction(stableKeys, action, options || {})),
         mergeRelatedReferences: ready(stableKeys => this._mergeRelatedReferences(stableKeys)),
         getCalendars: ready(() => this._getCalendars()),
-        createCalendarItem: ready((stableKey, itemType, calendarId) => this._createCalendarItem(stableKey, itemType, calendarId)),
+        createCalendarItem: ready((stableKey, itemType, calendarId, options) => this._createCalendarItem(stableKey, itemType, calendarId, options)),
         createCaseCalendarItem: ready((caseId, itemType, calendarId) => this._createCaseCalendarItem(caseId, itemType, calendarId)),
         snoozeReminder: ready((stableKey, durationMs) => this._snoozeReminder(stableKey, durationMs)),
         runCompatibilityCheck: ready(() => this._checkCompatibility(true)),
@@ -2599,6 +2599,24 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     return {synced, skipped, errors, managedTags: clone(PIN_MODULES.PinTagSync?.DEFINITIONS || [])};
   }
 
+  _clearNoReplyState(ref) {
+    PIN_MODULES.PinWorkflow?.clearNoReplyState(ref);
+  }
+
+  _applyWorkflowStatusToReference(ref, target, options = {}, now = Date.now()) {
+    const wasCompleted = Boolean(ref.completedAt || ref.workflowStatus === "completed");
+    if (target === "completed" && !wasCompleted) {
+      ref.completedAt ||= now;
+      this._archiveReferenceHistory(ref, options.action || "completed", options.archiveExtra || {});
+    }
+    PIN_MODULES.PinWorkflow?.applyStatus(ref, target, {
+      ...options,
+      now,
+      defaultFollowUpDays: this._settings.defaultFollowUpDays || 3,
+      enableRecurringFollowUps: this._settings.enableRecurringFollowUps
+    });
+  }
+
   _setWorkflowStatus(stableKeys, status, options = {}) {
     assertStructuredInput(options, "Options de workflow", {maxBytes: 64 * 1024, maxNodes: 1000});
     const allowed = new Set(["active", "waiting", "planned", "completed"]);
@@ -2609,31 +2627,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     this._pushUndo(`Statut ${target}`);
     const now = Date.now();
     for (const ref of refs) {
-      if (target === "completed") {
-        ref.completedAt ||= now;
-        ref.workflowStatus = "completed";
-        this._archiveReferenceHistory(ref, options.action || "completed");
-        if (this._settings.enableRecurringFollowUps && ref.recurrenceRule) {
-          const base = ref.dueAt || now;
-          ref.dueAt = PIN_MODULES.PinWorkflow?.nextFutureOccurrence(base, ref.recurrenceRule, ref.recurrenceInterval, now) || 0;
-          ref.completedAt = 0;
-          ref.workflowStatus = "active";
-          ref.reminderAt = ref.dueAt ? Math.max(now, ref.dueAt - (ref.reminderLeadMinutes || 0) * 60000) : 0;
-        }
-      } else {
-        ref.workflowStatus = target;
-        ref.completedAt = 0;
-        if (target === "waiting") {
-          ref.waitingSince ||= now;
-          ref.followUpAt = Number(options.followUpAt) || ref.followUpAt || now + (this._settings.defaultFollowUpDays || 3) * DAY_MS;
-        } else if (target === "planned") {
-          ref.waitingSince = 0;
-          ref.followUpAt = Number(options.followUpAt) || ref.followUpAt || ref.dueAt || 0;
-        } else {
-          ref.waitingSince = 0;
-          if (options.clearFollowUp !== false) ref.followUpAt = 0;
-        }
-      }
+      this._applyWorkflowStatusToReference(ref, target, options, now);
       ref.updatedAt = now;
       if (this._settings.enableBidirectionalCalendarSync && ref.calendarItemId) this._syncReferenceToCalendar(ref).catch(error => this._recordDiagnostic("warning","Synchronisation Agenda impossible",error));
     }
@@ -2710,15 +2704,16 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     const keys=normalizeStableKeyList(stableKeys);const refs=keys.map(key=>this._data.refs[key]).filter(Boolean);const now=Date.now();
     if (pushUndo) this._pushUndo(`Application du modèle ${template.name}`);
     for(const ref of refs){
-      ref.templateId=template.id;ref.groupId=template.groupId||ref.groupId;ref.caseId=template.caseId||ref.caseId;ref.priorityLevel=template.priorityLevel;ref.workflowStatus=template.workflowStatus;ref.completedAt=0;
-      if(template.workflowStatus==="waiting")ref.waitingSince=ref.waitingSince||now;else if(template.workflowStatus==="active")ref.waitingSince=0;
+      ref.templateId=template.id;ref.groupId=template.groupId||ref.groupId;ref.caseId=template.caseId||ref.caseId;ref.priorityLevel=template.priorityLevel;
       if(template.dueOffsetDays)ref.dueAt=now+template.dueOffsetDays*DAY_MS;
+      const templateFollowUpAt=template.followUpDelayDays?now+template.followUpDelayDays*DAY_MS:0;
+      this._applyWorkflowStatusToReference(ref,template.workflowStatus,{followUpAt:templateFollowUpAt,clearFollowUp:!templateFollowUpAt,clearNoReply:true,preserveFollowUp:false},now);
       ref.reminderLeadMinutes=template.reminderLeadMinutes;
       if(ref.dueAt)ref.reminderAt=Math.max(now,ref.dueAt-template.reminderLeadMinutes*60000);
-      if(template.followUpDelayDays)ref.followUpAt=now+template.followUpDelayDays*DAY_MS;
       ref.recurrenceRule=template.recurrenceRule;ref.recurrenceInterval=template.recurrenceInterval;
       if(template.notePrefix&&!ref.note.startsWith(template.notePrefix))ref.note=`${template.notePrefix}${ref.note?`\n${ref.note}`:""}`.slice(0,MAX_NOTE_LENGTH);
       ref.updatedAt=now;
+      if(this._settings.enableBidirectionalCalendarSync&&ref.calendarItemId)this._syncReferenceToCalendar(ref).catch(error=>this._recordDiagnostic("warning","Mise à jour Agenda après modèle impossible",error));
     }
     if (save) this._saveData("template-apply");
     if (refresh) this._refreshAllStates(true);
@@ -2945,13 +2940,72 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     this._pushUndo(label, this._captureFlags(usable));
     const byFolder = new Map();
     for (const hdr of usable) {
+      const messageKey = messageStableKey(hdr);
+      const conversationKey = conversationStableKey(hdr);
+      const {targetKey, oppositeKey} = PIN_MODULES.PinIdentity?.pinKeyPlan(trackingMode, messageKey, conversationKey) || {
+        targetKey: trackingMode === "conversation" ? conversationKey : messageKey,
+        oppositeKey: trackingMode === "conversation" ? messageKey : conversationKey
+      };
       if (newState) {
-        this._ensureReference(hdr, sourceInboxURI || hdr.folder?.URI || "", trackingMode);
+        const opposite = this._data.refs[oppositeKey];
+        const targetExisted = hasOwn(this._data.refs, targetKey);
+        const target = this._ensureReference(hdr, sourceInboxURI || hdr.folder?.URI || "", trackingMode);
+        if (opposite && opposite !== target) {
+          if (!targetExisted) {
+            const identity = {
+              stableKey: target.stableKey,
+              headerMessageId: target.headerMessageId,
+              accountKey: target.accountKey,
+              sourceInboxURI: target.sourceInboxURI,
+              lastFolderURI: target.lastFolderURI,
+              lastMessageKey: target.lastMessageKey,
+              subject: target.subject,
+              author: target.author,
+              date: target.date,
+              accountName: target.accountName,
+              folderName: target.folderName,
+              trackingMode: target.trackingMode,
+              conversationKey: target.conversationKey,
+              identityFingerprint: target.identityFingerprint,
+              rootMessageId: target.rootMessageId,
+              gmThreadId: target.gmThreadId,
+              threadId: target.threadId,
+              lastSeen: target.lastSeen,
+              missingSince: target.missingSince
+            };
+            Object.assign(target, clone(opposite), identity, {updatedAt: Date.now()});
+          } else {
+            const metadata = PIN_MODULES.PinRelated?.mergeMetadata([opposite, target]);
+            if (metadata) Object.assign(target, {
+              note: metadata.note,
+              priorityLevel: metadata.priorityLevel,
+              pinnedAt: metadata.pinnedAt,
+              dueAt: metadata.dueAt,
+              reminderAt: metadata.reminderAt,
+              followUpAt: metadata.followUpAt,
+              snoozeUntil: metadata.snoozeUntil,
+              groupId: metadata.groupId,
+              caseId: metadata.caseId,
+              noReplyTracking: metadata.noReplyTracking,
+              noReplyAt: metadata.noReplyAt,
+              noReplyStartedAt: metadata.noReplyStartedAt,
+              workflowStatus: metadata.workflowStatus
+            });
+            target.trackingMode = trackingMode;
+            target.updatedAt = Date.now();
+          }
+          if (opposite.calendarItemId && !target.calendarItemId) {
+            target.calendarId = opposite.calendarId;
+            target.calendarItemId = opposite.calendarItemId;
+            target.calendarItemType = opposite.calendarItemType;
+          }
+          this._removeReferenceByKey(oppositeKey, {deleteCalendar: false});
+        }
       } else {
-        this._removeReferenceByKey(trackingMode === "conversation" ? conversationStableKey(hdr) : messageStableKey(hdr));
-        // If the row is active only because its whole conversation is pinned,
-        // clicking its visible pin must actually clear that state.
-        if (trackingMode === "conversation" || hasOwn(this._data.refs, conversationStableKey(hdr))) this._removeReferenceByKey(conversationStableKey(hdr));
+        const removedTarget = this._removeReferenceByKey(targetKey);
+        // A generic toggle represents one logical pin. Clear a legacy opposite
+        // representation as well so it cannot remain as a parallel card.
+        this._removeReferenceByKey(oppositeKey, {deleteCalendar: !removedTarget});
       }
       if (this._settings.pinMode === "nativeStar") {
         const list = byFolder.get(hdr.folder) || [];
@@ -3133,7 +3187,8 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     }
     const allPinned = headers.every(hdr => this._isPinnedHeader(hdr));
     const newState = typeof forceState === "boolean" ? forceState : !allPinned;
-    this._setHeadersPinned(headers, newState, folder.URI, newState ? "Épinglage" : "Désépinglage");
+    const trackingMode = this._genericTrackingMode();
+    this._setHeadersPinned(headers, newState, folder.URI, newState ? "Épinglage" : "Désépinglage", trackingMode);
     return {count: headers.length, pinned: newState};
   }
 
@@ -3142,6 +3197,10 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       this._about3PaneForTab(context, tabId),
       forceState
     );
+  }
+
+  _genericTrackingMode() {
+    return PIN_MODULES.PinIdentity?.genericTrackingMode(this._settings) || "message";
   }
 
   async _performSelectedByTab(context, tabId, action) {
@@ -3194,7 +3253,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     const headers = pane ? this._getSelectedHeaders(pane).filter(Boolean) : [];
     if (!folder || !headers.length || (!(folder.flags & Ci.nsMsgFolderFlags.Inbox) && !this._settings.allowPinOutsideInbox)) return {count: 0};
 
-    const trackingMode = this._settings.defaultPinTarget === "conversation" && this._settings.enableConversationPins ? "conversation" : "message";
+    const trackingMode = this._genericTrackingMode();
     const counterSnapshot = this._captureFolderCounters(headers);
     this._pushUndo("Capture rapide", this._captureFlags(headers));
     const refs = new Map();
@@ -3457,14 +3516,17 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     if("priorityLevel" in patch&&["normal","high","urgent"].includes(patch.priorityLevel))ref.priorityLevel=patch.priorityLevel;
     if("groupId" in patch)ref.groupId=this._groupForId(String(patch.groupId||""))?String(patch.groupId):"";
     if("caseId" in patch)ref.caseId=(this._data.cases||[]).some(item=>item.id===String(patch.caseId||""))?String(patch.caseId):"";
-    if("workflowStatus" in patch&&["active","waiting","planned","completed"].includes(patch.workflowStatus))ref.workflowStatus=patch.workflowStatus;
-    if("completed" in patch){ref.completedAt=patch.completed?(ref.completedAt||now):0;ref.workflowStatus=patch.completed?"completed":"active";if(patch.completed)this._archiveReferenceHistory(ref,"metadata-complete");}
     if("repeatRule" in patch&&["","daily","weekdays","weekly","monthly"].includes(patch.repeatRule))ref.repeatRule=patch.repeatRule;
     if("recurrenceRule" in patch&&["","daily","weekdays","weekly","monthly","quarterly","yearly"].includes(patch.recurrenceRule))ref.recurrenceRule=patch.recurrenceRule;
     if("recurrenceInterval" in patch)ref.recurrenceInterval=clampNumber(patch.recurrenceInterval,1,100,1);
     if("followUpAt" in patch)ref.followUpAt=Math.max(0,Number(patch.followUpAt)||0);
     if("reminderLeadMinutes" in patch)ref.reminderLeadMinutes=clampNumber(patch.reminderLeadMinutes,0,10080,0);
     if("snoozeUntil" in patch){ref.snoozeUntil=Math.max(0,Number(patch.snoozeUntil)||0);ref.reminderFiredAt=0;}
+    const requestedWorkflow = ["active","waiting","planned","completed"].includes(patch.workflowStatus) ? patch.workflowStatus : "";
+    if (requestedWorkflow || "completed" in patch) {
+      const target = patch.completed === true ? "completed" : requestedWorkflow || "active";
+      this._applyWorkflowStatusToReference(ref, target, {followUpAt:ref.followUpAt,clearFollowUp:false,action:"metadata-complete"}, now);
+    }
     ref.updatedAt=now;this._recordActivity("metadata",stableKey,ref.subject);this._saveData("metadata");this._refreshAllStates(true);this._showToastAll("Informations du message mises à jour.",true);
     if(this._settings.enableBidirectionalCalendarSync&&ref.calendarItemId)this._syncReferenceToCalendar(ref).catch(error=>this._recordDiagnostic("warning","Mise à jour Agenda impossible",error));
     if(this._settings.enableThunderbirdTagSync)this._syncTags([stableKey]).catch(error=>this._recordDiagnostic("warning","Synchronisation des tags impossible",error));
@@ -3695,11 +3757,15 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     const enabled = options.enabled !== false;
     const days = clampNumber(options.days, 1, 365, this._settings.noReplyDefaultDays || 5);
     const now = Date.now();
+    const requestedAt = Number(options.at);
+    const dueAt = requestedAt > now
+      ? Math.min(requestedAt, now + 365 * DAY_MS)
+      : now + days * DAY_MS;
     this._pushUndo(enabled ? "Suivi sans réponse" : "Arrêt du suivi sans réponse");
     for (const ref of refs) {
       ref.noReplyTracking = enabled;
       ref.noReplyStartedAt = enabled ? now : 0;
-      ref.noReplyAt = enabled ? Number(options.at) || now + days * DAY_MS : 0;
+      ref.noReplyAt = enabled ? dueAt : 0;
       ref.noReplyBaselineMessageId = enabled ? String(ref.headerMessageId || "") : "";
       if (enabled) {
         ref.workflowStatus = "waiting"; ref.waitingSince ||= now; ref.followUpAt = ref.noReplyAt; ref.completedAt = 0;
@@ -3856,24 +3922,17 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     if(rule.action==="unpin") return this._removeReferenceByKey(key);
     if(rule.action==="keep") return false;
     ref ||= this._ensureReference(hdr,hdr.folder?.URI||"",mode);
-    if(rule.action==="complete") { ref.completedAt ||= Date.now(); ref.workflowStatus="completed"; this._archiveReferenceHistory(ref,"rule-complete",{ruleId:rule.id}); return true; }
+    if(rule.action==="complete") {
+      const now=Date.now();
+      this._applyWorkflowStatusToReference(ref,"completed",{action:"rule-complete",archiveExtra:{ruleId:rule.id}},now);
+      ref.updatedAt=now;
+      return true;
+    }
     if(rule.action==="group" && this._groupForId(rule.groupId)) { ref.groupId=rule.groupId; return true; }
     if(rule.action==="case" && (this._data.cases||[]).some(item=>item.id===rule.caseId)) { ref.caseId=rule.caseId; return true; }
     if(rule.action==="status") {
       const now=Date.now();
-      ref.workflowStatus=rule.workflowStatus;
-      if(rule.workflowStatus==="completed"){
-        ref.completedAt ||= now;
-        this._archiveReferenceHistory(ref,"rule-complete",{ruleId:rule.id});
-      } else {
-        ref.completedAt=0;
-        if(rule.workflowStatus==="waiting"){
-          ref.waitingSince ||= now;
-          ref.followUpAt ||= now+(this._settings.defaultFollowUpDays||3)*DAY_MS;
-        } else if(rule.workflowStatus==="active") {
-          ref.waitingSince=0;
-        }
-      }
+      this._applyWorkflowStatusToReference(ref,rule.workflowStatus,{action:"rule-complete",archiveExtra:{ruleId:rule.id},clearNoReply:true},now);
       ref.updatedAt=now;
       return true;
     }
@@ -3951,9 +4010,9 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         } else if(this._settings.enableWaitingWorkflow){
           const now=messageTime;
           for(const ref of refs){
-            ref.workflowStatus="waiting";ref.completedAt=0;ref.waitingSince=now;ref.lastOutgoingAt=now;
             const trackingDays=this._settings.enableAutomaticNoReplyTracking?(this._settings.noReplyDefaultDays||5):(this._settings.defaultFollowUpDays||3);
-            ref.followUpAt=now+trackingDays*DAY_MS;
+            const followUpAt=now+trackingDays*DAY_MS;
+            this._applyWorkflowStatusToReference(ref,"waiting",{followUpAt,clearNoReply:true},now);ref.waitingSince=now;ref.lastOutgoingAt=now;
             if(this._settings.enableAutomaticNoReplyTracking){ref.noReplyTracking=true;ref.noReplyStartedAt=now;ref.noReplyAt=ref.followUpAt;ref.noReplyBaselineMessageId=String(hdr.messageId||"");}
             if(this._settings.moveToWaitingOnReply&&this._groupForId(this._settings.waitingGroupId))ref.groupId=this._settings.waitingGroupId;
             changed=true;this._recordActivity("reply-sent",ref.stableKey,formatSubject(hdr));
@@ -3962,22 +4021,22 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       } else {
         for(const ref of refs){ref.lastReplyAt=messageTime;ref.updatedAt=messageTime;changed=true;}
         if(this._settings.enableWaitingWorkflow){
-          for(const ref of refs){if(ref.workflowStatus==="waiting"&&this._settings.reopenOnConversationReply){ref.workflowStatus="active";ref.followUpAt=0;ref.followUpCount=(ref.followUpCount||0)+1;if(this._settings.noReplyCancelOnIncomingReply){ref.noReplyTracking=false;ref.noReplyAt=0;ref.noReplyStartedAt=0;ref.noReplyBaselineMessageId="";}changed=true;this._recordActivity("reply-received",ref.stableKey,formatSubject(hdr));}}
+          for(const ref of refs){if(ref.workflowStatus==="waiting"&&this._settings.reopenOnConversationReply){this._applyWorkflowStatusToReference(ref,"active",{clearNoReply:this._settings.noReplyCancelOnIncomingReply!==false},messageTime);ref.followUpCount=(ref.followUpCount||0)+1;changed=true;this._recordActivity("reply-received",ref.stableKey,formatSubject(hdr));}}
         }
       }
     }
     if(trigger==="read"&&this._settings.autoUnpinOnRead)for(const key of keys)changed=this._removeReferenceByKey(key)||changed;
     if(trigger==="archive"||(trigger==="move"&&destination?.flags&Ci.nsMsgFolderFlags.Archive)){
       if(this._settings.autoUnpinOnArchive)for(const ref of refs){this._archiveReferenceHistory(ref,"archive-unpin");changed=this._removeReferenceByKey(ref.stableKey)||changed;}
-      else if(this._settings.autoCompleteOnArchive)for(const ref of refs){ref.completedAt||=Date.now();ref.workflowStatus="completed";this._archiveReferenceHistory(ref,"archive-complete");changed=true;}
+      else if(this._settings.autoCompleteOnArchive){const now=Date.now();for(const ref of refs){this._applyWorkflowStatusToReference(ref,"completed",{action:"archive-complete"},now);ref.updatedAt=now;changed=true;}}
     }
     if(trigger==="reply"){
       if(this._settings.autoUnpinOnReply)for(const ref of refs){this._archiveReferenceHistory(ref,"reply-unpin");changed=this._removeReferenceByKey(ref.stableKey)||changed;}
-      else if(this._settings.enableWaitingWorkflow){const now=Date.now();for(const ref of refs){ref.workflowStatus="waiting";ref.waitingSince=now;ref.lastOutgoingAt=now;const trackingDays=this._settings.enableAutomaticNoReplyTracking?(this._settings.noReplyDefaultDays||5):(this._settings.defaultFollowUpDays||3);ref.followUpAt=now+trackingDays*DAY_MS;if(this._settings.enableAutomaticNoReplyTracking){ref.noReplyTracking=true;ref.noReplyStartedAt=now;ref.noReplyAt=ref.followUpAt;ref.noReplyBaselineMessageId=String(hdr.messageId||"");}if(this._settings.moveToWaitingOnReply&&this._groupForId(this._settings.waitingGroupId))ref.groupId=this._settings.waitingGroupId;changed=true;}}
+      else if(this._settings.enableWaitingWorkflow){const now=Date.now();for(const ref of refs){const trackingDays=this._settings.enableAutomaticNoReplyTracking?(this._settings.noReplyDefaultDays||5):(this._settings.defaultFollowUpDays||3);const followUpAt=now+trackingDays*DAY_MS;this._applyWorkflowStatusToReference(ref,"waiting",{followUpAt,clearNoReply:true},now);ref.waitingSince=now;ref.lastOutgoingAt=now;ref.updatedAt=now;if(this._settings.enableAutomaticNoReplyTracking){ref.noReplyTracking=true;ref.noReplyStartedAt=now;ref.noReplyAt=ref.followUpAt;ref.noReplyBaselineMessageId=String(hdr.messageId||"");}if(this._settings.moveToWaitingOnReply&&this._groupForId(this._settings.waitingGroupId))ref.groupId=this._settings.waitingGroupId;changed=true;}}
     }
     if(trigger==="delete"&&this._settings.autoUnpinOnDelete)for(const ref of refs){this._archiveReferenceHistory(ref,"delete");changed=this._removeReferenceByKey(ref.stableKey)||changed;}
     if(trigger==="move"&&!this._settings.keepPinOnMove)for(const ref of refs)changed=this._removeReferenceByKey(ref.stableKey)||changed;
-    if(changed){this._saveData(`rule-${trigger}`);this._refreshAllStates();if(this._settings.enableThunderbirdTagSync){const tagKeys=this._referencesForHeader(hdr).map(ref=>ref.stableKey);this._syncTags(tagKeys).catch(error=>this._recordDiagnostic("warning","Synchronisation des tags impossible",error));}}
+    if(changed){this._saveData(`rule-${trigger}`);this._refreshAllStates();if(this._settings.enableBidirectionalCalendarSync){for(const ref of this._referencesForHeader(hdr))if(ref.calendarItemId)this._syncReferenceToCalendar(ref).catch(error=>this._recordDiagnostic("warning","Synchronisation Agenda après règle impossible",error));}if(this._settings.enableThunderbirdTagSync){const tagKeys=this._referencesForHeader(hdr).map(ref=>ref.stableKey);this._syncTags(tagKeys).catch(error=>this._recordDiagnostic("warning","Synchronisation des tags impossible",error));}}
     return changed;
   }
 
@@ -4097,7 +4156,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     if (!hdr) return {count: 0};
     const current = this._isPinnedHeader(hdr);
     const state = typeof forceState === "boolean" ? forceState : !current;
-    const mode = this._settings.defaultPinTarget === "conversation" && this._settings.enableConversationPins ? "conversation" : "message";
+    const mode = this._genericTrackingMode();
     this._setHeadersPinned([hdr], state, hdr.folder?.URI || "", state ? "Épinglage" : "Désépinglage", mode);
     return {count: 1, pinned: state};
   }
@@ -4160,6 +4219,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       accountColor: this._getAccountColor(ref.accountKey),
       calendarItemId: ref.calendarItemId,
       calendarId: ref.calendarId,
+      calendarItemType: ref.calendarItemType,
       activity: includeActivity ? (this._data.activity || []).filter(item => item.stableKey === ref.stableKey).slice(-20) : undefined
     };
   }
@@ -4388,7 +4448,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       this._refreshAllStates(true);
       return {count: refs.length, dueAt: normalizedOptions.dueAt};
     }
-    if (normalizedAction === "calendar") return this._createCalendarItem(refs[0].stableKey, normalizedOptions.itemType, normalizedOptions.calendarId);
+    if (normalizedAction === "calendar") return this._createCalendarItem(refs[0].stableKey, normalizedOptions.itemType, normalizedOptions.calendarId, normalizedOptions);
     if (normalizedAction === "group") {
       this._pushUndo("Changement de groupe");
       const groupId = this._groupForId(normalizedOptions.groupId) ? normalizedOptions.groupId : "";
@@ -4487,10 +4547,12 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       ref.reminderAt=due&&ref.reminderLeadMinutes?Math.max(Date.now(),due-ref.reminderLeadMinutes*60000):0;
       changed=true;
     }
-    if(completed&&!ref.completedAt){ref.completedAt=Date.now();ref.workflowStatus="completed";this._archiveReferenceHistory(ref,"calendar-complete");changed=true;}
-    if(!completed&&ref.completedAt&&ref.workflowStatus==="completed"){ref.completedAt=0;ref.workflowStatus="active";changed=true;}
+    const currentStatus=PIN_MODULES.PinWorkflow?.statusForReference(ref)||"active";
+    if(completed&&currentStatus!=="completed"){this._applyWorkflowStatusToReference(ref,"completed",{action:"calendar-complete"});changed=true;}
+    if(!completed&&currentStatus==="completed"){this._applyWorkflowStatusToReference(ref,"active");changed=true;}
     ref.calendarLastSyncedAt=Date.now();
     if(changed){
+      ref.updatedAt=Date.now();
       this._recordActivity("calendar-sync",stableKey,ref.subject);
       this._saveData("calendar-to-pin");
       this._refreshAllStates(true);
@@ -4504,7 +4566,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     }
   }
 
-  async _syncReferenceToCalendar(ref) {
+  async _syncReferenceToCalendar(ref, schedule = {}) {
     if (!this._settings.enableCalendarIntegration || !this._settings.enableBidirectionalCalendarSync || !ref?.calendarItemId) return {synced: false};
     const {calendar, item} = await this._calendarItemForRef(ref);
     if (!calendar || !item) return {synced: false, missing: true};
@@ -4513,8 +4575,8 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     const compatible = type === "event" ? descriptor.eventCompatible : descriptor.taskCompatible;
     if (!compatible) { const error=this._calendarOperationError("Calendrier devenu incompatible", descriptor, type); ref.calendarSyncError=String(error.message||error).slice(0,500); throw error; }
     const cloneItem = item.clone();
-    const due = ref.dueAt || ref.followUpAt || 0;
-    this._thunderbird?.calendar?.applySchedule?.(cloneItem, type, due);
+    const due = Number(type === "event" ? schedule.startAt : schedule.dueAt) || ref.dueAt || ref.followUpAt || 0;
+    this._thunderbird?.calendar?.applySchedule?.(cloneItem, type, due, Number(schedule.endAt) || 0);
     if (type !== "event" && this._settings.calendarCompleteOnPinComplete) {
       try { this._thunderbird?.calendar?.applyCompletion?.(cloneItem, ref.completedAt); } catch {}
     }
@@ -4634,23 +4696,46 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     );
   }
 
-  async _createCalendarItem(stableKey, itemType = "", calendarId = "") {
+  _normalizeCalendarSchedule(itemType, options, fallbackAt) {
+    assertStructuredInput(options, "Planification Agenda", {maxBytes: 16 * 1024, maxNodes: 100});
+    const type = itemType === "event" ? "event" : "task";
+    const minimum = Date.UTC(2000, 0, 1);
+    const maximum = Date.UTC(2100, 0, 1);
+    const timestamp = (value, fallback) => {
+      const candidate = Number(value);
+      return Number.isFinite(candidate) && candidate >= minimum && candidate <= maximum ? candidate : fallback;
+    };
+    if (type === "event") {
+      const startAt = timestamp(options?.startAt, fallbackAt);
+      const endAt = timestamp(options?.endAt, startAt + 3_600_000);
+      if (endAt <= startAt) throw new ExtensionError("La fin de l’événement doit être postérieure à son début.");
+      return {startAt, endAt};
+    }
+    const dueAt = timestamp(options?.dueAt, fallbackAt);
+    return {entryAt: Math.min(Date.now(), dueAt), dueAt};
+  }
+
+  async _createCalendarItem(stableKey, itemType = "", calendarId = "", options = {}) {
     stableKey = boundedText(stableKey, 8192);
     calendarId = boundedText(calendarId, 512);
     if (!this._settings.enableCalendarIntegration) throw new ExtensionError("L’intégration Agenda est désactivée.");
     const ref = this._data.refs[String(stableKey || "")];
     if (!ref) throw new ExtensionError("Message épinglé introuvable.");
     const type = itemType === "event" ? "event" : (itemType === "task" ? "task" : this._settings.calendarItemType);
+    const start = ref.dueAt || ref.followUpAt || Date.now() + 3600000;
+    const schedule = this._normalizeCalendarSchedule(type, options, start);
     if (ref.calendarItemId) {
       const existing = await this._calendarItemForRef(ref);
       if (existing.item) {
-        await this._syncReferenceToCalendar(ref);
+        ref.dueAt = type === "event" ? schedule.startAt : schedule.dueAt;
+        ref.calendarItemType = type;
+        await this._syncReferenceToCalendar(ref, schedule);
+        this._saveData("calendar-update");
         return {created: false, updated: true, calendarId: ref.calendarId, itemId: ref.calendarItemId, itemType: ref.calendarItemType};
       }
     }
     const {calendar, descriptor} = this._selectCalendarForItem(type, calendarId);
     const hdr = this._resolveReference(ref, true);
-    const start = ref.dueAt || ref.followUpAt || Date.now() + 3600000;
     const description = [
       ref.note,
       hdr ? `Message : ${hdr.folder.getUriForMsg(hdr)}` : "",
@@ -4660,8 +4745,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     const item = this._thunderbird?.calendar?.createItem?.(type, {
       calendar,
       title: ref.subject || "Message épinglé",
-      startAt: start,
-      dueAt: start,
+      ...schedule,
       properties: {
         DESCRIPTION: description,
         "X-PIN-MAILS-STABLE-KEY": ref.stableKey,
@@ -4678,6 +4762,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     ref.calendarId = calendar.id;
     ref.calendarItemId = saved?.id || item.id || "";
     ref.calendarItemType = type;
+    ref.dueAt = type === "event" ? schedule.startAt : schedule.dueAt;
     ref.calendarLastSyncedAt = Date.now();
     this._registerCalendarObservers();
     this._recordActivity("calendar", ref.stableKey, `${type === "event" ? "Événement" : "Tâche"} créé`);
@@ -5265,14 +5350,11 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       const runEditorCalendarAction = async (itemType, button) => {
         setActionBusy(button, true);
         try {
-          let calendarId = calendarSelect.value;
           const ref = this._data.refs[editor.dataset.stableKey];
-          if (!calendarId && !ref?.calendarItemId) {
-            calendarId = await chooseCalendarForType(itemType, ref?.calendarId || this._settings.preferredCalendarId);
-            if (!calendarId) return;
-            calendarSelect.value = calendarId;
-          }
-          await this._createCalendarItem(editor.dataset.stableKey, itemType, calendarId || ref?.calendarId || "");
+          const selection = await chooseCalendarForType(itemType, calendarSelect.value || ref?.calendarId || this._settings.preferredCalendarId, ref);
+          if (!selection) return;
+          calendarSelect.value = selection.calendarId;
+          await this._createCalendarItem(editor.dataset.stableKey, itemType, selection.calendarId, selection.options);
           showToast(t(itemType === "event" ? "panelEventSynced" : "panelTaskSynced"), false, "success");
         } catch (error) {
           this._recordDiagnostic("error", "Écriture Agenda depuis l’éditeur impossible", error);
@@ -5507,38 +5589,84 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       ? calendar.eventCompatible
       : calendar.taskCompatible;
 
-    const chooseCalendarForType = (itemType, selectedId = "") => {
+    const chooseCalendarForType = (itemType, selectedId = "", ref = null) => {
       const type = itemType === "event" ? "event" : "task";
       const calendars = this._getCalendars();
       const compatible = calendars.filter(calendar => calendarCompatible(calendar, type));
-      if (!compatible.length) throw new ExtensionError(t(type === "event" ? "panelNoCompatibleEventCalendar" : "panelNoCompatibleTaskCalendar"));
       return new Promise(resolve => {
         const dialog = createNode("dialog", "pin-mails-calendar-dialog");
         const form = createNode("form", "pin-mails-calendar-dialog-form");
         form.method = "dialog";
         const title = createNode("h2", "pin-mails-calendar-dialog-title", t(type === "event" ? "panelChooseEventCalendar" : "panelChooseTaskCalendar"));
-        const explanation = createNode("p", "pin-mails-calendar-dialog-help", t("panelCalendarChooserHelp"));
+        const explanation = createNode("p", "pin-mails-calendar-dialog-help", compatible.length ? t("panelCalendarChooserHelp") : t(type === "event" ? "calendarNoCompatibleEvent" : "calendarNoCompatibleTask"));
         const label = createNode("label", "", t("panelTargetCalendar"));
         const select = createNode("select", "pin-mails-calendar-dialog-select");
-        for (const calendar of calendars) {
-          const supported = calendarCompatible(calendar, type);
-          const suffix = supported ? t("panelCalendarCompatible") : (calendar.reason || t(type === "event" ? "panelEventsUnsupported" : "panelTasksUnsupported"));
-          const option = createNode("option", "", `${calendar.name} — ${suffix}`);
-          option.value = calendar.id;
-          option.disabled = !supported;
-          select.appendChild(option);
+        if (compatible.length) {
+          for (const calendar of calendars) {
+            const supported = calendarCompatible(calendar, type);
+            const suffix = supported ? t("panelCalendarCompatible") : (calendar.reason || t(type === "event" ? "panelEventsUnsupported" : "panelTasksUnsupported"));
+            const option = createNode("option", "", `${calendar.name} — ${suffix}`);
+            option.value = calendar.id;
+            option.disabled = !supported;
+            select.appendChild(option);
+          }
         }
         const preferred = [selectedId, this._settings.preferredCalendarId]
           .find(id => compatible.some(calendar => calendar.id === id));
-        select.value = preferred || compatible[0].id;
+        select.value = preferred || compatible[0]?.id || "";
         label.appendChild(select);
+        const now = Date.now();
+        const relevant = Number(ref?.dueAt || ref?.followUpAt || 0);
+        const nextHour = new Date(now); nextHour.setMinutes(0, 0, 0); nextHour.setHours(nextHour.getHours() + 1);
+        const startAt = relevant > now ? relevant : nextHour.getTime();
+        const tomorrow = new Date(now); tomorrow.setDate(tomorrow.getDate() + 1); tomorrow.setHours(9, 0, 0, 0);
+        const schedule = createNode("div", "pin-mails-calendar-schedule");
+        const dateTimeField = (key, className, value) => {
+          const fieldLabel = createNode("label", "", t(key));
+          const input = createNode("input", className);
+          input.type = "datetime-local";
+          input.value = toLocalDateTimeValue(value);
+          fieldLabel.appendChild(input);
+          schedule.appendChild(fieldLabel);
+          return input;
+        };
+        let startInput = null;
+        let endInput = null;
+        let dueInput = null;
+        if (type === "event") {
+          startInput = dateTimeField("startDate", "pin-mails-calendar-start", startAt);
+          endInput = dateTimeField("endDate", "pin-mails-calendar-end", startAt + 3_600_000);
+        } else {
+          dueInput = dateTimeField("dueDate", "pin-mails-calendar-due", relevant > now ? relevant : tomorrow.getTime());
+        }
+        const error = createNode("p", "pin-mails-calendar-dialog-error");
+        error.setAttribute("role", "alert");
+        error.setAttribute("aria-live", "polite");
+        error.hidden = true;
         const actions = createNode("div", "pin-mails-editor-actions");
         const cancel = createNode("button", "secondary", t("panelCancel"));
         cancel.type = "button";
         const confirm = createNode("button", "primary", t("continue"));
         confirm.type = "submit";
         actions.append(cancel, confirm);
-        form.append(title, explanation, label, actions);
+        const selectedOptions = () => type === "event"
+          ? {startAt:fromLocalDateTimeValue(startInput.value),endAt:fromLocalDateTimeValue(endInput.value)}
+          : {dueAt:fromLocalDateTimeValue(dueInput.value)};
+        const validate = () => {
+          const options = selectedOptions();
+          let message = "";
+          if (!compatible.length) message = t(type === "event" ? "calendarNoCompatibleEvent" : "calendarNoCompatibleTask");
+          else if (!select.value) message = t("calendarRequired");
+          else if (type === "event" && (!options.startAt || !options.endAt)) message = t("eventDatesRequired");
+          else if (type === "event" && options.endAt <= options.startAt) message = t("eventEndAfterStart");
+          else if (type === "task" && !options.dueAt) message = t("taskDueRequired");
+          error.textContent = message;
+          error.hidden = !message;
+          confirm.disabled = Boolean(message);
+          return !message;
+        };
+        if (compatible.length) label.appendChild(select);
+        form.append(title, explanation, ...(compatible.length ? [label] : []), schedule, error, actions);
         dialog.appendChild(form);
         document.body.appendChild(dialog);
         let resolved = false;
@@ -5549,16 +5677,81 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
           dialog.remove();
         };
         cancel.addEventListener("click", () => { dialog.close(); finish(""); });
+        if (compatible.length) select.addEventListener("change", validate);
+        for (const input of [startInput, endInput, dueInput].filter(Boolean)) input.addEventListener("input", validate);
         form.addEventListener("submit", event => {
           event.preventDefault();
-          const value = select.value;
+          if (!validate()) return;
+          const value = {calendarId:select.value,options:selectedOptions()};
           dialog.close();
           finish(value);
         });
         dialog.addEventListener("cancel", event => { event.preventDefault(); dialog.close(); finish(""); });
         dialog.addEventListener("close", () => finish(""), {once: true});
         dialog.showModal();
-        select.focus();
+        validate();
+        (compatible.length ? select : cancel).focus();
+      });
+    };
+
+    const chooseNoReplySchedule = ref => {
+      return new Promise(resolve => {
+        const dialog = createNode("dialog", "pin-mails-calendar-dialog pin-mails-no-reply-dialog");
+        const form = createNode("form", "pin-mails-calendar-dialog-form");
+        form.method = "dialog";
+        const title = createNode("h2", "pin-mails-calendar-dialog-title", t("noReplyDialogTitle"));
+        const explanation = createNode("p", "pin-mails-calendar-dialog-help", t("noReplyDialogHelp"));
+        const presetLabel = createNode("label", "", t("noReplyDelay"));
+        const preset = createNode("select", "pin-mails-calendar-dialog-select");
+        for (const [value, key] of [["default","defaultDelay"],["tomorrow","tomorrowMorning"],["3","inThreeDays"],["5","inFiveDays"],["7","inSevenDays"],["custom","customDate"]]) {
+          const option = createNode("option", "", t(key)); option.value = value; preset.appendChild(option);
+        }
+        preset.value = ref?.noReplyTracking ? "custom" : "default";
+        presetLabel.appendChild(preset);
+        const customLabel = createNode("label", "pin-mails-no-reply-custom", t("customDate"));
+        const custom = createNode("input", "pin-mails-calendar-dialog-select");
+        custom.type = "datetime-local";
+        const initialAt = Number(ref?.noReplyAt || 0) > Date.now()
+          ? Number(ref.noReplyAt)
+          : Date.now() + (this._settings.noReplyDefaultDays || 5) * DAY_MS;
+        custom.value = toLocalDateTimeValue(initialAt);
+        customLabel.appendChild(custom);
+        const preview = createNode("p", "pin-mails-calendar-dialog-preview");
+        const error = createNode("p", "pin-mails-calendar-dialog-error");
+        error.setAttribute("role", "alert"); error.setAttribute("aria-live", "polite");
+        const actions = createNode("div", "pin-mails-editor-actions");
+        const stop = createNode("button", "danger", t("cancelNoReplyTracking")); stop.type = "button"; stop.hidden = !ref?.noReplyTracking;
+        const cancel = createNode("button", "secondary", t("panelCancel")); cancel.type = "button";
+        const confirm = createNode("button", "primary", t("apply")); confirm.type = "submit";
+        actions.append(stop, cancel, confirm);
+        form.append(title, explanation, presetLabel, customLabel, preview, error, actions);
+        dialog.appendChild(form); document.body.appendChild(dialog);
+        const dueAt = () => {
+          const now = Date.now();
+          if (preset.value === "custom") return fromLocalDateTimeValue(custom.value);
+          if (preset.value === "tomorrow") { const target = new Date(now); target.setDate(target.getDate() + 1); target.setHours(9, 0, 0, 0); return target.getTime(); }
+          const days = preset.value === "default" ? Number(this._settings.noReplyDefaultDays || 5) : Number(preset.value);
+          return now + Math.max(1, days || 5) * DAY_MS;
+        };
+        const validate = () => {
+          customLabel.hidden = preset.value !== "custom";
+          const at = dueAt();
+          const valid = at > Date.now();
+          preview.textContent = valid ? `${t("noReplyResult")} : ${this._formatTimestamp(about3Pane, at)}` : "";
+          error.textContent = valid ? "" : t("noReplyDateFuture");
+          error.hidden = valid;
+          confirm.disabled = !valid;
+          return valid;
+        };
+        let resolved = false;
+        const finish = value => { if (resolved) return; resolved = true; resolve(value); dialog.remove(); };
+        cancel.addEventListener("click", () => { dialog.close(); finish(null); });
+        stop.addEventListener("click", () => { dialog.close(); finish({enabled:false}); });
+        preset.addEventListener("change", validate); custom.addEventListener("input", validate);
+        form.addEventListener("submit", event => { event.preventDefault(); if (!validate()) return; const at = dueAt(); dialog.close(); finish({enabled:true,at}); });
+        dialog.addEventListener("cancel", event => { event.preventDefault(); dialog.close(); finish(null); });
+        dialog.addEventListener("close", () => finish(null), {once:true});
+        dialog.showModal(); validate(); preset.focus();
       });
     };
 
@@ -5688,8 +5881,15 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
           return;
         }
         if (action === "track-no-reply") {
-          this._setNoReplyTracking([key], {enabled:true});
-          showToast(t("panelNoReplyScheduled", {days: this._settings.noReplyDefaultDays || 5}), true, "success");
+          const selection = await chooseNoReplySchedule(ref);
+          if (!selection) return;
+          if (selection.enabled === false) {
+            this._setNoReplyTracking([key], {enabled:false});
+            showToast(t("panelNoReplyDisabled"), true, "success");
+            return;
+          }
+          this._setNoReplyTracking([key], {enabled:true,at:selection.at});
+          showToast(t("panelNoReplyScheduledAt", {date:this._formatTimestamp(about3Pane, selection.at)}), true, "success");
           return;
         }
         if (action === "cancel-no-reply") {
@@ -5704,14 +5904,12 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         }
         if (action === "calendar-task" || action === "calendar-event") {
           const type = action === "calendar-event" ? "event" : "task";
-          const calendarId = ref.calendarItemId
-            ? ref.calendarId
-            : await chooseCalendarForType(type, ref.calendarId || this._settings.preferredCalendarId);
-          if (!calendarId && !ref.calendarItemId) {
+          const selection = await chooseCalendarForType(type, ref.calendarId || this._settings.preferredCalendarId, ref);
+          if (!selection) {
             showToast(t("panelCalendarCancelled"), false, "info");
             return;
           }
-          await this._createCalendarItem(key, type, calendarId);
+          await this._createCalendarItem(key, type, selection.calendarId, selection.options);
           showToast(t(type === "event" ? "panelEventSynced" : "panelTaskSynced"), false, "success");
           return;
         }
@@ -6229,7 +6427,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       const statusLine = createNode("div", "pin-mails-status-line");
       if (ref.trackingMode === "conversation") statusLine.appendChild(createNode("span", "pin-mails-conversation-chip", `${t("panelMessagesCount", {count: ref.conversationCount || 1})}${ref.conversationUnread ? ` · ${t("panelUnreadCount", {count: ref.conversationUnread})}` : ""}`));
       const responseState = PIN_MODULES.PinAnalytics?.responseState(ref) || "none";
-      if (responseState === "waitingForThem") statusLine.appendChild(createNode("span", "pin-mails-response-chip waiting", t("panelWaitingForThem")));
+      if (responseState === "waitingForThem" && ref.workflowStatus !== "waiting") statusLine.appendChild(createNode("span", "pin-mails-response-chip waiting", t("panelWaitingForThem")));
       else if (responseState === "needsReply") statusLine.appendChild(createNode("span", "pin-mails-response-chip reply", t("panelNeedsReply")));
       if (ref.workflowStatus === "waiting") statusLine.appendChild(createNode("span", "pin-mails-workflow-chip waiting", ref.waitingSince ? t("panelWaitingSince", {date: this._formatTimestamp(about3Pane, ref.waitingSince)}) : t("panelWaitingForReply")));
       else if (ref.workflowStatus === "planned") statusLine.appendChild(createNode("span", "pin-mails-workflow-chip planned", t("panelPlanned")));

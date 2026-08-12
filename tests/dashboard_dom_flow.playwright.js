@@ -27,6 +27,7 @@ async page => {
         stableKey: "synthetic-waiting", subject: "Supplier response", author: "Taylor Doe",
         accountName: "Synthetic account", folderName: "Inbox", date: now - 3_600_000,
         workflowStatus: "waiting", smartSection: "noReply", noReplyTracking: true,
+        responseState: "waitingForThem",
         noReplyAt: now - 60_000, trackingMode: "conversation", conversationCount: 2,
         caseId: "case-1", caseName: "Launch", accountColor: "#6264a7"
       },
@@ -60,14 +61,22 @@ async page => {
       diagnostics: {total: 0, counts: {}}, revision: 1, counterRegressionEvents: []
     };
     globalThis.__mailperchDashboardActions = [];
+    globalThis.__mailperchDashboardFailRefreshAfterActionCount = 0;
+    globalThis.__mailperchCalendars = [{id: "calendar-1", name: "Synthetic calendar", writable: true, taskCompatible: true, eventCompatible: true, reason: ""}];
     globalThis.messenger = {
       runtime: {getManifest: () => ({version: "1.1.1"}), getURL: path => path},
       i18n: {getUILanguage: () => "en", getMessage: text},
       pinInbox: new Proxy({}, {
         get(_target, name) {
           if (name === "getConfiguration") return async () => ({settings: {defaultSmartView: "all", enableBulkActions: true, confirmBulkDestructiveActions: false, noReplyDefaultDays: 5, preferredCalendarId: "calendar-1", calendarItemType: "task"}});
-          if (name === "getDashboardData") return async options => ({...clone(baseData), search: options.search || "", smartView: options.smartView || "all", view: options.view || "today", reviewMode: options.reviewMode || "daily", review: {...clone(review), mode: options.reviewMode || "daily"}});
-          if (name === "getCalendars") return async () => [{id: "calendar-1", name: "Synthetic calendar", writable: true, taskCompatible: true, eventCompatible: true, reason: ""}];
+          if (name === "getDashboardData") return async options => {
+            if (globalThis.__mailperchDashboardFailRefreshAfterActionCount > 0 && globalThis.__mailperchDashboardFailRefreshAfterActionCount === globalThis.__mailperchDashboardActions.length) {
+              globalThis.__mailperchDashboardFailRefreshAfterActionCount = 0;
+              throw new Error("Synthetic dashboard refresh failure");
+            }
+            return {...clone(baseData), search: options.search || "", smartView: options.smartView || "all", view: options.view || "today", reviewMode: options.reviewMode || "daily", review: {...clone(review), mode: options.reviewMode || "daily"}};
+          };
+          if (name === "getCalendars") return async () => clone(globalThis.__mailperchCalendars);
           if (name === "performReferenceAction") return async (keys, action, options) => { globalThis.__mailperchDashboardActions.push({keys, action, options}); return {count: keys.length}; };
           if (name === "getHealthReport") return async () => clone(baseData.health);
           if (name === "repairHealthIssues") return async () => ({repaired: 0, health: clone(baseData.health)});
@@ -84,7 +93,7 @@ async page => {
   const assert = (condition, message) => { if (!condition) throw new Error(message); };
   await page.setViewportSize({width: 1440, height: 900});
   await page.goto(`${baseUrl}/extension/dashboard/dashboard.html`);
-  await page.waitForFunction(() => !document.body.hasAttribute("data-loading"));
+  await page.waitForFunction(() => document.querySelectorAll(".stat").length === 9 && !document.body.hasAttribute("data-loading"));
   assert(await page.locator("#fatal-error").isHidden(), "Dashboard must initialize without a fatal error");
   assert(await page.locator(".stat").count() === 9, "Dashboard must render all summary cards");
   assert(await page.locator("#search").inputValue() === "", "Dashboard search must start empty, never as an undefined string");
@@ -107,7 +116,53 @@ async page => {
   await page.locator("#bulk-action").selectOption("active");
   await page.locator("#apply").click();
   await page.waitForFunction(() => globalThis.__mailperchDashboardActions.length === 1);
+  await page.waitForFunction(expected => document.getElementById("status-message")?.textContent === expected, messages.dashboardActionActive.message);
   assert(await page.locator("#selection-bar").isHidden(), "Successful bulk action must clear the selection");
+
+  const waitingCard = page.locator('#items .item[data-key="synthetic-waiting"]');
+  assert(await waitingCard.locator(".badges .waiting").count() === 1, "Waiting workflow must not render duplicate waiting badges");
+  assert(await waitingCard.locator('[data-action="active"]').count() === 1, "Waiting card must offer a return-to-active action");
+  await waitingCard.locator('[data-action="active"]').click();
+  await page.waitForFunction(() => globalThis.__mailperchDashboardActions.length === 2);
+  await page.waitForFunction(expected => document.getElementById("status-message")?.textContent === expected, messages.dashboardActionActive.message);
+  assert((await page.evaluate(() => globalThis.__mailperchDashboardActions.at(-1))).action === "active", "Waiting toggle must dispatch active");
+
+  await waitingCard.locator('[data-action="trackNoReply"]').click();
+  assert(await page.locator("#no-reply-dialog").evaluate(dialog => dialog.open), "No-reply action must open its per-item dialog");
+  assert(await page.locator("#no-reply-stop").isVisible(), "Existing no-reply tracking must expose the stop control");
+  await page.locator("#no-reply-preset").selectOption("3");
+  assert(Boolean(await page.locator("#no-reply-preview").textContent()), "No-reply preset must preview the resulting local date and time");
+  await page.locator("#no-reply-confirm").click();
+  await page.waitForFunction(() => globalThis.__mailperchDashboardActions.length === 3);
+  await page.waitForFunction(expected => document.getElementById("status-message")?.textContent === expected, messages.dashboardActionTrackNoReply.message);
+  const noReplyAction = await page.evaluate(() => globalThis.__mailperchDashboardActions.at(-1));
+  assert(noReplyAction.action === "trackNoReply" && noReplyAction.options.at > Date.now(), "No-reply dialog must dispatch an explicit future timestamp");
+
+  const activeCard = page.locator('#items .item[data-key="synthetic-active"]');
+  await activeCard.locator('[data-action="calendar"]').click();
+  assert(await page.locator("#calendar-dialog").evaluate(dialog => dialog.open), "Calendar action must open the scheduling dialog");
+  assert(await page.locator("#calendar-item-type").inputValue() === "event", "A new Calendar dialog must default to an event even when an older task preference is present");
+  const calendarOverflow = await page.locator("#calendar-dialog").evaluate(dialog => ({scrollWidth: dialog.scrollWidth, clientWidth: dialog.clientWidth}));
+  assert(calendarOverflow.scrollWidth <= calendarOverflow.clientWidth + 1, `Calendar dialog must not overflow horizontally: ${JSON.stringify(calendarOverflow)}`);
+  await page.locator("#calendar-item-type").selectOption("event");
+  assert(await page.locator("#calendar-event-schedule").isVisible(), "Event scheduling fields must be visible for events");
+  assert(await page.locator("#calendar-task-schedule").isHidden(), "Task scheduling fields must be hidden for events");
+  const startDate = await page.locator("#calendar-event-start-date").inputValue();
+  const startTime = await page.locator("#calendar-event-start-time").inputValue();
+  await page.locator("#calendar-event-end-date").fill(startDate);
+  await page.locator("#calendar-event-end-time").fill(startTime);
+  assert(await page.locator("#calendar-confirm").isDisabled(), "Calendar validation must reject an end equal to the start");
+  await page.locator("#calendar-event-end-time").fill("23:59");
+  if (startTime === "23:59") {
+    const nextDate = new Date(`${startDate}T12:00`); nextDate.setDate(nextDate.getDate() + 1);
+    await page.locator("#calendar-event-end-date").fill(nextDate.toISOString().slice(0, 10));
+  }
+  assert(await page.locator("#calendar-confirm").isEnabled(), "A valid event range must enable creation");
+  await page.locator("#calendar-confirm").click();
+  await page.waitForFunction(() => globalThis.__mailperchDashboardActions.length === 4);
+  const calendarAction = await page.evaluate(() => globalThis.__mailperchDashboardActions.at(-1));
+  assert(calendarAction.action === "calendar" && calendarAction.options.endAt > calendarAction.options.startAt, "Calendar dialog must forward the validated event range");
+  await page.waitForFunction(() => document.getElementById("status")?.classList.contains("success") && /calendar/i.test(document.getElementById("status-message")?.textContent || ""));
 
   const frenchLeaks = await page.locator("body *:not(noscript)").evaluateAll(elements => {
     const pattern = /[éèêàùçœ]|\b(Aucun|Aucune|Choisir|Supprimer|Nom|Affaire|Groupe|Règle|Compte|Dossiers|Paramètres|Enregistrer|Annuler|Raccourci|Sauvegarde|Réparation|Vérification)\b/i;
@@ -128,6 +183,19 @@ async page => {
   assert(await page.evaluate(() => getComputedStyle(document.documentElement).colorScheme.includes("dark")), "Dark color scheme must remain supported");
   await page.setViewportSize({width: 1440, height: 900});
   await page.screenshot({path: "output/playwright/dashboard-en.png", fullPage: true});
+
+  await page.goto(`${baseUrl}/extension/dashboard/dashboard.html`);
+  await page.waitForFunction(() => document.querySelectorAll(".stat").length === 9 && !document.body.hasAttribute("data-loading"));
+  await page.locator('[data-view="list"]').click();
+  await page.waitForFunction(() => !document.getElementById("items").hidden);
+  const activeSelection = page.locator('#items .item[data-key="synthetic-active"] input[type="checkbox"]');
+  await activeSelection.check();
+  await page.evaluate(() => { globalThis.__mailperchDashboardFailRefreshAfterActionCount = 1; });
+  await page.locator('#items .item[data-key="synthetic-active"] [data-action="complete"]').click();
+  await page.waitForFunction(() => globalThis.__mailperchDashboardActions.length === 1);
+  await page.waitForFunction(() => !document.getElementById("status")?.classList.contains("busy"));
+  assert((await page.locator("#status").getAttribute("class")).includes("error"), "A failed post-action refresh must not be reported as a success");
+  assert(await page.locator("#selection-bar").isVisible(), "Selection must remain available when the post-action refresh fails");
 
   return {
     views: 7,

@@ -1,8 +1,20 @@
-# Plan de test manuel MailPerch — 1.5.1
+# Plan de test manuel MailPerch — 1.5.4
 
 Utiliser de préférence un profil Thunderbird jetable avec des messages synthétiques pour les scénarios destructifs ou de migration. Pour une validation utilisateur finale, un profil réel peut être utilisé après sauvegarde, en évitant toute opération destructive non nécessaire.
 
-Le présent plan sert à compléter les validations automatisées de la release 1.5.1. Les preuves historiques restent utiles uniquement pour les surfaces inchangées ; toute zone runtime modifiée en 1.5.1 doit disposer d’une preuve fraîche avant publication.
+Le présent plan complète les validations automatisées du candidat local 1.5.4. Les preuves historiques restent utiles uniquement pour les surfaces inchangées ; toute zone runtime modifiée doit disposer d’une preuve fraîche avant publication.
+
+## Priorité 1.5.4 — recette des constats utilisateurs
+
+1. Dans Options, ouvrir les règles personnalisées en FR puis EN et vérifier à 100/125/200 % que l’aide reste lisible, que les trois actions passent proprement à la ligne et qu’aucun scroll horizontal n’apparaît.
+2. Dans le Dashboard puis le panneau Thunderbird, ouvrir Agenda sur une petite fenêtre : une nouvelle création doit démarrer sur **Événement** ; créer un événement avec début/fin personnalisés, puis choisir Tâche avec et sans calendrier compatible. Sans destination tâche, aucun sélecteur vide ne doit apparaître, l’explication doit être visible et la création désactivée. Vérifier aussi qu’un élément Agenda existant conserve son type réel.
+3. Sur une carte active, cliquer **En attente** : un seul badge En attente doit apparaître. Cliquer **Repasser à traiter** : statut actif, aucun badge d’attente et aucune échéance résiduelle liée à cette attente.
+4. Ouvrir **Me relancer si aucune réponse**, tester la valeur par défaut, demain, 3/5/7 jours et une date personnalisée ; vérifier l’aperçu, la modification d’un suivi existant et son arrêt.
+5. Épingler une ligne/message puis utiliser une autre entrée générique : la seconde action doit désépingler sans carte parallèle. Refaire toolbar → ligne, avec cibles par défaut message/conversation et conversations activées/désactivées.
+6. Utiliser l’action explicitement conversation puis une entrée générique inverse ; vérifier qu’une seule référence logique subsiste et que notes, checklist, échéance, groupe et Agenda ne sont pas perdus.
+7. Avec une fenêtre Thunderbird globalement large, déplacer continûment le splitter du panneau entre environ 800 et 280 px ; vérifier header, recherche, filtres, cartes, actions et absence de scroll horizontal ou sauts de layout.
+
+La readiness reste **NO-GO** tant que ces scénarios n’ont pas été observés sur le XPI 1.5.4 exact fourni pour retest.
 
 ## Priorité A — intégration Thunderbird consolidée
 

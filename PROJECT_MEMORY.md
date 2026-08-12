@@ -1,13 +1,13 @@
 # Mémoire opérationnelle — MailPerch
 
-> Version publique : **1.5.3**
-> Branche de référence : `main` ; préparation 1.5.2 effectuée sur `release/1.5.2-runtime-coverage`
-> Base GitHub de la passe 1.5.2 : `main` au commit `e5fe966a4beff4755bd727ad4d79fb81148e3b36`
+> Version publique : **1.5.3** ; candidat local : **1.5.4**
+> Branche de travail : `fix/pre-store-manual-findings-1.5.4`
+> Base GitHub de l’audit : `main` au commit `afff4b6338f19c45e6c949d1d4628fcd58373ebc`
 > Extension ID : `pin-mails@MailPerch.local`
 
 ## Résumé
 
-MailPerch est une extension Thunderbird Manifest V3 locale qui ajoute un panneau de messages épinglés et transforme ces épingles en suivis actionnables sans remplacer la liste native. La version 1.5.2 corrige les substitutions localisées paramétrées du Dashboard, améliore la densité du panneau et surtout étend le banc Thunderbird réel aux DOM Dashboard/Options, commandes XUL natives, thèmes clair/sombre et persistance multi-processus. Elle ne rajoute aucune permission, dépendance runtime, migration ni connexion réseau.
+MailPerch est une extension Thunderbird Manifest V3 locale qui ajoute un panneau de messages épinglés et transforme ces épingles en suivis actionnables sans remplacer la liste native. Le candidat 1.5.4 corrige les constats manuels de 1.5.3 : épinglage canonique entre entrées, responsive réel du panneau, géométrie Options, états du Dashboard, transitions workflow cohérentes et préparation date/heure Agenda. Il n’ajoute aucune permission, dépendance runtime, migration ni connexion réseau.
 
 Les futures fonctions **Prochaine action**, **Timeline de conversation**, **Follow-up récurrent** et **Résultat du suivi** restent hors périmètre de cette release.
 
@@ -99,7 +99,7 @@ La source de vérité visuelle demeure `docs/UI_SPEC.md`; aucun `PRODUCT.md` ou 
 
 Diagnostiquer l’environnement avec `npx skills ls -g` et le hook avec `node C:\Users\ussma\.agents\skills\impeccable\scripts\hook-admin.mjs status`. Pour une mise à jour, vérifier d’abord le dépôt officiel, la version et les écritures prévues ; utiliser `npx skills update -g` pour les sources suivies et l’installateur officiel Impeccable avec le fournisseur Codex explicite.
 
-## État 1.5.2
+## État 1.5.4
 
 - schéma SQLite : 5 ; schéma paramètres : 8 ; schéma données : 7 ;
 - compatibilité déclarée : Thunderbird 153.0 à 153.* ;
@@ -111,7 +111,8 @@ Diagnostiquer l’environnement avec `npx skills ls -g` et le hook avec `node C:
 - détection fournisseurs par domaine exact ou sous-domaine légitime ;
 - portée multi-comptes basée sur `account.key`, sélection maximale bornée à 50 comptes ;
 - volume conseillé : jusqu’à 2 000 épingles, sans blocage technique au-delà ;
-- aucune nouvelle permission, dépendance runtime ou connexion réseau introduite par la 1.5.2.
+- aucune nouvelle permission, dépendance runtime ou connexion réseau introduite par la 1.5.4.
+- recette utilisateur du XPI 1.5.4 encore requise avant toute publication.
 
 ## Commandes obligatoires
 
@@ -133,7 +134,7 @@ python tests/test_thunderbird_test_bench.py
 
 ## Définition de terminé
 
-- branche de release propre et déclarations 1.5.2 synchronisées avant toute publication ;
+- branche de préparation propre et déclarations 1.5.4 synchronisées avant toute soumission ATN ;
 - tests, scans de secrets et builds reproductibles verts ;
 - frontière Thunderbird vérifiée sans réintroduction d’accès direct ;
 - Options Recommandé/Avancé et portée multi-comptes cohérentes en FR/EN ;

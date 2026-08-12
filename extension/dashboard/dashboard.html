@@ -113,8 +113,23 @@
     <form method="dialog">
       <header><div><h2 data-i18n="calendarCreate">Créer dans l’Agenda</h2><p data-i18n="calendarCreateHelp">Seuls les calendriers compatibles et inscriptibles peuvent être sélectionnés.</p></div><button value="cancel" class="icon-button" aria-label="Fermer" data-i18n-aria-label="close">×</button></header>
       <label><span data-i18n="calendarItemType">Type</span><select id="calendar-item-type"><option value="task" data-i18n="task">Tâche</option><option value="event" data-i18n="event">Événement</option></select></label>
-      <label><span data-i18n="calendarTarget">Calendrier</span><select id="calendar-target"></select></label>
-      <footer><button value="cancel" class="button secondary" data-i18n="cancel">Annuler</button><button id="calendar-confirm" value="default" class="button primary" data-i18n="create">Créer</button></footer>
+      <label id="calendar-target-field"><span data-i18n="calendarTarget">Calendrier</span><select id="calendar-target"></select></label>
+      <p id="calendar-availability" class="dialog-error" role="alert" aria-live="polite" hidden></p>
+      <fieldset id="calendar-event-schedule" class="schedule-fields" hidden><legend data-i18n="eventSchedule">Date et heure de l’événement</legend><div class="schedule-grid"><label><span data-i18n="startDate">Date de début</span><input id="calendar-event-start-date" type="date" required></label><label><span data-i18n="startTime">Heure de début</span><input id="calendar-event-start-time" type="time" step="60" required></label><label><span data-i18n="endDate">Date de fin</span><input id="calendar-event-end-date" type="date" required></label><label><span data-i18n="endTime">Heure de fin</span><input id="calendar-event-end-time" type="time" step="60" required></label></div></fieldset>
+      <fieldset id="calendar-task-schedule" class="schedule-fields"><legend data-i18n="taskSchedule">Échéance de la tâche</legend><div class="schedule-grid"><label><span data-i18n="dueDate">Date d’échéance</span><input id="calendar-task-due-date" type="date" required></label><label><span data-i18n="dueTime">Heure d’échéance</span><input id="calendar-task-due-time" type="time" step="60" required></label></div></fieldset>
+      <p id="calendar-error" class="dialog-error" role="alert" aria-live="polite" hidden></p>
+      <footer><button value="cancel" class="button secondary" data-i18n="cancel">Annuler</button><button id="calendar-confirm" type="submit" class="button primary" data-i18n="create">Créer</button></footer>
+    </form>
+  </dialog>
+
+  <dialog id="no-reply-dialog" class="calendar-dialog compact-dialog">
+    <form method="dialog">
+      <header><div><h2 data-i18n="noReplyDialogTitle">Relancer sans réponse</h2><p data-i18n="noReplyDialogHelp">Choisissez le moment où cette épingle devra revenir à votre attention.</p></div><button value="cancel" class="icon-button" aria-label="Fermer" data-i18n-aria-label="close">×</button></header>
+      <label><span data-i18n="noReplyDelay">Délai</span><select id="no-reply-preset"><option value="default" data-i18n="defaultDelay">Délai par défaut</option><option value="tomorrow" data-i18n="tomorrowMorning">Demain matin</option><option value="3" data-i18n="inThreeDays">Dans 3 jours</option><option value="5" data-i18n="inFiveDays">Dans 5 jours</option><option value="7" data-i18n="inSevenDays">Dans 7 jours</option><option value="custom" data-i18n="customDate">Date personnalisée</option></select></label>
+      <div id="no-reply-custom" class="schedule-grid" hidden><label><span data-i18n="dueDate">Date</span><input id="no-reply-date" type="date"></label><label><span data-i18n="dueTime">Heure</span><input id="no-reply-time" type="time" step="60"></label></div>
+      <p class="dialog-preview"><span data-i18n="noReplyResult">Relance prévue</span> : <strong id="no-reply-preview"></strong></p>
+      <p id="no-reply-error" class="dialog-error" role="alert" aria-live="polite" hidden></p>
+      <footer><button id="no-reply-stop" value="stop" class="button danger" data-i18n="cancelNoReplyTracking" hidden>Arrêter le suivi</button><button value="cancel" class="button secondary" data-i18n="cancel">Annuler</button><button id="no-reply-confirm" type="submit" class="button primary" data-i18n="apply">Appliquer</button></footer>
     </form>
   </dialog>
 

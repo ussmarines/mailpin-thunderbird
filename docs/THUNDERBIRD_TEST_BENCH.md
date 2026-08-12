@@ -118,25 +118,25 @@ Après publication de la branche, lancer **Thunderbird functional and scale benc
 ```bash
 python tests/thunderbird/functional_bench.py \
   --binary /chemin/vers/thunderbird \
-  --xpi dist/MailPerch_v1.5.1.xpi \
+  --xpi dist/MailPerch_v1.5.3.xpi \
   --geckodriver /chemin/vers/geckodriver \
   --output-dir artifacts/thunderbird-bench \
   --volumes 50,100,500,1000,2000 \
   --timeout 180
 ```
 
-Les onglets internes Dashboard et Options de Thunderbird ne sont pas exposés comme handles de contenu Marionette : le banc externe prouve leur ouverture, pas leurs scénarios DOM internes, qui restent couverts séparément par les tests de page et la validation manuelle. De même, Thunderbird ignore les commandes synthétiques non fiables des `menuitem` XUL ; les mutations via l’éditeur de carte restent manuelles. Les intégrations Agenda distantes, la réception POP/IMAP réelle et l’inspection visuelle automatisée ne sont pas simulées. Un calendrier local n’est utilisé que si Thunderbird en expose déjà un compatible et inscriptible.
+Le banc 1.5.2+ accède aux vrais onglets Dashboard et Options via le `BrowsingContext`/acteur Marionette du processus de contenu et déclenche l’éditeur de carte par sa commande XUL native. Les intégrations Agenda distantes, la réception POP/IMAP réelle et le jugement esthétique complet ne sont pas simulés. Un calendrier local n’est utilisé que si Thunderbird en expose déjà un compatible et inscriptible.
 
 La validation ciblée `--scope-validation-only` reste séparée de la matrice 50–2000. Pour chacun des cas vide, A, B, A+C et A+B+C, elle crée trois comptes synthétiques dont les identifiants canoniques Thunderbird sont `account1`, `account2`, `account3` (`account.key`) et dont les serveurs natifs distincts sont `server1`, `server2`, `server3` (`incomingServer.key`). Les épingles, `selectedAccountKeys` et le filtre utilisent uniquement les `account.key`. Dès la première session, le banc vérifie le compte rendu, des épingles représentatives de chaque compte inclus, l’absence explicite des comptes exclus et l’absence de doublons. Il persiste ensuite `panelScope` et `selectedAccountKeys` dans la préférence production, ferme la première session, puis démarre un nouveau processus Thunderbird avec exactement le même chemin `-profile`. Avant de réinstaller temporairement le même XPI, il exige que comptes, dossiers, messages, préférence, sentinelle d’installation et lignes SQLite soient encore présents. Il n’utilise ni le DOM de l’onglet Options, non exposé comme contexte WebDriver fiable, ni `addon.userDisabled`, non fiable pour une extension temporaire.
 
-Limite observée le 9 août 2026 avec Thunderbird 153.0.2 sous Windows et geckodriver 0.37.1 : le second processus a bien rouvert le chemin de profil exact, retrouvé les comptes synthétiques et rouvert leur dossier actif, mais le stockage structuré SQLite n’était plus disponible avant la réinstallation du XPI temporaire. Le scénario s’arrête donc explicitement avant toute assertion de portée et classe la preuve automatisée comme limitée par le harness. Il ne copie aucun fichier interne et ne modifie pas le cycle de vie production pour contourner cette suppression ; la clôture complète doit passer par une installation non temporaire dans le profil Thunderbird de test ou par la validation manuelle ciblée.
+Le banc 1.5.2+ utilise une installation non temporaire dans le profil jetable pour la persistance : il redémarre Thunderbird sur le même chemin de profil, vérifie les comptes, SQLite, les réglages et la sentinelle avant le réveil MV3 naturel, sans copier de fichier interne ni modifier le cycle de vie production.
 
 Pour préparer cette validation manuelle sans automatiser l’onglet Options, utiliser `--prepare-manual-scope-validation`. Le mode crée un profil jetable hors ligne, avec deux dossiers par compte et exactement A = `account1` = 18 épingles, B = `account2` = 16, C = `account3` = 16 (total 50) ; les noms visibles restent A = `server1`, B = `server2`, C = `server3`, et le premier dossier contient 9 épingles. `selectedAccountKeys` est vide dans ce nouveau profil. Il installe l’XPI temporaire, laisse Thunderbird ouvert, affiche le chemin du profil et la checklist dans le terminal, puis conserve le profil après fermeture de Thunderbird. Le chemin imprimé peut être supprimé uniquement après validation terminée et Thunderbird fermé.
 
 ```bash
 python tests/thunderbird/functional_bench.py \
   --binary /chemin/vers/thunderbird \
-  --xpi dist/MailPerch_v1.5.1.xpi \
+  --xpi dist/MailPerch_v1.5.3.xpi \
   --geckodriver /chemin/vers/geckodriver \
   --output-dir artifacts/thunderbird-manual-scope \
   --prepare-manual-scope-validation \
@@ -146,7 +146,7 @@ python tests/thunderbird/functional_bench.py \
 ```bash
 python tests/thunderbird/functional_bench.py \
   --binary /chemin/vers/thunderbird \
-  --xpi dist/MailPerch_v1.5.1.xpi \
+  --xpi dist/MailPerch_v1.5.3.xpi \
   --geckodriver /chemin/vers/geckodriver \
   --output-dir artifacts/thunderbird-multi-account \
   --scope-validation-only \
@@ -182,7 +182,7 @@ Sous Windows x64, l’installation utilisateur validée est `C:\Users\ussma\AppD
 ```bash
 python tests/thunderbird/real_smoke.py \
   --binary /chemin/vers/thunderbird \
-  --xpi dist/MailPerch_v1.5.1.xpi \
+  --xpi dist/MailPerch_v1.5.3.xpi \
   --geckodriver /chemin/vers/geckodriver \
   --output-dir artifacts/thunderbird-smoke \
   --timeout 45
@@ -215,3 +215,5 @@ La passe fonctionnelle Windows du 9 août 2026 sur Thunderbird 153.0.2/geckodriv
 Le 10 août 2026, le banc a été relancé sous Linux avec Thunderbird 153.0.1 ESR et geckodriver 0.37.1 après correction d’une fausse assertion du harness : `.pin-mails-count` représente le total de la portée et ne doit pas devenir le nombre de cartes filtrées par la recherche. Le test contrôle désormais séparément la stabilité de ce total, l’appartenance de chaque carte au résultat recherché et le nombre exact de cartes après pagination. Le cas ciblé 50 épingles puis la matrice complète 50/100/500/1000/2000 ont tous réussi, avec zéro timeout et zéro exception JavaScript. À 500, 1000 et 2000, la pagination complète a rendu respectivement 500, 1000 et 2000 cartes sans doublon et les contrôles début/milieu/fin sont positifs.
 
 Ces preuves ne remplacent pas les tests utilisateur avec fournisseurs réels ni la matrice multi-versions/multi-OS.
+
+Le 12 août 2026, l’audit pré-store 1.5.3 a repassé sous Windows Thunderbird 153.0.2/geckodriver 0.37.1 : smoke, matrice 50/100/500/1000/2000, DOM Dashboard/Options, éditeur XUL, thèmes clair/sombre et cinq portées persistantes sur deux processus. Tous les scénarios ont réussi sans timeout ni exception JavaScript MailPerch ; les détails courants sont enregistrés dans `docs/AI_VALIDATION_STATE.json`.

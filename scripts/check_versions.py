@@ -17,9 +17,18 @@ checks = {
     "README.en.md": [f"**MailPerch:** `{version}`", f"MailPerch_v{version}.xpi"],
     "CHANGELOG.md": [f"## {version}"],
     "THIRD_PARTY_NOTICES.md": [f"MailPerch {version}"],
-    "PROJECT_MEMORY.md": [f"Version publique : **{version}**"],
+    "PROJECT_MEMORY.md": [f"candidat local : **{version}**"],
+    "PRIVACY.md": [f"MailPerch {version} ne contient", f"MailPerch {version} contains"],
+    "SECURITY.md": [f"SECURITY_AUDIT_{version}.md"],
+    "STORE_RELEASE.md": [f"Version candidate locale :** {version}", f"MailPerch_v{version}.xpi", f"MailPerch_GitHub_Repository_v{version}.zip"],
+    "docs/ATN_RELEASE_CHECKLIST.md": [f"— {version}", f"version {version} synchronisée"],
+    "docs/KNOWN_LIMITATIONS.md": [f"Version {version} et portée de validation"],
+    "docs/MANUAL_TEST_PLAN.md": [f"— {version}"],
     "docs/PROJECT_STATE.json": [f'"extensionVersion": "{version}"'],
-    "docs/BUG_TRACKER.md": [f"Version publique : **{version}**"],
+    "docs/BUG_TRACKER.md": [f"candidat local : **{version}**"],
+    "release/ATN_REVIEW_NOTES_TEMPLATE.md": [f"— MailPerch {version}", f"Version :** {version}"],
+    "release/BUILD_INSTRUCTIONS.md": [f"build {version}", f"MailPerch_v{version}.xpi", f"MailPerch_GitHub_Repository_v{version}.zip"],
+    "release/manifest-store-template.json": [f"publication {version}"],
 }
 for relative, tokens in checks.items():
     text = (ROOT / relative).read_text(encoding="utf-8")

@@ -1,14 +1,14 @@
 # Limites connues
 
-## Version 1.5.2 et portée de validation
+## Version 1.5.4 et portée de validation
 
-La version **1.5.2** est une release corrective de couverture runtime et de finition. Elle ne modifie ni la frontière privilégiée `PinCompatibility`, ni les permissions, ni les schémas de stockage. Les validations fraîches sont consignées dans `VALIDATION_REPORT_1.5.2.md`.
+Le candidat **1.5.4** modifie l’API Agenda bornée, la résolution des identités d’épinglage et plusieurs surfaces UI. Il ne modifie ni les permissions ni les schémas de stockage. Les validations automatisées fraîches sont consignées dans `VALIDATION_REPORT_1.5.4.md` et `docs/AI_VALIDATION_STATE.json`; la recette manuelle utilisateur reste requise.
 
 Une matrice exhaustive de tous les systèmes, versions Thunderbird, fournisseurs réels, types de dossiers, calendriers, lecteurs d’écran et configurations de profil reste hors de portée d’un banc automatisé unique. Les éléments non observés restent explicitement documentés.
 
 ## Compatibilité Thunderbird
 
-- Le manifeste 1.5.2 déclare Thunderbird `153.0` à `153.*`.
+- Le manifeste 1.5.4 déclare Thunderbird `153.0` à `153.*`.
 - MailPerch utilise une API Experiment privilégiée ; une évolution interne de Thunderbird peut exiger une adaptation.
 - Messages, Tags et Agenda restent isolés dans leurs adaptateurs dédiés.
 - Le DOM `about:3pane`, `ThreadCard`, les fenêtres et menus natifs restent des surfaces internes à surveiller.
@@ -25,11 +25,11 @@ Une matrice exhaustive de tous les systèmes, versions Thunderbird, fournisseurs
 
 - Les gardes statiques et contrats restent exécutables sans Thunderbird.
 - Le smoke réel vérifie le XPI construit, le background MV3, l’injection unique, l’ouverture du Dashboard, le cleanup et la réinstallation.
-- Le banc 1.5.2 exécute les scénarios DOM Dashboard et Options dans leurs vrais onglets Thunderbird via le `BrowsingContext`/acteur Marionette du processus de contenu.
+- Le banc Thunderbird exécute les scénarios DOM Dashboard et Options dans leurs vrais onglets Thunderbird via le `BrowsingContext`/acteur Marionette du processus de contenu.
 - L’éditeur de carte est ouvert via la commande XUL native `doCommand()` ; notes, checklist, priorité, groupe, échéances, statut et relance sont modifiés dans le runtime réel.
 - Le banc mesure automatiquement en clair et sombre le clipping, le débordement horizontal, l’alignement des contrôles et le contraste texte de base.
 - La persistance est testée avec une extension non temporaire sur le même profil jetable à travers deux processus Thunderbird distincts ; SQLite et les réglages sont contrôlés avant réveil naturel du background MV3 par activation d’onglet.
-- Le smoke/banc Linux sur Thunderbird 153.0.1 ESR ne prouve pas à lui seul Windows/macOS, tous les extrêmes de version ni les fournisseurs réseau externes.
+- Le smoke/banc Linux sur Thunderbird 153.0.1 ESR et la passe Windows 153.0.2 du 12 août 2026 ne prouvent pas à eux seuls macOS, tous les extrêmes de version ni les fournisseurs réseau externes.
 
 ## Interface et accessibilité
 

@@ -97,6 +97,7 @@ input[type="checkbox"]:checked::after {
 .button.primary:hover:not(:disabled) { border-color: var(--accent-hover); background: var(--accent-hover); }
 .button.primary:active:not(:disabled) { border-color: var(--accent-pressed); background: var(--accent-pressed); }
 .button.secondary { background: var(--surface); }
+.button.danger { border-color: var(--danger-border); background: var(--danger-soft); color: var(--danger); }
 .text-button { min-height: auto; padding: .2rem .35rem; border: 0; background: transparent; color: var(--accent-foreground); box-shadow: none; font-size: max(.84rem, 12px); }
 .text-button:hover:not(:disabled) { background: var(--accent-soft); }
 .icon-button { min-width: 2.2rem; min-height: 2.2rem; padding: .2rem; border: 0; background: transparent; box-shadow: none; }
@@ -356,11 +357,17 @@ h1 { margin-bottom: .25rem; font-size: 1.75rem; line-height: 1.2; font-weight: 6
 .status button { min-height: 1.8rem; padding: .1rem .4rem; border: 0; background: transparent; box-shadow: none; }
 .fatal-error { position: fixed; inset: 1rem; z-index: 2000; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem; border: 2px solid var(--danger); border-radius: var(--radius); background: var(--danger-soft); box-shadow: var(--shadow); }
 body[data-loading] .dashboard-shell { opacity: .55; pointer-events: none; }
-.calendar-dialog { width: min(31rem, calc(100vw - 2rem)); padding: 1.25rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface-raised); color: var(--text); box-shadow: var(--mp-shadow-28); }
+.calendar-dialog { box-sizing: border-box; width: min(34rem, calc(100vw - 2rem)); max-width: calc(100vw - 2rem); max-block-size: calc(100dvh - 2rem); overflow-y: auto; padding: 1.25rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface-raised); color: var(--text); box-shadow: var(--mp-shadow-28); }
 .calendar-dialog::backdrop { background: rgb(0 0 0 / .55); }
 .calendar-dialog form, .calendar-dialog label { display: grid; gap: .65rem; }
+.calendar-dialog form, .calendar-dialog header > div, .calendar-dialog label, .calendar-dialog select, .calendar-dialog input { min-width: 0; }
 .calendar-dialog header, .calendar-dialog footer { display: flex; align-items: flex-start; justify-content: space-between; gap: .75rem; }
 .calendar-dialog footer { justify-content: flex-end; margin-top: 1rem; }
+.schedule-fields { min-width: 0; margin: 0; padding: .8rem; border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.schedule-fields legend { padding-inline: .35rem; font-weight: 650; }
+.schedule-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
+.dialog-error { margin: .75rem 0 0; padding: .65rem .75rem; border: 1px solid var(--danger-border); border-radius: var(--radius-sm); background: var(--danger-soft); color: var(--danger); }
+.dialog-preview { margin: .25rem 0 0; color: var(--muted); }
 
 .visually-hidden { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0,0,0,0) !important; white-space: nowrap !important; border: 0 !important; }
 .skip-link { position: fixed; inset: .75rem auto auto .75rem; z-index: 3000; translate: 0 -180%; padding: .7rem 1rem; border-radius: var(--radius-sm); background: var(--accent); color: #fff; font-weight: 700; text-decoration: none; box-shadow: var(--shadow); }
@@ -389,6 +396,7 @@ body[data-loading] .dashboard-shell { opacity: .55; pointer-events: none; }
   .brand-mark { inline-size: 3rem; block-size: 3rem; }
   .header-actions { flex-direction: column; }
   .header-actions .button { width: 100%; }
+  .schedule-grid { grid-template-columns: 1fr; }
   .smart-views, .bulk-controls { grid-template-columns: 1fr; }
   .item { grid-template-columns: 1fr; }
   .item > input { position: absolute; right: .8rem; top: .8rem; }

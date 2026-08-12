@@ -188,6 +188,12 @@
   "calendarCreateHelp": {
     "message": "Seuls les calendriers compatibles et inscriptibles peuvent être sélectionnés."
   },
+  "calendarNoCompatibleTask": {
+    "message": "Aucun agenda compatible avec les tâches n’est disponible. Les calendriers actuellement disponibles prennent en charge les événements, mais pas nécessairement les tâches dans Thunderbird."
+  },
+  "calendarNoCompatibleEvent": {
+    "message": "Aucun agenda compatible avec les événements n’est disponible."
+  },
   "calendarError": {
     "message": "Agenda à vérifier"
   },
@@ -1268,6 +1274,7 @@
   "account": {"message": "Compte"},
   "actionInProgress": {"message": "Action en cours…"},
   "actionFailed": {"message": "Action impossible"},
+  "actionSavedRefreshFailed": {"message": "L’action a été enregistrée, mais le Dashboard n’a pas pu s’actualiser. Réessayez."},
   "chooseBulkAction": {"message": "Choisissez une action groupée."},
   "chooseTemplate": {"message": "Choisir un modèle…"},
   "confirmBulkDelete": {"message": "Supprimer ces $1 message(s) ?"},
@@ -1608,5 +1615,31 @@
   "tagSyncControlHelp": {"message": "Seuls les tags réservés à MailPerch sont créés, modifiés ou supprimés."},
   "sectionThunderbirdTechnicalEyebrow": {"message": "Thunderbird"},
   "sectionThunderbirdTechnical": {"message": "Compatibilité et comportements techniques"},
-  "sectionThunderbirdTechnicalIntro": {"message": "Ces réglages servent au diagnostic, aux cas de compatibilité particuliers et aux très grands volumes. Le mode Recommandé les gère automatiquement."}
+  "sectionThunderbirdTechnicalIntro": {"message": "Ces réglages servent au diagnostic, aux cas de compatibilité particuliers et aux très grands volumes. Le mode Recommandé les gère automatiquement."},
+  "returnToActive": {"message": "Repasser à traiter"},
+  "changeNoReplyTracking": {"message": "Modifier la relance"},
+  "eventSchedule": {"message": "Date et heure de l’événement"},
+  "taskSchedule": {"message": "Échéance de la tâche"},
+  "startDate": {"message": "Date de début"},
+  "startTime": {"message": "Heure de début"},
+  "endDate": {"message": "Date de fin"},
+  "endTime": {"message": "Heure de fin"},
+  "dueDate": {"message": "Date d’échéance"},
+  "dueTime": {"message": "Heure d’échéance"},
+  "calendarRequired": {"message": "Choisissez un calendrier inscriptible."},
+  "eventDatesRequired": {"message": "Renseignez les dates et heures de début et de fin."},
+  "eventEndAfterStart": {"message": "La fin doit être postérieure au début."},
+  "taskDueRequired": {"message": "Renseignez la date et l’heure d’échéance."},
+  "noReplyDialogTitle": {"message": "Relancer sans réponse"},
+  "noReplyDialogHelp": {"message": "Choisissez le moment où cette épingle devra revenir à votre attention."},
+  "defaultDelay": {"message": "Délai par défaut"},
+  "tomorrowMorning": {"message": "Demain matin"},
+  "inThreeDays": {"message": "Dans 3 jours"},
+  "inFiveDays": {"message": "Dans 5 jours"},
+  "inSevenDays": {"message": "Dans 7 jours"},
+  "customDate": {"message": "Date personnalisée"},
+  "noReplyResult": {"message": "Relance prévue"},
+  "invalidDate": {"message": "Date invalide"},
+  "noReplyDateRequired": {"message": "Choisissez une date et une heure valides."},
+  "noReplyDateFuture": {"message": "Choisissez une date et une heure futures."}
 }

@@ -33,9 +33,27 @@ def run(*command: str) -> subprocess.CompletedProcess[str]:
 
 
 def repository_files() -> list[Path]:
+    if (ROOT / ".git").exists():
+        tracked = subprocess.run(
+            ["git", "ls-files", "-z"],
+            cwd=ROOT,
+            capture_output=True,
+            text=False,
+            check=False,
+        )
+        if tracked.returncode == 0:
+            return sorted(
+                (
+                    ROOT / raw.decode("utf-8", "surrogateescape")
+                    for raw in tracked.stdout.split(b"\0")
+                    if raw and not raw.endswith(b"/.mailperch-source-files.json")
+                ),
+                key=lambda path: path.relative_to(ROOT).as_posix(),
+            )
+
     excluded = {
         ".git", ".playwright-cli", ".pytest_cache", ".reports", ".security-reports",
-        "__pycache__", "dist", "node_modules",
+        "__pycache__", "artifacts", "dist", "graphify-out", "node_modules",
     }
     files = [
         path for path in ROOT.rglob("*")

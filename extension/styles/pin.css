@@ -37,6 +37,7 @@
  * L'icône est un masque CSS : Thunderbird ne peut donc plus imposer le noir
  * contenu dans un SVG utilisé comme image d'arrière-plan. */
 #pin-mails-panel {
+  container: threadPane / inline-size;
   flex: 0 0 auto;
   display: flex;
   flex-direction: column;
@@ -606,20 +607,23 @@
 }
 
 @container threadPane (max-width: 600px) {
+  .pin-mails-summary { display: none; }
   .pin-mails-header-select { max-inline-size: 105px; }
   .pin-mails-header-select[data-secondary] { display: none; }
 }
 
 @container threadPane (max-width: 390px) {
   .pin-mails-panel-header {
+    flex-wrap: wrap;
     gap: 4px;
     padding-inline: 6px;
   }
 
   .pin-mails-header-icon {
-    inline-size: 20px;
-    block-size: 20px;
+    display: none;
   }
+
+  .pin-mails-title-wrap { flex: 1 1 64px; }
 
   .pin-mails-collapse-button,
   .pin-mails-header-action {
@@ -629,7 +633,10 @@
   }
 
   .pin-mails-header-select {
-    max-inline-size: 82px;
+    order: 10;
+    flex: 1 0 100%;
+    inline-size: 100%;
+    max-inline-size: none;
     min-inline-size: 0;
     padding-inline: 5px 18px;
   }
@@ -919,12 +926,6 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   .pin-mails-independent-button:focus-visible, .pin-mails-card:focus-visible, .pin-mails-quick-button:focus-visible { outline: 2px solid Highlight !important; }
   .pin-mails-note, .pin-mails-due, .pin-mails-group-chip { forced-color-adjust: none; }
 }
-@container threadPane (max-width: 390px) {
-  .pin-mails-panel-tools { flex-direction: column; align-items: stretch; }
-  .pin-mails-search-wrap { flex: 0 0 auto; min-inline-size: 0; }
-  .pin-mails-card-actions { opacity: 1; }
-  .pin-mails-summary { display: none; }
-}
 /* 2.0 — sections intelligentes, conversations, état terminé et agenda. */
 .pin-mails-smart-group {
   margin-block: 6px;
@@ -1158,20 +1159,25 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
 }
 .pin-mails-calendar-dialog {
   inline-size: min(540px, calc(100vw - 32px));
+  max-block-size: calc(100dvh - 32px);
+  box-sizing: border-box;
   padding: 0;
   border: 1px solid var(--pin-mails-border);
   border-radius: 10px;
   background: var(--layout-background-0);
   color: inherit;
   box-shadow: var(--mp-shadow-28);
+  overflow: auto;
 }
 .pin-mails-calendar-dialog::backdrop { background: rgb(0 0 0 / .45); }
 .pin-mails-calendar-dialog-form { display: grid; gap: 13px; padding: 18px; }
 .pin-mails-calendar-dialog-title { margin: 0; font-size: 1.15rem; }
 .pin-mails-calendar-dialog-help { margin: 0; color: var(--layout-color-2); line-height: 1.4; }
 .pin-mails-calendar-dialog-form label { display: grid; gap: 6px; font-weight: 650; }
-.pin-mails-calendar-dialog-select {
+.pin-mails-calendar-dialog-select,
+.pin-mails-calendar-schedule input {
   inline-size: 100%;
+  box-sizing: border-box;
   min-block-size: 36px;
   padding: 6px 8px;
   border: 1px solid var(--pin-mails-border);
@@ -1179,6 +1185,15 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   background: var(--layout-background-1);
   color: inherit;
   font: inherit;
+}
+.pin-mails-calendar-schedule { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.pin-mails-calendar-dialog-preview { margin: 0; color: var(--layout-color-2); }
+.pin-mails-calendar-dialog-error { margin: 0; color: var(--mp-color-danger-foreground); }
+.pin-mails-calendar-dialog-error[hidden] { display: none; }
+.pin-mails-editor-actions .danger { margin-inline-end: auto; border: 1px solid var(--mp-color-danger-foreground); background: transparent; color: var(--mp-color-danger-foreground); }
+
+@media (max-width: 480px) {
+  .pin-mails-calendar-schedule { grid-template-columns: minmax(0, 1fr); }
 }
 
 /* 3.2.0 — vues intelligentes, confort visuel et suivi sans réponse. */
@@ -1196,11 +1211,13 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
   font-size: max(.84rem, 12px);
 }
 @container threadPane (max-width: 390px) {
+  .pin-mails-search-wrap { flex: 1 1 120px; min-inline-size: 96px; }
   .pin-mails-smart-view-select {
-    flex: 0 0 auto;
-    inline-size: 100%;
+    flex: 0 1 116px;
+    inline-size: auto;
+    min-inline-size: 96px;
     block-size: 30px;
-    max-inline-size: none;
+    max-inline-size: 116px;
   }
 }
 .pin-mails-no-reply-chip {

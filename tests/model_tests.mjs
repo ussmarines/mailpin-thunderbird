@@ -54,6 +54,25 @@ assert.equal(scope.PinIdentity.sameConversation(noIdentitySigA, noIdentitySigB),
 assert.notEqual(scope.PinIdentity.conversationIdentity(noIdentityA, "account1", noIdentityA.subject), scope.PinIdentity.conversationIdentity(noIdentityB, "account1", noIdentityB.subject));
 assert.equal(scope.PinIdentity.strongConversationKey(scope.PinIdentity.conversationIdentity(noIdentityA, "account1", noIdentityA.subject)), false);
 
+for (const [settings, expected] of [
+  [{defaultPinTarget: "message", enableConversationPins: false}, "message"],
+  [{defaultPinTarget: "message", enableConversationPins: true}, "message"],
+  [{defaultPinTarget: "conversation", enableConversationPins: false}, "message"],
+  [{defaultPinTarget: "conversation", enableConversationPins: true}, "conversation"]
+]) {
+  assert.equal(scope.PinIdentity.genericTrackingMode(settings), expected, JSON.stringify(settings));
+}
+assert.deepEqual(
+  JSON.parse(JSON.stringify(scope.PinIdentity.pinKeyPlan("message", "message-key", "conversation-key"))),
+  {targetKey: "message-key", oppositeKey: "conversation-key"},
+  "A generic message pin must remove a legacy parallel conversation key"
+);
+assert.deepEqual(
+  JSON.parse(JSON.stringify(scope.PinIdentity.pinKeyPlan("conversation", "message-key", "conversation-key"))),
+  {targetKey: "conversation-key", oppositeKey: "message-key"},
+  "An explicit conversation pin must remove a legacy parallel message key"
+);
+
 const diagnosticInput = [
   "person@example.test", "C:\\Users\\Person\\mail.txt", "\\\\server\\share\\mail.txt", "/tmp/private/mail.txt",
   "github_" + "pat_" + "A".repeat(40), "sk-" + "proj-" + "B".repeat(24),
@@ -106,6 +125,56 @@ assert.equal(
   true,
   "Fixed recurrences must jump beyond now even after more than 1000 occurrences"
 );
+
+const transitionNow = new Date("2026-08-12T12:00:00Z").getTime();
+const transitionDay = 86_400_000;
+const trackedWaiting = {
+  workflowStatus: "waiting", completedAt: 0, waitingSince: transitionNow - transitionDay,
+  followUpAt: transitionNow + transitionDay, noReplyTracking: true, noReplyAt: transitionNow + transitionDay,
+  noReplyStartedAt: transitionNow - transitionDay, noReplyBaselineMessageId: "reply@example.test"
+};
+scope.PinWorkflow.applyStatus(trackedWaiting, "completed", {now: transitionNow, defaultFollowUpDays: 3});
+assert.deepEqual(
+  {
+    workflowStatus: trackedWaiting.workflowStatus,
+    completedAt: trackedWaiting.completedAt,
+    waitingSince: trackedWaiting.waitingSince,
+    followUpAt: trackedWaiting.followUpAt,
+    noReplyTracking: trackedWaiting.noReplyTracking,
+    noReplyAt: trackedWaiting.noReplyAt,
+    noReplyStartedAt: trackedWaiting.noReplyStartedAt,
+    noReplyBaselineMessageId: trackedWaiting.noReplyBaselineMessageId
+  },
+  {
+    workflowStatus: "completed", completedAt: transitionNow, waitingSince: 0, followUpAt: 0,
+    noReplyTracking: false, noReplyAt: 0, noReplyStartedAt: 0, noReplyBaselineMessageId: ""
+  },
+  "Completing tracked waiting work must remove every pending-wait marker"
+);
+
+const replanned = {
+  workflowStatus: "waiting", completedAt: transitionNow - transitionDay, waitingSince: transitionNow - transitionDay,
+  dueAt: transitionNow + 2 * transitionDay, followUpAt: transitionNow + transitionDay,
+  noReplyTracking: true, noReplyAt: transitionNow + transitionDay,
+  noReplyStartedAt: transitionNow - transitionDay, noReplyBaselineMessageId: "reply@example.test"
+};
+scope.PinWorkflow.applyStatus(replanned, "planned", {now: transitionNow, followUpAt: replanned.dueAt});
+assert.deepEqual(
+  {
+    workflowStatus: replanned.workflowStatus,
+    completedAt: replanned.completedAt,
+    waitingSince: replanned.waitingSince,
+    followUpAt: replanned.followUpAt,
+    noReplyTracking: replanned.noReplyTracking,
+    noReplyAt: replanned.noReplyAt
+  },
+  {
+    workflowStatus: "planned", completedAt: 0, waitingSince: 0,
+    followUpAt: transitionNow + 2 * transitionDay, noReplyTracking: false, noReplyAt: 0
+  },
+  "Planning tracked waiting work must replace the old waiting schedule"
+);
+
 const protectedArchive = scope.PinWorkflow.archiveRecord(
   {stableKey: "original", subject: "Subject", pinnedAt: 1},
   "completed",

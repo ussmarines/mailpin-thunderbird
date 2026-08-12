@@ -47,7 +47,7 @@ expectations = {
     },
     ("simulateRules", "options"): {"trigger", "limit", "accountKey", "folderURI"},
     ("performReferenceAction", "options"): {
-        "calendarId", "groupId", "caseId", "templateId", "note", "dueAt",
+        "calendarId", "groupId", "caseId", "templateId", "note", "dueAt", "startAt", "endAt",
         "reminderAt", "priorityLevel", "workflowStatus", "completed",
         "repeatRule", "recurrenceRule", "recurrenceInterval", "followUpAt",
         "reminderLeadMinutes", "snoozeUntil", "clearFollowUp", "action"

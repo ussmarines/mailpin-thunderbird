@@ -10,6 +10,7 @@ let loadGeneration = 0;
 let searchTimer = null;
 let statusTimer = null;
 let pendingCalendarKeys = [];
+let pendingNoReplyKey = "";
 let loading = false;
 let lastSelectedKey = "";
 
@@ -91,6 +92,31 @@ function formatDate(value) {
   catch { return new Date(timestamp).toLocaleString(); }
 }
 
+function padLocalPart(value) {
+  return String(value).padStart(2, "0");
+}
+
+function localDateValue(timestamp) {
+  const date = new Date(timestamp);
+  return `${date.getFullYear()}-${padLocalPart(date.getMonth() + 1)}-${padLocalPart(date.getDate())}`;
+}
+
+function localTimeValue(timestamp) {
+  const date = new Date(timestamp);
+  return `${padLocalPart(date.getHours())}:${padLocalPart(date.getMinutes())}`;
+}
+
+function localTimestamp(dateValue, timeValue) {
+  if (!dateValue || !timeValue) return 0;
+  const timestamp = new Date(`${dateValue}T${timeValue}`).getTime();
+  return Number.isFinite(timestamp) ? timestamp : 0;
+}
+
+function setLocalDateTime(dateId, timeId, timestamp) {
+  $(dateId).value = localDateValue(timestamp);
+  $(timeId).value = localTimeValue(timestamp);
+}
+
 function formatDurationDays(value) {
   const ms = Math.max(0, Number(value) || 0);
   if (!ms) return "0";
@@ -122,7 +148,10 @@ function checklistElement(item) {
     checkbox.addEventListener("change", async () => {
       const next = (item.checklist || []).map(candidate => candidate.id === entry.id ? {...candidate, completed: true, completedAt: Date.now()} : candidate);
       checkbox.disabled = true;
-      try { await api.pinInbox.updateReferenceDetails(item.stableKey, {checklist: next}); await load({silent: true}); }
+      try {
+        await api.pinInbox.updateReferenceDetails(item.stableKey, {checklist: next});
+        if (!await loadAfterMutation()) checkbox.disabled = false;
+      }
       catch (error) { checkbox.disabled = false; setStatus(failureMessage("actionFailed", "Action impossible", error), "error", {persistent: true}); }
     });
     label.append(checkbox, node("span", "", entry.text)); list.append(label);
@@ -247,7 +276,7 @@ function badge(host, condition, label, className = "") {
 function badgesFor(item) {
   const host = node("div", "badges");
   badge(host, item.unread, msg("unread", "Non lu"));
-  badge(host, item.responseState === "waitingForThem", msg("waitingForThem", "J’attends"), "waiting");
+  badge(host, item.responseState === "waitingForThem" && item.workflowStatus !== "waiting", msg("waitingForThem", "J’attends"), "waiting");
   badge(host, item.responseState === "needsReply", msg("needsReply", "Je dois répondre"), "reply-needed");
   badge(host, item.workflowStatus === "waiting", msg("statusWaiting", "En attente"), "waiting");
   badge(host, item.workflowStatus === "planned", msg("statusPlanned", "Planifié"), "planned");
@@ -322,13 +351,16 @@ function createCard(item, {compact = false, selectable = true} = {}) {
 
   if (!compact) {
     const actions = node("div", "item-actions");
+    const waitingAction = item.workflowStatus === "waiting" ? "active" : "waiting";
+    const waitingButton = actionButton(waitingAction, item.workflowStatus === "waiting" ? msg("returnToActive", "Repasser à traiter") : msg("statusWaiting", "En attente"));
+    waitingButton.setAttribute("aria-pressed", String(item.workflowStatus === "waiting"));
     actions.append(
       actionButton("open", msg("open", "Ouvrir")),
       actionButton("reply", msg("reply", "Répondre")),
       actionButton(item.completedAt ? "active" : "complete", item.completedAt ? msg("reopen", "Rouvrir") : msg("statusComplete", "Terminer")),
       actionButton(Number(item.snoozeUntil || 0) > Date.now() ? "wake" : "snooze", Number(item.snoozeUntil || 0) > Date.now() ? msg("wakeNow", "Réveiller maintenant") : msg("snoozeOneHour", "Reporter d’une heure")),
-      actionButton("waiting", msg("statusWaiting", "Attente")),
-      actionButton(item.noReplyTracking ? "cancelNoReply" : "trackNoReply", item.noReplyTracking ? msg("cancelNoReplyTracking", "Arrêter la relance") : msg("trackNoReply", "Relancer sans réponse")),
+      waitingButton,
+      actionButton("trackNoReply", item.noReplyTracking ? msg("changeNoReplyTracking", "Modifier la relance") : msg("trackNoReply", "Relancer sans réponse")),
       actionButton("calendar", msg("calendar", "Agenda")),
       actionButton("unpin", msg("unpin", "Désépingler"))
     );
@@ -770,9 +802,17 @@ async function load({silent = false} = {}) {
     return true;
   } catch (error) {
     if (generation === loadGeneration) setFatal(error);
+    return false;
   } finally {
     if (generation === loadGeneration) setLoading(false);
   }
+}
+
+async function loadAfterMutation() {
+  const refreshed = await load({silent: true});
+  if (refreshed) return true;
+  setStatus(msg("actionSavedRefreshFailed", "The action was saved, but the dashboard could not refresh. Try again."), "error", {persistent: true});
+  return false;
 }
 
 function destructive(action) { return ["delete", "archive", "unpin"].includes(action); }
@@ -809,8 +849,11 @@ async function perform(keys, action, options = {}, {reload = true, control = nul
   setStatus(msg("actionInProgress", "Action en cours…"), "busy", {persistent: true});
   try {
     const result = await api.pinInbox.performReferenceAction(safeKeys, action, options);
-    if (action !== "open" && action !== "reply") safeKeys.forEach(key => selected.delete(key));
-    if (reload) await load({silent: true});
+    if (reload && !await loadAfterMutation()) return result;
+    if (action !== "open" && action !== "reply") {
+      safeKeys.forEach(key => selected.delete(key));
+      updateSelectionBar();
+    }
     const actionMessage = ACTION_MESSAGES[action];
     setStatus(actionMessage ? msg(...actionMessage) : msg("itemsUpdated", "$1 élément(s) mis à jour.", [displayCount(result?.count || safeKeys.length)]), "success");
     return result;
@@ -831,21 +874,110 @@ function updateBulkVisibility() {
   ]) $(id).hidden = !visible;
 }
 
+function selectedCalendarItem() {
+  return (current?.items || []).find(item => item.stableKey === pendingCalendarKeys[0]) || null;
+}
+
+function populateCalendarTargets() {
+  const type = $("calendar-item-type").value || "event";
+  const target = $("calendar-target");
+  const field = $("calendar-target-field");
+  const availability = $("calendar-availability");
+  target.replaceChildren();
+  const compatible = calendars.filter(calendar => type === "event" ? calendar.eventCompatible : calendar.taskCompatible);
+  for (const calendar of compatible) {
+    target.append(option(calendar.id, `${calendar.name}${calendar.reason ? ` · ${calendar.reason}` : ""}`));
+  }
+  target.value = compatible.some(calendar => calendar.id === calendarIdFor(type)) ? calendarIdFor(type) : (compatible[0]?.id || "");
+  const noCompatibleCalendar = !compatible.length;
+  field.hidden = noCompatibleCalendar;
+  availability.textContent = noCompatibleCalendar
+    ? msg(type === "event" ? "calendarNoCompatibleEvent" : "calendarNoCompatibleTask", type === "event" ? "No compatible event calendar is available." : "Aucun agenda compatible avec les tâches n’est disponible.")
+    : "";
+  availability.hidden = !noCompatibleCalendar;
+  target.disabled = noCompatibleCalendar;
+}
+
+function updateCalendarScheduleVisibility() {
+  const event = $("calendar-item-type").value === "event";
+  $("calendar-event-schedule").hidden = !event;
+  $("calendar-task-schedule").hidden = event;
+}
+
+function calendarScheduleOptions() {
+  if ($("calendar-item-type").value === "event") {
+    return {
+      startAt: localTimestamp($("calendar-event-start-date").value, $("calendar-event-start-time").value),
+      endAt: localTimestamp($("calendar-event-end-date").value, $("calendar-event-end-time").value)
+    };
+  }
+  return {dueAt: localTimestamp($("calendar-task-due-date").value, $("calendar-task-due-time").value)};
+}
+
+function validateCalendarSchedule() {
+  const error = $("calendar-error");
+  let message = "";
+  const schedule = calendarScheduleOptions();
+  if (!$("calendar-target").value) message = $("calendar-availability").textContent || msg("calendarRequired", "Choisissez un calendrier inscriptible.");
+  else if ($("calendar-item-type").value === "event" && (!schedule.startAt || !schedule.endAt)) message = msg("eventDatesRequired", "Renseignez les dates et heures de début et de fin.");
+  else if ($("calendar-item-type").value === "event" && schedule.endAt <= schedule.startAt) message = msg("eventEndAfterStart", "La fin doit être postérieure au début.");
+  else if ($("calendar-item-type").value === "task" && !schedule.dueAt) message = msg("taskDueRequired", "Renseignez la date et l’heure d’échéance.");
+  error.textContent = message;
+  error.hidden = !message;
+  $("calendar-confirm").disabled = Boolean(message);
+  return !message;
+}
+
 function openCalendarDialog(keys) {
   pendingCalendarKeys = [...keys];
-  const type = $("calendar-item-type").value || configuration?.settings?.calendarItemType || "task";
-  const target = $("calendar-target");
-  target.replaceChildren();
-  for (const calendar of calendars) {
-    const compatible = type === "event" ? calendar.eventCompatible : calendar.taskCompatible;
-    const item = option(calendar.id, `${calendar.name}${calendar.reason ? ` · ${calendar.reason}` : ""}`);
-    item.disabled = !compatible;
-    target.append(item);
-  }
-  const preferred = configuration?.settings?.preferredCalendarId || "";
-  target.value = [...target.options].some(item => item.value === preferred && !item.disabled) ? preferred : ([...target.options].find(item => !item.disabled)?.value || "");
-  $("calendar-confirm").disabled = !target.value;
+  const now = Date.now();
+  const item = selectedCalendarItem();
+  const relevant = normalizeTimestamp(item?.dueAt || item?.followUpAt || 0);
+  const nextHour = new Date(now); nextHour.setMinutes(0, 0, 0); nextHour.setHours(nextHour.getHours() + 1);
+  const eventStart = relevant > now ? relevant : nextHour.getTime();
+  const taskDefault = new Date(now); taskDefault.setDate(taskDefault.getDate() + 1); taskDefault.setHours(9, 0, 0, 0);
+  const taskDue = relevant > now ? relevant : taskDefault.getTime();
+  $("calendar-item-type").value = item?.calendarItemId ? (item.calendarItemType === "task" ? "task" : "event") : "event";
+  setLocalDateTime("calendar-event-start-date", "calendar-event-start-time", eventStart);
+  setLocalDateTime("calendar-event-end-date", "calendar-event-end-time", eventStart + 60 * 60_000);
+  setLocalDateTime("calendar-task-due-date", "calendar-task-due-time", taskDue);
+  updateCalendarScheduleVisibility();
+  populateCalendarTargets();
+  validateCalendarSchedule();
   $("calendar-dialog").showModal();
+}
+
+function noReplyDueAt() {
+  const preset = $("no-reply-preset").value;
+  const now = Date.now();
+  if (preset === "custom") return localTimestamp($("no-reply-date").value, $("no-reply-time").value);
+  if (preset === "tomorrow") {
+    const target = new Date(now); target.setDate(target.getDate() + 1); target.setHours(9, 0, 0, 0); return target.getTime();
+  }
+  const days = preset === "default" ? Number(configuration?.settings?.noReplyDefaultDays || 5) : Number(preset);
+  return now + Math.max(1, days || 5) * 86_400_000;
+}
+
+function updateNoReplyPreview() {
+  const custom = $("no-reply-preset").value === "custom";
+  $("no-reply-custom").hidden = !custom;
+  const dueAt = noReplyDueAt();
+  const valid = dueAt > Date.now();
+  $("no-reply-preview").textContent = dueAt ? formatDate(dueAt) : msg("invalidDate", "Date invalide");
+  $("no-reply-error").textContent = valid ? "" : msg("noReplyDateFuture", "Choisissez une date et une heure futures.");
+  $("no-reply-error").hidden = valid;
+  $("no-reply-confirm").disabled = !valid;
+}
+
+function openNoReplyDialog(key) {
+  pendingNoReplyKey = String(key || "");
+  const item = (current?.items || []).find(candidate => candidate.stableKey === pendingNoReplyKey);
+  $("no-reply-preset").value = item?.noReplyTracking ? "custom" : "default";
+  const customAt = normalizeTimestamp(item?.noReplyAt || 0) || noReplyDueAt();
+  setLocalDateTime("no-reply-date", "no-reply-time", customAt);
+  $("no-reply-stop").hidden = !item?.noReplyTracking;
+  updateNoReplyPreview();
+  $("no-reply-dialog").showModal();
 }
 
 async function refreshHealth(control = null) {
@@ -881,7 +1013,7 @@ async function handleActionClick(event) {
     setStatus(msg("mergeRelatedBusy", "Fusion de la conversation…"), "busy", {persistent: true});
     try {
       await api.pinInbox.mergeRelatedReferences(group.stableKeys);
-      await load({silent: true});
+      if (!await loadAfterMutation()) return;
       setStatus(msg("mergeRelated", "Conversation fusionnée."), "success");
     } catch (error) { setStatus(failureMessage("mergeRelatedFailed", "Fusion impossible", error), "error", {persistent: true}); }
     finally { setButtonBusy(control, false); }
@@ -890,6 +1022,7 @@ async function handleActionClick(event) {
   const key = card?.dataset.key;
   if (!key) return;
   if (action === "calendar") { openCalendarDialog([key]); return; }
+  if (action === "trackNoReply" || action === "cancelNoReply") { openNoReplyDialog(key); return; }
   if (action === "snooze-hour") return perform([key], "snooze", {durationMs: 60 * 60_000}, {control});
   if (action === "snooze-tomorrow") return perform([key], "snooze", {until: snoozeUntilTomorrow()}, {control});
   if (action === "snooze") return perform([key], "snooze", {durationMs: 60 * 60_000}, {control});
@@ -998,7 +1131,7 @@ function bindEvents() {
       try {
         const result = await api.pinInbox.repairHealthIssues({actions: ["orphan-links", "repair-references"]});
         current.health = result.health;
-        await load({silent: true});
+        if (!await loadAfterMutation()) return;
         setStatus(msg("healthRepairComplete", "$1 élément(s) réparé(s).", [displayCount(result.repaired)]), "success");
       } catch (error) { setStatus(failureMessage("healthRepairFailed", "Réparation impossible", error), "error", {persistent: true}); }
       finally { setButtonBusy(control, false); }
@@ -1020,7 +1153,7 @@ function bindEvents() {
       setButtonBusy(control, true);
       try {
         await api.pinInbox.clearDiagnostics();
-        await load({silent: true});
+        if (!await loadAfterMutation()) return;
         setStatus(msg("diagnosticCleared", "Journal diagnostic vidé."), "success");
       } catch (error) { setStatus(failureMessage("diagnosticClearFailed", "Nettoyage impossible", error), "error", {persistent: true}); }
       finally { setButtonBusy(control, false); }
@@ -1035,15 +1168,31 @@ function bindEvents() {
     }
   });
 
-  $("calendar-item-type").addEventListener("change", () => openCalendarDialog(pendingCalendarKeys));
-  $("calendar-target").addEventListener("change", () => { $("calendar-confirm").disabled = !$("calendar-target").value; });
-  $("calendar-dialog").addEventListener("close", async () => {
-    if ($("calendar-dialog").returnValue !== "default" || !pendingCalendarKeys.length) { pendingCalendarKeys = []; return; }
+  $("calendar-item-type").addEventListener("change", () => { updateCalendarScheduleVisibility(); populateCalendarTargets(); validateCalendarSchedule(); });
+  $("calendar-target").addEventListener("change", validateCalendarSchedule);
+  for (const id of ["calendar-event-start-date", "calendar-event-start-time", "calendar-event-end-date", "calendar-event-end-time", "calendar-task-due-date", "calendar-task-due-time"]) $(id).addEventListener("input", validateCalendarSchedule);
+  $("calendar-dialog").querySelector("form").addEventListener("submit", async event => {
+    event.preventDefault();
+    if (event.submitter?.value === "cancel") { $("calendar-dialog").close("cancel"); pendingCalendarKeys = []; return; }
+    if (!pendingCalendarKeys.length || !validateCalendarSchedule()) return;
     const key = pendingCalendarKeys[0];
     const type = $("calendar-item-type").value;
     const calendarId = $("calendar-target").value;
-    pendingCalendarKeys = [];
-    await perform([key], "calendar", {itemType: type, calendarId});
+    const result = await perform([key], "calendar", {itemType: type, calendarId, ...calendarScheduleOptions()});
+    if (result) { pendingCalendarKeys = []; $("calendar-dialog").close("created"); }
+  });
+  $("no-reply-preset").addEventListener("change", updateNoReplyPreview);
+  $("no-reply-date").addEventListener("input", updateNoReplyPreview);
+  $("no-reply-time").addEventListener("input", updateNoReplyPreview);
+  $("no-reply-dialog").querySelector("form").addEventListener("submit", async event => {
+    event.preventDefault();
+    const key = pendingNoReplyKey;
+    if (!key || event.submitter?.value === "cancel") { pendingNoReplyKey = ""; $("no-reply-dialog").close("cancel"); return; }
+    const action = event.submitter?.value === "stop" ? "cancelNoReply" : "trackNoReply";
+    const dueAt = noReplyDueAt();
+    if (action === "trackNoReply" && dueAt <= Date.now()) { updateNoReplyPreview(); return; }
+    const result = await perform([key], action, action === "trackNoReply" ? {at: dueAt} : {});
+    if (result) { pendingNoReplyKey = ""; $("no-reply-dialog").close(action); }
   });
 }
 

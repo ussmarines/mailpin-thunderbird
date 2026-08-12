@@ -89,6 +89,7 @@ const initialPanelScope = arguments[2] === "selectedAccounts" ? "selectedAccount
   const { MailServices } = ChromeUtils.importESModule("resource:///modules/MailServices.sys.mjs");
   const { ExtensionStorage } = ChromeUtils.importESModule("resource://gre/modules/ExtensionStorage.sys.mjs");
   const { Sqlite } = ChromeUtils.importESModule("resource://gre/modules/Sqlite.sys.mjs");
+  const { cal } = ChromeUtils.importESModule("resource:///modules/calendar/calUtils.sys.mjs");
   const { classes: Cc, interfaces: Ci } = Components;
   Services.io.offline = true;
   Services.prefs.setBoolPref("network.manage-offline-status", false);
@@ -100,6 +101,13 @@ const initialPanelScope = arguments[2] === "selectedAccounts" ? "selectedAccount
   if (!win || !pane) throw new Error("about:3pane is unavailable");
   const sleep = ms => new Promise(resolve => win.setTimeout(resolve, ms));
   try { win.document.querySelector("account-hub-container")?.modal?.close(); } catch {}
+
+  const benchCalendar = cal.manager.createCalendar("memory", Services.io.newURI(`moz-memory-calendar://mailperch-bench-${volume}`));
+  if (!benchCalendar) throw new Error("Writable memory calendar could not be created");
+  benchCalendar.id = `mailperch-bench-calendar-${volume}`;
+  benchCalendar.name = "MailPerch Bench Calendar";
+  benchCalendar.setProperty("requiresNetwork", false);
+  cal.manager.registerCalendar(benchCalendar);
 
   const servers = [];
   const syntheticAccounts = [];
@@ -277,6 +285,7 @@ const initialPanelScope = arguments[2] === "selectedAccounts" ? "selectedAccount
     enableMultiSelect: true, enableBulkActions: true, enableSmartViews: true,
     enablePerformanceMetrics: true, settingsExperience: "advanced",
     safeMode: false, hideCompleted: false, confirmBulkDestructiveActions: false,
+    preferredCalendarId: benchCalendar.id,
   };
   await ExtensionStorage.set("pin-mails@MailPerch.local", {"mailperch.installation":"mailperch-installation-v1"});
   Services.prefs.setStringPref("extensions.pinMails.settings", JSON.stringify(settings));
@@ -365,7 +374,7 @@ const initialPanelScope = arguments[2] === "selectedAccounts" ? "selectedAccount
     accountKeys, accounts: accountSummaries, selectedAccountLabels, folderUris: folders.map(folder => String(folder.URI)),
     currentFolderUri: String(controlFolder.URI),
     currentFolderPinnedCount: Object.values(refs).filter(ref => ref.sourceInboxURI === controlFolder.URI).length,
-    controlMessageId,
+    controlMessageId, calendarId: benchCalendar.id,
     firstKey: manualOrder[0], middleKey: manualOrder[Math.floor(volume / 2)], lastKey: manualOrder[volume - 1],
   });
 })().catch(error => done({__mailperchSmokeError: `${error?.name || "Error"}: ${error?.message || error}\n${error?.stack || ""}`}));
@@ -526,10 +535,18 @@ const scopeExpected = arguments[2] || {};
     try { pane.gDBView?.selection?.select(0); } catch {}
     const conversationButton = panel.querySelector(".pin-mails-action-conversation");
     conversationButton.click();
-    await waitFor(() => count() === expected + 1, "conversation pin");
+    await waitFor(() => count() === expected, "message-to-conversation pin reconciliation");
+    if (new Set(cards().map(card => card.dataset.stableKey)).size !== cards().length) throw new Error("Parallel message/conversation cards after explicit conversation pin");
+    controlButton.click();
+    await waitFor(() => count() === expected - 1, "conversation pin removed from native row");
     conversationButton.click();
-    await waitFor(() => count() === expected, "conversation unpin");
-    functional.push("conversation-pin-unpin");
+    await waitFor(() => count() === expected, "conversation pin restored");
+    controlButton.click();
+    await waitFor(() => count() === expected - 1, "conversation-to-message generic toggle removes one logical pin");
+    controlButton.click();
+    await waitFor(() => count() === expected, "generic message pin restored without a parallel conversation");
+    if (new Set(cards().map(card => card.dataset.stableKey)).size !== cards().length) throw new Error("Parallel cards after cross-entry pin toggles");
+    functional.push("cross-entry-message-conversation-reconciliation");
     panel.querySelector(".pin-mails-action-add-group").click(); await sleep(100);
     const groupDialog = doc.querySelector('.pin-mails-group-dialog[open]');
     if (!groupDialog) throw new Error("Create-group dialog did not open");
@@ -547,6 +564,7 @@ const scopeExpected = arguments[2] || {};
     functional.push("card-action-menu-native-command");
     await waitFor(() => Boolean(doc.getElementById("pin-mails-editor")?.open), "card editor opened by native XUL command");
     const editor = doc.getElementById("pin-mails-editor");
+    const editedKey = editor.dataset.stableKey;
     editor.querySelector(".pin-mails-editor-note").value = "Note modifiée par le banc fonctionnel";
     const checklistInput = editor.querySelector(".pin-mails-editor-checklist-input");
     checklistInput.value = "Sous-tâche ajoutée par le banc";
@@ -557,8 +575,45 @@ const scopeExpected = arguments[2] || {};
     editor.querySelector(".pin-mails-editor-due").value = "2030-01-02T10:00";
     editor.querySelector(".pin-mails-editor-follow-up").value = "2030-01-01T09:00";
     editor.querySelector("form").requestSubmit();
-    await sleep(250);
+    await waitFor(() => Boolean(cards().find(card => card.dataset.stableKey === editedKey)?.querySelector(".pin-mails-workflow-chip.waiting")), "panel editor waiting state persisted");
     functional.push("group-assign", "notes-checklist-priority-deadline-status-followup-editor");
+
+    const invokeContextAction = async action => {
+      const card = cards().find(candidate => candidate.dataset.stableKey === editedKey);
+      card?.querySelector('[data-card-action="more"]')?.click();
+      await sleep(100);
+      const item = contextMenu.querySelector(`[data-context-action="${action}"]`);
+      if (!item || typeof item.doCommand !== "function") throw new Error(`Panel context action is unavailable: ${action}`);
+      item.doCommand();
+    };
+    await invokeContextAction("track-no-reply");
+    await waitFor(() => Boolean(doc.querySelector(".pin-mails-no-reply-dialog[open]")), "panel no-reply dialog");
+    const noReplyDialog = doc.querySelector(".pin-mails-no-reply-dialog[open]");
+    const noReplyPreset = noReplyDialog.querySelector("select");
+    noReplyPreset.value = "custom";
+    noReplyPreset.dispatchEvent(new pane.Event("change", {bubbles:true}));
+    const noReplyDate = new Date(Date.now() + 4 * 86_400_000);
+    noReplyDate.setSeconds(0, 0);
+    noReplyDialog.querySelector('input[type="datetime-local"]').value = noReplyDate.toISOString().slice(0, 16);
+    noReplyDialog.querySelector('input[type="datetime-local"]').dispatchEvent(new pane.Event("input", {bubbles:true}));
+    noReplyDialog.querySelector("form").requestSubmit();
+    await waitFor(() => !doc.querySelector(".pin-mails-no-reply-dialog[open]") && Boolean(cards().find(card => card.dataset.stableKey === editedKey)?.querySelector(".pin-mails-no-reply-chip")), "panel custom no-reply schedule persisted");
+    functional.push("panel-no-reply-custom-schedule");
+
+    await invokeContextAction("calendar-event");
+    await waitFor(() => Boolean(doc.querySelector(".pin-mails-calendar-dialog[open]")), "panel Calendar schedule dialog");
+    const calendarDialog = doc.querySelector(".pin-mails-calendar-dialog[open]");
+    const calendarStart = calendarDialog.querySelector(".pin-mails-calendar-start");
+    const calendarEnd = calendarDialog.querySelector(".pin-mails-calendar-end");
+    if (!calendarStart || !calendarEnd) throw new Error("Panel event schedule controls are missing");
+    const eventStart = new Date(Date.now() + 5 * 3_600_000); eventStart.setSeconds(0, 0);
+    const eventEnd = new Date(eventStart.getTime() + 90 * 60_000);
+    calendarStart.value = eventStart.toISOString().slice(0, 16);
+    calendarEnd.value = eventEnd.toISOString().slice(0, 16);
+    calendarEnd.dispatchEvent(new pane.Event("input", {bubbles:true}));
+    calendarDialog.querySelector("form").requestSubmit();
+    await waitFor(() => !doc.querySelector(".pin-mails-calendar-dialog[open]") && Boolean(cards().find(card => card.dataset.stableKey === editedKey)?.querySelector(".pin-mails-calendar-chip")), "panel event schedule persisted");
+    functional.push("panel-calendar-custom-schedule");
   }
 
   scope.value = "global";
@@ -801,6 +856,8 @@ const fullFunctional = Boolean(arguments[1]);
   const totalText = doc.getElementById("stats")?.textContent || "";
   if (!totalText.includes(String(expected))) throw new Error(`Dashboard total ${expected} is missing`);
   const checks = [];
+  const calendarCreates = [];
+  const workflowTransitions = [];
   if (fullFunctional) {
     for (const view of ["today", "list", "kanban", "cases", "review", "history", "health"]) {
       doc.querySelector(`[data-view="${view}"]`).click(); await sleep(300);
@@ -828,8 +885,94 @@ const fullFunctional = Boolean(arguments[1]);
     doc.getElementById("command-close").click();
     doc.getElementById("refresh").click(); await sleep(300);
     checks.push("search", "smart-view", "saved-view", "multi-select", "bulk-priority", "command-palette", "refresh");
+
+    const waitFor = async (predicate, label) => {
+      const limit = Date.now() + 10000;
+      while (Date.now() < limit) { if (await predicate()) return; await sleep(100); }
+      throw new Error(`Dashboard calendar timeout: ${label}`);
+    };
+    const localParts = timestamp => {
+      const date = new Date(timestamp);
+      const pad = value => String(value).padStart(2, "0");
+      return {date:`${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}`,time:`${pad(date.getHours())}:${pad(date.getMinutes())}`};
+    };
+    const calendarKeys = [...doc.querySelectorAll('#items .item[data-key]')].slice(0, 2).map(card => card.dataset.key);
+    if (calendarKeys.length < 2) throw new Error("Two Dashboard cards are required for Calendar creation");
+    for (const [index, type] of ["event", "task"].entries()) {
+      const key = calendarKeys[index];
+      const card = [...doc.querySelectorAll('#items .item[data-key]')].find(candidate => candidate.dataset.key === key);
+      if (!card) throw new Error(`${type} Dashboard card disappeared before Calendar creation`);
+      card.querySelector('[data-action="calendar"]').click();
+      await waitFor(() => doc.getElementById("calendar-dialog").open, `${type} dialog open`);
+      const typeControl = doc.getElementById("calendar-item-type");
+      typeControl.value = type; typeControl.dispatchEvent(new Event("change", {bubbles:true}));
+      const start = Date.now() + (index + 2) * 3_600_000;
+      if (type === "event") {
+        const startParts = localParts(start); const endParts = localParts(start + 90 * 60_000);
+        for (const [id, value] of [["calendar-event-start-date",startParts.date],["calendar-event-start-time",startParts.time],["calendar-event-end-date",endParts.date],["calendar-event-end-time",endParts.time]]) {
+          const control = doc.getElementById(id); control.value = value; control.dispatchEvent(new Event("input", {bubbles:true}));
+        }
+      } else {
+        const due = localParts(start + 24 * 3_600_000);
+        for (const [id, value] of [["calendar-task-due-date",due.date],["calendar-task-due-time",due.time]]) {
+          const control = doc.getElementById(id); control.value = value; control.dispatchEvent(new Event("input", {bubbles:true}));
+        }
+      }
+      const target = doc.getElementById("calendar-target");
+      if (!target.value || target.selectedOptions[0]?.disabled) throw new Error(`No writable ${type} calendar target`);
+      const confirm = doc.getElementById("calendar-confirm");
+      if (confirm.disabled) throw new Error(`${type} Calendar confirmation stayed disabled`);
+      confirm.click();
+      await waitFor(() => !doc.getElementById("calendar-dialog").open, `${type} creation`);
+      const data = await messenger.pinInbox.getDashboardData({view:"list",filter:"all",smartView:"all",useSmartView:false});
+      const linked = data.items.find(item => item.stableKey === key);
+      if (!linked?.calendarItemId || linked.calendarItemType !== type) throw new Error(`${type} was not linked to its Dashboard reference`);
+      calendarCreates.push({type,key,itemId:linked.calendarItemId,calendarId:linked.calendarId});
+      checks.push(`calendar-${type}-create`);
+    }
+
+    const workflowKey = calendarKeys[0];
+    const plannedAt = Date.now() + 2 * 86_400_000;
+    await messenger.pinInbox.performReferenceAction([workflowKey], "setMetadata", {
+      workflowStatus: "planned", completed: false, followUpAt: plannedAt
+    });
+    let workflowData = await messenger.pinInbox.getDashboardData({view:"list",filter:"all",smartView:"all",useSmartView:false});
+    let workflowItem = workflowData.items.find(item => item.stableKey === workflowKey);
+    if (workflowItem?.workflowStatus !== "planned" || workflowItem.completedAt) {
+      throw new Error(`Editor metadata workflow did not preserve planned state: ${JSON.stringify(workflowItem)}`);
+    }
+    workflowTransitions.push({status:workflowItem.workflowStatus,followUpAt:workflowItem.followUpAt});
+
+    const noReplyAt = Date.now() + 3 * 86_400_000;
+    await messenger.pinInbox.setNoReplyTracking([workflowKey], {enabled:true,at:noReplyAt});
+    await messenger.pinInbox.performReferenceAction([workflowKey], "active", {});
+    workflowData = await messenger.pinInbox.getDashboardData({view:"list",filter:"all",smartView:"all",useSmartView:false});
+    workflowItem = workflowData.items.find(item => item.stableKey === workflowKey);
+    if (workflowItem?.workflowStatus !== "active" || workflowItem.completedAt || workflowItem.noReplyTracking || workflowItem.noReplyAt || workflowItem.noReplyStartedAt || workflowItem.noReplyBaselineMessageId) {
+      throw new Error(`Leaving no-reply workflow kept orphan state: ${JSON.stringify(workflowItem)}`);
+    }
+    workflowTransitions.push({status:workflowItem.workflowStatus,noReplyTracking:workflowItem.noReplyTracking});
+
+    await messenger.pinInbox.setNoReplyTracking([workflowKey], {enabled:true,at:noReplyAt});
+    await messenger.pinInbox.performReferenceAction([workflowKey], "complete", {});
+    workflowData = await messenger.pinInbox.getDashboardData({view:"list",filter:"all",smartView:"all",useSmartView:false});
+    workflowItem = workflowData.items.find(item => item.stableKey === workflowKey);
+    if (workflowItem?.workflowStatus !== "completed" || !workflowItem.completedAt || workflowItem.waitingSince || workflowItem.followUpAt || workflowItem.noReplyTracking || workflowItem.noReplyAt || workflowItem.noReplyStartedAt || workflowItem.noReplyBaselineMessageId) {
+      throw new Error(`Completing no-reply workflow kept pending state: ${JSON.stringify(workflowItem)}`);
+    }
+    workflowTransitions.push({status:workflowItem.workflowStatus,followUpAt:workflowItem.followUpAt,noReplyTracking:workflowItem.noReplyTracking});
+
+    await messenger.pinInbox.setNoReplyTracking([workflowKey], {enabled:true,at:noReplyAt});
+    await messenger.pinInbox.applyTemplate([workflowKey], "bench-template-0");
+    workflowData = await messenger.pinInbox.getDashboardData({view:"list",filter:"all",smartView:"all",useSmartView:false});
+    workflowItem = workflowData.items.find(item => item.stableKey === workflowKey);
+    if (workflowItem?.workflowStatus !== "active" || workflowItem.completedAt || workflowItem.waitingSince || workflowItem.noReplyTracking || workflowItem.noReplyAt || workflowItem.noReplyStartedAt || workflowItem.noReplyBaselineMessageId) {
+      throw new Error(`Applying active template kept no-reply state: ${JSON.stringify(workflowItem)}`);
+    }
+    workflowTransitions.push({status:workflowItem.workflowStatus,templateId:workflowItem.templateId,noReplyTracking:workflowItem.noReplyTracking});
+    checks.push("metadata-workflow-transition", "no-reply-cleanup-on-active", "no-reply-cleanup-on-complete", "no-reply-cleanup-on-template");
   }
-  done({stats, checks, badText:/\b(?:null|undefined|NaN)\b/.test(doc.body.textContent)});
+  done({stats, checks, calendarCreates, workflowTransitions, badText:/\b(?:null|undefined|NaN)\b/.test(doc.body.textContent)});
 })().catch(error => done({__mailperchSmokeError: `${error?.name || "Error"}: ${error?.message || error}\n${error?.stack || ""}`}));
 """
 
@@ -926,8 +1069,14 @@ const dark = Boolean(arguments[0]);
   if (!panel || cards.length < 2) throw new Error("Two panel cards are not available for theme evidence");
   const list = panel.querySelector(".pin-mails-panel-list");
   const listRect = list.getBoundingClientRect();
-  const firstRect = cards[0].getBoundingClientRect();
-  const secondRect = cards[1].getBoundingClientRect();
+  const ordinaryCards = cards.filter(card => !card.querySelector(".pin-mails-note") && !card.querySelector(".pin-mails-checklist"));
+  const densityCards = (ordinaryCards.length >= 2 ? ordinaryCards : cards)
+    .map(card => ({card,height:card.getBoundingClientRect().height}))
+    .sort((left, right) => left.height - right.height)
+    .slice(0, 2)
+    .map(item => item.card);
+  const firstRect = densityCards[0].getBoundingClientRect();
+  const secondRect = densityCards[1].getBoundingClientRect();
   const searchRect = panel.querySelector(".pin-mails-search").getBoundingClientRect();
   const filterRect = panel.querySelector(".pin-mails-smart-view-select").getBoundingClientRect();
   const pin = cards[0].querySelector(".pin-mails-card-pin");
@@ -939,10 +1088,9 @@ const dark = Boolean(arguments[0]);
   const contrast = element => { const fg=luminance(parseRgb(pane.getComputedStyle(element).color)); const bg=luminance(parseRgb(effectiveBackground(element))); if(fg==null||bg==null)return 0; return (Math.max(fg,bg)+0.05)/(Math.min(fg,bg)+0.05); };
   const searchElement=panel.querySelector(".pin-mails-search");
   const filterElement=panel.querySelector(".pin-mails-smart-view-select");
-  const ordinaryCards=cards.filter(card => !card.querySelector(".pin-mails-note") && !card.querySelector(".pin-mails-checklist"));
   const listStyle=pane.getComputedStyle(list);
   const ordinaryGap=parseFloat(listStyle.rowGap || listStyle.gap || "0") || 0;
-  const ordinaryCardHeights=ordinaryCards.slice(0,2).map(card => card.getBoundingClientRect().height);
+  const ordinaryCardHeights=densityCards.map(card => card.getBoundingClientRect().height);
   const ordinaryTwoFit=ordinaryCardHeights.length >= 2 && ordinaryCardHeights[0] + ordinaryCardHeights[1] + ordinaryGap <= list.clientHeight + 1;
   const sameRow = Math.abs(searchRect.top - filterRect.top) <= 2;
   const sameColumn = Math.abs(searchRect.left - filterRect.left) <= 4 && Math.abs(searchRect.width - filterRect.width) <= 4;

@@ -103,6 +103,9 @@ for required_runtime_surface in [
     "twoCompleteCards", "controlsAligned", "cleanup-and-clean-reinstall",
     "PROFILE_STATE_SCRIPT", "ACCOUNT_SCOPE_PANEL_SCRIPT",
     "same-profile-distinct-thunderbird-processes",
+    "metadata-workflow-transition", "no-reply-cleanup-on-active",
+    "no-reply-cleanup-on-complete", "no-reply-cleanup-on-template",
+    "panel-no-reply-custom-schedule", "panel-calendar-custom-schedule",
 ]:
     assert required_runtime_surface in BENCH
 assert '"args": ["-profile", str(profile)]' in BENCH
@@ -159,8 +162,9 @@ assert not re.search(r"uses:\s+[^\s]+@(main|master|latest)\b", BENCH_WORKFLOW)
 assert re.search(
     r"\.pin-mails-smart-view-select\s*\{[^}]*flex:\s*0 1 150px;[\s\S]*?"
     r"@container threadPane \(max-width: 390px\)[\s\S]*?"
-    r"\.pin-mails-smart-view-select\s*\{[^}]*flex:\s*0 0 auto;"
-    r"[^}]*block-size:\s*30px;",
+    r"\.pin-mails-search-wrap\s*\{[^}]*flex:\s*1 1 120px;[^}]*min-inline-size:\s*96px;[\s\S]*?"
+    r"\.pin-mails-smart-view-select\s*\{[^}]*flex:\s*0 1 116px;"
+    r"[^}]*min-inline-size:\s*96px;[^}]*block-size:\s*30px;[^}]*max-inline-size:\s*116px;",
     PIN_CSS,
 )
 

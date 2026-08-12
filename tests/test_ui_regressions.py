@@ -134,27 +134,29 @@ assert 'headerAction("pin-mails-action-add-group"' in impl
 assert 'createNode("button", "pin-mails-header-action", "C")' not in impl
 
 
-# Narrow thread panes must not turn the search control's horizontal flex basis
-# into a large vertical spacer. Empty reminder centers must stay invisible.
-responsive_start = css.index("@container threadPane (max-width: 390px)")
-responsive_end = css.index("/* 2.0", responsive_start)
-responsive_block = css[responsive_start:responsive_end]
-assert ".pin-mails-search-wrap { flex: 0 0 auto; min-inline-size: 0; }" in responsive_block
+# Narrow thread panes keep search and filter on one bounded row, preserving
+# list height without allowing either control to escape the real pane.
 responsive_select_start = css.index(
     "@container threadPane (max-width: 390px)", css.index("/* 3.2.0")
 )
 responsive_select_end = css.index(".pin-mails-no-reply-chip", responsive_select_start)
 responsive_select_block = css[responsive_select_start:responsive_select_end]
-assert "flex: 0 0 auto;" in responsive_select_block
-assert "inline-size: 100%;" in responsive_select_block
+assert ".pin-mails-search-wrap { flex: 1 1 120px; min-inline-size: 96px; }" in responsive_select_block
+assert "flex: 0 1 116px;" in responsive_select_block
+assert "inline-size: auto;" in responsive_select_block
+assert "min-inline-size: 96px;" in responsive_select_block
 assert "block-size: 30px;" in responsive_select_block
-assert "max-inline-size: none;" in responsive_select_block
+assert "max-inline-size: 116px;" in responsive_select_block
 assert ".pin-mails-search-wrap { flex: 1 1 180px; min-inline-size: 96px; }" in css
 assert "flex: 0 1 150px;" in css
 assert 'url("../icons/pin-filled.svg")' in css
 assert 'url("../icons/pin.svg")' not in css
 assert 'url("../icons/conversation.svg")' not in css
 assert "max-block-size: min(calc(100vh - 96px), var(--pin-mails-max-height));" in css
+assert (ROOT / "tests/fixtures/panel_responsive_153.html").is_file()
+panel_geometry = (ROOT / "tests/panel_container_geometry.playwright.js").read_text(encoding="utf-8")
+assert "for (let width = 800; width >= 280; width -= 20)" in panel_geometry
+assert "panel.scrollWidth - panel.clientWidth" in panel_geometry
 assert "selectedAccounts" in impl
 assert "matchesPanelScope(this._settings, ref, folder.URI)" in impl
 assert "selectedAccountKeys" in settings_js and "function matchesPanelScope" in settings_js

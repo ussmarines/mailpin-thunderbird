@@ -93,6 +93,20 @@
     return /\|conv:(?:gm|root|thread):/i.test(String(value || ""));
   }
 
+  function genericTrackingMode(settings = {}) {
+    return settings.defaultPinTarget === "conversation" && settings.enableConversationPins === true
+      ? "conversation"
+      : "message";
+  }
+
+  function pinKeyPlan(trackingMode, messageKey, conversationKey) {
+    const conversation = trackingMode === "conversation";
+    return Object.freeze({
+      targetKey: conversation ? String(conversationKey || "") : String(messageKey || ""),
+      oppositeKey: conversation ? String(messageKey || "") : String(conversationKey || "")
+    });
+  }
+
   function signature(hdr, accountKey, subject, author) {
     return {
       accountKey: String(accountKey || "unknown"),
@@ -156,6 +170,8 @@
     normalizeSubject,
     conversationIdentity,
     strongConversationKey,
+    genericTrackingMode,
+    pinKeyPlan,
     signature,
     sameConversation,
     fingerprint

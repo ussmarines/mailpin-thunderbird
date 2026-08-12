@@ -1,5 +1,14 @@
 # Journal des modifications
 
+## 1.5.4 — correctifs de recette et préparation du nouveau candidat
+
+- résolution canonique du mode d’épinglage générique et réconciliation sans perte de métadonnées entre représentations message/conversation, afin d’éviter les cartes parallèles entre entrées ;
+- panneau `about:3pane` réellement responsive selon sa propre largeur, avec états medium/narrow et scénario de resize continu de 800 à 280 px ;
+- refonte structurelle de l’en-tête des règles personnalisées Options pour séparer contenu et actions sans comprimer le texte d’aide ;
+- modale Agenda bornée et enrichie avec début/fin d’événement ou échéance de tâche, valeurs locales intelligentes et validation privilégiée ;
+- bouton En attente transformé en toggle, badge analytique redondant masqué et suivi sans réponse individuel configurable avant confirmation ;
+- aucune nouvelle permission WebExtension, dépendance runtime, connexion réseau, télémétrie, publicité, migration de stockage ou modification d’identité.
+
 ## 1.5.3 — durcissement des imports et correction de lisibilité des automatisations
 
 - neutralisation, lors d’un import de sauvegarde, des réglages automatiques ou destructifs `autoRemoveCompleted`, rétention des terminés, désépinglage après suppression et sauvegardes automatiques ;

@@ -160,6 +160,29 @@ async page => {
   const assert = (condition, message) => {
     if (!condition) throw new Error(message);
   };
+  const assertRulesHeaderGeometry = async locale => {
+    for (const [width, zoom] of [
+      [360, 1], [420, 1], [520, 1], [760, 1], [820, 1], [1000, 1], [1200, 1],
+      [1000, 1.25], [1200, 2]
+    ]) {
+      await page.setViewportSize({width, height: 900});
+      const geometry = await page.evaluate(value => {
+        document.documentElement.style.zoom = String(value);
+        const header = document.querySelector(".subsection-header-with-actions");
+        header.scrollIntoView({block: "center"});
+        const copy = header.firstElementChild.getBoundingClientRect();
+        const actions = header.querySelector(".button-row").getBoundingClientRect();
+        const helps = [...header.querySelectorAll(".button-help-wrap")].map(item => item.getBoundingClientRect().width);
+        return {copy, actions, helps, scrollWidth: header.scrollWidth, clientWidth: header.clientWidth};
+      }, zoom);
+      assert(geometry.copy.width >= 180, `${locale}/${width}/${zoom}: custom-rules copy must not collapse vertically`);
+      assert(geometry.actions.top >= geometry.copy.bottom - 1, `${locale}/${width}/${zoom}: actions must remain below the explanatory copy`);
+      assert(geometry.helps.every(value => value >= 110), `${locale}/${width}/${zoom}: action help must retain a readable measure`);
+      assert(geometry.scrollWidth <= geometry.clientWidth + 1, `${locale}/${width}/${zoom}: custom-rules header must not overflow horizontally`);
+    }
+    await page.evaluate(() => { document.documentElement.style.zoom = ""; });
+    await page.setViewportSize({width: 1440, height: 900});
+  };
   const waitReady = async () => {
     await page.waitForSelector("body[data-configuration-ready]");
     await page.waitForFunction(() => document.querySelector("#settings-form")?.hidden === false);
@@ -378,6 +401,7 @@ async page => {
       .map(node => node.getBoundingClientRect()).some(rect => overlaps(result, rect));
   });
   assert(!simulationGeometry, "The simulation result must not overlap its button, help or actions");
+  await assertRulesHeaderGeometry("fr");
   await page.locator("#discard-changes").click();
   await page.waitForFunction(() => document.querySelector("#save-dock").hidden);
 
@@ -401,6 +425,7 @@ async page => {
     }).map(element => element.outerHTML.slice(0, 240));
   });
   assert(frenchLeaks.length === 0, `English UI must not expose French dynamic text: ${frenchLeaks.join(" | ")}`);
+  await assertRulesHeaderGeometry("en");
   await page.locator("#discard-changes").click();
   await page.waitForFunction(() => document.querySelector("#save-dock").hidden);
 

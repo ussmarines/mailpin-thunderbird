@@ -188,6 +188,12 @@
   "calendarCreateHelp": {
     "message": "Only compatible writable calendars can be selected."
   },
+  "calendarNoCompatibleTask": {
+    "message": "No task-compatible calendar is available. The calendars currently available support events, but may not support tasks in Thunderbird."
+  },
+  "calendarNoCompatibleEvent": {
+    "message": "No event-compatible calendar is available."
+  },
   "calendarError": {
     "message": "Calendar needs attention"
   },
@@ -1268,6 +1274,7 @@
   "account": {"message": "Account"},
   "actionInProgress": {"message": "Action in progress…"},
   "actionFailed": {"message": "Action failed"},
+  "actionSavedRefreshFailed": {"message": "The action was saved, but the dashboard could not refresh. Try again."},
   "chooseBulkAction": {"message": "Choose a bulk action."},
   "chooseTemplate": {"message": "Choose a template…"},
   "confirmBulkDelete": {"message": "Delete these $1 message(s)?"},
@@ -1608,5 +1615,31 @@
   "tagSyncControlHelp": {"message": "Only tags reserved for MailPerch are created, changed, or removed."},
   "sectionThunderbirdTechnicalEyebrow": {"message": "Thunderbird"},
   "sectionThunderbirdTechnical": {"message": "Compatibility and technical behavior"},
-  "sectionThunderbirdTechnicalIntro": {"message": "These settings are for diagnostics, special compatibility cases, and very large volumes. Recommended mode manages them automatically."}
+  "sectionThunderbirdTechnicalIntro": {"message": "These settings are for diagnostics, special compatibility cases, and very large volumes. Recommended mode manages them automatically."},
+  "returnToActive": {"message": "Return to active"},
+  "changeNoReplyTracking": {"message": "Change follow-up"},
+  "eventSchedule": {"message": "Event date and time"},
+  "taskSchedule": {"message": "Task due date"},
+  "startDate": {"message": "Start date"},
+  "startTime": {"message": "Start time"},
+  "endDate": {"message": "End date"},
+  "endTime": {"message": "End time"},
+  "dueDate": {"message": "Due date"},
+  "dueTime": {"message": "Due time"},
+  "calendarRequired": {"message": "Choose a writable calendar."},
+  "eventDatesRequired": {"message": "Enter the start and end dates and times."},
+  "eventEndAfterStart": {"message": "The end must be after the start."},
+  "taskDueRequired": {"message": "Enter the due date and time."},
+  "noReplyDialogTitle": {"message": "Follow up if no reply"},
+  "noReplyDialogHelp": {"message": "Choose when this pin should return to your attention."},
+  "defaultDelay": {"message": "Default delay"},
+  "tomorrowMorning": {"message": "Tomorrow morning"},
+  "inThreeDays": {"message": "In 3 days"},
+  "inFiveDays": {"message": "In 5 days"},
+  "inSevenDays": {"message": "In 7 days"},
+  "customDate": {"message": "Custom date"},
+  "noReplyResult": {"message": "Follow-up scheduled"},
+  "invalidDate": {"message": "Invalid date"},
+  "noReplyDateRequired": {"message": "Choose a valid date and time."},
+  "noReplyDateFuture": {"message": "Choose a future date and time."}
 }

@@ -68,7 +68,12 @@ assert 'input=b"\\0".join(tracked_names) + b"\\0"' in deep_audit
 assert 'text=False' in deep_audit
 assert '"\n".join(sorted(tracked_names))' not in deep_audit
 assert '".reports"' in check_repo
+for local_generated in ('".playwright-cli"', '"artifacts"', '"graphify-out"'):
+    assert local_generated in check_repo
+assert 'parts[:2] == ("output", "playwright")' in check_repo
 assert '".reports"' in deep_audit
+assert '["git", "ls-files", "-z"]' in deep_audit
+assert 'raw.decode("utf-8", "surrogateescape")' in deep_audit
 assert '".playwright-cli"' in deep_audit
 assert 'path.relative_to(ROOT).parts[:2] != ("output", "playwright")' in deep_audit
 assert 'path.name != ".mailperch-source-files.json"' in deep_audit

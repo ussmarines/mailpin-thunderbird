@@ -73,14 +73,14 @@
       return item;
     }
 
-    function applySchedule(item, itemType, dueAt) {
+    function applySchedule(item, itemType, dueAt, endAt = 0) {
       const type = itemType === "event" ? "event" : "task";
       const due = Number(dueAt) || 0;
       if (due) {
         const date = jsDateToDateTime(due);
         if (type === "event") {
           item.startDate = date;
-          item.endDate = jsDateToDateTime(due + 3_600_000);
+          item.endDate = jsDateToDateTime(Number(endAt) > due ? Number(endAt) : due + 3_600_000);
         } else item.dueDate = date;
       } else if (type !== "event") item.dueDate = null;
       return item;

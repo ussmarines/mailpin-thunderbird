@@ -15,13 +15,14 @@ ROOT = Path(__file__).resolve().parents[1]
 EXT = ROOT / "extension"
 errors: list[str] = []
 LOCAL_GENERATED_PARTS = {
-    ".git", ".pytest_cache", ".reports", ".security-reports",
-    "__pycache__", "dist", "node_modules",
+    ".git", ".playwright-cli", ".pytest_cache", ".reports", ".security-reports",
+    "__pycache__", "artifacts", "dist", "graphify-out", "node_modules",
 }
 
 
 def is_local_generated(path: Path) -> bool:
-    return any(part in LOCAL_GENERATED_PARTS for part in path.relative_to(ROOT).parts)
+    parts = path.relative_to(ROOT).parts
+    return any(part in LOCAL_GENERATED_PARTS for part in parts) or parts[:2] == ("output", "playwright")
 
 
 class ResourceHTMLParser(HTMLParser):
@@ -290,7 +291,7 @@ check(store_id == manifest.get("browser_specific_settings", {}).get("gecko", {})
 check((ROOT / "dist/.gitkeep").is_file(), "dist/.gitkeep manquant")
 readme = (ROOT / "README.md").read_text(encoding="utf-8")
 check("actions/workflows/ci.yml/badge.svg?branch=main" in readme, "badge QA manquant")
-check(f"release-v{version}" in readme, "badge release incohérent")
+check(f"release-v{version}" in readme or f"candidate-v{version}" in readme, "badge release/candidat incohérent")
 check("MailPerch%20Source--Available%201.1" in readme, "badge licence incohérent")
 check(not (ROOT / ".github/workflows/FUNDING.yml").exists(), "FUNDING.yml ne doit pas être placé dans workflows")
 release_workflow = (ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8")

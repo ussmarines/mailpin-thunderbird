@@ -185,7 +185,7 @@ for required in (
     ".setting-toggle[data-enabled=\"true\"]",
     ".setting-toggle.featured[data-enabled=\"true\"]",
     ".toggle-recommended-badge",
-    ".subsection-header:has(+ #rule-simulation)",
+    ".subsection-header-with-actions",
     "calc(7rem + env(safe-area-inset-bottom))",
 ):
     assert required in CSS, required
