@@ -81,7 +81,7 @@ Les vues Aujourd’hui et Revue sont dérivées à la demande depuis les référ
 
 La détection des éléments associés produit uniquement des propositions. La fusion est déclenchée par l’utilisateur, confirmée dans le dashboard, validée à nouveau dans l’Experiment et enregistrée dans la pile d’annulation.
 
-Les paramètres utilisent une navigation groupée, une recherche, des aides sous chaque contrôle, un aperçu des règles avant enregistrement et des notifications fixes mais non bloquantes. La présentation est organisée en **Essentiel**, **Organisation**, **Automatisation** et **Avancé**. Le mode historique `guided` est présenté comme **Recommandé** : il masque les sections techniques avancées sans les supprimer et peut préparer un brouillon de valeurs sûres. Ce brouillon conserve les valeurs propres au profil et exige toujours un clic explicite sur Enregistrer. Le mode `advanced` reste disponible pour exposer tous les contrôles.
+Les paramètres utilisent une navigation groupée, une recherche, des aides sous chaque contrôle, un aperçu des règles avant enregistrement et une zone de statut non bloquante intégrée au flux. La présentation est organisée en **Essentiel**, **Organisation**, **Automatisation** et **Avancé**. Le mode historique `guided` est présenté comme **Recommandé** : il masque les sections techniques avancées sans les supprimer et peut préparer un brouillon de valeurs sûres. Ce brouillon conserve les valeurs propres au profil et exige toujours un clic explicite sur Enregistrer. Le mode `advanced` reste disponible pour exposer tous les contrôles.
 
 Les dix commandes MailPin sont personnalisables avec l’API `commands` de Thunderbird et sont incluses dans les exports de configuration.
 
@@ -89,7 +89,7 @@ Le bouton injecté émet `pinInbox.onDashboardRequested`; le background ouvre la
 
 ### Politique de composants UI
 
-MailPin suit Fluent 2 par ses jetons CSS locaux, sa hiérarchie, ses états et ses contrôles HTML natifs. Le build assemble directement les fichiers suivis sous `extension/` et n’exécute aucun bundler : une dépendance npm non importée ne peut donc pas devenir un composant du XPI. `@fluentui/web-components` 3.0.3 a été évalué puis retiré, notamment parce qu’il exige Node 22/24 alors que la validation du dépôt inclut Node 20. Une future adoption exige simultanément un besoin produit précis, un bundle local déterministe auditable, aucun actif distant et une matrice Node/Thunderbird documentée.
+MailPin utilise Organic Workspace avec HTML natif, jetons CSS locaux et des shells Dashboard/Options écrits directement dans les sources. Le runtime gère les états sans reconstruire la structure visuelle. Fluent 2 reste un historique de conception et non le langage UI canonique. Le build assemble directement les fichiers suivis sous `extension/` et n’exécute aucun bundler : une dépendance npm non importée ne peut donc pas devenir un composant du XPI. `@fluentui/web-components` 3.0.3 a été évalué puis retiré, notamment parce qu’il exige Node 22/24 alors que la validation du dépôt inclut Node 20. Une future adoption exige simultanément un besoin produit précis, un bundle local déterministe auditable, aucun actif distant et une matrice Node/Thunderbird documentée.
 
 ## Stockage et migrations
 

@@ -1,29 +1,46 @@
-# Passage de relais Codex — MailPin 1.6.1
+# Passage de relais — MailPin Organic Workspace
 
 ## Référence
 
-- runtime MailPin intégré par la PR #35 : `4fdb978e1828325001f95951c115059a931b8b6e` ;
-- baseline `main` avant préparation 1.6.1 : `6d582da0cf729b1a93df348e4845430fbfb7fad2` ;
-- version cible publique : **1.6.1** ;
-- identifiant canonique : `ussmarines.mailpin@addons.thunderbird.net` ;
-- branche de préparation : `release/mailpin-1.6.1-store-metadata`.
+- dépôt : `ussmarines/mailpin-thunderbird` ;
+- branche auditée : `design/organic-workspace-ui` ;
+- base `main` avant intégration : `497d71e9660c068a166201a4da13fdddc3e65628` ;
+- HEAD produit propre validé : `41ae231d4c3f2fca1ccbb33325b294ba88453d40` ;
+- PR : **#39 — design: rebuild MailPin as Organic Workspace V2 + QoL** ;
+- version distribuée inchangée : **1.6.1** ;
+- identifiant canonique inchangé : `ussmarines.mailpin@addons.thunderbird.net`.
 
-## État produit
+## État audité
 
-MailPin 1.6.0 a introduit le nouveau nom, l’ID ATN définitif, l’icône SVG et la palette professionnelle sans modifier la logique métier validée avant rebranding. Le runtime rebrand intégré par #35 a ensuite repassé QA Linux/Windows, garde sécurité et smoke Thunderbird 153 réel sur le commit exact `4fdb978e1828325001f95951c115059a931b8b6e`.
+Organic Workspace est désormais écrit directement dans les sources HTML/CSS canoniques : le runtime gère les états et interactions mais ne reconstruit plus le shell Dashboard/Options. Le Dashboard ne contient qu’un landmark `main`, Options conserve ses 101 contrôles persistés, et les anciens wrappers CSS devenus morts ont été supprimés.
 
-La 1.6.1 ne corrige pas un bug runtime. Elle retire des métadonnées de publication 1.5.4 restées actives dans l’archive source 1.6.0 et évite d’attribuer à tort une recette manuelle fraîche à un XPI qui ne l’avait pas reçue. Le seul delta XPI prévu est `manifest.version = 1.6.1`.
+La passe vidéo/QoL reste intégrée : responsive par surface disponible, inspector contextuel, menus et statistiques dans le flux, Kanban lisible, Rule Builder structuré, Affaires recomposées, commandes Enregistrer/Annuler dans l’en-tête sticky, palette automatique MailPin et focus immédiat après création.
 
-## Preuves
+L’audit a aussi corrigé un défaut de validation : `tests/test_organic_workspace_ui.py` définissait des fonctions de test mais était lancé comme simple script. Il possède maintenant un point d’entrée explicite ; ses cinq contrats sont réellement exécutés par `npm test` et affichent `Organic Workspace UI contracts: OK`.
 
-- recette manuelle : dernière preuve fraîche sur le candidat 1.5.4 avant rebranding, réutilisée uniquement pour le métier inchangé ;
-- QA/sécurité/smoke réel MailPin 1.6.0 : verts sur `4fdb978e1828325001f95951c115059a931b8b6e` ;
-- XPI v1.6.0 public : `6860e0177795b163cb672edd1a93897260785c4b8eeeeac71d1b3d32dca281ae` ;
-- 1.6.1 : exiger QA Linux/Windows + sécurité + `npm run ci` + smoke Thunderbird réel sur la PR et le `main` final avant release.
+Aucun changement de permission, API Experiment, schéma de données, stockage, réseau, télémétrie, dépendance runtime ou ID d’extension.
 
-## Readiness
+## Preuves fraîches du HEAD propre
 
-- **GitHub 1.6.1 : GO uniquement après les gates ci-dessus** ;
-- **ATN : candidat officiel après release GitHub**, avec recette humaine ciblée, fournisseurs réseau/matrice multi-OS et contrôles accessibilité humains restant explicitement hors preuve.
+Sur `41ae231d4c3f2fca1ccbb33325b294ba88453d40` :
 
-Aucune nouvelle permission, dépendance runtime, connexion réseau, télémétrie, publicité ou migration de stockage n’est introduite en 1.6.1. Le changement d’identité a eu lieu volontairement en 1.6.0 et reste immuable pour la publication ATN. Codex Security n’a pas été utilisé.
+- GitHub Actions QA run **31713371255** : succès ;
+  - `npm run ci` complet + structure XPI sous Linux : succès ;
+  - contrôles source/modèles Windows : succès ;
+  - garde sécurité + full-history identity : succès ;
+  - artefact `development-build` : **9186201391** ;
+- Thunderbird runtime smoke run **31713371263** : succès ;
+  - Thunderbird **153.0.1 ESR** + geckodriver **0.37.1** ;
+  - installation, injection, ouverture Dashboard, désinstallation/nettoyage et réinstallation : succès ;
+  - artefact `thunderbird-runtime-smoke` : **9186204968** ;
+- XPI du HEAD propre : SHA-256 `5ae857ea9b10303b77fdb87fa5b8fbe7894c1f30e829431942542515316d1e19`.
+
+## Limites
+
+Le smoke réel valide le cycle de vie et les contrats runtime, pas le jugement visuel humain. Les derniers problèmes d’espacement/ergonomie signalés par l’utilisateur devront servir d’entrées à la prochaine passe de revue, après l’audit global du dépôt.
+
+## Git
+
+L’utilisateur a explicitement autorisé l’intégration de cette refonte dans `main` après cette validation, puis un audit global du dépôt. Utiliser le mode de merge autorisé par le ruleset (squash si requis), vérifier le SHA final de `main`, puis repartir d’une branche dédiée pour le nettoyage global.
+
+Codex Security n’a pas été utilisé et n’est pas requis par cette étape.

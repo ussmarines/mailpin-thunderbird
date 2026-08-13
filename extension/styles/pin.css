@@ -1487,3 +1487,282 @@ tr[data-pin-mails-pinned] .pin-mails-independent-button:focus-visible::before {
 .pin-mails-response-chip { display: inline-flex; align-items: center; min-block-size: 24px; padding: 2px 7px; border-radius: 999px; font-size: max(.78rem, 12px); font-weight: 650; }
 .pin-mails-response-chip.waiting { background: color-mix(in srgb, #8a3700 14%, transparent); color: color-mix(in srgb, #8a3700 80%, currentColor); }
 .pin-mails-response-chip.reply { background: color-mix(in srgb, #0f6cbd 14%, transparent); color: color-mix(in srgb, #0f6cbd 82%, currentColor); }
+
+/* -------------------------------------------------------------------------
+ * Organic Workspace companion panel
+ * ------------------------------------------------------------------------- */
+#pin-mails-panel {
+  margin: 6px 8px 8px;
+  max-inline-size: calc(100% - 16px);
+  border: 1px solid color-mix(in srgb, var(--pin-mails-border) 78%, transparent);
+  border-radius: var(--mp-radius-organic-md);
+  background: var(--pin-mails-panel-bg);
+  box-shadow: var(--mp-shadow-organic-low);
+  overflow: clip;
+}
+
+.pin-mails-panel-header {
+  min-block-size: 52px;
+  gap: 7px;
+  padding: 8px 9px;
+  border-block-end: 1px solid color-mix(in srgb, var(--pin-mails-border) 70%, transparent);
+  background: color-mix(in srgb, var(--pin-mails-header-bg) 78%, var(--pin-mails-panel-bg));
+}
+
+.pin-mails-header-icon {
+  inline-size: 26px;
+  block-size: 26px;
+}
+
+.pin-mails-title-wrap {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 0 7px;
+  align-items: center;
+}
+
+.pin-mails-title {
+  font-family: var(--mp-font-family-display);
+  font-size: max(.95rem, 12px);
+  font-weight: 650;
+  letter-spacing: -.025em;
+}
+
+.pin-mails-summary {
+  grid-column: 1 / -1;
+  overflow: hidden;
+  color: var(--layout-color-2);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pin-mails-count,
+.pin-mails-group-count {
+  min-inline-size: 24px;
+  padding: 2px 7px;
+  border-radius: var(--mp-radius-round);
+  background: color-mix(in srgb, var(--pin-mails-accent) 12%, transparent);
+  font-variant-numeric: tabular-nums;
+}
+
+.pin-mails-collapse-button,
+.pin-mails-header-action {
+  inline-size: 30px;
+  block-size: 30px;
+  min-inline-size: 30px;
+  min-block-size: 30px;
+  border-radius: var(--mp-radius-organic-sm);
+}
+
+.pin-mails-header-select,
+.pin-mails-smart-view-select {
+  min-block-size: 30px;
+  border-color: color-mix(in srgb, currentColor 14%, transparent);
+  border-radius: var(--mp-radius-round);
+  background: color-mix(in srgb, var(--pin-mails-panel-bg) 88%, var(--pin-mails-header-bg));
+  box-shadow: none;
+}
+
+.pin-mails-panel-tools {
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) minmax(120px, auto) auto;
+  gap: 7px;
+  padding: 8px 9px;
+  border-block-end: 1px solid color-mix(in srgb, var(--pin-mails-border) 60%, transparent);
+  background: var(--pin-mails-panel-bg);
+}
+
+.pin-mails-search-wrap {
+  min-inline-size: 0;
+}
+
+.pin-mails-search {
+  inline-size: 100%;
+  min-block-size: 34px;
+  padding-inline: 11px;
+  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  border-radius: var(--mp-radius-organic-sm);
+  background: color-mix(in srgb, var(--pin-mails-header-bg) 64%, var(--pin-mails-panel-bg));
+  box-shadow: none;
+}
+
+.pin-mails-search:focus {
+  border-color: var(--pin-mails-accent);
+  outline: 3px solid color-mix(in srgb, var(--pin-mails-accent) 18%, transparent);
+  outline-offset: 0;
+}
+
+.pin-mails-panel-list {
+  padding: 4px 6px 7px;
+}
+
+.pin-mails-account-group {
+  margin: 0 0 8px;
+  border: 0;
+  border-radius: 0;
+  overflow: visible;
+}
+
+.pin-mails-account-header {
+  min-block-size: 30px;
+  padding: 6px 7px 5px;
+  border: 0;
+  background: transparent;
+  color: var(--layout-color-2);
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: .035em;
+}
+
+.pin-mails-account-dot {
+  inline-size: 7px;
+  block-size: 7px;
+  box-shadow: none;
+}
+
+.pin-mails-card {
+  gap: 4px;
+  min-block-size: var(--pin-mails-card-min-height);
+  margin: 1px 0;
+  padding: 9px 10px 9px 15px;
+  border: 1px solid transparent;
+  border-radius: var(--mp-radius-organic-sm);
+  background: transparent;
+  transition:
+    transform var(--mp-duration-normal) var(--mp-ease-organic),
+    background-color var(--mp-duration-fast) linear,
+    border-color var(--mp-duration-fast) linear,
+    box-shadow var(--mp-duration-normal) var(--mp-ease-organic);
+}
+
+.pin-mails-card::before {
+  inset-block: 10px;
+  inset-inline-start: 4px;
+  inline-size: 3px;
+  border-radius: var(--mp-radius-round);
+  opacity: .72;
+}
+
+.pin-mails-card:hover,
+.pin-mails-card:focus-within {
+  border-color: color-mix(in srgb, var(--pin-account-color) 22%, transparent);
+  background: color-mix(in srgb, var(--pin-account-color) 7%, var(--pin-mails-card-bg));
+  box-shadow: var(--mp-shadow-organic-low);
+  transform: translateY(-1px);
+}
+
+.pin-mails-card[data-active] {
+  background: color-mix(in srgb, var(--pin-account-color) 6%, transparent);
+}
+
+.pin-mails-card[data-selected] {
+  border-color: color-mix(in srgb, var(--pin-account-color) 48%, transparent);
+  background: color-mix(in srgb, var(--pin-account-color) 10%, var(--pin-mails-card-bg));
+}
+
+.pin-mails-card-pin {
+  inline-size: 30px;
+  block-size: 30px;
+  min-inline-size: 30px;
+  min-block-size: 30px;
+  border-color: transparent;
+  border-radius: var(--mp-radius-organic-sm);
+  background: color-mix(in srgb, var(--pin-account-color) 10%, transparent);
+  box-shadow: none;
+}
+
+.pin-mails-card-pin::before {
+  inline-size: 20px;
+  block-size: 20px;
+  -webkit-mask-size: 20px 20px;
+  mask-size: 20px 20px;
+  filter: none;
+}
+
+.pin-mails-note,
+.pin-mails-checklist {
+  border-radius: var(--mp-radius-organic-sm);
+  background: color-mix(in srgb, var(--pin-mails-header-bg) 62%, transparent);
+}
+
+.pin-mails-badge,
+.pin-mails-tag,
+.pin-mails-chip {
+  border-radius: var(--mp-radius-round);
+}
+
+.pin-mails-empty {
+  min-block-size: 84px;
+  margin: 4px 2px;
+  border: 0;
+  border-radius: var(--mp-radius-organic-md);
+  background: color-mix(in srgb, var(--pin-mails-header-bg) 68%, transparent);
+}
+
+.pin-mails-reminder-center {
+  gap: 5px;
+  padding: 7px 8px;
+  background: color-mix(in srgb, var(--mp-color-warning-background) 42%, var(--pin-mails-panel-bg));
+}
+
+.pin-mails-reminder-row {
+  border-color: color-mix(in srgb, var(--mp-color-warning-foreground) 16%, var(--pin-mails-border));
+  border-radius: var(--mp-radius-organic-sm);
+}
+
+@container threadPane (max-width: 560px) {
+  #pin-mails-panel {
+    margin-inline: 5px;
+    max-inline-size: calc(100% - 10px);
+  }
+
+  .pin-mails-panel-header {
+    flex-wrap: wrap;
+  }
+
+  .pin-mails-title-wrap {
+    flex: 1 1 calc(100% - 76px);
+  }
+
+  .pin-mails-header-select {
+    flex: 1 1 120px;
+    max-inline-size: none;
+  }
+
+  .pin-mails-panel-tools {
+    grid-template-columns: 1fr;
+  }
+}
+
+@container threadPane (max-width: 360px) {
+  .pin-mails-header-icon,
+  .pin-mails-summary,
+  .pin-mails-header-select[data-secondary] {
+    display: none;
+  }
+
+  .pin-mails-card {
+    padding-inline-end: 7px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pin-mails-card {
+    transition: none;
+    transform: none !important;
+  }
+}
+
+@media (forced-colors: active) {
+  #pin-mails-panel,
+  .pin-mails-card,
+  .pin-mails-search,
+  .pin-mails-header-select,
+  .pin-mails-smart-view-select {
+    border-color: CanvasText;
+    background: Canvas;
+    color: CanvasText;
+    box-shadow: none;
+  }
+}

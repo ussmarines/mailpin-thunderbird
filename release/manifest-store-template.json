@@ -7,10 +7,10 @@
       "strict_max_version": "153.*"
     }
   },
-  "homepage_url": "https://github.com/ussmarines/mailperch-thunderbird",
+  "homepage_url": "https://github.com/ussmarines/mailpin-thunderbird",
   "developer": {
     "name": "ussmarines",
     "url": "https://github.com/ussmarines"
   },
-  "support_url": "https://github.com/ussmarines/mailperch-thunderbird/issues"
+  "support_url": "https://github.com/ussmarines/mailpin-thunderbird/issues"
 }

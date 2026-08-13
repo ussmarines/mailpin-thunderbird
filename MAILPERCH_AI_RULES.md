@@ -2,7 +2,7 @@
 
 Version de référence : 2026-08-12
 Révision modèles Codex : GPT-5.6 Luna / Terra / Sol
-Projet : `ussmarines/mailperch-thunderbird`
+Projet : `ussmarines/mailpin-thunderbird`
 
 > **Compatibilité projet :** le fichier conserve son nom historique `MAILPERCH_AI_RULES.md` afin de ne pas casser les paramètres ChatGPT/Codex existants ; son contenu gouverne désormais MailPin.
 

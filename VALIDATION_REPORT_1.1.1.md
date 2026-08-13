@@ -65,9 +65,9 @@ restent explicitement suivies dans `docs/MANUAL_TEST_PLAN.md` et
 
 | Fichier | Taille | SHA-256 |
 |---|---:|---|
-| [`MailPerch_v1.1.1.xpi`](https://github.com/ussmarines/mailperch-thunderbird/releases/download/v1.1.1/MailPerch_v1.1.1.xpi) | 232 053 octets | `20b0821bfd0e5f1e2457e3dc9148ba6ec0f553be6ccdfb98b1e56380435bf79f` |
-| [`MailPerch_GitHub_Repository_v1.1.1.zip`](https://github.com/ussmarines/mailperch-thunderbird/releases/download/v1.1.1/MailPerch_GitHub_Repository_v1.1.1.zip) | 457 774 octets | `2a2bc1c097ec6ceb49d1bd704c572febdf7da7280d043f3580c1b089dcdd7468` |
-| [`SHA256SUMS.txt`](https://github.com/ussmarines/mailperch-thunderbird/releases/download/v1.1.1/SHA256SUMS.txt) | 192 octets | `b0e61e9920c6d3f43e521efe4d1717663c06f599cb480663b67885b2cdeacadf` |
+| [`MailPerch_v1.1.1.xpi`](https://github.com/ussmarines/mailpin-thunderbird/releases/download/v1.1.1/MailPerch_v1.1.1.xpi) | 232 053 octets | `20b0821bfd0e5f1e2457e3dc9148ba6ec0f553be6ccdfb98b1e56380435bf79f` |
+| [`MailPerch_GitHub_Repository_v1.1.1.zip`](https://github.com/ussmarines/mailpin-thunderbird/releases/download/v1.1.1/MailPerch_GitHub_Repository_v1.1.1.zip) | 457 774 octets | `2a2bc1c097ec6ceb49d1bd704c572febdf7da7280d043f3580c1b089dcdd7468` |
+| [`SHA256SUMS.txt`](https://github.com/ussmarines/mailpin-thunderbird/releases/download/v1.1.1/SHA256SUMS.txt) | 192 octets | `b0e61e9920c6d3f43e521efe4d1717663c06f599cb480663b67885b2cdeacadf` |
 
 Le fichier `SHA256SUMS.txt` téléchargé valide les deux archives publiées. Une
 comparaison Windows/Linux trouve les mêmes 47 entrées XPI et 165 entrées source,

@@ -5,7 +5,7 @@
 
 **Email Follow-up & Productivity for Thunderbird**
 
-[![QA](https://github.com/ussmarines/mailperch-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailperch-thunderbird/actions/workflows/ci.yml)
+[![QA](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml)
 ![Release](https://img.shields.io/badge/release-v1.6.1-4F7F75)
 ![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x-3D536B)
 ![Licence](https://img.shields.io/badge/licence-MailPin%20Source--Available%201.1-1A1D21)
@@ -24,7 +24,7 @@ MailPin transforme les e-mails importants en suivi actionnable **sans remplacer 
 
 ## Interface
 
-La 1.6.0 inaugure l’identité **MailPin** : symbole enveloppe + pin, palette Ink / Slate / Sage / Brass, canvas chaud, typographie locale et accents sobres. Aucun dégradé ni asset distant. Les thèmes clair/sombre, le contraste forcé, le focus clavier et la réduction du mouvement restent pris en charge.
+**Organic Workspace** organise l’interface comme un véritable espace de travail : rail de navigation, canvas éditorial, contexte secondaire, panneaux plus organiques et micro-interactions fonctionnelles. La palette Ink / Slate / Sage / Brass évolue vers des tons plus naturels et une typographie locale plus expressive. Aucun dégradé, glow, glassmorphism, asset ou police distante. Les thèmes clair/sombre, le contraste forcé, le focus clavier et la réduction du mouvement restent pris en charge.
 
 <div align="center">
   <img src="assets/brand/mailpin-brand-board.svg" width="92%" alt="Système de marque MailPin">
@@ -81,7 +81,7 @@ MailPin ne contient aucun appel réseau runtime, aucune télémétrie, aucune pu
 - [Banc Thunderbird](docs/THUNDERBIRD_TEST_BENCH.md)
 - [Build reviewers](release/BUILD_INSTRUCTIONS.md)
 - [Préparation ATN](STORE_RELEASE.md)
-- [Signaler un problème](https://github.com/ussmarines/mailperch-thunderbird/issues)
+- [Signaler un problème](https://github.com/ussmarines/mailpin-thunderbird/issues)
 
 Maintenu par [ussmarines](https://github.com/ussmarines). Les dons [PayPal](https://paypal.me/ussmarinesdot) sont facultatifs et ne débloquent aucune fonction.
 

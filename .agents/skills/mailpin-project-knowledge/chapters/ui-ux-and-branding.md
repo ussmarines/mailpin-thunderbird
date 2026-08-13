@@ -20,7 +20,7 @@ The stored value `guided` is presented as Recommended; `advanced` exposes all co
 
 ## Visual identity and accessibility
 
-MailPin follows Fluent 2 through local CSS tokens, hierarchy, states and native HTML controls. It has no Fluent npm runtime, bundler, CDN, remote font or remote asset. Use system UI / Segoe UI / Aptos-family local font stacks, 14/20 body rhythm, and a 12 px minimum for explicit or inherited text.
+MailPin uses the local **Organic Workspace** system: content-first hierarchy, contextual rails, progressive disclosure, container-aware responsive composition and restrained functional motion. Fluent 2 is historical inspiration only and is not the canonical visual language. There is no UI runtime, bundler, CDN, remote font or remote asset. Use system UI / Segoe UI Variable / Aptos-family local font stacks, a readable body rhythm, and a 12 px minimum for explicit or inherited text.
 
 Keep keyboard navigation, visible focus, dark/light/high-contrast themes, reduced motion, narrow widths and 200% zoom in scope. Automated DOM or Chromium checks do not prove rendering inside Thunderbird.
 

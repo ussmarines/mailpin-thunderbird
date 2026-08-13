@@ -36,6 +36,39 @@ const INITIALIZATION_TIMEOUTS = Object.freeze({
   calendar: 7_000,
   auxiliary: 7_000
 });
+const ENTITY_DEFAULT_COLORS = Object.freeze([
+  "#4e7569", "#a14f68", "#718547", "#59558f",
+  "#9b7040", "#47758e", "#a95d4e", "#875476"
+]);
+
+function nextEntityColor(items = [], startIndex = 0) {
+  const usage = new Map(ENTITY_DEFAULT_COLORS.map(color => [color, 0]));
+  for (const item of Array.isArray(items) ? items : []) {
+    const color = String(item?.color || "").toLowerCase();
+    if (usage.has(color)) usage.set(color, usage.get(color) + 1);
+  }
+  const minimum = Math.min(...usage.values());
+  const start = Math.max(0, Number(startIndex) || 0) % ENTITY_DEFAULT_COLORS.length;
+  for (let offset = 0; offset < ENTITY_DEFAULT_COLORS.length; offset += 1) {
+    const color = ENTITY_DEFAULT_COLORS[(start + offset) % ENTITY_DEFAULT_COLORS.length];
+    if (usage.get(color) === minimum) return color;
+  }
+  return ENTITY_DEFAULT_COLORS[start];
+}
+
+function focusCreatedEntity(hostId, selector = "input:not([type='color'])") {
+  requestAnimationFrame(() => {
+    const host = $(hostId);
+    const card = host?.lastElementChild;
+    if (!card) return;
+    card.scrollIntoView({block: "nearest", behavior: "smooth"});
+    const control = card.querySelector(selector);
+    control?.focus({preventScroll: true});
+    if (control instanceof HTMLInputElement && ["text", "search", "url", "email", "tel"].includes(control.type)) {
+      control.select();
+    }
+  });
+}
 const COMMANDS = Object.freeze([
   ["toggle-pin-selected", "commandToggle"],
   ["toggle-conversation-selected", "commandConversation"],
@@ -874,7 +907,6 @@ function calendarLabel(id) {
 function calendarOptions(type, selectedId = "") {
   const compatible = availableCalendars.filter(calendar => type === "event" ? calendar.eventCompatible : calendar.taskCompatible);
   const control = select([["", msg("dynamicChooseCalendar")], ...compatible.map(calendar => [calendar.id, calendar.name])], selectedId, msg("calendarTarget"));
-  control.required = true;
   return {control, compatible};
 }
 
@@ -938,11 +970,11 @@ function renderCases(){
   const host=$("cases-list");host.replaceChildren();
   if(!cases.length)host.append(node("p","hint",msg("noCases")));
   cases.forEach((item,index)=>{
-    const row=node("article","group-row case-editor-row");row.style.setProperty("--group-color",item.color);
+    const row=node("article","group-row case-editor-row case-editor-card");row.style.setProperty("--group-color",item.color);
     const name=document.createElement("input");name.value=item.name;name.maxLength=120;name.required=true;
     const color=document.createElement("input");color.type="color";color.value=item.color;
     const status=select([["active",msg("statusActive")],["waiting",msg("statusWaiting")],["planned",msg("statusPlanned")],["completed",msg("statusComplete")]],item.status||"active",msg("dynamicStatus"));
-    const due=document.createElement("input");due.type="datetime-local";due.required=true;due.value=item.dueAt?new Date(item.dueAt-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16):"";
+    const due=document.createElement("input");due.type="datetime-local";due.value=item.dueAt?new Date(item.dueAt-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16):"";
     const note=document.createElement("input");note.value=item.note||"";note.placeholder=msg("notes");
     const type=select([["task",msg("task")],["event",msg("event")]],item.calendarItemType||currentSettings().calendarItemType||"task",msg("calendarItemType"));
     let {control: calendar, compatible} = calendarOptions(type.value, item.calendarId || currentSettings().preferredCalendarId || "");
@@ -955,7 +987,7 @@ function renderCases(){
       sync();
     });
     for(const control of[name,color,status,due,note,type,calendar])control.addEventListener("input",sync);
-    const agenda = node("button", "secondary compact", item.calendarItemId ? msg("dynamicCalendarSync") : msg("calendarCreate"));
+    const agenda = node("button", "secondary", item.calendarItemId ? msg("dynamicCalendarSync") : msg("calendarCreate"));
     agenda.type = "button";
     agenda.dataset.action = "case-calendar";
     agenda.addEventListener("click", async event => {
@@ -970,32 +1002,35 @@ function renderCases(){
         }
         const result = await withBusy(event.currentTarget, msg("dynamicCalendarBusy"), async () => {
           await messenger.pinInbox.updateCase(item.id, item);
-          return messenger.pinInbox.createCaseCalendarItem(
-            item.id,
-            type.value,
-            calendar.value
-          );
+          return messenger.pinInbox.createCaseCalendarItem(item.id,type.value,calendar.value);
         });
         item.calendarItemId = result.itemId || item.calendarItemId || "";
         item.calendarId = result.calendarId || item.calendarId || "";
         renderCases();
-        setStatus(
-          msg(result.updated ? "dynamicCaseSynchronized" : "dynamicCaseCreated", [calendarLabel(result.calendarId || calendar.value), msg(result.itemType === "event" ? "event" : "task"), new Date(item.dueAt).toLocaleString()]),
-          "success"
-        );
+        setStatus(msg(result.updated ? "dynamicCaseSynchronized" : "dynamicCaseCreated", [calendarLabel(result.calendarId || calendar.value), msg(result.itemType === "event" ? "event" : "task"), new Date(item.dueAt).toLocaleString()]),"success");
       } catch (error) {
         setStatus(failureMessage("calendarWriteFailed", error), "error");
       }
     });
     const[up,down]=moveButtons(cases,index,renderCases);
-    row.append(entityField("dynamicTitle",name,"dynamicCaseTitleHelp"),entityField("dynamicColor",color),entityField("dynamicStatus",status),entityField("deadline",due,"dynamicCaseDueHelp"),entityField("notes",note),entityField("calendarItemType",type),entityField("calendarTarget",calendar,"calendarCreateHelp"),agenda,up,down,removeButton(()=>{cases.splice(index,1);renderCases();renderRules();renderTemplates();}));host.append(row);
+    const remove=removeButton(()=>{cases.splice(index,1);renderCases();renderRules();renderTemplates();});
+    const head=node("div","case-editor-head");
+    const identity=node("div","case-editor-identity");
+    identity.append(entityField("dynamicTitle",name,"dynamicCaseTitleHelp"),entityField("dynamicColor",color));
+    const actions=node("div","entity-actions case-editor-actions");actions.append(up,down,remove);
+    head.append(identity,actions);
+    const fields=node("div","case-editor-grid");
+    fields.append(entityField("dynamicStatus",status),entityField("deadline",due,"dynamicCaseDueHelp"),entityField("calendarItemType",type),entityField("calendarTarget",calendar,"calendarCreateHelp"));
+    const noteField=entityField("notes",note);noteField.classList.add("case-editor-note");
+    const footer=node("div","case-editor-footer");footer.append(agenda);
+    row.append(head,fields,noteField,footer);host.append(row);
   });
 }
 function renderTemplates(){
   const host=$("templates-list");host.replaceChildren();
   if(!templates.length)host.append(node("p","hint",msg("noTemplates")));
   templates.forEach((item,index)=>{
-    const row=node("article","rule-row template-row");
+    const row=node("article","rule-row template-row template-editor-card");
     const name=document.createElement("input");name.value=item.name;name.placeholder=msg("templateNamePlaceholder");
     const group=select([["",msg("withoutGroup")],...groups.map(g=>[g.id,g.name])],item.groupId||"",msg("group"));
     const caseSelect=select([["",msg("withoutCase")],...cases.map(c=>[c.id,c.name])],item.caseId||"",msg("case"));
@@ -1010,8 +1045,16 @@ function renderTemplates(){
     const sync=()=>Object.assign(item,{name:name.value.slice(0,120),groupId:group.value,caseId:caseSelect.value,priorityLevel:priority.value,workflowStatus:status.value,dueOffsetDays:Number(due.value)||0,followUpDelayDays:Number(follow.value)||0,reminderLeadMinutes:Number(lead.value)||0,recurrenceRule:recurrence.value,recurrenceInterval:Number(interval.value)||1,notePrefix:note.value.slice(0,500)});
     for(const control of[name,group,caseSelect,priority,status,due,follow,lead,recurrence,interval,note])control.addEventListener("input",sync);
     const[up,down]=moveButtons(templates,index,renderTemplates);
-    row.append(entityField("dynamicName",name,"dynamicTemplateNameHelp"),entityField("group",group),entityField("case",caseSelect),entityField("priority",priority),entityField("dynamicStatus",status),entityField("deadline",due,"dynamicTemplateDeadlineHelp"),entityField("dynamicFollowUp",follow,"dynamicTemplateFollowUpHelp"),entityField("dynamicLead",lead,"dynamicTemplateLeadHelp"),entityField("dynamicRecurrence",recurrence),entityField("dynamicInterval",interval,"dynamicTemplateIntervalHelp"),entityField("dynamicNotePrefix",note),up,down,removeButton(()=>{templates.splice(index,1);renderTemplates();renderRules();}));
-    host.append(row);
+    const remove=removeButton(()=>{templates.splice(index,1);renderTemplates();renderRules();});
+    const head=node("div","template-editor-head");
+    const nameField=entityField("dynamicName",name,"dynamicTemplateNameHelp");nameField.classList.add("template-name-field");
+    const actions=node("div","entity-actions");actions.append(up,down,remove);head.append(nameField,actions);
+    const organization=node("div","template-editor-grid");
+    organization.append(entityField("group",group),entityField("case",caseSelect),entityField("priority",priority),entityField("dynamicStatus",status));
+    const timing=node("div","template-editor-grid template-timing-grid");
+    timing.append(entityField("deadline",due,"dynamicTemplateDeadlineHelp"),entityField("dynamicFollowUp",follow,"dynamicTemplateFollowUpHelp"),entityField("dynamicLead",lead,"dynamicTemplateLeadHelp"),entityField("dynamicRecurrence",recurrence),entityField("dynamicInterval",interval,"dynamicTemplateIntervalHelp"));
+    const noteField=entityField("dynamicNotePrefix",note);noteField.classList.add("template-note-field");
+    row.append(head,organization,timing,noteField);host.append(row);
   });
 }
 function renderAccounts(accounts) {
@@ -1039,10 +1082,14 @@ function renderAccounts(accounts) {
     color.dataset.settingDirty = "true";
     color.dataset.settingSave = "true";
     color.dataset.settingMigration = PinSettings.MIGRATION_STRATEGY;
+    color.setAttribute("aria-label", `${msg("dynamicColor")} · ${primaryLabel}`);
+    color.title = `${msg("dynamicColor")} · ${primaryLabel}`;
     color.addEventListener("input", () => card.style.setProperty("--account-color", color.value));
     accountControls.set(account.key, color);
     const reset = node("button", "secondary", msg("defaultButton"));
     reset.type = "button";
+    reset.setAttribute("aria-label", `${msg("defaultButton")} · ${primaryLabel}`);
+    reset.title = `${msg("defaultButton")} · ${primaryLabel}`;
     reset.addEventListener("click", () => {
       color.value = account.defaultColor;
       card.style.setProperty("--account-color", account.defaultColor);
@@ -1125,27 +1172,18 @@ function reorderSettingsFamilies() {
   const tail = form.querySelector(".form-footer");
   if (!tail) return;
   for (const heading of form.querySelectorAll(".settings-family-heading")) heading.remove();
-  const families = [
-    ["Essentiel", "navEssential", "Essentiel"],
-    ["Automatisation", "navAutomation", "Automatisation"],
-    ["Organisation", "navOrganization", "Organisation"],
-    ["Avancé", "navAdvanced", "Avancé"]
-  ];
-  for (const [family, key, fallback] of families) {
+  for (const family of ["Essentiel", "Automatisation", "Organisation", "Avancé"]) {
     const sections = [...form.querySelectorAll(`:scope > .settings-section[data-nav-group="${family}"]`)];
-    if (!sections.length) continue;
-    const heading = node("div", "settings-family-heading");
-    heading.append(node("h2", "", msg(key, fallback)));
-    form.insertBefore(heading, tail);
     for (const section of sections) form.insertBefore(section, tail);
   }
 }
+
 function renderRules(){
   const host=$("rules-list");host.replaceChildren();
   if(!rules.length)host.append(node("p","hint",msg("noCustomRules")));
-  const accountOptions=[["",msg("allAccounts")],...(configuration?.accounts||[]).map(account=>[account.key,account.name||account.email||account.key])];
+  const accountOptions=[["",msg("allAccounts")],...(configuration?.accounts||[]).map(a=>[a.key,a.name||a.email||a.key])];
   rules.forEach((rule,index)=>{
-    const row=node("article","rule-row");
+    const row=node("article","rule-row rule-builder-card");
     const enabled=document.createElement("input");enabled.type="checkbox";enabled.checked=rule.enabled!==false;enabled.title=msg("dynamicRuleEnabledHelp");enabled.setAttribute("aria-label",msg("dynamicRuleEnabled"));
     const name=document.createElement("input");name.value=rule.name||msg("ruleDefaultName", [index+1]);name.placeholder=msg("dynamicName");
     const priority=document.createElement("input");priority.type="number";priority.min="1";priority.max="10000";priority.value=rule.priority||((index+1)*100);priority.title=msg("dynamicRulePriorityHelp");
@@ -1161,7 +1199,7 @@ function renderRules(){
     const caseSelect=select([["",msg("withoutCase")],...cases.map(c=>[c.id,c.name])],rule.caseId||"",msg("dynamicCaseTarget"));
     const template=select([["",msg("withoutTemplate")],...templates.map(t=>[t.id,t.name])],rule.templateId||"",msg("dynamicTemplateTarget"));
     const status=select([["active",msg("statusActive")],["waiting",msg("statusWaiting")],["planned",msg("statusPlanned")],["completed",msg("statusComplete")]],rule.workflowStatus||"active",msg("dynamicStatusTarget"));
-    const stopLabel=node("label","compact-check");const stop=document.createElement("input");stop.type="checkbox";stop.checked=rule.stopProcessing!==false;stopLabel.append(stop,document.createTextNode(msg("stopProcessing")));
+    const stopLabel=node("label","compact-check rule-stop-processing");const stop=document.createElement("input");stop.type="checkbox";stop.checked=rule.stopProcessing!==false;stopLabel.append(stop,document.createTextNode(msg("stopProcessing")));
     const rate=document.createElement("input");rate.type="number";rate.min="1";rate.max="1000";rate.value=rule.maxPerMinute||60;rate.title=msg("dynamicRuleLimitHelp");
     const sync=()=>Object.assign(rule,{
       enabled:enabled.checked,name:name.value.slice(0,100),priority:Number(priority.value)||100,
@@ -1173,8 +1211,24 @@ function renderRules(){
     });
     for(const control of[enabled,name,priority,trigger,action,target,sender,subject,tag,account,folder,group,caseSelect,template,status,stop,rate])control.addEventListener("input",sync);
     const [up,down]=moveButtons(rules,index,renderRules);
-    row.append(entityField("dynamicRuleEnabled",enabled,"dynamicRuleEnabledHelp"),entityField("dynamicName",name,"dynamicRuleNameHelp"),entityField("priority",priority,"dynamicRulePriorityHelp"),entityField("dynamicTrigger",trigger),entityField("dynamicAction",action),entityField("dynamicTarget",target),entityField("dynamicSenderContains",sender),entityField("dynamicSubjectContains",subject),entityField("dynamicTagKey",tag),entityField("dynamicAccount",account),entityField("folder",folder,"dynamicFolderHelp"),entityField("dynamicGroupTarget",group),entityField("dynamicCaseTarget",caseSelect),entityField("dynamicTemplateTarget",template),entityField("dynamicStatusTarget",status),stopLabel,entityField("dynamicRuleLimit",rate,"dynamicRuleLimitHelp"),up,down,removeButton(()=>{rules.splice(index,1);renderRules();}));
-    host.append(row);
+    const remove=removeButton(()=>{rules.splice(index,1);renderRules();});
+
+    const head=node("div","rule-builder-head");
+    const identity=node("div","rule-builder-identity");
+    const enabledLabel=node("label","compact-check rule-enabled");enabledLabel.append(enabled,document.createTextNode(msg("dynamicRuleEnabled")));
+    identity.append(enabledLabel,entityField("dynamicName",name,"dynamicRuleNameHelp"),entityField("priority",priority,"dynamicRulePriorityHelp"));
+    const actions=node("div","entity-actions rule-builder-actions");actions.append(up,down,remove);head.append(identity,actions);
+
+    const section=(labelKey,className,fields)=>{
+      const box=node("section",`rule-builder-section ${className}`);
+      box.append(node("h4","rule-builder-kicker",msg(labelKey)));
+      const grid=node("div","rule-builder-grid");grid.append(...fields);box.append(grid);return box;
+    };
+    const when=section("ruleBuilderWhen","rule-when",[entityField("dynamicTrigger",trigger),entityField("dynamicTarget",target)]);
+    const conditions=section("ruleBuilderIf","rule-if",[entityField("dynamicSenderContains",sender),entityField("dynamicSubjectContains",subject),entityField("dynamicTagKey",tag),entityField("dynamicAccount",account),entityField("folder",folder,"dynamicFolderHelp")]);
+    const then=section("ruleBuilderThen","rule-then",[entityField("dynamicAction",action),entityField("dynamicGroupTarget",group),entityField("dynamicCaseTarget",caseSelect),entityField("dynamicTemplateTarget",template),entityField("dynamicStatusTarget",status)]);
+    const limits=section("ruleBuilderLimits","rule-limits",[stopLabel,entityField("dynamicRuleLimit",rate,"dynamicRuleLimitHelp")]);
+    row.append(head,when,conditions,then,limits);host.append(row);
   });
 }
 async function renderCalendars(selected) {
@@ -1196,11 +1250,14 @@ async function renderCalendars(selected) {
     if (generation !== calendarRenderGeneration) return;
     availableCalendars = calendars.filter(calendar => calendar && typeof calendar.id === "string");
     for (const calendar of calendars) {
-      const option = node(
-        "option",
-        "",
-        `${calendar.name} — ${msg("tasksShort")} ${calendar.taskCompatible ? "✓" : "✕"} · ${msg("eventsShort")} ${calendar.eventCompatible ? "✓" : "✕"}${calendar.reason ? ` · ${calendar.reason}` : ""}`
-      );
+      const optionState = calendar.taskCompatible && calendar.eventCompatible
+        ? msg("calendarTasksAndEvents")
+        : calendar.taskCompatible
+          ? msg("calendarTasksOnly")
+          : calendar.eventCompatible
+            ? msg("calendarEventsOnly")
+            : msg("calendarReadOnly");
+      const option = node("option", "", `${calendar.name} · ${optionState}`);
       option.value = calendar.id;
       option.disabled = !calendar.taskCompatible && !calendar.eventCompatible;
       el.append(option);
@@ -1816,19 +1873,20 @@ async function startOptions() {
     groups.push({
       id: uniqueEntityId("group", groups),
       name: msg("dynamicNewGroup"),
-      color: "#6264a7"
+      color: nextEntityColor([...groups, ...cases])
     });
     renderGroups();
     renderRules();
     renderTemplates();
     syncDirtyState();
+    focusCreatedEntity("groups-list");
   });
 
   $("add-case").addEventListener("click", () => {
     cases.push({
       id: uniqueEntityId("case", cases),
       name: msg("dynamicNewCase"),
-      color: "#0f6cbd",
+      color: nextEntityColor([...groups, ...cases]),
       status: "active",
       createdAt: Date.now(),
       updatedAt: Date.now()
@@ -1837,6 +1895,7 @@ async function startOptions() {
     renderRules();
     renderTemplates();
     syncDirtyState();
+    focusCreatedEntity("cases-list");
   });
 
   $("add-template").addEventListener("click", () => {
@@ -1850,6 +1909,7 @@ async function startOptions() {
     renderTemplates();
     renderRules();
     syncDirtyState();
+    focusCreatedEntity("templates-list");
   });
 
   $("add-rule").addEventListener("click", () => {
@@ -1866,6 +1926,7 @@ async function startOptions() {
     });
     renderRules();
     syncDirtyState();
+    focusCreatedEntity("rules-list");
   });
 
   $("simulate-rules").addEventListener("click", async event => {

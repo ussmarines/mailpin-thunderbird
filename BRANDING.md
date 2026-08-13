@@ -7,7 +7,7 @@
 - **Baseline canonique :** Email Follow-up & Productivity for Thunderbird
 - **Signature secondaire EN :** Stay on top. Follow through. Get results.
 - **Signature secondaire FR :** Gardez le cap. Assurez le suivi. Avancez.
-- **Dépôt :** `ussmarines/mailperch-thunderbird` (slug GitHub historique conservé tant qu’il n’est pas renommé dans les paramètres du dépôt)
+- **Dépôt :** `ussmarines/mailpin-thunderbird`
 - **Nom du paquet npm privé :** `mailpin-thunderbird`
 - **Nom des builds :** `MailPin_v<VERSION>.xpi`
 - **Nom des archives source :** `MailPin_GitHub_Repository_v<VERSION>.zip`
@@ -16,22 +16,22 @@
 
 Le symbole combine une enveloppe et un repère/pin. Il représente le geste central du produit : sélectionner un e-mail, le garder à portée et le faire progresser dans un workflow de suivi.
 
-La direction artistique est volontairement éditoriale et sobre : pas de dégradés, pas d’effets de verre, pas de glow, pas de texture générative. L’interface conserve la géométrie Thunderbird et utilise la marque comme système de hiérarchie, pas comme décoration.
+La direction produit **Organic Workspace** est éditoriale, spatiale et command-first : rail de navigation, canvas de travail, contexte secondaire et micro-interactions fonctionnelles. Elle ne reprend plus Fluent comme langage visuel. Pas de dégradés, verre, glow ou texture générative ; la marque sert la hiérarchie plutôt que la décoration.
 
 ## Palette
 
-- **Ink Charcoal** `#1A1D21` — texte et structure.
-- **Slate Blue** `#3D536B` — information secondaire et intégration Thunderbird.
-- **Sage Teal** `#4F7F75` — action principale ; contraste AA avec texte blanc.
-- **Sage Teal Dark** `#426F67` — hover/pressed et surfaces sombres.
-- **Brass** `#C79A3A` — accent ponctuel pour rappel/attention, jamais texte blanc.
-- **Warm Off-White** `#F7F5F0` — canvas clair.
+- **Ink** `#171A18` — texte, commandes structurantes et contraste.
+- **Slate** `#46575D` — information secondaire et structure.
+- **Sage** `#4E7569` — progression et action.
+- **Sage Deep** `#2D5148` — action forte / état pressé.
+- **Brass** `#9B7040` — accent ponctuel de contexte.
+- **Warm Paper** `#F4F1E9` — canvas clair.
 
 Les valeurs runtime vivent dans `extension/styles/tokens.css`. Les thèmes clair, sombre, contraste forcé et réduction du mouvement restent pris en charge.
 
 ## Typographie
 
-Pile locale uniquement : `system-ui`, `Segoe UI Variable`, `Aptos`, `Segoe UI`, sans-serif. Aucune police distante, CDN ou dépendance ajoutée.
+Pile locale uniquement : `Segoe UI Variable Display` / `Aptos Display` pour les titres, `Segoe UI Variable Text` / `Aptos` pour le texte et repli système ; `Cascadia Code` / `Consolas` pour le mono. Aucune police distante, CDN ou dépendance ajoutée.
 
 ## Assets canoniques
 

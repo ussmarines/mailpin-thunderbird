@@ -133,12 +133,13 @@ for icon in EXT.glob("icons/*.svg"):
 
 tokens = (EXT / "styles/tokens.css").read_text(encoding="utf-8")
 for token in [
-    "--mp-brand-background: #4f7f75", "--mp-secondary-background: #3d536b",
-    "--mp-color-neutral-background-canvas: #f7f5f0", "--mp-color-neutral-background-canvas: #111315",
+    "--mp-brand-background: #4e7569", "--mp-secondary-background: #46575d",
+    "--mp-color-neutral-background-canvas: #f4f1e9", "--mp-color-neutral-background-canvas: #121512",
     "--mp-color-neutral-foreground-1: #ffffff", ":root[data-mp-theme=\"dark\"]",
     "@media (prefers-color-scheme: dark)", "--mp-brand: var(--mp-brand-background)",
     "--mp-font-family", "--mp-radius-md: var(--mp-radius-xlarge)",
-    "--mp-radius-lg: var(--mp-radius-xxlarge)", "--mp-duration-normal: 180ms"
+    "--mp-radius-lg: var(--mp-radius-xxlarge)", "--mp-duration-normal: 220ms",
+    "--mp-radius-organic-lg: 20px", "--mp-ease-organic"
 ]:
     assert token in tokens, token
 for html_name in ["options/options.html", "dashboard/dashboard.html"]:

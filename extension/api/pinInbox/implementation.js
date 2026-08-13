@@ -293,18 +293,40 @@ function registerMailPinLifecycle(extensionId) {
   Management.on("update", handlers.onUpdate);
 }
 
-const DEFAULT_COLORS = [
-  "#0f6cbd",
-  "#5c2d91",
-  "#107c10",
-  "#c239b3",
-  "#d83b01",
-  "#038387",
-  "#8e562e",
-  "#8764b8",
-  "#0078d4",
-  "#ca5010"
-];
+const DEFAULT_COLORS = Object.freeze([
+  "#4e7569", // sage
+  "#a14f68", // berry
+  "#718547", // moss
+  "#59558f", // indigo
+  "#9b7040", // brass
+  "#47758e", // ocean
+  "#a95d4e", // clay
+  "#875476"  // plum
+]);
+
+// Pre-Organic Workspace defaults were generated automatically from the
+// account key and were then persisted by the Options form. Treat only that
+// exact generated value as a legacy default; arbitrary/custom colours stay
+// untouched.
+const LEGACY_DEFAULT_COLORS = Object.freeze([
+  "#0f6cbd", "#5c2d91", "#107c10", "#c239b3", "#d83b01",
+  "#038387", "#8e562e", "#8764b8", "#0078d4", "#ca5010"
+]);
+
+function nextDefaultColor(items = [], startIndex = 0) {
+  const usage = new Map(DEFAULT_COLORS.map(color => [color, 0]));
+  for (const item of Array.isArray(items) ? items : []) {
+    const color = String(item?.color || "").toLowerCase();
+    if (usage.has(color)) usage.set(color, usage.get(color) + 1);
+  }
+  const minimum = Math.min(...usage.values());
+  const start = Math.max(0, Number(startIndex) || 0) % DEFAULT_COLORS.length;
+  for (let offset = 0; offset < DEFAULT_COLORS.length; offset += 1) {
+    const color = DEFAULT_COLORS[(start + offset) % DEFAULT_COLORS.length];
+    if (usage.get(color) === minimum) return color;
+  }
+  return DEFAULT_COLORS[start];
+}
 
 let DEFAULT_SETTINGS = null;
 
@@ -613,7 +635,7 @@ function normalizeGroup(value, fallbackIndex = 0) {
     return null;
   }
   const name = String(value.name || "Groupe").trim().slice(0, 80) || "Groupe";
-  const color = COLOR_RE.test(String(value.color || "")) ? String(value.color).toLowerCase() : "#6264a7";
+  const color = COLOR_RE.test(String(value.color || "")) ? String(value.color).toLowerCase() : DEFAULT_COLORS[fallbackIndex % DEFAULT_COLORS.length];
   return {id, name, color, updatedAt: Math.max(0, Number(value.updatedAt) || Date.now())};
 }
 
@@ -624,7 +646,7 @@ function normalizeCase(value, fallbackIndex = 0) {
   return {
     id,
     name: boundedText(value.name || `Affaire ${fallbackIndex + 1}`, 120),
-    color: COLOR_RE.test(String(value.color || "")) ? String(value.color).toLowerCase() : "#0f6cbd",
+    color: COLOR_RE.test(String(value.color || "")) ? String(value.color).toLowerCase() : DEFAULT_COLORS[fallbackIndex % DEFAULT_COLORS.length],
     note: boundedText(value.note, 4000),
     dueAt: Math.max(0, Number(value.dueAt) || 0),
     status: ["active", "waiting", "planned", "completed"].includes(value.status) ? value.status : "active",
@@ -860,6 +882,10 @@ function hashString(value) {
 
 function getDefaultColor(accountKey) {
   return DEFAULT_COLORS[hashString(accountKey) % DEFAULT_COLORS.length];
+}
+
+function getLegacyDefaultColor(accountKey) {
+  return LEGACY_DEFAULT_COLORS[hashString(accountKey) % LEGACY_DEFAULT_COLORS.length];
 }
 
 function getFolderChildren(folder) {
@@ -2072,7 +2098,9 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   }
 
   _getAccountColor(accountKey) {
-    return this._settings.accountColors[accountKey] || getDefaultColor(accountKey);
+    const stored = String(this._settings.accountColors[accountKey] || "").toLowerCase();
+    if (!stored || stored === getLegacyDefaultColor(accountKey)) return getDefaultColor(accountKey);
+    return stored;
   }
 
   _getAccountsMetadata() {
@@ -2641,7 +2669,10 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     if (!this._settings.enableCases) throw new ExtensionError("Les affaires sont désactivées.");
     if ((this._data.cases || []).length >= MAX_CASES) throw new ExtensionError("Nombre maximal d’affaires atteint.");
     const values = this._data.cases || [];
-    const item = normalizeCase({...details, id: details.id || uniqueEntityId("case", values)}, values.length);
+    const requestedColor = COLOR_RE.test(String(details.color || ""))
+      ? String(details.color).toLowerCase()
+      : nextDefaultColor([...(this._data.groups || []), ...values]);
+    const item = normalizeCase({...details, color: requestedColor, id: details.id || uniqueEntityId("case", values)}, values.length);
     if (!item) throw new ExtensionError("Affaire invalide.");
     if (values.some(existing => existing.id === item.id)) throw new ExtensionError("Une affaire utilise déjà cet identifiant.");
     values.push(item); this._data.caseOrder.push(item.id); this._saveData("case-create");
@@ -5479,7 +5510,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         let index = 2;
         while (this._data.groups.some(group => group.id === id)) id = `${base.slice(0, 35)}-${index++}`;
         this._pushUndo(t("panelUndoCreateGroup"));
-        this._data.groups.push({id, name: label.slice(0, 80), color: COLOR_RE.test(color.value) ? color.value : "#6264a7"});
+        this._data.groups.push({id, name: label.slice(0, 80), color: COLOR_RE.test(color.value) ? color.value : nextDefaultColor(this._data.groups)});
         this._data.groupOrder.push(id);
         this._saveData("group-create");
         this._refreshAllStates(true);
@@ -5498,7 +5529,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       const name = dialog.querySelector(".pin-mails-group-dialog-name");
       const color = dialog.querySelector(".pin-mails-group-dialog-color");
       name.value = t("panelDefaultGroupName");
-      color.value = DEFAULT_COLORS[this._data.groups.length % DEFAULT_COLORS.length];
+      color.value = nextDefaultColor(this._data.groups);
       dialog.showModal();
       name.select();
     };
@@ -6385,7 +6416,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
       }
       const color = this._settings.showAccountColor
         ? this._getAccountColor(ref.accountKey)
-        : "#0f6cbd";
+        : DEFAULT_COLORS[0];
       const card = createNode("article", "pin-mails-card");
       card.setAttribute("role", "option"); card.tabIndex = -1; card.dataset.stableKey = ref.stableKey; card._pinMessageHeader = hdr;
       card.draggable = this._settings.sortMode === "manual" && Boolean(hdr) && !this._settings.safeMode;
@@ -6642,7 +6673,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
         for (const [key, bucket] of buckets) fragment.appendChild(createGroupSection(
           key,
           bucket[0].ref.accountName || key,
-          this._settings.showAccountColor ? this._getAccountColor(key) : "#0f6cbd",
+          this._settings.showAccountColor ? this._getAccountColor(key) : DEFAULT_COLORS[0],
           bucket,
           "account"
         ));

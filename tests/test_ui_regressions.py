@@ -19,7 +19,8 @@ tokens = (EXT / "styles/tokens.css").read_text(encoding="utf-8")
 # The three user-facing surfaces share one compact product design language.
 # The font stack must remain fully local and must not depend on an optional
 # system installation of a third-party typeface.
-assert '--mp-font-family: system-ui,' in tokens
+assert '--mp-font-family: \"Segoe UI Variable Text\", \"Aptos\", system-ui,' in tokens
+assert '--mp-font-family-display: \"Segoe UI Variable Display\", \"Aptos Display\"' in tokens
 assert '--mp-font-family: Inter,' not in tokens
 assert "--mp-control-height-standard: 36px;" in tokens
 assert "--mp-page-max-width: 1440px;" in tokens

@@ -257,12 +257,6 @@ h1 {
 .overview-label { color: var(--muted); font-weight: 600; }
 .quick-overview small { grid-column: 1 / -1; color: var(--muted); }
 
-.settings-layout {
-  display: grid;
-  grid-template-columns: minmax(250px, 300px) minmax(0, 1fr);
-  gap: var(--space-6);
-  align-items: start;
-}
 .settings-loading {
   display: grid;
   gap: .4rem;
@@ -580,7 +574,7 @@ body[data-settings-experience="guided"] details.advanced-group:not([data-guided-
 .organization-block + .organization-block { margin-top: var(--space-3); padding-top: var(--space-5); border-top: 1px solid var(--border); }
 
 .entity-list, .account-list, .capability-list { display: grid; gap: var(--space-3); margin-top: var(--space-3); }
-.group-row, .rule-row, .account-card, .calendar-capability, .info-panel, .health-panel, .provider-panel, #import-preview {
+.group-row, .rule-row, .account-card, .calendar-capability, .health-panel, #import-preview {
   padding: var(--space-4);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -600,13 +594,12 @@ body[data-settings-experience="guided"] details.advanced-group:not([data-guided-
 .rule-row > input[type="checkbox"] { align-self: center; }
 
 .account-card { position: relative; display: grid; gap: .65rem; border-inline-start: 2px solid var(--account-color, var(--accent-foreground)); }
-.account-card-header { display: flex; align-items: center; gap: .65rem; }
 .account-header { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: .75rem; align-items: center; }
 .account-title { display: grid; gap: .15rem; min-width: 0; }
 .account-name { font-weight: 700; overflow-wrap: anywhere; }
 .account-email { color: var(--muted); font-size: max(.84rem, 12px); overflow-wrap: anywhere; }
 .account-email:empty { display: none; }
-.account-inboxes, .inbox-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: .55rem; }
+.inbox-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: .55rem; }
 .inbox-list label {
   display: flex;
   align-items: center;
@@ -636,7 +629,7 @@ body[data-settings-experience="guided"] details.advanced-group:not([data-guided-
 .calendar-capability.events-only, .calendar-capability.tasks-only { border-inline-start-color: var(--accent-foreground); }
 .calendar-capability.blocked .calendar-capability-state { color: var(--warning); border-color: var(--warning-border); background: var(--warning-soft); }
 
-.health-panel, .provider-panel { display: grid; gap: .65rem; margin-top: var(--space-3); }
+.health-panel { display: grid; gap: .65rem; margin-top: var(--space-3); }
 .health-summary { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
 .health-issues { display: grid; gap: .5rem; }
 .health-issue {
@@ -816,10 +809,6 @@ body[data-reduce-motion="always"] *, body[data-reduce-motion="always"] *::before
   .subsection-header > .button-row { margin: 0; }
 }
 @media (max-width: 1050px) {
-  .settings-layout { grid-template-columns: 1fr; }
-  .settings-sidebar { position: static; max-height: none; }
-  .settings-nav { grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); }
-  .settings-nav-group + .settings-nav-group { margin-top: 0; padding-top: 0; border-top: 0; }
   .quick-overview { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .setting-grid.three-columns, .toggle-grid, .feature-map { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }

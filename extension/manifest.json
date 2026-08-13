@@ -9,7 +9,7 @@
     "name": "ussmarines",
     "url": "https://github.com/ussmarines"
   },
-  "homepage_url": "https://github.com/ussmarines/mailperch-thunderbird",
+  "homepage_url": "https://github.com/ussmarines/mailpin-thunderbird",
   "browser_specific_settings": {
     "gecko": {
       "id": "ussmarines.mailpin@addons.thunderbird.net",

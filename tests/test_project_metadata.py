@@ -12,7 +12,7 @@ readmes = [(ROOT / name).read_text(encoding="utf-8") for name in ("README.md", "
 locales = {locale: json.loads((ROOT / f"extension/_locales/{locale}/messages.json").read_text(encoding="utf-8")) for locale in ("fr", "en")}
 
 author_url = "https://github.com/ussmarines"
-repository_url = "https://github.com/ussmarines/mailperch-thunderbird"
+repository_url = "https://github.com/ussmarines/mailpin-thunderbird"
 paypal_url = "https://paypal.me/ussmarinesdot"
 
 assert manifest["author"] == "ussmarines"

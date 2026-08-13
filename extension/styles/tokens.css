@@ -1,11 +1,13 @@
-/* MailPin product design tokens.
- * Global values are separated from semantic aliases so every surface can share
- * the same light, dark and high-contrast behavior without hard-coded overrides. */
+/* MailPin Organic Workspace design tokens.
+ * Semantic aliases remain stable for Thunderbird integration while the visual
+ * language is intentionally independent from Fluent or any external library. */
 :root {
   color-scheme: light;
   /* A guaranteed local sans-serif stack. MailPin intentionally ships no
    * third-party font until its asset and licence can be reviewed together. */
-  --mp-font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI Variable", "Aptos", "Segoe UI", sans-serif;
+  --mp-font-family: "Segoe UI Variable Text", "Aptos", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mp-font-family-display: "Segoe UI Variable Display", "Aptos Display", "Segoe UI Variable Text", system-ui, sans-serif;
+  --mp-font-family-mono: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
   --mp-font-size-caption: 12px;
   --mp-font-size-body: 14px;
   --mp-font-size-title: 20px;
@@ -15,36 +17,36 @@
   --mp-font-weight-semibold: 600;
 
   /* Brand palette */
-  --mp-brand-background: #4f7f75;
-  --mp-brand-background-hover: #426f67;
-  --mp-brand-background-pressed: #355b55;
-  --mp-brand-foreground: #4f7f75;
-  --mp-brand-foreground-hover: #426f67;
-  --mp-brand-subtle: #e8f0ee;
-  --mp-brand-subtle-hover: #d9e8e4;
-  --mp-brand-stroke: #86aaa2;
-  --mp-secondary-background: #3d536b;
-  --mp-secondary-background-hover: #31465a;
-  --mp-secondary-foreground: #3d536b;
-  --mp-secondary-subtle: #e9edf1;
+  --mp-brand-background: #4e7569;
+  --mp-brand-background-hover: #3d655a;
+  --mp-brand-background-pressed: #2d5148;
+  --mp-brand-foreground: #466e63;
+  --mp-brand-foreground-hover: #355d53;
+  --mp-brand-subtle: #e2ebe6;
+  --mp-brand-subtle-hover: #d5e3dd;
+  --mp-brand-stroke: #83a79d;
+  --mp-secondary-background: #46575d;
+  --mp-secondary-background-hover: #394b51;
+  --mp-secondary-foreground: #46575d;
+  --mp-secondary-subtle: #e5e9e8;
 
-  /* Fluent neutral aliases — light */
+  /* Neutral workspace aliases — light */
   --mp-color-neutral-background-1: #ffffff;
-  --mp-color-neutral-background-2: #f4f1ea;
-  --mp-color-neutral-background-3: #eeeae2;
-  --mp-color-neutral-background-4: #e5e0d7;
-  --mp-color-neutral-background-canvas: #f7f5f0;
+  --mp-color-neutral-background-2: #efebe2;
+  --mp-color-neutral-background-3: #e9e5dc;
+  --mp-color-neutral-background-4: #e1dcd1;
+  --mp-color-neutral-background-canvas: #f4f1e9;
   --mp-color-neutral-background-inverted: #1a1d21;
   --mp-color-neutral-card-background: #ffffff;
   --mp-color-neutral-card-background-hover: #ffffff;
-  --mp-color-neutral-foreground-1: #1a1d21;
-  --mp-color-neutral-foreground-2: #566066;
-  --mp-color-neutral-foreground-3: #6f777b;
+  --mp-color-neutral-foreground-1: #171a18;
+  --mp-color-neutral-foreground-2: #59615d;
+  --mp-color-neutral-foreground-3: #767d78;
   --mp-color-neutral-foreground-inverted: #ffffff;
-  --mp-color-neutral-stroke-1: #d7d3ca;
-  --mp-color-neutral-stroke-2: #e7e2d9;
-  --mp-color-neutral-stroke-accessible: #737b7e;
-  --mp-color-neutral-stroke-focus: #3d536b;
+  --mp-color-neutral-stroke-1: #d8d3c8;
+  --mp-color-neutral-stroke-2: #e5e0d6;
+  --mp-color-neutral-stroke-accessible: #787e79;
+  --mp-color-neutral-stroke-focus: #466e63;
 
   /* Semantic aliases — light */
   --mp-color-success-foreground: #0e700e;
@@ -62,11 +64,11 @@
 
   /* Geometry and rhythm */
   --mp-radius-none: 0;
-  --mp-radius-small: 4px;
-  --mp-radius-medium: 6px;
-  --mp-radius-large: 8px;
-  --mp-radius-xlarge: 10px;
-  --mp-radius-xxlarge: 12px;
+  --mp-radius-small: 6px;
+  --mp-radius-medium: 9px;
+  --mp-radius-large: 12px;
+  --mp-radius-xlarge: 15px;
+  --mp-radius-xxlarge: 20px;
   --mp-radius-round: 9999px;
   --mp-stroke-width: 1px;
   --mp-stroke-width-thick: 2px;
@@ -87,19 +89,46 @@
   --mp-focus-ring-color: color-mix(in srgb, var(--mp-brand-foreground) 72%, transparent);
 
   /* Elevation — light */
-  --mp-shadow-2: 0 1px 2px rgb(18 39 51 / 0.05);
-  --mp-shadow-4: 0 2px 5px rgb(18 39 51 / 0.06);
-  --mp-shadow-8: 0 4px 10px rgb(18 39 51 / 0.08);
-  --mp-shadow-16: 0 8px 18px rgb(18 39 51 / 0.10);
-  --mp-shadow-28: 0 14px 30px rgb(18 39 51 / 0.14);
+  --mp-shadow-2: 0 1px 2px rgb(23 26 24 / 0.05);
+  --mp-shadow-4: 0 2px 6px rgb(23 26 24 / 0.07);
+  --mp-shadow-8: 0 5px 14px rgb(23 26 24 / 0.09);
+  --mp-shadow-16: 0 10px 26px rgb(23 26 24 / 0.12);
+  --mp-shadow-28: 0 20px 48px rgb(23 26 24 / 0.16);
 
   /* Motion */
   --mp-duration-ultra-fast: 50ms;
-  --mp-duration-fast: 100ms;
-  --mp-duration-normal: 180ms;
-  --mp-duration-slow: 260ms;
-  --mp-ease-standard: cubic-bezier(0.2, 0, 0, 1);
-  --mp-ease-decelerate: cubic-bezier(0.1, 0.9, 0.2, 1);
+  --mp-duration-fast: 120ms;
+  --mp-duration-normal: 220ms;
+  --mp-duration-slow: 320ms;
+  --mp-ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
+  --mp-ease-decelerate: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Organic Workspace vocabulary. These aliases are deliberately semantic so
+   * light/dark/forced-color themes can change without rewriting components. */
+  --mp-ink: var(--mp-color-neutral-foreground-1);
+  --mp-paper: var(--mp-color-neutral-background-1);
+  --mp-sage: var(--mp-brand-background);
+  --mp-sage-deep: var(--mp-brand-background-pressed);
+  --mp-slate: var(--mp-secondary-background);
+  --mp-brass: #9b7040;
+  --mp-brass-soft: #efe4d5;
+  --mp-clay: #a95d4e;
+  --mp-workspace-canvas: var(--mp-color-neutral-background-canvas);
+  --mp-workspace-rail: var(--mp-color-neutral-background-2);
+  --mp-workspace-inspector: var(--mp-color-neutral-background-2);
+  --mp-workspace-surface: var(--mp-color-neutral-background-1);
+  --mp-workspace-surface-strong: var(--mp-color-neutral-background-2);
+  --mp-workspace-hover: var(--mp-color-neutral-background-3);
+  --mp-border-soft: var(--mp-color-neutral-stroke-2);
+  --mp-focus-soft: color-mix(in srgb, var(--mp-brand-foreground) 20%, transparent);
+  --mp-radius-organic-sm: 10px;
+  --mp-radius-organic-md: 15px;
+  --mp-radius-organic-lg: 20px;
+  --mp-radius-organic-xl: 26px;
+  --mp-shadow-organic-low: 0 2px 8px rgb(23 26 24 / 0.07);
+  --mp-shadow-organic-medium: 0 10px 28px rgb(23 26 24 / 0.11);
+  --mp-shadow-organic-high: 0 24px 64px rgb(23 26 24 / 0.18);
+  --mp-ease-organic: cubic-bezier(0.22, 1, 0.36, 1);
 
   /* Compatibility aliases retained for the injected Thunderbird panel. */
   --mp-brand: var(--mp-brand-background);
@@ -137,34 +166,34 @@
 
 :root[data-mp-theme="dark"] {
   color-scheme: dark;
-  --mp-brand-background: #426f67;
-  --mp-brand-background-hover: #4f7f75;
-  --mp-brand-background-pressed: #5e8f86;
-  --mp-brand-foreground: #9bc3bb;
-  --mp-brand-foreground-hover: #b0d0c9;
-  --mp-brand-subtle: #203a36;
-  --mp-brand-subtle-hover: #294741;
+  --mp-brand-background: #537b70;
+  --mp-brand-background-hover: #648c80;
+  --mp-brand-background-pressed: #345a50;
+  --mp-brand-foreground: #9fc4b9;
+  --mp-brand-foreground-hover: #b5d2ca;
+  --mp-brand-subtle: #243a34;
+  --mp-brand-subtle-hover: #2c4941;
   --mp-brand-stroke: #5e8f86;
   --mp-secondary-background: #31465a;
   --mp-secondary-background-hover: #3d536b;
   --mp-secondary-foreground: #aebdcc;
   --mp-secondary-subtle: #202c36;
 
-  --mp-color-neutral-background-1: #292929;
-  --mp-color-neutral-background-2: #1f1f1f;
-  --mp-color-neutral-background-3: #141414;
-  --mp-color-neutral-background-4: #333333;
-  --mp-color-neutral-background-canvas: #111315;
+  --mp-color-neutral-background-1: #1d211e;
+  --mp-color-neutral-background-2: #171a18;
+  --mp-color-neutral-background-3: #252a26;
+  --mp-color-neutral-background-4: #2d332e;
+  --mp-color-neutral-background-canvas: #121512;
   --mp-color-neutral-background-inverted: #ffffff;
-  --mp-color-neutral-card-background: #292929;
-  --mp-color-neutral-card-background-hover: #333333;
+  --mp-color-neutral-card-background: #1d211e;
+  --mp-color-neutral-card-background-hover: #252a26;
   --mp-color-neutral-foreground-1: #ffffff;
-  --mp-color-neutral-foreground-2: #d6d6d6;
-  --mp-color-neutral-foreground-3: #adadad;
+  --mp-color-neutral-foreground-2: #d2d7d2;
+  --mp-color-neutral-foreground-3: #a4ada6;
   --mp-color-neutral-foreground-inverted: #242424;
-  --mp-color-neutral-stroke-1: #525252;
-  --mp-color-neutral-stroke-2: #3d3d3d;
-  --mp-color-neutral-stroke-accessible: #8a8a8a;
+  --mp-color-neutral-stroke-1: #454c46;
+  --mp-color-neutral-stroke-2: #323833;
+  --mp-color-neutral-stroke-accessible: #89918b;
   --mp-color-neutral-stroke-focus: #ffffff;
 
   --mp-color-success-foreground: #6ccb5f;
@@ -190,33 +219,33 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-mp-theme="light"]) {
     color-scheme: dark;
-    --mp-brand-background: #426f67;
-    --mp-brand-background-hover: #4f7f75;
-    --mp-brand-background-pressed: #5e8f86;
-    --mp-brand-foreground: #9bc3bb;
-    --mp-brand-foreground-hover: #b0d0c9;
-    --mp-brand-subtle: #203a36;
-    --mp-brand-subtle-hover: #294741;
+    --mp-brand-background: #537b70;
+    --mp-brand-background-hover: #648c80;
+    --mp-brand-background-pressed: #345a50;
+    --mp-brand-foreground: #9fc4b9;
+    --mp-brand-foreground-hover: #b5d2ca;
+    --mp-brand-subtle: #243a34;
+    --mp-brand-subtle-hover: #2c4941;
     --mp-brand-stroke: #5e8f86;
     --mp-secondary-background: #31465a;
     --mp-secondary-background-hover: #3d536b;
     --mp-secondary-foreground: #aebdcc;
     --mp-secondary-subtle: #202c36;
-    --mp-color-neutral-background-1: #292929;
-    --mp-color-neutral-background-2: #1f1f1f;
-    --mp-color-neutral-background-3: #141414;
-    --mp-color-neutral-background-4: #333333;
-    --mp-color-neutral-background-canvas: #111315;
+    --mp-color-neutral-background-1: #1d211e;
+    --mp-color-neutral-background-2: #171a18;
+    --mp-color-neutral-background-3: #252a26;
+    --mp-color-neutral-background-4: #2d332e;
+    --mp-color-neutral-background-canvas: #121512;
     --mp-color-neutral-background-inverted: #ffffff;
-    --mp-color-neutral-card-background: #292929;
-    --mp-color-neutral-card-background-hover: #333333;
+    --mp-color-neutral-card-background: #1d211e;
+    --mp-color-neutral-card-background-hover: #252a26;
     --mp-color-neutral-foreground-1: #ffffff;
-    --mp-color-neutral-foreground-2: #d6d6d6;
-    --mp-color-neutral-foreground-3: #adadad;
+    --mp-color-neutral-foreground-2: #d2d7d2;
+    --mp-color-neutral-foreground-3: #a4ada6;
     --mp-color-neutral-foreground-inverted: #242424;
-    --mp-color-neutral-stroke-1: #525252;
-    --mp-color-neutral-stroke-2: #3d3d3d;
-    --mp-color-neutral-stroke-accessible: #8a8a8a;
+    --mp-color-neutral-stroke-1: #454c46;
+    --mp-color-neutral-stroke-2: #323833;
+    --mp-color-neutral-stroke-accessible: #89918b;
     --mp-color-neutral-stroke-focus: #ffffff;
     --mp-color-success-foreground: #6ccb5f;
     --mp-color-success-background: #173b1a;

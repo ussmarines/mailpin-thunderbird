@@ -2623,5 +2623,29 @@
   },
   "noReplyDateFuture": {
     "message": "Choose a future date and time."
+  },
+  "moreActions": {
+    "message": "More actions"
+  },
+  "contextPanel": {
+    "message": "Context"
+  },
+  "closeContext": {
+    "message": "Close context"
+  },
+  "moreStats": {
+    "message": "More statistics"
+  },
+  "ruleBuilderWhen": {
+    "message": "When"
+  },
+  "ruleBuilderIf": {
+    "message": "If"
+  },
+  "ruleBuilderThen": {
+    "message": "Then"
+  },
+  "ruleBuilderLimits": {
+    "message": "Limits"
   }
 }

@@ -2,7 +2,7 @@
 
 > Lire d’abord `PROJECT_MEMORY.md`, puis `docs/CODEX_HANDOFF.md` pour la branche de consolidation.
 
-La page Options contient beaucoup de réglages historiques. L’objectif actuel n’est pas d’en supprimer, mais de réduire la charge cognitive sans casser les profils existants.
+La page Options contient beaucoup de réglages historiques. Organic Workspace la traite comme un éditeur : réduire la charge cognitive, révéler progressivement le contexte et conserver tous les contrôles/persistences utiles sans reproduire un dashboard administratif.
 
 ## Taxonomie UX
 
@@ -13,7 +13,7 @@ La navigation publique reste limitée à quatre familles :
 - **Automatisation** : règles, workflows et tags Thunderbird ;
 - **Avancé** : sauvegardes, diagnostics, maintenance et comportements techniques.
 
-Ne pas créer une nouvelle famille sans besoin produit explicite. Les réglages techniques peuvent rester dans le DOM pour le mode Avancé, mais doivent être retirés de la navigation/recherche et masqués lorsqu’ils sont marqués avancés en mode Recommandé.
+Les quatre familles restent une taxonomie fonctionnelle, pas une contrainte de composition visuelle. Le rail, la scène, la recherche et les transitions peuvent être refondus librement tant que chaque contrôle reste atteignable. Les réglages techniques peuvent rester dans le DOM pour le mode Avancé, mais doivent être retirés de la navigation/recherche et masqués lorsqu’ils sont marqués avancés en mode Recommandé.
 
 ## Mode Recommandé
 

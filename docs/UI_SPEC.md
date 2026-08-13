@@ -1,103 +1,139 @@
-# Spécification d’interface
+# Spécification d’interface — MailPin Organic Workspace
 
-## Principes UX
+## Direction canonique
 
-- présenter d’abord les actions et informations utiles ;
-- regrouper les réglages par besoin utilisateur plutôt que par détail technique ;
-- réserver les options avancées aux groupes repliables ;
-- laisser de l’espace entre textes, boutons, cases et blocs, avec une hiérarchie typographique nette et des alignements cohérents ;
-- afficher le résultat près de l’action et dans un toast non bloquant ;
-- conserver le clavier, le zoom 200 %, les thèmes sombre/clair et le contraste élevé ;
-- utiliser uniquement des polices locales et garantir un plancher de 12 px à tout texte explicite ou hérité via `<small>`.
+MailPin n’utilise plus Fluent comme direction artistique. Le produit adopte **Organic Workspace** : une interface de travail locale, calme mais vivante, qui privilégie le contenu, le contexte et les transitions plutôt que l’empilement de cartes administratives.
 
-## Panneau
+Références de conception : espaces de travail créatifs, interfaces command-first et outils de productivité modernes. Elles servent de principes, jamais de composants copiés. MailPin conserve sa propre identité et n’ajoute aucune dépendance UI externe.
 
-- placé au-dessus de la liste native et repliable ;
-- hauteur limitée avec défilement interne ;
-- portée, tri, recherche et vue intelligente explicites ;
-- cache de cartes et chargement progressif au-delà du seuil configuré ;
-- sélection multiple et barre d’actions groupées seulement lorsqu’elle est utile ;
-- indicateur de santé discret uniquement en cas d’attention ;
-- aucune modification du badge de dossier natif.
+Principes :
 
-## Liste générale
+- **workspace avant dashboard** : navigation persistante, canvas central et contexte secondaire ;
+- **contenu avant chrome** : hiérarchie par typographie, espace, proximité et mouvement plutôt que bordures systématiques ;
+- **progressive disclosure** : les outils avancés apparaissent au bon moment sans masquer les capacités existantes ;
+- **command-first sans command-only** : la palette accélère le clavier, toutes les actions importantes restent aussi accessibles visuellement ;
+- **mouvement fonctionnel** : une transition explique un changement d’état ou de contexte ; elle ne décore jamais gratuitement ;
+- **zéro effet générique** : pas de dégradé, glow, glassmorphism, blob décoratif ou animation spectaculaire de landing page ;
+- **local par construction** : aucune police, icône, texture, script ou ressource distante.
 
-- conserver la hauteur virtuelle native de Thunderbird ;
-- placer étoile, punaise et bouton « Plus » sur un rail horizontal centré verticalement ;
-- utiliser des cibles de 24×24 px en densité normale et 28×28 px en densité tactile ;
-- garantir une marge supérieure et inférieure identique ;
-- réserver l’espace du rail sans chevaucher auteur, date, objet, étiquettes ou pièces jointes ;
-- les réglages `uiPreset` et `density` ne modifient jamais la géométrie native.
+## Architecture du workspace
 
-## Cartes
+### Dashboard
 
-- liseré de couleur du compte ;
-- expéditeur, date, objet et métadonnées lisibles ;
-- punaise pleine colorée ;
-- actions rapides limitées et menu complet via clic droit ou bouton « Plus d’actions » ;
-- clic simple : affichage à droite sans défilement natif ;
-- double-clic : ouverture native ;
-- focus visible, roving `tabindex`, flèches, Home/End, PageUp/PageDown, Entrée, Espace, Shift+F10 et Échap.
+Le Dashboard est un espace de travail à trois zones lorsque la largeur le permet :
 
-## Menu contextuel
+1. **rail de navigation** : recherche, vues principales, vues intelligentes et vues enregistrées ;
+2. **canvas** : contexte courant, métriques utiles, focus et contenu actionnable ;
+3. **inspector** : diagnostic, activité et informations secondaires qui ne doivent pas concurrencer la tâche principale.
 
-- `menupopup` Thunderbird natif dans le `popupset` de la fenêtre ;
-- ancré sous le bouton ou ouvert aux coordonnées écran du clic droit ;
-- focus restauré au déclencheur après fermeture ;
-- confirmation avant action destructive selon les paramètres.
+Sous 1260 px, l’inspector sort de la colonne et rejoint le flux. Sous 920 px, le rail devient une barre de workspace compacte. Aucun contenu essentiel ne doit devenir inaccessible.
 
-## Paramètres
+Les vues Aujourd’hui, Liste, Kanban, Affaires, Revue, Historique et Santé conservent leur contrat métier et leurs raccourcis. La vue active doit être identifiable sans dépendre de la couleur seule.
 
-- en-tête et résumé immédiat ;
-- barre latérale groupée : Essentiel, Suivi, Organisation, Intégrations, Maintenance et Accès rapide ;
-- recherche filtrant sections et navigation ;
-- section active signalée par `aria-current` ;
-- modes Recommandé/Avancé et espacement Compact/Équilibré/Très aéré limité à cette page ;
-- aide sous chaque contrôle et bouton, sans placer aide et libellé côte à côte ;
-- un seul dock Enregistrer/Annuler, visible uniquement lorsqu’une modification existe ;
-- toast fixe non invasif, avec fermeture en haut à droite ;
-- comptes, groupes et calendriers présentés sans duplication ni jargon technique inutile.
-- les cartes de droite sont rendues dans le même ordre que leur navigation : **Essentiel**, **Automatisation**, **Organisation**, puis **Avancé** lorsque ce niveau est visible ;
-- la portée des épingles est limitée à **Cette boîte**, **Comptes sélectionnés** (identifiants Thunderbird locaux) et **Tous les comptes**. En portée sélectionnée, la liste présente le nom lisible du compte, l’adresse seulement en information secondaire, un compteur localisé et l’état des comptes devenus indisponibles. Le mode Recommandé conserve les comptes sélectionnés dans son brouillon.
-- l’Essentiel indique que **2 000 épingles** est le volume actuellement validé et conseillé, sans imposer de limite technique. Le Centre de santé reprend ce repère à titre informatif seulement.
+### Panneau Thunderbird
 
-## Dashboard
+Le panneau est un **compagnon compact** : voir → agir → repartir. Il ne doit pas reproduire le Dashboard en miniature.
 
-- thèmes clair/sombre/contraste élevé et réduction de mouvement ;
-- liste, vues intelligentes, vues enregistrées, Kanban, affaires, historique et centre de santé ;
-- palette de commandes accessible au bouton, au clavier dans le dashboard et via la commande Thunderbird ;
-- recherche globale sur métadonnées, notes, sous-tâches, tags, groupes et affaires ;
-- cartes capables d’afficher progression de checklist et état **J’attends / Je dois répondre** sans surcharger le contenu ;
-- sélection multiple et options contextuelles pour les actions groupées ;
-- diagnostic exportable, matrice fournisseurs et réparations sûres ;
-- état de chargement, erreurs réessayables et mise en page utilisable à largeur réduite.
-- les compteurs utilisateur sont normalisés à un entier non négatif avant rendu ; aucun compteur ne peut afficher `null`, `undefined` ou `NaN`.
-- le soutien utilisateur se limite à PayPal ; les diagnostics détaillés restent dans le Centre de santé, pas dans le tableau principal.
+- panneau au-dessus de la liste native, repliable et à défilement interne ;
+- en-tête court avec portée, tri et actions réellement utiles ;
+- recherche et vue intelligente immédiatement disponibles lorsque activées ;
+- cartes traitées comme des lignes éditoriales, avec un repère de compte et peu de chrome ;
+- détails secondaires révélés sans augmenter inutilement la hauteur de toutes les cartes ;
+- container queries obligatoires pour les largeurs réellement imposées par le splitter Thunderbird ;
+- aucune modification de la hauteur virtuelle ou de la géométrie de la liste native.
 
+### Options
+
+Options est un **éditeur de réglages**, pas un tableau de bord.
+
+- rail persistant avec recherche et navigation ;
+- scène de contenu centrale avec sections éditoriales ;
+- familles fonctionnelles stables tant qu’aucun besoin produit ne justifie leur migration ;
+- contrôles existants et registre `SETTINGS_CONTROL_DEFINITIONS` préservés ;
+- mode Recommandé = réduction de charge cognitive, jamais sauvegarde implicite ;
+- un seul dock Enregistrer/Annuler, visible uniquement lorsqu’un brouillon diffère de l’état persisté ;
+- résultat d’une action affiché à proximité et via toast non bloquant.
+
+## Typographie
+
+Aucune police distante. MailPin utilise des familles locales privilégiant les variantes système à métriques modernes :
+
+- display : `Segoe UI Variable Display`, `Aptos Display`, puis système ;
+- texte : `Segoe UI Variable Text`, `Aptos`, puis système ;
+- mono : `Cascadia Code`, `SFMono-Regular`, `Consolas`, puis mono système.
+
+La hiérarchie utilise davantage l’échelle, la graisse et l’espace que les encadrements. Aucun texte explicite ne descend sous 12 px.
+
+## Couleur
+
+La base reste chaude et naturelle : Ink, Paper, Sage, Slate et Brass. Les valeurs runtime vivent dans `extension/styles/tokens.css`.
+
+- Sage = progression/action ;
+- Slate = information structurelle ;
+- Brass = attention contextuelle ;
+- états succès/alerte/danger restent sémantiques et ne sont jamais remplacés uniquement par la marque ;
+- les thèmes clair, sombre et couleurs forcées doivent garder la même hiérarchie d’information.
+
+Les dégradés et halos sont exclus du système produit.
+
+## Géométrie et profondeur
+
+- rayons plus organiques sur les surfaces interactives, pas sur chaque séparation ;
+- bordures faibles et rares ;
+- ombres uniquement pour une surface réellement détachée : dialog, dock, élément temporairement élevé ;
+- une liste de mails ne devient pas une grille de cartes sans raison fonctionnelle ;
+- l’alignement peut être asymétrique si la lecture et l’ordre clavier restent évidents.
+
+## Motion
+
+Durées de référence :
+
+- hover/feedback : 100–140 ms ;
+- changement d’état : 180–240 ms ;
+- déplacement ou changement de contexte : 240–320 ms.
+
+Utiliser une courbe organique de décélération. `prefers-reduced-motion` et le réglage MailPin de réduction du mouvement désactivent les déplacements non indispensables.
+
+Une animation ne doit jamais retarder une action, bloquer le clavier ou masquer l’état final.
+
+## Accessibilité et ergonomie
+
+- clavier complet sur Dashboard, Options et panneau ;
+- focus visible, ordre de tabulation cohérent et `aria-current` / `aria-pressed` selon le rôle ;
+- zoom 200 % sans perte de fonctionnalité ;
+- thèmes clair/sombre, contraste élevé et `forced-colors` ;
+- cibles d’action suffisamment grandes sans gonfler toute l’interface ;
+- aucun état uniquement communiqué par couleur ;
+- scroll interne seulement lorsqu’il préserve le contexte ; éviter les scrolls imbriqués inutiles ;
+- erreurs réessayables et états de chargement explicites.
+
+## Invariants Thunderbird
+
+- ne jamais modifier un compteur natif ou l’état lu/non-lu lors d’un simple épinglage ;
+- clic carte = afficher le message sans faire défiler artificiellement la liste native ; double-clic = comportement natif prévu ;
+- menu contextuel Thunderbird natif et focus restauré après fermeture ;
+- étoile native intacte en mode indépendant ; transformation réversible en mode `nativeStar` ;
+- aucune modification de l’intégration `PinCompatibility` pour un besoin uniquement visuel.
 
 ## Sécurité de l’interface
 
-- aucun état `admin`, rôle caché ou permission simulée dans le DOM ;
-- désactiver Enregistrer/Annuler tant que la configuration n’est pas chargée ou qu’une écriture est en cours ;
-- une modification du DOM ne doit jamais définir un chemin local : le dossier de sauvegarde passe par le sélecteur natif ;
-- les imports affichent un aperçu et sont restaurés en mode sûr, automatismes désactivés ;
-- les confirmations UX complètent les contrôles privilégiés mais ne constituent jamais la seule barrière de sécurité ;
-- après désinstallation/réinstallation, l’interface doit repartir sur les valeurs recommandées sans données résiduelles.
+- aucune autorisation ou rôle simulé dans le DOM ;
+- aucune entrée de formulaire considérée fiable avant validation privilégiée ;
+- aucun `innerHTML` ou HTML construit avec des métadonnées mail ;
+- import en aperçu sûr et automatismes neutralisés ;
+- sélecteur natif obligatoire pour tout chemin local ;
+- les confirmations UX complètent les contrôles privilégiés mais ne sont jamais la barrière unique.
 
+## Critère de validation visuelle
 
-## Étoile native et punaise
+Une refonte n’est pas considérée validée parce que ses tests statiques passent. Toute affirmation concernant géométrie, responsive, focus, thème ou mouvement dans Thunderbird exige une observation sur le vrai runtime lorsque la surface concernée y est rendue.
 
-- en mode indépendant : conserver l’étoile Thunderbird intacte et ajouter uniquement la punaise MailPin ;
-- en mode `nativeStar` : transformer un seul contrôle canonique, masquer uniquement ses doublons et restaurer exactement l’état natif en quittant ce mode ;
-- ne jamais positionner un contrôle marqué `data-pin-mails-native-star` si la racine ne porte pas `pin-mails-native-star`.
+## Quality of Life
 
-## Barre Enregistrer/Annuler
-
-- un seul groupe d’actions globales ;
-- boutons associés au formulaire par l’attribut `form` ;
-- Enregistrer = `submit`, Annuler = `reset` intercepté pour recharger les valeurs persistées ;
-- état occupé et erreurs affichés sans bloquer le reste de la lecture.
-
-## Typographie Fluent 2
-
-Options, dashboard et panneau injecté utilisent une pile sans-serif locale commençant par `system-ui`, complétée par les variantes système Segoe UI/Aptos. Aucune police n’est téléchargée ni embarquée sans son actif et sa licence explicitement revus. Le corps courant est 14 px / 20 px et aucun `font-size` explicite ne peut descendre sous 12 px. Les grilles de statistiques utilisent `auto-fit` afin d’éviter les colonnes compressées aux petites largeurs.
+- Création Groupe / Affaire / Modèle / Règle : focus immédiat sur le nom et sélection du libellé par défaut.
+- Un champ optionnel ne devient requis qu’au moment de l’action qui en dépend ; Agenda valide échéance et calendrier au moment de créer/synchroniser.
+- Les couleurs automatiques utilisent Sage, Berry, Moss, Indigo, Brass, Ocean, Clay et Plum, en privilégiant la couleur la moins utilisée.
+- Les couleurs personnalisées sont conservées.
+- Menus, inspector et statistiques progressives restent dans le flux ou recomposent le layout avant toute superposition.
+- Les commandes Enregistrer/Annuler restent dans l’en-tête sticky et aucune surface flottante ne recouvre un champ éditable.
+- Un seul landmark `main` par document ; aucun `main` imbriqué.

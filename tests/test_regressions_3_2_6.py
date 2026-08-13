@@ -22,16 +22,16 @@ assert 'iconInfo?.insertBefore(button, nativeStar || null);' in independent
 assert 'insertBefore(star' not in independent
 assert 'appendChild(star' not in independent
 
-# Save/cancel live inside the form and use direct click handlers. Native form
-# events remain as a keyboard/assistive fallback, but no cross-form association
-# is required by the visible controls.
+# Save/cancel live in the canonical sticky header so they cannot cover fields.
+# Explicit form association preserves semantics; direct click handlers remain
+# authoritative in Thunderbird embedding.
 form_start = OPTIONS_HTML.index('<form id="settings-form"')
 form_end = OPTIONS_HTML.index('</form>', form_start)
 dock_pos = OPTIONS_HTML.index('id="save-dock"')
-assert form_start < dock_pos < form_end
-assert 'id="discard-changes" type="reset"' in OPTIONS_HTML
-assert 'id="save-all-floating" type="submit"' in OPTIONS_HTML
-assert 'form="settings-form"' not in OPTIONS_HTML[OPTIONS_HTML.index('id="save-dock"'):form_end]
+assert dock_pos < form_start < form_end
+assert 'class="save-dock header-save-dock"' in OPTIONS_HTML
+assert 'id="discard-changes" type="reset" form="settings-form"' in OPTIONS_HTML
+assert 'id="save-all-floating" type="submit" form="settings-form"' in OPTIONS_HTML
 assert 'save?.addEventListener("click", saveAll);' in OPTIONS_JS
 assert 'discard?.addEventListener("click", discardChanges);' in OPTIONS_JS
 assert 'document.addEventListener("click", event => {' not in OPTIONS_JS

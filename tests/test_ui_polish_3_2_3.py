@@ -16,6 +16,7 @@ pin_css = (ROOT / "extension/styles/pin.css").read_text(encoding="utf-8")
 options_html = (ROOT / "extension/options/options.html").read_text(encoding="utf-8")
 options_js = (ROOT / "extension/options/options.js").read_text(encoding="utf-8")
 options_css = (ROOT / "extension/options/options.css").read_text(encoding="utf-8")
+workspace_css = (ROOT / "extension/styles/workspace.css").read_text(encoding="utf-8")
 tokens_css = (ROOT / "extension/styles/tokens.css").read_text(encoding="utf-8")
 deep_audit = (ROOT / "scripts/deep_audit.py").read_text(encoding="utf-8")
 
@@ -57,13 +58,15 @@ for minimum in ("--pin-mails-card-min-height: 48px", "--pin-mails-card-min-heigh
     assert minimum in pin_css, minimum
 assert "min-block-size: var(--pin-mails-card-min-height)" in pin_css
 
-# Fluent identity remains shared rather than duplicated by each HTML surface.
+# Organic Workspace identity remains shared rather than duplicated by each HTML surface.
 for token in (
-    "--mp-brand-background: #4f7f75", "--mp-secondary-background: #3d536b",
-    ":root[data-mp-theme=\"dark\"]", "--mp-radius-lg: var(--mp-radius-xxlarge)",
-    "--mp-shadow-low",
+    "--mp-brand-background: #4e7569", "--mp-secondary-background: #46575d",
+    ":root[data-mp-theme=\"dark\"]", "--mp-radius-organic-lg: 20px",
+    "--mp-shadow-organic-low", "--mp-ease-organic",
 ):
     assert token in tokens_css, token
+assert "linear-gradient" not in workspace_css
+assert "radial-gradient" not in workspace_css
 assert 'src="../styles/theme.js"' in options_html
 assert 'href="../styles/tokens.css"' in options_html
 assert "--accent: var(--mp-brand-background)" in options_css
@@ -94,7 +97,7 @@ for class_name in sorted(html_classes | js_classes):
     # being standalone layout contracts.
     if class_name in {"success", "error", "busy", "hidden", "active", "dirty"}:
         continue
-    assert re.search(rf"\.{re.escape(class_name)}(?=[\s,:.#>+~\[]|\{{)", options_css), f"Missing options CSS class: {class_name}"
+    assert re.search(rf"\.{re.escape(class_name)}(?=[\s,:.#>+~\[]|\{{)", options_css + "\n" + workspace_css), f"Missing options CSS class: {class_name}"
 
 # Screenshots exposed duplicated account labels and incorrect calendar fields.
 assert "secondaryLabel.localeCompare(primaryLabel" in options_js

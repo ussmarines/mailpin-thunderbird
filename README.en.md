@@ -5,7 +5,7 @@
 
 **Email Follow-up & Productivity for Thunderbird**
 
-[![QA](https://github.com/ussmarines/mailperch-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailperch-thunderbird/actions/workflows/ci.yml)
+[![QA](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml)
 ![Release](https://img.shields.io/badge/release-v1.6.1-4F7F75)
 ![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x-3D536B)
 ![License](https://img.shields.io/badge/license-MailPin%20Source--Available%201.1-1A1D21)
@@ -24,7 +24,7 @@ MailPin turns important email into actionable follow-up **without replacing Thun
 
 ## Brand & interface
 
-Version 1.6.0 introduces the **MailPin** identity: envelope + pin mark, Ink / Slate / Sage / Brass palette, warm canvas, local typography, and restrained accents. No gradients and no remote assets. Light/dark themes, forced colors, keyboard focus, and reduced motion remain supported.
+**Organic Workspace** organizes MailPin as a real productivity workspace: persistent navigation, an editorial canvas, on-demand context, compact Thunderbird companion surfaces, and functional micro-interactions. The Ink / Slate / Sage / Brass identity uses natural tones and local typography only. No gradients, glow, glassmorphism, remote assets, or remote fonts. Light/dark themes, forced colors, keyboard focus, and reduced motion remain supported.
 
 <div align="center">
   <img src="assets/brand/mailpin-brand-board.svg" width="92%" alt="MailPin brand system">
@@ -81,7 +81,7 @@ MailPin has no runtime network call, telemetry, advertising or remote code. Full
 - [Thunderbird test bench](docs/THUNDERBIRD_TEST_BENCH.md)
 - [Reviewer build instructions](release/BUILD_INSTRUCTIONS.md)
 - [ATN preparation](STORE_RELEASE.md)
-- [Report an issue](https://github.com/ussmarines/mailperch-thunderbird/issues)
+- [Report an issue](https://github.com/ussmarines/mailpin-thunderbird/issues)
 
 Maintained by [ussmarines](https://github.com/ussmarines). [PayPal](https://paypal.me/ussmarinesdot) donations are optional and unlock no functionality.
 

@@ -63,7 +63,7 @@
     "Business modules do not call Thunderbird core services directly outside compatibility adapters",
     "Recommended mode never auto-saves and preserves profile-specific settings",
     "Privileged dependencies injected into compatibility adapters are explicitly imported before facade creation",
-    "Fluent 2 styling uses local CSS tokens and native HTML controls with no npm runtime dependency or remote asset",
+    "Organic Workspace uses native HTML plus local CSS tokens, with canonical Dashboard/Options shells written directly in source and no remote UI asset",
     "Selected-account scope uses Thunderbird account.key consistently from Options through runtime filtering"
   ],
   "ui": {
@@ -107,7 +107,7 @@
     "providerDetection": "exact recognized domain or dot-boundary subdomain matching; CodeQL incomplete URL substring checks removed in 1.2.1",
     "thunderbirdBoundary": "MailServices/MailUtils/MessageArchiver and Calendar internals are injected into dedicated compatibility adapters; business logic must not call them directly",
     "recommendedMode": "recommended values are draft-only, preserve profile-specific fields and require explicit save",
-    "uiDependencyPolicy": "native HTML plus local Fluent 2 CSS tokens; no npm runtime dependency, bundler, CDN or remote asset",
+    "uiDependencyPolicy": "native HTML plus local Organic Workspace CSS tokens; canonical shell in source; no npm runtime dependency, bundler, CDN or remote asset",
     "runtimeTestSupplyChain": "test-only Thunderbird/geckodriver downloads are checksum-verified and are not runtime dependencies of the extension"
   },
   "developmentBranch": "main",
