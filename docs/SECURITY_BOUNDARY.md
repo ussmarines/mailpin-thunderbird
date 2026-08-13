@@ -105,7 +105,7 @@ Cette activité réseau appartient à la chaîne CI, pas au produit installé ; 
 
 ## Dépendances de l’interface
 
-Le XPI ne contient aucune dépendance npm runtime, aucun composant chargé depuis un CDN et aucun code généré à l’installation. L’évaluation de `@fluentui/web-components` 3.0.3 n’a trouvé aucun import dans l’extension et aucun chemin de bundle vers le XPI ; conserver le paquet aurait ajouté une chaîne de dépendances inutilisée et une exigence Node 22/24. Le paquet et le lockfile ont donc été retirés. Les contrôles restent natifs et les jetons Fluent 2 sont versionnés localement dans `extension/styles/tokens.css`.
+Le XPI ne contient aucune dépendance npm runtime, aucun composant chargé depuis un CDN et aucun code généré à l’installation. L’évaluation de `@fluentui/web-components` 3.0.3 n’a trouvé aucun import dans l’extension et aucun chemin de bundle vers le XPI ; conserver le paquet aurait ajouté une chaîne de dépendances inutilisée et une exigence Node 22/24. Le paquet et le lockfile ont donc été retirés. Les contrôles restent natifs et les jetons Organic Workspace sont versionnés localement dans `extension/styles/tokens.css`; l’évaluation Fluent est conservée uniquement comme historique de chaîne d’approvisionnement.
 
 ## Règles pour les futures modifications
 

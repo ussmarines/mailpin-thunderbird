@@ -2115,7 +2115,7 @@ async function startOptions() {
         () => messenger.pinInbox.exportDiagnosticBundle()
       );
       downloadJson(
-        `mailperch-diagnostic-${new Date().toISOString().slice(0, 10)}.json`,
+        `mailpin-diagnostic-${new Date().toISOString().slice(0, 10)}.json`,
         report
       );
       setStatus(msg("diagnosticExported"), "success");
@@ -2132,7 +2132,7 @@ async function startOptions() {
         value.shortcut = value.shortcuts["toggle-pin-selected"] || "";
         return value;
       });
-      downloadJson(`mailperch-${new Date().toISOString().slice(0, 10)}.json`, data);
+      downloadJson(`mailpin-${new Date().toISOString().slice(0, 10)}.json`, data);
       setStatus(msg("backupExported"), "success");
     } catch (error) {
       setStatus(failureMessage("backupExportFailed", error), "error");

@@ -1,6 +1,6 @@
 ---
 name: mailpin-project-knowledge
-description: Project knowledge for the MailPin Thunderbird extension. Use when a task requires current context about MailPin architecture, the privileged Experiment and Thunderbird compatibility layer, pin and workflow features, local data model, Options/dashboard/panel UI, Fluent 2 branding, security boundaries, testing evidence, or release constraints. Do not use for generic Git work, isolated edits fully explained by the touched files, or procedures governed by AGENTS.md, MAILPERCH_AI_RULES.md, Superpowers, or another dedicated skill.
+description: Project knowledge for the MailPin Thunderbird extension. Use when a task requires current context about MailPin architecture, the privileged Experiment and Thunderbird compatibility layer, pin and workflow features, local data model, Options/dashboard/panel UI, Organic Workspace branding, security boundaries, testing evidence, or release constraints. Do not use for generic Git work, isolated edits fully explained by the touched files, or procedures governed by AGENTS.md, MAILPERCH_AI_RULES.md, Superpowers, or another dedicated skill.
 ---
 
 # MailPin Project Knowledge

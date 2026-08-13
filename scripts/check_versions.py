@@ -1,37 +1,43 @@
 #!/usr/bin/env python3
-"""Keep all release-facing MailPin version declarations aligned."""
+"""Keep source-version and latest-public-version declarations truthful."""
 from __future__ import annotations
-import json
-import re
+import json, re
 from pathlib import Path
-
 ROOT = Path(__file__).resolve().parents[1]
 package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
 manifest = json.loads((ROOT / "extension/manifest.json").read_text(encoding="utf-8"))
+state = json.loads((ROOT / "docs/PROJECT_STATE.json").read_text(encoding="utf-8"))
 version = str(package["version"])
+public = str(state["latestPublicVersion"])
 assert re.fullmatch(r"\d+\.\d+\.\d+", version), version
-assert manifest["version"] == version, (manifest["version"], version)
-
-checks = {
-    "README.md": [f"**MailPin :** `{version}`", f"MailPin_v{version}.xpi", f"release-v{version}"],
-    "README.en.md": [f"**MailPin:** `{version}`", f"MailPin_v{version}.xpi", f"release-v{version}"],
+assert re.fullmatch(r"\d+\.\d+\.\d+", public), public
+assert manifest["version"] == version
+assert state["extensionVersion"] == version
+assert state["releaseStatus"] in {"development", "candidate", "published"}
+source_checks = {
+    "README.md": [f"**Version source :** `{version}`", f"dist/MailPin_v{version}.xpi"],
+    "README.en.md": [f"**Source version:** `{version}`", f"dist/MailPin_v{version}.xpi"],
     "CHANGELOG.md": [f"## {version}"],
-    "THIRD_PARTY_NOTICES.md": [f"MailPin {version}"],
-    "PROJECT_MEMORY.md": [f"Version publique : **{version}**"],
+    "THIRD_PARTY_NOTICES.md": [f"MailPin {version} source"],
+    "PROJECT_MEMORY.md": [f"Version source : **{version}**"],
     "PRIVACY.md": [f"MailPin {version} ne contient", f"MailPin {version} contains"],
-    "SECURITY.md": [f"SECURITY_AUDIT_{version}.md"],
-    "STORE_RELEASE.md": [f"Version publique :** {version}", f"MailPin_v{version}.xpi", f"MailPin_GitHub_Repository_v{version}.zip"],
-    "docs/ATN_RELEASE_CHECKLIST.md": [f"— {version}", f"version {version} synchronisée"],
-    "docs/KNOWN_LIMITATIONS.md": [f"Version {version} et portée de validation"],
+    "STORE_RELEASE.md": [f"Version source/candidate :** {version}", f"MailPin_v{version}.xpi"],
+    "docs/ATN_RELEASE_CHECKLIST.md": [f"candidat {version}"],
+    "docs/KNOWN_LIMITATIONS.md": [f"Source {version}"],
     "docs/MANUAL_TEST_PLAN.md": [f"— {version}"],
-    "docs/PROJECT_STATE.json": [f'"extensionVersion": "{version}"'],
-    "docs/BUG_TRACKER.md": [f"Version publique : **{version}**"],
-    "release/ATN_REVIEW_NOTES_TEMPLATE.md": [f"— MailPin {version}", f"Version :** {version}"],
-    "release/BUILD_INSTRUCTIONS.md": [f"build {version}", f"MailPin_v{version}.xpi", f"MailPin_GitHub_Repository_v{version}.zip"],
-    "release/manifest-store-template.json": [f"publication {version}"],
+    "docs/BUG_TRACKER.md": [f"Version source : **{version}**"],
+    "release/ATN_REVIEW_NOTES_TEMPLATE.md": [f"MailPin {version} (candidate)", f"**Version :** {version}"],
+    "release/BUILD_INSTRUCTIONS.md": [f"candidat {version}", f"MailPin_v{version}.xpi"],
+    "release/manifest-store-template.json": [f"candidat {version}"],
 }
-for relative, tokens in checks.items():
+public_checks = {
+    "README.md": [f"release `v{public}`", f"MailPin_v{public}.xpi", f"**Dernière release publique :** `{public}`"],
+    "README.en.md": [f"release `v{public}`", f"MailPin_v{public}.xpi", f"**Latest public release:** `{public}`"],
+    "STORE_RELEASE.md": [f"Dernière release publique :** {public}"],
+    "docs/PROJECT_STATE.json": [f'"latestPublicVersion": "{public}"'],
+}
+for relative, tokens in {**source_checks, **public_checks}.items():
     text = (ROOT / relative).read_text(encoding="utf-8")
     for token in tokens:
         assert token in text, f"{relative}: missing version token {token!r}"
-print(f"Version declarations {version}: OK")
+print(f"Version declarations: source {version}, latest public {public}: OK")

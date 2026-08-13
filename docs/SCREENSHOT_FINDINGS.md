@@ -69,3 +69,12 @@ possède une règle CSS.
 - la punaise héritait encore de classes d’icône Thunderbird et l’étoile était déplacée par le CSS MailPin ;
 - la barre Enregistrer/Annuler était visible mais les contrôles restaient hors du formulaire et dépendaient de `form=`, non fiable dans l’onglet Options ;
 - ces constats correspondent à MP-2026-004 et MP-2026-005 dans `docs/BUG_TRACKER.md`.
+
+## Vidéos du 13 août 2026 — Organic Workspace
+
+- la première refonte Organic Workspace conservait trop de densité, des grilles complexes comprimées et plusieurs surfaces flottantes susceptibles de recouvrir le contenu ;
+- les menus `•••`, statistiques secondaires, inspector et commandes Enregistrer/Annuler ont été ramenés dans le flux ou dans le layout ;
+- Rule Builder, Affaires, modèles et Agenda ont reçu une structure de champs explicite et davantage de respiration ;
+- `workspace.css` a été consolidé en une feuille canonique au lieu d’empiler une nouvelle couche V3 ;
+- l’audit post-vidéo a supprimé le re-parenting runtime Dashboard/Options : le shell final est désormais écrit directement dans le HTML ;
+- la recette visuelle humaine reste ouverte : le smoke Thunderbird confirme le cycle de vie et les erreurs runtime, pas le jugement pixel/ergonomie.

@@ -393,9 +393,6 @@ function clampNumber(value, min, max, fallback) {
   return Math.min(max, Math.max(min, number));
 }
 
-function normalizeBoolean(value, fallback) {
-  return typeof value === "boolean" ? value : fallback;
-}
 
 const UNSAFE_RECORD_KEYS = new Set(["__proto__", "prototype", "constructor"]);
 
@@ -888,9 +885,6 @@ function getLegacyDefaultColor(accountKey) {
   return LEGACY_DEFAULT_COLORS[hashString(accountKey) % LEGACY_DEFAULT_COLORS.length];
 }
 
-function getFolderChildren(folder) {
-  return THUNDERBIRD_COMPAT?.messages?.folderChildren?.(folder) || [];
-}
 
 function walkFolders(root) {
   return THUNDERBIRD_COMPAT?.messages?.walkFolders?.(root) || [];
@@ -3679,7 +3673,7 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
   _exportDiagnosticBundle() {
     return {
       ...this._getDiagnosticReport(),
-      format: "mailperch-diagnostic-bundle",
+      format: "mailpin-diagnostic-bundle",
       version: 4,
       healthSnapshot: PIN_MODULES.PinHealth?.build({
         data: this._data, settings: this._settings, compatibility: this._compatibility,

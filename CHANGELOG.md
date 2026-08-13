@@ -1,5 +1,16 @@
 # Journal des modifications
 
+## 1.7.0 — Organic Workspace, QoL et audit global du dépôt
+
+- refonte complète Dashboard / Options / panneau autour d’Organic Workspace, avec shell canonique écrit directement dans les sources HTML/CSS ;
+- responsive par surface disponible, inspector contextuel, menus/statistiques dans le flux, Kanban lisible, Rule Builder et Affaires recomposés ;
+- palette automatique MailPin et attribution de couleurs différenciées pour comptes/épingles/groupes/affaires, avec conservation des choix personnalisés ;
+- suppression des couches CSS legacy/surcharges, des wrappers UI morts et de deux helpers privilégiés devenus inutilisés ;
+- correction du garde Organic Workspace pour que ses cinq contrats soient réellement exécutés par `npm test` ;
+- séparation explicite entre **version source 1.7.0** et **dernière release publique 1.6.1**, afin d’éviter de produire deux XPI différents sous le même numéro ;
+- nettoyage des noms de diagnostics/exports encore visibles sous MailPerch, des métadonnées de formulaires GitHub et des documents actifs devenus obsolètes ;
+- aucune nouvelle permission WebExtension, dépendance runtime, connexion réseau, télémétrie, publicité ou code distant.
+
 ## 1.6.1 — métadonnées de publication et dossier ATN fiabilisés
 
 - corrige les documents actifs de publication/review qui avaient conservé des preuves 1.5.4 sous des libellés 1.6.0 après le rebranding ;

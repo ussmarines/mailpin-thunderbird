@@ -181,12 +181,12 @@ function setLoading(value) {
   for (const control of document.querySelectorAll("button, select, input")) {
     if (control.id === "retry" || control.closest("dialog")) continue;
     if (loading) {
-      control.dataset.mailperchLoadingWasDisabled = String(control.disabled);
+      control.dataset.mailpinLoadingWasDisabled = String(control.disabled);
       control.disabled = true;
       control.setAttribute("aria-busy", "true");
-    } else if (Object.prototype.hasOwnProperty.call(control.dataset, "mailperchLoadingWasDisabled")) {
-      control.disabled = control.dataset.mailperchLoadingWasDisabled === "true";
-      delete control.dataset.mailperchLoadingWasDisabled;
+    } else if (Object.prototype.hasOwnProperty.call(control.dataset, "mailpinLoadingWasDisabled")) {
+      control.disabled = control.dataset.mailpinLoadingWasDisabled === "true";
+      delete control.dataset.mailpinLoadingWasDisabled;
       control.removeAttribute("aria-busy");
     }
   }
@@ -195,15 +195,15 @@ function setLoading(value) {
 function setButtonBusy(control, busy) {
   if (!(control instanceof HTMLButtonElement)) return;
   if (busy) {
-    if (!Object.prototype.hasOwnProperty.call(control.dataset, "mailperchBusyWasDisabled")) {
-      control.dataset.mailperchBusyWasDisabled = String(control.disabled);
+    if (!Object.prototype.hasOwnProperty.call(control.dataset, "mailpinBusyWasDisabled")) {
+      control.dataset.mailpinBusyWasDisabled = String(control.disabled);
     }
     control.disabled = true;
     control.dataset.busy = "true";
     control.setAttribute("aria-busy", "true");
   } else {
-    control.disabled = control.dataset.mailperchBusyWasDisabled === "true";
-    delete control.dataset.mailperchBusyWasDisabled;
+    control.disabled = control.dataset.mailpinBusyWasDisabled === "true";
+    delete control.dataset.mailpinBusyWasDisabled;
     delete control.dataset.busy;
     control.removeAttribute("aria-busy");
   }
@@ -638,14 +638,14 @@ function renderKanban() {
     list.addEventListener("drop", async event => {
       event.preventDefault();
       clearKanbanDropState();
-      const key = event.dataTransfer.getData("text/x-mailperch-key");
+      const key = event.dataTransfer.getData("text/x-mailpin-key");
       if (!key) return;
       await perform([key], status === "completed" ? "complete" : status);
     });
     for (const item of items) {
       const card = createCard(item, {compact: true, selectable: false});
       card.draggable = true;
-      card.addEventListener("dragstart", event => { event.dataTransfer.setData("text/x-mailperch-key", item.stableKey); event.dataTransfer.effectAllowed = "move"; });
+      card.addEventListener("dragstart", event => { event.dataTransfer.setData("text/x-mailpin-key", item.stableKey); event.dataTransfer.effectAllowed = "move"; });
       card.addEventListener("dblclick", () => perform([item.stableKey], "open", {}, {reload: false}));
       list.append(card);
     }
@@ -1166,7 +1166,7 @@ function bindEvents() {
       try {
         const bundle = await api.pinInbox.exportDiagnosticBundle();
         const date = new Date().toISOString().slice(0, 10);
-        downloadJson(`mailperch-diagnostic-${date}.json`, bundle);
+        downloadJson(`mailpin-diagnostic-${date}.json`, bundle);
         setStatus(msg("diagnosticExported", "Diagnostic local exporté."), "success");
       } catch (error) { setStatus(failureMessage("diagnosticExportFailed", "Export impossible", error), "error", {persistent: true}); }
       finally { setButtonBusy(control, false); }

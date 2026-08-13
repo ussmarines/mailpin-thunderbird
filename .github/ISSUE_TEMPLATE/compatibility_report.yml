@@ -2,10 +2,10 @@ name: Test de compatibilité
 about: Consigner un test réel avec un fournisseur, un calendrier ou une version Thunderbird
 body:
   - type: input
-    id: mailperch
+    id: mailpin_version
     attributes:
       label: Version MailPin
-      placeholder: 3.2.0
+      placeholder: 1.7.0
     validations:
       required: true
   - type: input

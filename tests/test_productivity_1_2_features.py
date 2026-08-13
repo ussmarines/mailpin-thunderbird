@@ -91,7 +91,7 @@ analytics_js = (EXT / "api/pinInbox/modules/analytics.js").read_text(encoding="u
 for token in ("completedLast7Days", "averageOpenAgeMs", "averageWaitingAgeMs", "checklistPendingItems"):
     assert token in analytics_js and token in dashboard_js, token
 
-# UI: local Fluent-style font stack, no remote font, and no explicit text size below 12 px.
+# UI: local Organic Workspace font stack, no remote font, and no explicit text size below 12 px.
 assert '"Segoe UI Variable Text"' in tokens_css and '"Aptos"' in tokens_css
 assert "@font-face" not in tokens_css
 assert not re.search(r"https?://", tokens_css, re.I)

@@ -25,7 +25,8 @@ assert manifest["version"] == VERSION
 assert state["extensionVersion"] == VERSION
 assert state["baseGitHub"]["branch"] == "main"
 assert re.fullmatch(r"[0-9a-f]{40}", state["baseGitHub"]["commit"])
-assert f"Version publique : **{VERSION}**" in memory
+assert f"Version source : **{VERSION}**" in memory
+assert "Dernière release publique : **" in memory
 
 # Settings spacing must stay scoped to the settings page. Stale attributes are
 # removed from about:3pane so presets can never compress native message rows.

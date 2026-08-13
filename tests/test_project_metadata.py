@@ -56,3 +56,14 @@ for readme in readmes:
     assert "C:\\" not in readme
 
 print("Project metadata, support links and synchronized READMEs: OK")
+# Current non-persistent product surfaces must use MailPin naming. Historical
+# compatibility keys in storage/tags are intentionally excluded from this guard.
+dashboard_js = (ROOT / "extension/dashboard/dashboard.js").read_text(encoding="utf-8")
+options_js = (ROOT / "extension/options/options.js").read_text(encoding="utf-8")
+implementation_js = (ROOT / "extension/api/pinInbox/implementation.js").read_text(encoding="utf-8")
+assert "text/x-mailpin-key" in dashboard_js
+assert "text/x-mailperch-key" not in dashboard_js
+assert "mailpin-diagnostic-" in dashboard_js and "mailperch-diagnostic-" not in dashboard_js
+assert "mailpin-diagnostic-" in options_js and "mailperch-diagnostic-" not in options_js
+assert 'format: "mailpin-diagnostic-bundle"' in implementation_js
+assert 'format: "mailperch-diagnostic-bundle"' not in implementation_js

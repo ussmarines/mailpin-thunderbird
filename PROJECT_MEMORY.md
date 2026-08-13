@@ -1,13 +1,14 @@
 # Mémoire opérationnelle — MailPin
 
-> Version publique : **1.6.1**
-> Branche de référence : `main` ; runtime MailPin intégré par la PR #35
-> Base runtime validée : `4fdb978e1828325001f95951c115059a931b8b6e` ; préparation 1.6.1 dérivée de `6d582da0cf729b1a93df348e4845430fbfb7fad2`
+> Version source : **1.7.0**
+> Dernière release publique : **1.6.1**
+> Branche de référence : `main` ; Organic Workspace intégré par la PR #39
+> Base de l’audit global : `0c0400170aac631d13d795050d669cbb1a83ea7f`
 > Extension ID : `ussmarines.mailpin@addons.thunderbird.net`
 
 ## Résumé
 
-MailPin est une extension Thunderbird Manifest V3 locale qui ajoute un panneau de messages épinglés et transforme ces épingles en suivis actionnables sans remplacer la liste native. Le métier actuellement distribué reprend les corrections fonctionnelles consolidées avant le rebranding. La 1.6.0 a introduit l’identité MailPin et la 1.6.1 fiabilise uniquement le dossier de publication/review. Les corrections métier héritées couvrent : épinglage canonique entre entrées, responsive réel du panneau, géométrie Options, états du Dashboard, transitions workflow cohérentes, planification Agenda et gestion explicite des calendriers incompatibles avec les tâches. Les nouvelles créations Agenda démarrent sur **Événement**. La 1.6.1 n’ajoute aucune permission, dépendance runtime, migration de stockage ni connexion réseau. Le changement d’ID a été introduit volontairement en 1.6.0 avant la première publication ATN.
+MailPin est une extension Thunderbird Manifest V3 locale qui ajoute un panneau de messages épinglés et transforme ces épingles en suivis actionnables sans remplacer la liste native. La dernière release publique reste 1.6.1. La source 1.7.0 intègre Organic Workspace, les corrections QoL issues des recettes vidéo et l’audit global post-fusion ; sa publication reste une décision séparée. Les corrections métier héritées couvrent : épinglage canonique entre entrées, responsive réel du panneau, géométrie Options, états du Dashboard, transitions workflow cohérentes, planification Agenda et gestion explicite des calendriers incompatibles avec les tâches. Les nouvelles créations Agenda démarrent sur **Événement**. La ligne source 1.7.0 n’ajoute aucune permission, dépendance runtime, migration de stockage ni connexion réseau. Le changement d’ID a été introduit volontairement en 1.6.0 avant la première publication ATN.
 
 Les futures fonctions **Prochaine action**, **Timeline de conversation**, **Follow-up récurrent** et **Résultat du suivi** restent hors périmètre de cette release.
 
@@ -27,7 +28,7 @@ Les futures fonctions **Prochaine action**, **Timeline de conversation**, **Foll
 12. Le métier ne doit pas réintroduire d’appels directs à `MailServices`, `MailUtils`, `MessageArchiver`, `cal`, `CalEvent` ou `CalTodo` en dehors de la frontière de compatibilité.
 13. Le mode **Recommandé** prépare des valeurs sûres mais ne sauvegarde jamais automatiquement ; Enregistrer/Annuler restent explicites.
 14. Toute classe ou service privilégié injecté dans `PinCompatibility` doit être importé/défini explicitement avant la création des adaptateurs ; aucun identifiant global implicite ne doit être requis au bootstrap.
-15. L’apparence Fluent 2 repose sur les composants HTML natifs et les jetons CSS locaux de `extension/styles/tokens.css` ; aucun paquet Fluent, bundler ou actif distant n’entre dans le XPI.
+15. Organic Workspace repose sur HTML natif et les jetons CSS locaux ; le shell Dashboard/Options est écrit directement dans les sources et aucun framework UI, bundler ou actif distant n’entre dans le XPI.
 16. La portée « Comptes sélectionnés » utilise `account.key` comme identité canonique de bout en bout ; `incomingServer.key` n’est pas une clé de sélection persistée.
 
 ## Carte complète des fichiers
@@ -83,7 +84,7 @@ L’action « appliquer les réglages recommandés » produit uniquement un brou
 
 La sélection de comptes apparaît uniquement pour la portée « Comptes sélectionnés », conserve le brouillon lors d’un changement temporaire de portée et affiche les comptes Thunderbird avec leurs libellés lisibles. Le banc 1.5.2 valide automatiquement la sauvegarde Options → panneau et la persistance A+C (34 épingles, B absent) après redémarrage sur le même profil.
 
-`@fluentui/web-components` 3.0.3 a été évalué puis retiré : aucun fichier de l’extension ne l’importait, le build XPI n’a pas de bundler, le paquet exige Node 22/24 alors que le dépôt conserve Node 20 dans sa matrice, et son arbre n’apportait donc aucun composant au produit livré. MailPin garde le langage Fluent 2 local, sans dépendance npm runtime ni lockfile.
+`@fluentui/web-components` 3.0.3 a été évalué puis retiré : aucun fichier de l’extension ne l’importait, le build XPI n’a pas de bundler, le paquet exige Node 22/24 alors que le dépôt conserve Node 20 dans sa matrice, et son arbre n’apportait donc aucun composant au produit livré. MailPin garde Organic Workspace local, sans dépendance npm runtime ni lockfile ; Fluent 2 reste uniquement une référence historique de décisions antérieures.
 
 ### Banc Thunderbird
 

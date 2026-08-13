@@ -2,11 +2,11 @@
   "format": "mailperch-project-state",
   "version": 1,
   "project": "MailPin — Email Follow-up & Productivity for Thunderbird",
-  "extensionVersion": "1.6.1",
+  "extensionVersion": "1.7.0",
   "baseGitHub": {
     "branch": "main",
-    "commit": "6d582da0cf729b1a93df348e4845430fbfb7fad2",
-    "role": "pre-1.6.1 release-metadata baseline"
+    "commit": "0c0400170aac631d13d795050d669cbb1a83ea7f",
+    "role": "Organic Workspace merged baseline before global audit"
   },
   "extensionId": "ussmarines.mailpin@addons.thunderbird.net",
   "thunderbird": {
@@ -110,7 +110,7 @@
     "uiDependencyPolicy": "native HTML plus local Organic Workspace CSS tokens; canonical shell in source; no npm runtime dependency, bundler, CDN or remote asset",
     "runtimeTestSupplyChain": "test-only Thunderbird/geckodriver downloads are checksum-verified and are not runtime dependencies of the extension"
   },
-  "developmentBranch": "main",
+  "developmentBranch": "audit/global-repo-cleanup-2026-08-13",
   "testing": {
     "contract": [
       "tests/test_thunderbird_compatibility_boundary.py",
@@ -120,7 +120,9 @@
     ],
     "runtimeWorkflow": ".github/workflows/thunderbird-smoke.yml",
     "runtimeScript": "tests/thunderbird/real_smoke.py",
-    "browserStatus": "Chromium DOM-flow and geometry evidence predates the branding-only release delta and remains applicable to unchanged business/layout behavior; MailPin identity/palette are covered by current static/UI guards.",
-    "runtimeStatus": "MailPin 1.6.0 rebrand runtime commit 4fdb978e1828325001f95951c115059a931b8b6e passed Linux/Windows QA, security guard and real Thunderbird 153 smoke. MailPin 1.6.1 changes only manifest version plus publication/reviewer metadata; its release process must rerun full QA and real Thunderbird smoke. No fresh manual 1.6.1 XPI acceptance is claimed."
-  }
+    "browserStatus": "Organic Workspace DOM/layout contracts are current and the final shell is written directly in source HTML. Browser-model evidence complements, but does not replace, real Thunderbird visual acceptance.",
+    "runtimeStatus": "Organic Workspace PR #39 passed Linux/Windows QA, security guard and real Thunderbird 153 smoke before merge. Source 1.7.0 is the post-merge audit line; latest public release remains 1.6.1 until a separate publication decision."
+  },
+  "latestPublicVersion": "1.6.1",
+  "releaseStatus": "development"
 }

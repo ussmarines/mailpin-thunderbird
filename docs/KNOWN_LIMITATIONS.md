@@ -1,55 +1,34 @@
 # Limites connues
 
-## Version 1.6.1 et portée de validation
+## Source 1.7.0 / release publique 1.6.1
 
-MailPin **1.6.1** ne change pas la logique métier de 1.6.0 : le delta distribué est le champ `version` du manifeste et les métadonnées/documentations de publication. Le rebranding MailPin, la nouvelle identité ATN, l’icône SVG et la palette ont été introduits en 1.6.0 et ont passé QA Linux/Windows, garde sécurité et smoke Thunderbird 153 réel sur le runtime intégré. La recette manuelle utilisateur reste une preuve héritée de la dernière build pré-rebranding 1.5.4 pour les comportements métier inchangés ; elle n’est pas présentée comme une recette manuelle fraîche du XPI 1.6.1. Les validations automatisées fraîches de 1.6.1 sont consignées dans `VALIDATION_REPORT_1.6.1.md`.
-
-Une matrice exhaustive de tous les systèmes, versions Thunderbird, fournisseurs réels, types de dossiers, calendriers, lecteurs d’écran et configurations de profil reste hors de portée d’un banc automatisé unique. Les éléments non observés restent explicitement documentés.
-
-## Compatibilité Thunderbird
-
-- Le manifeste 1.6.1 déclare Thunderbird `153.0` à `153.*`.
-- MailPin utilise une API Experiment privilégiée ; une évolution interne de Thunderbird peut exiger une adaptation.
-- Messages, Tags et Agenda restent isolés dans leurs adaptateurs dédiés.
-- Le DOM `about:3pane`, `ThreadCard`, les fenêtres et menus natifs restent des surfaces internes à surveiller.
-- Les comportements propres aux fournisseurs et dossiers réels doivent toujours être validés dans les environnements concernés.
-
-## Agenda, tags et fournisseurs réseau
-
-- Les comptes POP/IMAP synthétiques du banc valident la logique locale et les portées sans utiliser de secret ni de service externe. Ils ne remplacent pas un test contre Gmail, Microsoft, un serveur IMAP réel ou un autre fournisseur.
-- La synchronisation Agenda dépend des capacités et ACL du calendrier. Un fournisseur CalDAV ou tiers réel peut se comporter différemment du scénario local.
-- La synchronisation Tags reste facultative et ne doit gérer que les définitions dont la propriété MailPin est démontrée par clé et libellé exacts.
-- Aucun compte, jeton ou credential réel n’est incorporé au dépôt ou au banc.
-
-## Banc de test Thunderbird
-
-- Les gardes statiques et contrats restent exécutables sans Thunderbird.
-- Le smoke réel vérifie le XPI construit, le background MV3, l’injection unique, l’ouverture du Dashboard, le cleanup et la réinstallation.
-- Le banc Thunderbird exécute les scénarios DOM Dashboard et Options dans leurs vrais onglets Thunderbird via le `BrowsingContext`/acteur Marionette du processus de contenu.
-- L’éditeur de carte est ouvert via la commande XUL native `doCommand()` ; notes, checklist, priorité, groupe, échéances, statut et relance sont modifiés dans le runtime réel.
-- Le banc mesure automatiquement en clair et sombre le clipping, le débordement horizontal, l’alignement des contrôles et le contraste texte de base.
-- La persistance est testée avec une extension non temporaire sur le même profil jetable à travers deux processus Thunderbird distincts ; SQLite et les réglages sont contrôlés avant réveil naturel du background MV3 par activation d’onglet.
-- Le smoke/banc Linux sur Thunderbird 153.0.1 ESR et la passe Windows 153.0.2 du 12 août 2026 ne prouvent pas à eux seuls macOS, tous les extrêmes de version ni les fournisseurs réseau externes.
+La source **1.7.0** contient Organic Workspace, la passe QoL et l’audit global post-fusion. Elle n’est pas encore une release publique ; la dernière release GitHub reste **1.6.1**. Les validations automatisées du candidat source ne doivent pas être présentées comme une recette humaine de release.
 
 ## Interface et accessibilité
 
-- Le plancher CSS de 12 px, le clipping, les débordements et le contraste texte de base sont contrôlés automatiquement.
-- Le jugement esthétique pixel par pixel, le rendu exact à zoom 200 %, les polices système atypiques, le contraste élevé OS et l’usage complet avec lecteurs d’écran conservent une part d’inspection humaine.
-- Les scénarios Chromium restent utiles pour les contrats DOM mais ne sont plus la seule preuve des onglets Dashboard/Options.
+- Le smoke Thunderbird valide installation, injection, ouverture du Dashboard, nettoyage et réinstallation ; il ne juge pas la qualité visuelle pixel par pixel.
+- Une recette humaine reste nécessaire sur Dashboard, Options et panneau avec splitter continu, thèmes clair/sombre, zoom 200 %, contraste élevé et lecteurs d’écran.
+- Les derniers problèmes UI signalés par l’utilisateur doivent être reproduits sur le XPI exact de la source 1.7.0 avant fermeture.
 
-## Cycle de vie et stockage
+## Compatibilité Thunderbird
 
-- La purge immédiate dépend du cycle de vie de l’Experiment lorsqu’il est chargé ; la sentinelle Gecko continue de protéger la réinstallation normale.
-- Les sauvegardes exportées manuellement hors des dossiers gérés par MailPin ne peuvent ni ne doivent être effacées automatiquement.
-- Le propriétaire du profil local et toute personne disposant de la Browser Toolbox contrôlent déjà le processus Thunderbird ; MailPin ne crée pas une frontière d’autorisation contre cet acteur.
+- Le manifeste déclare Thunderbird `153.0` à `153.*`.
+- MailPin utilise une API Experiment privilégiée ; les évolutions internes `about:3pane`, `ThreadCard`, Messages, Tags et Agenda restent des surfaces à surveiller.
+- Les adaptateurs `PinCompatibility` réduisent le rayon de changement mais ne remplacent pas un test réel après une mise à jour Thunderbird.
 
-## Build et publication
+## Fournisseurs / Agenda / Tags
 
-- Les builds ZIP répétés sur un même environnement sont binaires identiques, mais Python `zipfile`/zlib peut produire des conteneurs différents entre Windows et Linux malgré des entrées décompressées identiques. `MP-2026-018` suit cette reproductibilité inter-plateforme.
-- Les SHA-256 de la release GitHub sont autoritatifs pour les artefacts publiés.
-- Les actions GitHub sont épinglées à des commits précis et suivies par Dependabot.
-- Le portail ATN doit encore accepter l’identifiant, le nom, la licence et la matrice de compatibilité réelle avant diffusion catalogue.
+- Les comptes synthétiques ne remplacent pas Gmail, Microsoft, un serveur IMAP réel ou un fournisseur CalDAV réel.
+- La synchronisation Agenda dépend des capacités/ACL du calendrier.
+- Les tags MailPin utilisent volontairement les clés historiques `mailperch-*` pour préserver la compatibilité des profils ; seuls les tags possédés par clé **et** libellé exacts peuvent être gérés.
 
-## Sécurité
+## Build et stockage
 
-Une sécurité absolue ne peut pas être garantie. Toute nouvelle version Thunderbird ou modification de l’API Experiment exige une nouvelle revue des frontières privilégiées et des tests réels. Les téléchargements Thunderbird/geckodriver du banc sont des dépendances **de test uniquement** et ne modifient pas la promesse locale/no-network de l’extension installée.
+- `MP-2026-018` suit encore la reproductibilité binaire inter-plateforme du conteneur ZIP ; les entrées décompressées et les builds répétés sur un même environnement sont déterministes.
+- Les sauvegardes/exportations manuelles hors des dossiers gérés restent sous contrôle utilisateur et ne sont pas supprimées automatiquement.
+- Les identifiants persistants historiques (`mailperch.installation`, `mailperch-*`, `pin-mails-v2.sqlite`, préférences legacy) sont conservés lorsqu’ils servent une migration ou la continuité des données ; ils ne sont pas des résidus de marque à renommer mécaniquement.
+
+## Publication
+
+- Aucun tag/release 1.7.0 n’est créé par cet audit.
+- La disponibilité juridique de la marque, le portail ATN et la matrice externe restent des validations humaines/externes.

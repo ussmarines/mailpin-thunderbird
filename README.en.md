@@ -7,6 +7,7 @@
 
 [![QA](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml)
 ![Release](https://img.shields.io/badge/release-v1.6.1-4F7F75)
+![Source](https://img.shields.io/badge/candidate-v1.7.0-3D536B)
 ![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x-3D536B)
 ![License](https://img.shields.io/badge/license-MailPin%20Source--Available%201.1-1A1D21)
 </div>
@@ -32,7 +33,8 @@ MailPin turns important email into actionable follow-up **without replacing Thun
 
 ## Compatibility
 
-- **MailPin:** `1.6.1`
+- **Source version:** `1.7.0` — in development
+- **Latest public release:** `1.6.1`
 - **Thunderbird:** `153.0` to `153.*`
 - **Format:** MailExtension Manifest V3
 - **Locales:** French and English
@@ -60,8 +62,8 @@ npm run ci
 
 Reproducible outputs:
 
-- `dist/MailPin_v1.6.1.xpi`
-- `dist/MailPin_GitHub_Repository_v1.6.1.zip`
+- `dist/MailPin_v1.7.0.xpi`
+- `dist/MailPin_GitHub_Repository_v1.7.0.zip`
 - `dist/SHA256SUMS.txt`
 
 ## Privacy & security
@@ -70,8 +72,8 @@ MailPin has no runtime network call, telemetry, advertising or remote code. Full
 
 - [Privacy](PRIVACY.md)
 - [Security](SECURITY.md)
-- [Security audit 1.6.0](SECURITY_AUDIT_1.6.0.md)
-- [Validation report 1.6.0](VALIDATION_REPORT_1.6.0.md)
+- [Source security audit 1.7.0](SECURITY_AUDIT_1.7.0.md)
+- [Source validation report 1.7.0](VALIDATION_REPORT_1.7.0.md)
 - [Known limitations](docs/KNOWN_LIMITATIONS.md)
 
 ## Documentation & support

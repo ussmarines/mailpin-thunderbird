@@ -1,10 +1,10 @@
-# Plan de test manuel MailPin — 1.6.1
+# Plan de test manuel MailPin — 1.7.0
 
 Utiliser de préférence un profil Thunderbird jetable avec des messages synthétiques pour les scénarios destructifs ou de migration. Pour une validation utilisateur finale, un profil réel peut être utilisé après sauvegarde, en évitant toute opération destructive non nécessaire.
 
-Le présent plan complète les validations automatisées du candidat 1.6.1. La logique métier est inchangée depuis le runtime MailPin 1.6.0 ; la recette utilisateur pré-rebranding 1.5.4 reste une preuve héritée uniquement pour ces comportements inchangés. Le XPI 1.6.1 doit néanmoins recevoir son propre smoke automatisé avant publication et peut recevoir une recette humaine ciblée avant soumission ATN.
+Le présent plan complète les validations automatisées de la source 1.7.0. La dernière release publique reste 1.6.1. Organic Workspace modifie fortement l’interface ; une nouvelle recette humaine est donc requise avant toute publication 1.7.0, même si les invariants métier restent couverts par les tests automatisés.
 
-## Priorité 1.6.1 — recette ciblée avant ATN
+## Priorité 1.7.0 — recette ciblée avant publication
 
 1. Dans Options, ouvrir les règles personnalisées en FR puis EN et vérifier à 100/125/200 % que l’aide reste lisible, que les trois actions passent proprement à la ligne et qu’aucun scroll horizontal n’apparaît.
 2. Dans le Dashboard puis le panneau Thunderbird, ouvrir Agenda sur une petite fenêtre : une nouvelle création doit démarrer sur **Événement** ; créer un événement avec début/fin personnalisés, puis choisir Tâche avec et sans calendrier compatible. Sans destination tâche, aucun sélecteur vide ne doit apparaître, l’explication doit être visible et la création désactivée. Vérifier aussi qu’un élément Agenda existant conserve son type réel.
@@ -14,7 +14,7 @@ Le présent plan complète les validations automatisées du candidat 1.6.1. La l
 6. Utiliser l’action explicitement conversation puis une entrée générique inverse ; vérifier qu’une seule référence logique subsiste et que notes, checklist, échéance, groupe et Agenda ne sont pas perdus.
 7. Avec une fenêtre Thunderbird globalement large, déplacer continûment le splitter du panneau entre environ 800 et 280 px ; vérifier header, recherche, filtres, cartes, actions et absence de scroll horizontal ou sauts de layout.
 
-Pour GitHub, le GO 1.6.1 dépend des QA Linux/Windows, de la garde sécurité, du build reproductible et du smoke Thunderbird réel. Pour ATN, une recette humaine ciblée du XPI 1.6.1 reste recommandée et doit être consignée sans réattribuer les tests 1.5.4 à cette version.
+Pour GitHub, le GO 1.7.0 dépend des QA Linux/Windows, de la garde sécurité, du build reproductible, du smoke Thunderbird réel et de la recette UI humaine du XPI exact. ATN reste une étape séparée après décision explicite de publication.
 
 ## Priorité A — intégration Thunderbird consolidée
 

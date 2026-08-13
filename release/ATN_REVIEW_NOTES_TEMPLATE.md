@@ -1,10 +1,10 @@
-# Notes pour les reviewers ATN — MailPin 1.6.1
+# Notes pour les reviewers ATN — MailPin 1.7.0 (candidate)
 
 ## Identité
 
 - **Nom :** MailPin — Email Follow-up & Productivity for Thunderbird
 - **Nom court :** MailPin
-- **Version :** 1.6.1
+- **Version :** 1.7.0
 - **ID :** `ussmarines.mailpin@addons.thunderbird.net`
 - **Compatibilité :** Thunderbird 153.0 à 153.*
 - **Langues :** français et anglais
@@ -36,7 +36,7 @@ L’Experiment possède par nature un accès privilégié et provoque l’averti
 - aucune dépendance d’exécution ou de build tierce ;
 - code source lisible, non minifié et build reproductible.
 
-Voir `PRIVACY.md`, `SECURITY.md`, `SECURITY_AUDIT_1.6.0.md` et `release/BUILD_INSTRUCTIONS.md`.
+Voir `PRIVACY.md`, `SECURITY.md`, `SECURITY_AUDIT_1.7.0.md` et `release/BUILD_INSTRUCTIONS.md`.
 
 ## Scénario de test rapide
 

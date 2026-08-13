@@ -71,7 +71,7 @@ MailPin ne déplace, ne masque et ne relabellise aucun contrôle étoile lorsque
 
 ## Les actions globales des paramètres utilisent le formulaire natif
 
-La barre fixe peut rester hors du formulaire dans le DOM, mais ses boutons ciblent explicitement `settings-form` avec `type=submit` et `type=reset`. Le JavaScript écoute `submit` et `reset`, ce qui garantit clavier, accessibilité et activation standard sans chemin `click` parallèle.
+Les commandes Enregistrer/Annuler vivent dans l’en-tête sticky, hors du formulaire visuel, et ciblent explicitement `settings-form` avec `type=submit` et `type=reset`. Le JavaScript conserve aussi des handlers directs sur les contrôles visibles car l’onglet Options embarqué ne garantit pas toujours la délégation native cross-form ; le dirty state et le verrouillage `saveInFlight` restent les sources de vérité.
 
 ## Le suivi des bugs est permanent
 
@@ -102,3 +102,9 @@ La valeur persistée `guided` est conservée pour la compatibilité des profils,
 ## 2026-08-08 — smoke Thunderbird séparé de la QA obligatoire
 
 Le smoke runtime utilise un binaire Thunderbird officiel et geckodriver vérifiés par SHA-256. Pendant sa phase d’épreuve, il reste un workflow séparé et non requis afin qu’une incompatibilité du harnais externe ne bloque pas la QA source. Il ne pourra devenir un contrôle requis qu’après plusieurs exécutions fiables et une décision explicite.
+
+## 2026-08-13 — Organic Workspace canonique en source
+
+Le Dashboard et Options portent leur shell final directement dans le HTML suivi. Le JavaScript ne re-parente pas l’interface pour appliquer la DA ; il ne fait que lier états et interactions. Cette règle évite les landmarks imbriqués, les doubles structures legacy et les divergences entre DOM source, tests et runtime.
+
+Les menus secondaires, statistiques progressives et inspector doivent rester dans le flux ou recomposer le layout avant toute superposition. Les dialogs sont les seules surfaces prévues pour recouvrir volontairement le contenu principal.

@@ -1,11 +1,17 @@
 # Registre des bugs MailPin
 
-Version publique : **1.6.1**
+Version source : **1.7.0**
+
+Dernière release publique : **1.6.1**
 
 Les entrées corrigées des versions antérieures restent disponibles dans l’historique Git et les rapports d’audit archivés. Ce registre courant conserve les validations encore utiles à la prochaine passe.
 
 ## Bugs ouverts
 
+| MP-2026-052 | Organic Workspace post-merge | Le `main` contenait un runtime différent de la release v1.6.1 tout en conservant le même numéro de version. | La refonte avait été fusionnée sans ouvrir une nouvelle ligne de version source. | version/métadonnées/release docs | `scripts/check_versions.py`, CI | CORRIGÉ | 1.7.0 | Version source 1.7.0 séparée explicitement de la dernière release publique 1.6.1. |
+| MP-2026-051 | audit Organic Workspace | Le garde `test_organic_workspace_ui.py` définissait des fonctions de test mais `npm test` l’exécutait comme simple script, donc ses assertions ne tournaient pas. | Absence de point d’entrée `__main__`. | `tests/test_organic_workspace_ui.py` | `npm test` | CORRIGÉ | 1.7.0 | Les cinq contrats sont appelés explicitement et affichent `Organic Workspace UI contracts: OK`. |
+| MP-2026-050 | audit Organic Workspace | Dashboard/Options conservaient un HTML legacy ensuite re-parenté/reconstruit par JavaScript. | La DA avait été introduite comme transformation runtime au-dessus du DOM historique. | Dashboard/Options HTML/JS/CSS | DOM contract, Organic Workspace guard, CI, smoke Thunderbird | CORRIGÉ | 1.7.0 | Shell final écrit directement dans les sources, un seul `main`, wrappers legacy retirés. |
+| MP-2026-049 | audit global | Deux helpers privilégiés et plusieurs noms de diagnostics/exports étaient devenus morts ou encore visibles sous MailPerch. | Résidus de refactors/rebranding successifs. | `implementation.js`, Dashboard, Options | syntaxe, grep de régression, CI | CORRIGÉ | 1.7.0 | Helpers inutilisés supprimés ; noms non persistants basculés vers MailPin. |
 | ID | Introduit | Symptôme | Cause | Fichiers | Test | Statut | Correction | Validation |
 |---|---|---|---|---|---|---|---|---|
 | MP-2026-024 | 1.5.0 | L’action Modifier d’une carte échoue avec `ReferenceError: assignment to undeclared variable checklistItems`. | État checklist et fonction de rendu déclarés dans `createEditor()` mais utilisés par son sibling `openEditor()`. | `extension/api/pinInbox/implementation.js` | `tests/test_calendar_and_card_actions.py` | CORRIGÉ | 1.5.1 | État/rendu remontés dans la closure `about:3pane` et garde de portée ajoutée. |

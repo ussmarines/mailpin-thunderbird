@@ -296,6 +296,7 @@ check("MailPin%20Source--Available%201.1" in readme, "badge licence incohérent"
 check(not (ROOT / ".github/workflows/FUNDING.yml").exists(), "FUNDING.yml ne doit pas être placé dans workflows")
 release_workflow = (ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8")
 check("gh release create" in release_workflow and "npm run ci" in release_workflow, "workflow release incomplet")
+check("releaseStatus" in release_workflow and '= "candidate"' in release_workflow, "workflow release doit refuser une source development")
 
 # Avoid symlink-based source exfiltration, accidental secret/config files and oversized sources.
 for candidate in ROOT.rglob("*"):

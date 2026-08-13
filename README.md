@@ -7,6 +7,7 @@
 
 [![QA](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml)
 ![Release](https://img.shields.io/badge/release-v1.6.1-4F7F75)
+![Source](https://img.shields.io/badge/candidate-v1.7.0-3D536B)
 ![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x-3D536B)
 ![Licence](https://img.shields.io/badge/licence-MailPin%20Source--Available%201.1-1A1D21)
 </div>
@@ -32,7 +33,8 @@ MailPin transforme les e-mails importants en suivi actionnable **sans remplacer 
 
 ## Compatibilité
 
-- **MailPin :** `1.6.1`
+- **Version source :** `1.7.0` — en préparation
+- **Dernière release publique :** `1.6.1`
 - **Thunderbird :** `153.0` à `153.*`
 - **Format :** MailExtension Manifest V3
 - **Langues :** français et anglais
@@ -60,8 +62,8 @@ npm run ci
 
 Livrables reproductibles :
 
-- `dist/MailPin_v1.6.1.xpi`
-- `dist/MailPin_GitHub_Repository_v1.6.1.zip`
+- `dist/MailPin_v1.7.0.xpi`
+- `dist/MailPin_GitHub_Repository_v1.7.0.zip`
 - `dist/SHA256SUMS.txt`
 
 ## Confidentialité & sécurité
@@ -70,8 +72,8 @@ MailPin ne contient aucun appel réseau runtime, aucune télémétrie, aucune pu
 
 - [Politique de confidentialité](PRIVACY.md)
 - [Politique de sécurité](SECURITY.md)
-- [Audit sécurité 1.6.0](SECURITY_AUDIT_1.6.0.md)
-- [Rapport de validation 1.6.0](VALIDATION_REPORT_1.6.0.md)
+- [Audit sécurité source 1.7.0](SECURITY_AUDIT_1.7.0.md)
+- [Rapport de validation source 1.7.0](VALIDATION_REPORT_1.7.0.md)
 - [Limites connues](docs/KNOWN_LIMITATIONS.md)
 
 ## Documentation & support
