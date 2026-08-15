@@ -110,7 +110,7 @@
     "uiDependencyPolicy": "native HTML plus local Organic Workspace CSS tokens; canonical shell in source; no npm runtime dependency, bundler, CDN or remote asset",
     "runtimeTestSupplyChain": "test-only Thunderbird/geckodriver downloads are checksum-verified and are not runtime dependencies of the extension"
   },
-  "developmentBranch": "audit/global-repo-cleanup-2026-08-13",
+  "developmentBranch": "codex/release-mailpin-1.7.0",
   "testing": {
     "contract": [
       "tests/test_thunderbird_compatibility_boundary.py",
@@ -121,8 +121,8 @@
     "runtimeWorkflow": ".github/workflows/thunderbird-smoke.yml",
     "runtimeScript": "tests/thunderbird/real_smoke.py",
     "browserStatus": "Organic Workspace DOM/layout contracts are current and the final shell is written directly in source HTML. Browser-model evidence complements, but does not replace, real Thunderbird visual acceptance.",
-    "runtimeStatus": "Organic Workspace PR #39 passed Linux/Windows QA, security guard and real Thunderbird 153 smoke before merge. Source 1.7.0 is the post-merge audit line; latest public release remains 1.6.1 until a separate publication decision."
+    "runtimeStatus": "QA, standard security audit and real Thunderbird 153 smoke are green for the audited 1.7.0 source. On 2026-08-15 the owner explicitly authorized publication of 1.7.0 without recording an additional human visual-acceptance pass; no unexecuted manual test is claimed as successful."
   },
   "latestPublicVersion": "1.6.1",
-  "releaseStatus": "development"
+  "releaseStatus": "candidate"
 }

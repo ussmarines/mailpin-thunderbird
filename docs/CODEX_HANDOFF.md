@@ -1,48 +1,42 @@
-# Passage de relais — MailPin 1.7.0 après audit global
+# Passage de relais — release MailPin 1.7.0
 
 ## Référence
 
 - dépôt : `ussmarines/mailpin-thunderbird` ;
-- branche auditée : `audit/global-repo-cleanup-2026-08-13` ;
-- base `main` avant audit global : `0c0400170aac631d13d795050d669cbb1a83ea7f` ;
-- HEAD produit propre validé : `88ba52cd6bdb3e3c81a41e456e72042f8c84c587` ;
-- PR : **#40 — chore(audit): reconcile MailPin 1.7.0 source and repository state** ;
-- version source : **1.7.0** ;
-- dernière release publique : **1.6.1** ;
-- `releaseStatus` : **development** ;
+- source auditée : PR #40, HEAD produit `88ba52cd6bdb3e3c81a41e456e72042f8c84c587` ;
+- `main` avant promotion release : `0c27715e5573d7041291883268e5c456f2eae408` ;
+- branche de promotion : `codex/release-mailpin-1.7.0` ;
+- version : **1.7.0** ;
+- dernière release publique avant publication : **1.6.1** ;
+- `releaseStatus` : **candidate** ;
 - identifiant canonique inchangé : `ussmarines.mailpin@addons.thunderbird.net`.
 
-## État audité
+## État
 
-Organic Workspace est intégré dans `main` via la PR #39. L’audit global suivant a vérifié le dépôt entier puis corrigé uniquement les écarts prouvés : version source distincte de la release publique, documentation active, métadonnées, roadmap, noms non persistants hérités, deux helpers privilégiés morts et garde de publication.
+Organic Workspace est intégré et l’audit global 1.7.0 a terminé avec succès. Aucun changement de permission, schéma de données, migration, dépendance runtime, réseau, télémétrie ou ID d’extension n’a été introduit pendant la promotion release.
 
-Les identifiants historiques nécessaires aux migrations/continuité restent volontairement présents. Aucun changement de permission, schéma de données, migration, dépendance runtime, réseau, télémétrie ou ID d’extension n’a été introduit.
+Le propriétaire a explicitement autorisé la mise à jour et la publication de **MailPin 1.7.0 le 15 août 2026**. La promotion vers `candidate` est donc autorisée et le workflow Release peut publier après merge de la PR de préparation.
 
-Le workflow Release exige désormais `releaseStatus == candidate`. La ligne 1.7.0 reste donc non publiable tant qu’elle est marquée `development`.
-
-## Preuves fraîches
+## Preuves réutilisées
 
 Sur le HEAD produit `88ba52cd6bdb3e3c81a41e456e72042f8c84c587` :
 
 - PR #40 QA run **31719085457** : succès ;
-  - `npm run ci` complet + structure XPI Linux : succès ;
-  - contrôles source/modèles Windows : succès ;
-  - garde sécurité + full-history identity : succès ;
-  - artefact `development-build` : **9188508237** ;
-- Thunderbird runtime smoke run **31719085416** : succès ;
-  - Thunderbird **153.0.1 ESR** + geckodriver **0.37.1** ;
-  - build, installation, runtime Dashboard et cycle de nettoyage : succès ;
-  - artefact `thunderbird-runtime-smoke` : **9188512378** ;
-- audit sécurité standard complémentaire run **31721145559** : succès en mode bloquant ;
-  - identity/full-history, Gitleaks, Opengrep, Trivy vuln/misconfig, SBOM CycloneDX et Zizmor offline : succès ;
-  - artefact de rapports : **9189352790**.
+- Thunderbird runtime smoke run **31719085416** : succès avec Thunderbird **153.0.1 ESR** et geckodriver **0.37.1** ;
+- audit sécurité standard run **31721145559** : succès ;
+- aucun Codex Security utilisé.
 
-Codex Security n’a pas été utilisé.
+La modification de `docs/PROJECT_STATE.json` vers `candidate` invalide formellement le cache QA précédent pour la ligne de release ; la PR de promotion et surtout le workflow Release doivent donc fournir la preuve fraîche du commit candidat. Le workflow Release exécute `npm run ci` avant création de la release.
 
-## Limites et prochaine étape
+## Recette humaine
 
-La preuve automatisée ne remplace pas la recette visuelle et fonctionnelle humaine. L’utilisateur veut d’abord installer et tester cette version sur sa machine.
+La recette visuelle et fonctionnelle humaine supplémentaire n’est pas enregistrée comme exécutée. Aucun PASS manuel n’est inventé. Le propriétaire a néanmoins explicitement autorisé la publication sans exiger cette preuve supplémentaire avant la release.
 
-Ne pas préparer ni lancer de prompt Codex avant ce retour local. La future revue Codex devra partir des problèmes réellement observés pendant ce test, du diff encore pertinent et des preuves ci-dessus encore valides.
+## Étapes de sortie
 
-Aucun tag ni release 1.7.0 ne doit être créé à ce stade.
+1. valider les checks de la PR de promotion 1.7.0 ;
+2. merger la PR sur `main` ;
+3. créer/pousser le tag `v1.7.0` sur le commit de release ou déclencher le workflow Release sur `main` ;
+4. vérifier que la release GitHub `MailPin 1.7.0` contient `MailPin_v1.7.0.xpi`, `MailPin_GitHub_Repository_v1.7.0.zip` et `SHA256SUMS.txt` ;
+5. après publication, resynchroniser les métadonnées publiques (`latestPublicVersion`, README et état projet) sans modifier le runtime ;
+6. traiter séparément toute future soumission Add-ons for Thunderbird (ATN).

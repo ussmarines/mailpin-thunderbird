@@ -1,8 +1,8 @@
-# Rapport de validation — MailPin 1.7.0 (source)
+# Rapport de validation — MailPin 1.7.0
 
 ## État
 
-La source 1.7.0 est la ligne post-Organic Workspace et audit global. Dernière release publique : 1.6.1. `releaseStatus` reste `development` ; aucun tag ni release 1.7.0 n’est créé par ce rapport.
+La source 1.7.0 est la ligne post-Organic Workspace et audit global. La dernière release publique reste **1.6.1** jusqu’à la création effective de la release 1.7.0. Le propriétaire a explicitement autorisé la publication de MailPin 1.7.0 le **15 août 2026**.
 
 ## Tree produit validé
 
@@ -32,6 +32,12 @@ Audit standard complémentaire run **31721145559** sur une branche éphémère i
 
 Codex Security n’a pas été utilisé.
 
-## Validation restante
+## Décision de publication — 15 août 2026
 
-La recette visuelle et fonctionnelle humaine sur le XPI installé reste distincte des preuves automatisées. La revue Codex indépendante est volontairement différée jusqu’après le test local utilisateur.
+Le propriétaire a explicitement demandé de mettre à jour le dépôt et de publier la release **MailPin 1.7.0**. Cette instruction autorise la promotion de `releaseStatus` vers `candidate`, le merge de la préparation de release, le tag et la release GitHub.
+
+La recette visuelle et fonctionnelle humaine supplémentaire du XPI exact n’est **pas enregistrée comme exécutée**. Elle n’est donc pas présentée comme PASS. La décision du propriétaire est une autorisation de publication malgré cette preuve additionnelle non consignée ; elle ne modifie pas les résultats automatisés réellement obtenus.
+
+Le workflow Release doit reconstruire les artefacts depuis le commit exact de release et exécuter `npm run ci` avant publication.
+
+La soumission Add-ons for Thunderbird (ATN) reste une étape distincte de la release GitHub.
