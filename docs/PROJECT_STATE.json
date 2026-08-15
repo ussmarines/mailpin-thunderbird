@@ -5,8 +5,8 @@
   "extensionVersion": "1.7.0",
   "baseGitHub": {
     "branch": "main",
-    "commit": "0c0400170aac631d13d795050d669cbb1a83ea7f",
-    "role": "Organic Workspace merged baseline before global audit"
+    "commit": "419d1c7de208a304dd71ad4d87f9d2eacdb91048",
+    "role": "MailPin 1.7.0 published GitHub release baseline"
   },
   "extensionId": "ussmarines.mailpin@addons.thunderbird.net",
   "thunderbird": {
@@ -110,7 +110,7 @@
     "uiDependencyPolicy": "native HTML plus local Organic Workspace CSS tokens; canonical shell in source; no npm runtime dependency, bundler, CDN or remote asset",
     "runtimeTestSupplyChain": "test-only Thunderbird/geckodriver downloads are checksum-verified and are not runtime dependencies of the extension"
   },
-  "developmentBranch": "codex/release-mailpin-1.7.0",
+  "developmentBranch": "main",
   "testing": {
     "contract": [
       "tests/test_thunderbird_compatibility_boundary.py",
@@ -121,8 +121,8 @@
     "runtimeWorkflow": ".github/workflows/thunderbird-smoke.yml",
     "runtimeScript": "tests/thunderbird/real_smoke.py",
     "browserStatus": "Organic Workspace DOM/layout contracts are current and the final shell is written directly in source HTML. Browser-model evidence complements, but does not replace, real Thunderbird visual acceptance.",
-    "runtimeStatus": "QA, standard security audit and real Thunderbird 153 smoke are green for the audited 1.7.0 source. On 2026-08-15 the owner explicitly authorized publication of 1.7.0 without recording an additional human visual-acceptance pass; no unexecuted manual test is claimed as successful."
+    "runtimeStatus": "MailPin 1.7.0 was published on GitHub on 2026-08-15 from commit 419d1c7de208a304dd71ad4d87f9d2eacdb91048 after QA, security guard and release workflow run 31901834209 completed successfully. The owner explicitly authorized publication without recording an additional human visual-acceptance pass; no unexecuted manual test is claimed as successful."
   },
-  "latestPublicVersion": "1.6.1",
-  "releaseStatus": "candidate"
+  "latestPublicVersion": "1.7.0",
+  "releaseStatus": "published"
 }
