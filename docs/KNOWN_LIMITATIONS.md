@@ -1,8 +1,8 @@
 # Limites connues
 
-## Source 1.7.1 / release publique 1.7.0
+## Source 1.7.1 / release publique 1.7.1
 
-La source **1.7.1** est un candidat de durcissement pré-publication construit sur la release GitHub **1.7.0**. Elle ne modifie pas le runtime métier : elle réaligne les métadonnées actives et renforce les gardes de version et de ressources locales. Les preuves 1.7.0 ne sont réutilisées que pour les surfaces inchangées ; le candidat 1.7.1 doit repasser ses gates automatisés propres.
+La source **1.7.1** et la release publique **1.7.1** correspondent au même XPI construit depuis `c2b886677413a205d57a191234b1dac6279b86d6`. Le candidat 1.7.1 a repassé ses gates automatisés propres avant publication. Elle ne modifie pas le runtime métier : elle réaligne les métadonnées actives et renforce les gardes de version et de ressources locales.
 
 ## Interface et accessibilité
 
@@ -30,5 +30,5 @@ La source **1.7.1** est un candidat de durcissement pré-publication construit s
 
 ## Publication
 
-- Aucun tag/release 1.7.1 ne doit être créé avant que QA, build reproductible et smoke Thunderbird du candidat exact soient verts.
+- La release GitHub 1.7.1 est publiée ; la soumission ATN, la matrice fournisseurs et les validations humaines restent des étapes distinctes.
 - La disponibilité juridique de la marque, le portail ATN et la matrice externe restent des validations humaines/externes.

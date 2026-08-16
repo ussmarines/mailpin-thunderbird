@@ -2,7 +2,7 @@
 
 ## État
 
-La source courante est **1.7.1** ; la dernière release publique est **1.7.0**. Ce document décrit le candidat et ne prétend pas qu’il est déjà publié.
+La source courante est **1.7.1** ; la dernière release publique est **1.7.1**. Ce document décrit comment reproduire les artefacts issus du candidat 1.7.1 désormais publié.
 
 ## Environnement
 

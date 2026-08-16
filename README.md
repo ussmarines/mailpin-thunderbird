@@ -6,8 +6,8 @@
 **Email Follow-up & Productivity for Thunderbird**
 
 [![QA](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml)
-![Release](https://img.shields.io/badge/release-v1.7.0-4F7F75)
-![Source](https://img.shields.io/badge/candidate-v1.7.1-3D536B)
+![Release](https://img.shields.io/badge/release-v1.7.1-4F7F75)
+![Source](https://img.shields.io/badge/release-v1.7.1-3D536B)
 ![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x-3D536B)
 ![Licence](https://img.shields.io/badge/licence-MailPin%20Source--Available%201.1-1A1D21)
 </div>
@@ -33,8 +33,8 @@ MailPin transforme les e-mails importants en suivi actionnable **sans remplacer 
 
 ## Compatibilité
 
-- **Version source :** `1.7.1` — candidate de durcissement pré-publication
-- **Dernière release publique :** `1.7.0`
+- **Version source :** `1.7.1` — publiée
+- **Dernière release publique :** `1.7.1`
 - **Thunderbird :** `153.0` à `153.*`
 - **Format :** MailExtension Manifest V3
 - **Langues :** français et anglais
@@ -46,7 +46,7 @@ MailPin utilise une API Experiment privilégiée pour l’intégration `about:3p
 
 ### Release GitHub
 
-1. Téléchargez `MailPin_v1.7.0.xpi` depuis la release `v1.7.0`.
+1. Téléchargez `MailPin_v1.7.1.xpi` depuis la release `v1.7.1`.
 2. Thunderbird → **Extensions et thèmes** → engrenage → **Installer un module depuis un fichier**.
 3. Sélectionnez le XPI.
 

@@ -6,8 +6,8 @@
 **Email Follow-up & Productivity for Thunderbird**
 
 [![QA](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml)
-![Release](https://img.shields.io/badge/release-v1.7.0-4F7F75)
-![Source](https://img.shields.io/badge/candidate-v1.7.1-3D536B)
+![Release](https://img.shields.io/badge/release-v1.7.1-4F7F75)
+![Source](https://img.shields.io/badge/release-v1.7.1-3D536B)
 ![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x-3D536B)
 ![License](https://img.shields.io/badge/license-MailPin%20Source--Available%201.1-1A1D21)
 </div>
@@ -33,8 +33,8 @@ MailPin turns important email into actionable follow-up **without replacing Thun
 
 ## Compatibility
 
-- **Source version:** `1.7.1` — pre-publication hardening candidate
-- **Latest public release:** `1.7.0`
+- **Source version:** `1.7.1` — published
+- **Latest public release:** `1.7.1`
 - **Thunderbird:** `153.0` to `153.*`
 - **Format:** MailExtension Manifest V3
 - **Locales:** French and English
@@ -46,7 +46,7 @@ MailPin uses a privileged Thunderbird Experiment for `about:3pane`, local SQLite
 
 ### GitHub release
 
-1. Download `MailPin_v1.7.0.xpi` from release `v1.7.0`.
+1. Download `MailPin_v1.7.1.xpi` from release `v1.7.1`.
 2. Thunderbird → **Add-ons and Themes** → gear menu → **Install Add-on From File**.
 3. Select the XPI.
 

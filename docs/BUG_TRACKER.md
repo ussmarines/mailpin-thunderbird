@@ -2,7 +2,7 @@
 
 Version source : **1.7.1**
 
-Dernière release publique : **1.7.0**
+Dernière release publique : **1.7.1**
 
 Les entrées corrigées des versions antérieures restent disponibles dans l’historique Git et les rapports d’audit archivés. Ce registre courant conserve les validations encore utiles à la prochaine passe.
 

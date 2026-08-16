@@ -1,14 +1,14 @@
 # Mémoire opérationnelle — MailPin
 
 > Version source : **1.7.1**
-> Dernière release publique : **1.7.0**
-> Branche de travail : `release/1.7.1-pre-public-hardening` ; baseline publique : `main` à `378810a741be203b84abd1b07d5988e968ec8721`
+> Dernière release publique : **1.7.1**
+> Branche courante : `main` ; release 1.7.1 : `c2b886677413a205d57a191234b1dac6279b86d6`
 > Base de l’audit global : `0c0400170aac631d13d795050d669cbb1a83ea7f`
 > Extension ID : `ussmarines.mailpin@addons.thunderbird.net`
 
 ## Résumé
 
-MailPin est une extension Thunderbird Manifest V3 locale qui ajoute un panneau de messages épinglés et transforme ces épingles en suivis actionnables sans remplacer la liste native. La dernière release publique est **1.7.0**. La source **1.7.1** est une maintenance de préparation publique : elle corrige la cohérence des métadonnées actives et renforce les gardes de release/local-first sans modifier la logique métier, les permissions, les schémas, les dépendances runtime, l’identité ni le réseau. Organic Workspace et les corrections QoL restent le runtime publié 1.7.0. Les nouvelles créations Agenda démarrent sur **Événement**. Le changement d’ID a été introduit volontairement en 1.6.0 avant la première publication ATN.
+MailPin est une extension Thunderbird Manifest V3 locale qui ajoute un panneau de messages épinglés et transforme ces épingles en suivis actionnables sans remplacer la liste native. La dernière release publique est **1.7.1**, ciblant exactement `c2b886677413a205d57a191234b1dac6279b86d6`. Cette maintenance corrige la cohérence des métadonnées actives et renforce les gardes de release/local-first sans modifier la logique métier, les permissions, les schémas, les dépendances runtime, l’identité ni le réseau. Organic Workspace et les corrections QoL restent le runtime métier issu de 1.7.0. Les nouvelles créations Agenda démarrent sur **Événement**. Le changement d’ID a été introduit volontairement en 1.6.0 avant la première publication ATN.
 
 Les futures fonctions **Prochaine action**, **Timeline de conversation**, **Follow-up récurrent** et **Résultat du suivi** restent hors périmètre de cette release.
 
@@ -117,7 +117,7 @@ Diagnostiquer l’environnement avec `npx skills ls -g` et le hook avec `node C:
 - aucune nouvelle permission, dépendance runtime ou connexion réseau introduite par la 1.7.1 ;
 - recette utilisateur pré-rebranding 1.5.4 verte pour le métier inchangé ; cette preuve n’est pas renommée recette 1.6.1 ;
 - runtime MailPin `4fdb978e1828325001f95951c115059a931b8b6e` : QA Linux/Windows, garde sécurité et smoke Thunderbird 153 réel verts ;
-- 1.7.1 modifie uniquement la version distribuée, les documents actifs et les gardes de dépôt/release ; QA et smoke Thunderbird du candidat exact restent exigés avant publication.
+- 1.7.1 modifie uniquement la version distribuée, les documents actifs et les gardes de dépôt/release ; PR #43, QA Linux/Windows, garde identité/sécurité, smoke Thunderbird réel et publication depuis le commit exact sont PASS.
 
 ## Commandes obligatoires
 
@@ -139,11 +139,11 @@ python tests/test_thunderbird_test_bench.py
 
 ## Définition de terminé
 
-- branche de préparation propre et déclarations 1.7.1 / dernière release publique 1.7.0 synchronisées avant toute publication ;
+- `main` publié et déclarations source/release publique 1.7.1 synchronisées après publication ;
 - tests, scans de secrets et builds reproductibles verts ;
 - frontière Thunderbird vérifiée sans réintroduction d’accès direct ;
 - Options Recommandé/Avancé et portée multi-comptes cohérentes en FR/EN ;
 - README, changelog, état projet, registre, architecture, sécurité et handoff à jour lorsque leur contenu est affecté ;
 - aucune permission, URL distante d’exécution, dépendance runtime ou schéma nouveau non justifié ;
 - résultats runtime décrits honnêtement : preuve réelle verte ou limite documentée, jamais supposée ;
-- tag/release uniquement après autorisation explicite de l’utilisateur — autorisation complète reçue le 16 août 2026 pour la release GitHub 1.7.1, sous réserve des gates techniques.
+- tag/release uniquement après autorisation explicite de l’utilisateur — autorisation complète reçue le 16 août 2026 ; release GitHub 1.7.1 publiée après gates techniques verts.

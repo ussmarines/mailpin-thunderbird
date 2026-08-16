@@ -19,4 +19,4 @@ La 1.7.1 est une maintenance de préparation release. Le runtime métier reste c
 
 ## Validation
 
-Les contrôles locaux ciblés et `npm run ci` sont verts. Deux mutations temporaires ont confirmé que les ressources distantes HTML puis CSS sont effectivement refusées par le garde. Les workflows PR et le smoke Thunderbird réel du candidat exact restent les gates distants avant release. Les identifiants des runs finaux seront consignés après leur exécution, sans inventer de résultat à l’avance.
+Les contrôles locaux ciblés et `npm run ci` sont verts. Deux mutations temporaires ont confirmé que les ressources distantes HTML puis CSS sont effectivement refusées par le garde. PR #43 a passé QA Linux/Windows et la garde identité/sécurité (`31950636397`) ainsi que le smoke Thunderbird 153 réel (`31950636456`). Après squash sur `c2b886677413a205d57a191234b1dac6279b86d6`, `main` a repassé QA (`31950703455`) et smoke (`31950703452`). Le workflow Release `31951120772` a reconstruit et publié les artefacts depuis ce commit exact.
