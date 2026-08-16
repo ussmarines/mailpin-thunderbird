@@ -1,14 +1,14 @@
 # Mémoire opérationnelle — MailPin
 
-> Version source : **1.7.0**
-> Dernière release publique : **1.6.1**
-> Branche de référence : `main` ; Organic Workspace intégré par la PR #39
+> Version source : **1.7.1**
+> Dernière release publique : **1.7.0**
+> Branche de travail : `release/1.7.1-pre-public-hardening` ; baseline publique : `main` à `378810a741be203b84abd1b07d5988e968ec8721`
 > Base de l’audit global : `0c0400170aac631d13d795050d669cbb1a83ea7f`
 > Extension ID : `ussmarines.mailpin@addons.thunderbird.net`
 
 ## Résumé
 
-MailPin est une extension Thunderbird Manifest V3 locale qui ajoute un panneau de messages épinglés et transforme ces épingles en suivis actionnables sans remplacer la liste native. La dernière release publique reste 1.6.1. La source 1.7.0 intègre Organic Workspace, les corrections QoL issues des recettes vidéo et l’audit global post-fusion ; sa publication reste une décision séparée. Les corrections métier héritées couvrent : épinglage canonique entre entrées, responsive réel du panneau, géométrie Options, états du Dashboard, transitions workflow cohérentes, planification Agenda et gestion explicite des calendriers incompatibles avec les tâches. Les nouvelles créations Agenda démarrent sur **Événement**. La ligne source 1.7.0 n’ajoute aucune permission, dépendance runtime, migration de stockage ni connexion réseau. Le changement d’ID a été introduit volontairement en 1.6.0 avant la première publication ATN.
+MailPin est une extension Thunderbird Manifest V3 locale qui ajoute un panneau de messages épinglés et transforme ces épingles en suivis actionnables sans remplacer la liste native. La dernière release publique est **1.7.0**. La source **1.7.1** est une maintenance de préparation publique : elle corrige la cohérence des métadonnées actives et renforce les gardes de release/local-first sans modifier la logique métier, les permissions, les schémas, les dépendances runtime, l’identité ni le réseau. Organic Workspace et les corrections QoL restent le runtime publié 1.7.0. Les nouvelles créations Agenda démarrent sur **Événement**. Le changement d’ID a été introduit volontairement en 1.6.0 avant la première publication ATN.
 
 Les futures fonctions **Prochaine action**, **Timeline de conversation**, **Follow-up récurrent** et **Résultat du suivi** restent hors périmètre de cette release.
 
@@ -102,7 +102,7 @@ La source de vérité visuelle demeure `docs/UI_SPEC.md`; aucun `PRODUCT.md` ou 
 
 Diagnostiquer l’environnement avec `npx skills ls -g` et le hook avec `node C:\Users\ussma\.agents\skills\impeccable\scripts\hook-admin.mjs status`. Pour une mise à jour, vérifier d’abord le dépôt officiel, la version et les écritures prévues ; utiliser `npx skills update -g` pour les sources suivies et l’installateur officiel Impeccable avec le fournisseur Codex explicite.
 
-## État 1.6.0
+## État technique courant
 
 - schéma SQLite : 5 ; schéma paramètres : 8 ; schéma données : 7 ;
 - compatibilité déclarée : Thunderbird 153.0 à 153.* ;
@@ -114,10 +114,10 @@ Diagnostiquer l’environnement avec `npx skills ls -g` et le hook avec `node C:
 - détection fournisseurs par domaine exact ou sous-domaine légitime ;
 - portée multi-comptes basée sur `account.key`, sélection maximale bornée à 50 comptes ;
 - volume conseillé : jusqu’à 2 000 épingles, sans blocage technique au-delà ;
-- aucune nouvelle permission, dépendance runtime ou connexion réseau introduite par la 1.6.0 ;
+- aucune nouvelle permission, dépendance runtime ou connexion réseau introduite par la 1.7.1 ;
 - recette utilisateur pré-rebranding 1.5.4 verte pour le métier inchangé ; cette preuve n’est pas renommée recette 1.6.1 ;
 - runtime MailPin `4fdb978e1828325001f95951c115059a931b8b6e` : QA Linux/Windows, garde sécurité et smoke Thunderbird 153 réel verts ;
-- 1.6.1 ne modifie que la version du manifeste et les métadonnées de publication, et exige ses propres gates automatisés avant release.
+- 1.7.1 modifie uniquement la version distribuée, les documents actifs et les gardes de dépôt/release ; QA et smoke Thunderbird du candidat exact restent exigés avant publication.
 
 ## Commandes obligatoires
 
@@ -139,11 +139,11 @@ python tests/test_thunderbird_test_bench.py
 
 ## Définition de terminé
 
-- branche de préparation propre et déclarations 1.6.0 synchronisées avant toute soumission ATN ;
+- branche de préparation propre et déclarations 1.7.1 / dernière release publique 1.7.0 synchronisées avant toute publication ;
 - tests, scans de secrets et builds reproductibles verts ;
 - frontière Thunderbird vérifiée sans réintroduction d’accès direct ;
 - Options Recommandé/Avancé et portée multi-comptes cohérentes en FR/EN ;
 - README, changelog, état projet, registre, architecture, sécurité et handoff à jour lorsque leur contenu est affecté ;
 - aucune permission, URL distante d’exécution, dépendance runtime ou schéma nouveau non justifié ;
 - résultats runtime décrits honnêtement : preuve réelle verte ou limite documentée, jamais supposée ;
-- tag/release uniquement après autorisation explicite de l’utilisateur — autorisation reçue le 12 août 2026 pour la release GitHub 1.6.0.
+- tag/release uniquement après autorisation explicite de l’utilisateur — autorisation complète reçue le 16 août 2026 pour la release GitHub 1.7.1, sous réserve des gates techniques.

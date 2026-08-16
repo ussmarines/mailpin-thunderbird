@@ -6,6 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 manifest = json.loads((ROOT / "extension/manifest.json").read_text(encoding="utf-8"))
 package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
+state = json.loads((ROOT / "docs/PROJECT_STATE.json").read_text(encoding="utf-8"))
 html = (ROOT / "extension/options/options.html").read_text(encoding="utf-8")
 js = (ROOT / "extension/options/options.js").read_text(encoding="utf-8")
 readmes = [(ROOT / name).read_text(encoding="utf-8") for name in ("README.md", "README.en.md")]
@@ -46,14 +47,37 @@ assert "event.preventDefault();" in js and "messenger.tabs.create({url: link.hre
 for key in ("supportTitle", "supportProject", "supportOpenFailed"):
     assert all(locales[locale][key]["message"].strip() for locale in locales), key
 
-version_badges = (f"release-v{package['version']}", f"candidate-v{package['version']}")
+source_version = str(package["version"])
+public_version = str(state["latestPublicVersion"])
+assert manifest["version"] == source_version == state["extensionVersion"]
+if state["releaseStatus"] == "candidate":
+    assert source_version != public_version
+    expected_source_badge = f"candidate-v{source_version}"
+elif state["releaseStatus"] == "published":
+    assert source_version == public_version
+    expected_source_badge = f"release-v{source_version}"
+else:
+    expected_source_badge = f"candidate-v{source_version}"
 for readme in readmes:
     assert "actions/workflows/ci.yml/badge.svg?branch=main" in readme
-    assert any(badge in readme for badge in version_badges)
+    assert expected_source_badge in readme
+    assert f"release-v{public_version}" in readme
     assert "Source--Available%201.1" in readme
-    for url in (author_url, repository_url, paypal_url, "PRIVACY.md", "SECURITY.md", "LICENSE"):
+    for url in (author_url, repository_url, paypal_url, "PRIVACY.md", "SECURITY.md", "SUPPORT.md", "LICENSE"):
         assert url in readme, url
     assert "C:\\" not in readme
+
+# Active release documents must agree on both source and latest-public versions.
+active_release_docs = {
+    "PROJECT_MEMORY.md": (f"Version source : **{source_version}**", f"Dernière release publique : **{public_version}**"),
+    "docs/BUG_TRACKER.md": (f"Version source : **{source_version}**", f"Dernière release publique : **{public_version}**"),
+    "docs/KNOWN_LIMITATIONS.md": (f"Source {source_version}", f"release publique {public_version}"),
+    "release/BUILD_INSTRUCTIONS.md": (f"candidat {source_version}", f"dernière release publique est **{public_version}**"),
+}
+for relative, tokens in active_release_docs.items():
+    text = (ROOT / relative).read_text(encoding="utf-8")
+    for token in tokens:
+        assert token in text, (relative, token)
 
 print("Project metadata, support links and synchronized READMEs: OK")
 # Current non-persistent product surfaces must use MailPin naming. Historical

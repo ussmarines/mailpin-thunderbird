@@ -26,25 +26,38 @@ def is_local_generated(path: Path) -> bool:
 
 
 class ResourceHTMLParser(HTMLParser):
-    """Collect IDs and local script/style references using the standard library."""
+    """Collect IDs and load-bearing HTML resource references."""
+
+    RESOURCE_ATTRIBUTES = {
+        "script": ("src",),
+        "link": ("href",),
+        "img": ("src",),
+        "iframe": ("src",),
+        "audio": ("src",),
+        "video": ("src", "poster"),
+        "source": ("src",),
+        "object": ("data",),
+        "embed": ("src",),
+    }
 
     def __init__(self) -> None:
         super().__init__(convert_charrefs=True)
         self.ids: set[str] = set()
         self.duplicate_ids: set[str] = set()
-        self.resources: list[str] = []
+        self.resources: list[tuple[str, str]] = []
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        tag = tag.lower()
         values = {name.lower(): value for name, value in attrs}
         node_id = values.get("id")
         if node_id:
             if node_id in self.ids:
                 self.duplicate_ids.add(node_id)
             self.ids.add(node_id)
-        if tag.lower() == "script" and values.get("src"):
-            self.resources.append(str(values["src"]))
-        elif tag.lower() == "link" and values.get("href"):
-            self.resources.append(str(values["href"]))
+        for attribute in self.RESOURCE_ATTRIBUTES.get(tag, ()):
+            value = values.get(attribute)
+            if value:
+                self.resources.append((f"{tag}[{attribute}]", str(value)))
 
 
 def validate_css_structure(text: str) -> str | None:
@@ -208,7 +221,7 @@ for api_name, details in manifest.get("experiment_apis", {}).items():
     resource(details.get("parent", {}).get("script"), f"experiment:{api_name}")
 
 # Syntax and risky-code checks.
-network_pattern = re.compile(r"(?:fetch|XMLHttpRequest|WebSocket|EventSource)\s*\(")
+network_pattern = re.compile(r"(?:fetch|XMLHttpRequest|WebSocket|EventSource|WebTransport|sendBeacon)\s*\(")
 for path in sorted(EXT.rglob("*.js")) + sorted(EXT.rglob("*.mjs")):
     result = subprocess.run(["node", "--check", str(path)], capture_output=True, text=True)
     check(result.returncode == 0, f"syntaxe JS invalide {path.relative_to(ROOT)}: {result.stderr.strip()}")
@@ -240,10 +253,15 @@ for html_path in EXT.rglob("*.html"):
         errors.append(f"HTML invalide {html_path.relative_to(ROOT)}: {exc}")
     for duplicate_id in sorted(parser.duplicate_ids):
         errors.append(f"ID HTML dupliqué {duplicate_id} dans {html_path.relative_to(ROOT)}")
-    for value in parser.resources:
-        if urlparse(value).scheme or value.startswith("#"):
+    for kind, value in parser.resources:
+        parsed = urlparse(value)
+        if value.startswith("#"):
             continue
-        target = (html_path.parent / value).resolve()
+        check(not parsed.scheme and not parsed.netloc and not value.startswith("//"),
+              f"sous-ressource HTML distante interdite {html_path.relative_to(ROOT)} {kind} -> {value}")
+        if parsed.scheme or parsed.netloc or value.startswith("//"):
+            continue
+        target = (html_path.parent / value.split("#", 1)[0].split("?", 1)[0]).resolve()
         check(target.is_file(), f"sous-ressource HTML manquante {html_path.relative_to(ROOT)} -> {value}")
     sibling_js = html_path.with_suffix(".js")
     if sibling_js.is_file():
@@ -259,9 +277,15 @@ for css_path in EXT.rglob("*.css"):
         errors.append(f"CSS invalide {css_path.relative_to(ROOT)}: {css_error}")
     for raw in re.findall(r"url\(([^)]+)\)", text):
         value = raw.strip().strip('"\'')
-        if not value or value.startswith(("data:", "#")) or urlparse(value).scheme:
+        if not value or value.startswith("#"):
             continue
-        check((css_path.parent / value).resolve().is_file(), f"ressource CSS manquante {css_path.relative_to(ROOT)} -> {value}")
+        parsed = urlparse(value)
+        check(not parsed.scheme and not parsed.netloc and not value.startswith("//"),
+              f"ressource CSS distante interdite {css_path.relative_to(ROOT)} -> {value}")
+        if parsed.scheme or parsed.netloc or value.startswith("//"):
+            continue
+        local = value.split("#", 1)[0].split("?", 1)[0]
+        check((css_path.parent / local).resolve().is_file(), f"ressource CSS manquante {css_path.relative_to(ROOT)} -> {value}")
 
 schema = load_json(EXT / "api/pinInbox/schema.json")
 functions = {item.get("name") for item in schema[0].get("functions", [])} if schema else set()
@@ -293,6 +317,7 @@ readme = (ROOT / "README.md").read_text(encoding="utf-8")
 check("actions/workflows/ci.yml/badge.svg?branch=main" in readme, "badge QA manquant")
 check(f"release-v{version}" in readme or f"candidate-v{version}" in readme, "badge release/candidat incohérent")
 check("MailPin%20Source--Available%201.1" in readme, "badge licence incohérent")
+check("SUPPORT.md" in readme, "lien support README manquant")
 check(not (ROOT / ".github/workflows/FUNDING.yml").exists(), "FUNDING.yml ne doit pas être placé dans workflows")
 release_workflow = (ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8")
 check("gh release create" in release_workflow and "npm run ci" in release_workflow, "workflow release incomplet")

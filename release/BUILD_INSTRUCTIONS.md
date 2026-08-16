@@ -1,8 +1,8 @@
-# Instructions de build pour les reviewers — candidat 1.7.0
+# Instructions de build pour les reviewers — candidat 1.7.1
 
 ## État
 
-La source courante est **1.7.0** ; la dernière release publique est **1.6.1**. Aucune publication 1.7.0 n’est implicite dans ce document.
+La source courante est **1.7.1** ; la dernière release publique est **1.7.0**. Ce document décrit le candidat et ne prétend pas qu’il est déjà publié.
 
 ## Environnement
 
@@ -22,8 +22,8 @@ npm run ci
 Livrables :
 
 ```text
-dist/MailPin_v1.7.0.xpi
-dist/MailPin_GitHub_Repository_v1.7.0.zip
+dist/MailPin_v1.7.1.xpi
+dist/MailPin_GitHub_Repository_v1.7.1.zip
 dist/SHA256SUMS.txt
 ```
 

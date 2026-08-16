@@ -7,7 +7,7 @@
 
 [![QA](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml)
 ![Release](https://img.shields.io/badge/release-v1.7.0-4F7F75)
-![Source](https://img.shields.io/badge/source-v1.7.0-3D536B)
+![Source](https://img.shields.io/badge/candidate-v1.7.1-3D536B)
 ![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x-3D536B)
 ![License](https://img.shields.io/badge/license-MailPin%20Source--Available%201.1-1A1D21)
 </div>
@@ -33,7 +33,7 @@ MailPin turns important email into actionable follow-up **without replacing Thun
 
 ## Compatibility
 
-- **Source version:** `1.7.0` — published
+- **Source version:** `1.7.1` — pre-publication hardening candidate
 - **Latest public release:** `1.7.0`
 - **Thunderbird:** `153.0` to `153.*`
 - **Format:** MailExtension Manifest V3
@@ -62,8 +62,8 @@ npm run ci
 
 Reproducible outputs:
 
-- `dist/MailPin_v1.7.0.xpi`
-- `dist/MailPin_GitHub_Repository_v1.7.0.zip`
+- `dist/MailPin_v1.7.1.xpi`
+- `dist/MailPin_GitHub_Repository_v1.7.1.zip`
 - `dist/SHA256SUMS.txt`
 
 ## Privacy & security
@@ -72,8 +72,8 @@ MailPin has no runtime network call, telemetry, advertising or remote code. Full
 
 - [Privacy](PRIVACY.md)
 - [Security](SECURITY.md)
-- [Source security audit 1.7.0](SECURITY_AUDIT_1.7.0.md)
-- [Source validation report 1.7.0](VALIDATION_REPORT_1.7.0.md)
+- [Source security audit 1.7.1](SECURITY_AUDIT_1.7.1.md)
+- [Source validation report 1.7.1](VALIDATION_REPORT_1.7.1.md)
 - [Known limitations](docs/KNOWN_LIMITATIONS.md)
 
 ## Documentation & support
@@ -83,6 +83,7 @@ MailPin has no runtime network call, telemetry, advertising or remote code. Full
 - [Thunderbird test bench](docs/THUNDERBIRD_TEST_BENCH.md)
 - [Reviewer build instructions](release/BUILD_INSTRUCTIONS.md)
 - [ATN preparation](STORE_RELEASE.md)
+- [Support and useful report details](SUPPORT.md)
 - [Report an issue](https://github.com/ussmarines/mailpin-thunderbird/issues)
 
 Maintained by [ussmarines](https://github.com/ussmarines). [PayPal](https://paypal.me/ussmarinesdot) donations are optional and unlock no functionality.

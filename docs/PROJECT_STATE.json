@@ -2,11 +2,11 @@
   "format": "mailperch-project-state",
   "version": 1,
   "project": "MailPin — Email Follow-up & Productivity for Thunderbird",
-  "extensionVersion": "1.7.0",
+  "extensionVersion": "1.7.1",
   "baseGitHub": {
     "branch": "main",
-    "commit": "419d1c7de208a304dd71ad4d87f9d2eacdb91048",
-    "role": "MailPin 1.7.0 published GitHub release baseline"
+    "commit": "378810a741be203b84abd1b07d5988e968ec8721",
+    "role": "MailPin 1.7.0 published post-release baseline"
   },
   "extensionId": "ussmarines.mailpin@addons.thunderbird.net",
   "thunderbird": {
@@ -110,7 +110,7 @@
     "uiDependencyPolicy": "native HTML plus local Organic Workspace CSS tokens; canonical shell in source; no npm runtime dependency, bundler, CDN or remote asset",
     "runtimeTestSupplyChain": "test-only Thunderbird/geckodriver downloads are checksum-verified and are not runtime dependencies of the extension"
   },
-  "developmentBranch": "main",
+  "developmentBranch": "release/1.7.1-pre-public-hardening",
   "testing": {
     "contract": [
       "tests/test_thunderbird_compatibility_boundary.py",
@@ -121,8 +121,8 @@
     "runtimeWorkflow": ".github/workflows/thunderbird-smoke.yml",
     "runtimeScript": "tests/thunderbird/real_smoke.py",
     "browserStatus": "Organic Workspace DOM/layout contracts are current and the final shell is written directly in source HTML. Browser-model evidence complements, but does not replace, real Thunderbird visual acceptance.",
-    "runtimeStatus": "MailPin 1.7.0 was published on GitHub on 2026-08-15 from commit 419d1c7de208a304dd71ad4d87f9d2eacdb91048 after QA, security guard and release workflow run 31901834209 completed successfully. The owner explicitly authorized publication without recording an additional human visual-acceptance pass; no unexecuted manual test is claimed as successful."
+    "runtimeStatus": "MailPin 1.7.0 reste la dernière preuve runtime publiée. La 1.7.1 ne change pas la logique runtime mais modifie le manifeste/version et les gardes de release ; QA et smoke Thunderbird 153 doivent donc être réexécutés sur le candidat exact avant publication. Aucun contrôle manuel non exécuté n’est déclaré comme réussi."
   },
   "latestPublicVersion": "1.7.0",
-  "releaseStatus": "published"
+  "releaseStatus": "candidate"
 }

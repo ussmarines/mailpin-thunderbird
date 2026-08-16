@@ -1,5 +1,13 @@
 # Journal des modifications
 
+## 1.7.1 — durcissement pré-publication et cohérence des métadonnées
+
+- corrige la dérive de métadonnées post-release qui laissait plusieurs documents actifs sur « source 1.7.0 / release publique 1.6.1 » après la publication effective de 1.7.0 ;
+- renforce les gardes de version pour contrôler séparément la version source et la dernière version publique, y compris la mémoire projet, le bug tracker, les limites connues, le plan manuel et les fichiers reviewers ;
+- durcit le contrôle local-first en refusant les sous-ressources HTML/CSS distantes et en étendant la détection des API réseau JavaScript, tout en conservant les liens externes explicitement ouverts par l’utilisateur ;
+- relie explicitement `SUPPORT.md` depuis les README et réaligne le bug tracker sur ses sections ouvert/corrigé ;
+- aucune modification de logique métier, permission WebExtension, schéma, dépendance runtime, identité, télémétrie ou connexion réseau n’est introduite.
+
 ## 1.7.0 — Organic Workspace, QoL et audit global du dépôt
 
 - refonte complète Dashboard / Options / panneau autour d’Organic Workspace, avec shell canonique écrit directement dans les sources HTML/CSS ;

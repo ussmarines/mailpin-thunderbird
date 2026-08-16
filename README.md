@@ -7,7 +7,7 @@
 
 [![QA](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml)
 ![Release](https://img.shields.io/badge/release-v1.7.0-4F7F75)
-![Source](https://img.shields.io/badge/source-v1.7.0-3D536B)
+![Source](https://img.shields.io/badge/candidate-v1.7.1-3D536B)
 ![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x-3D536B)
 ![Licence](https://img.shields.io/badge/licence-MailPin%20Source--Available%201.1-1A1D21)
 </div>
@@ -33,7 +33,7 @@ MailPin transforme les e-mails importants en suivi actionnable **sans remplacer 
 
 ## Compatibilité
 
-- **Version source :** `1.7.0` — publiée
+- **Version source :** `1.7.1` — candidate de durcissement pré-publication
 - **Dernière release publique :** `1.7.0`
 - **Thunderbird :** `153.0` à `153.*`
 - **Format :** MailExtension Manifest V3
@@ -62,8 +62,8 @@ npm run ci
 
 Livrables reproductibles :
 
-- `dist/MailPin_v1.7.0.xpi`
-- `dist/MailPin_GitHub_Repository_v1.7.0.zip`
+- `dist/MailPin_v1.7.1.xpi`
+- `dist/MailPin_GitHub_Repository_v1.7.1.zip`
 - `dist/SHA256SUMS.txt`
 
 ## Confidentialité & sécurité
@@ -72,8 +72,8 @@ MailPin ne contient aucun appel réseau runtime, aucune télémétrie, aucune pu
 
 - [Politique de confidentialité](PRIVACY.md)
 - [Politique de sécurité](SECURITY.md)
-- [Audit sécurité source 1.7.0](SECURITY_AUDIT_1.7.0.md)
-- [Rapport de validation source 1.7.0](VALIDATION_REPORT_1.7.0.md)
+- [Audit sécurité source 1.7.1](SECURITY_AUDIT_1.7.1.md)
+- [Rapport de validation source 1.7.1](VALIDATION_REPORT_1.7.1.md)
 - [Limites connues](docs/KNOWN_LIMITATIONS.md)
 
 ## Documentation & support
@@ -83,6 +83,7 @@ MailPin ne contient aucun appel réseau runtime, aucune télémétrie, aucune pu
 - [Banc Thunderbird](docs/THUNDERBIRD_TEST_BENCH.md)
 - [Build reviewers](release/BUILD_INSTRUCTIONS.md)
 - [Préparation ATN](STORE_RELEASE.md)
+- [Support et informations à fournir](SUPPORT.md)
 - [Signaler un problème](https://github.com/ussmarines/mailpin-thunderbird/issues)
 
 Maintenu par [ussmarines](https://github.com/ussmarines). Les dons [PayPal](https://paypal.me/ussmarinesdot) sont facultatifs et ne débloquent aucune fonction.

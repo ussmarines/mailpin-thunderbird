@@ -1,14 +1,14 @@
 # Limites connues
 
-## Source 1.7.0 / release publique 1.6.1
+## Source 1.7.1 / release publique 1.7.0
 
-La source **1.7.0** contient Organic Workspace, la passe QoL et l’audit global post-fusion. Elle n’est pas encore une release publique ; la dernière release GitHub reste **1.6.1**. Les validations automatisées du candidat source ne doivent pas être présentées comme une recette humaine de release.
+La source **1.7.1** est un candidat de durcissement pré-publication construit sur la release GitHub **1.7.0**. Elle ne modifie pas le runtime métier : elle réaligne les métadonnées actives et renforce les gardes de version et de ressources locales. Les preuves 1.7.0 ne sont réutilisées que pour les surfaces inchangées ; le candidat 1.7.1 doit repasser ses gates automatisés propres.
 
 ## Interface et accessibilité
 
 - Le smoke Thunderbird valide installation, injection, ouverture du Dashboard, nettoyage et réinstallation ; il ne juge pas la qualité visuelle pixel par pixel.
 - Une recette humaine reste nécessaire sur Dashboard, Options et panneau avec splitter continu, thèmes clair/sombre, zoom 200 %, contraste élevé et lecteurs d’écran.
-- Les derniers problèmes UI signalés par l’utilisateur doivent être reproduits sur le XPI exact de la source 1.7.0 avant fermeture.
+- La 1.7.1 ne modifie pas Dashboard/Options/panneau ; la recette humaine visuelle supplémentaire de 1.7.0 reste non consignée et demeure pertinente pour une soumission ATN, sans être présentée comme PASS.
 
 ## Compatibilité Thunderbird
 
@@ -30,5 +30,5 @@ La source **1.7.0** contient Organic Workspace, la passe QoL et l’audit global
 
 ## Publication
 
-- Aucun tag/release 1.7.0 n’est créé par cet audit.
+- Aucun tag/release 1.7.1 ne doit être créé avant que QA, build reproductible et smoke Thunderbird du candidat exact soient verts.
 - La disponibilité juridique de la marque, le portail ATN et la matrice externe restent des validations humaines/externes.
