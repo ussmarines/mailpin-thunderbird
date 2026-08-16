@@ -10,7 +10,7 @@ Dernière release GitHub publique : **1.7.1**. Le candidat **1.7.1** a franchi l
 - [x] actions GitHub épinglées par SHA ;
 - [x] publication 1.7.1 explicitement autorisée par le propriétaire le 16 août 2026 ;
 - [x] artefacts définitifs 1.7.1 reconstruits depuis `c2b886677413a205d57a191234b1dac6279b86d6` ;
-- [ ] avis juridique indépendant sur la marque — validation externe, non automatisable ici.
+- [x] gate juridique/marque considéré validé par décision explicite du propriétaire le 16 août 2026 ; aucune revue juridique indépendante n’est revendiquée.
 
 ## Compatibilité / UI
 
