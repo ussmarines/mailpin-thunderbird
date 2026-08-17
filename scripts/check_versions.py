@@ -32,15 +32,15 @@ source_checks = {
     "THIRD_PARTY_NOTICES.md": [f"MailPin {version} source"],
     "PROJECT_MEMORY.md": [f"Version source : **{version}**"],
     "PRIVACY.md": [f"MailPin {version} ne contient", f"MailPin {version} contains"],
-    "STORE_RELEASE.md": [f"Version source/candidate :** {version}", f"MailPin_v{version}.xpi"],
-    "docs/ATN_RELEASE_CHECKLIST.md": [f"candidat {version}", f"version source {version}"],
+    "STORE_RELEASE.md": [f"Version source :** {version}", f"MailPin_v{version}.xpi"],
+    "docs/ATN_RELEASE_CHECKLIST.md": [f"MailPin {version}", f"version source {version}"],
     "docs/KNOWN_LIMITATIONS.md": [f"Source {version}"],
     "docs/MANUAL_TEST_PLAN.md": [f"— {version}"],
     "docs/BUG_TRACKER.md": [f"Version source : **{version}**"],
     "docs/CODEX_HANDOFF.md": [f"version source : **{version}**"],
-    "release/ATN_REVIEW_NOTES_TEMPLATE.md": [f"MailPin {version} (candidate)", f"**Version :** {version}"],
-    "release/BUILD_INSTRUCTIONS.md": [f"candidat {version}", f"MailPin_v{version}.xpi"],
-    "release/manifest-store-template.json": [f"candidat {version}"],
+    "release/ATN_REVIEW_NOTES_TEMPLATE.md": [f"MailPin {version}", f"**Version :** {version}"],
+    "release/BUILD_INSTRUCTIONS.md": [f"MailPin {version}", f"MailPin_v{version}.xpi"],
+    "release/manifest-store-template.json": [f"MailPin {version}"],
     f"SECURITY_AUDIT_{version}.md": [f"MailPin {version}"],
     f"VALIDATION_REPORT_{version}.md": [f"MailPin {version}"],
 }
@@ -55,8 +55,8 @@ public_checks = {
     "docs/MANUAL_TEST_PLAN.md": [f"dernière release publique est {public}"],
     "docs/ATN_RELEASE_CHECKLIST.md": [f"publique : **{public}**"],
     "docs/CODEX_HANDOFF.md": [f"dernière release publique : **{public}**"],
-    "release/BUILD_INSTRUCTIONS.md": [f"dernière release publique est **{public}**"],
-    "release/manifest-store-template.json": [f"Dernière release publique : {public}"],
+    "release/BUILD_INSTRUCTIONS.md": [f"release GitHub **{public}** est publiée"],
+    "release/manifest-store-template.json": [f"MailPin {public} publié"],
 }
 
 

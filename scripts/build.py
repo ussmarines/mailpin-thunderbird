@@ -34,6 +34,7 @@ def archive_file(archive: zipfile.ZipFile, source: Path, target: str, *, root: P
     if not resolved.is_relative_to(root.resolve()) or not resolved.is_file():
         raise SystemExit(f"Source d’archive hors dépôt ou invalide : {source}")
     info = zipfile.ZipInfo(target.replace(os.sep, "/"), FIXED_TIME)
+    info.create_system = 3
     info.compress_type = zipfile.ZIP_DEFLATED
     info.external_attr = (0o100644 & 0xFFFF) << 16
     archive.writestr(info, source.read_bytes())
@@ -95,6 +96,7 @@ def create_source_zip(output: Path) -> None:
                 continue
             archive_file(archive, source, relative.as_posix(), root=ROOT)
         info = zipfile.ZipInfo(SOURCE_FILE_MANIFEST, FIXED_TIME)
+        info.create_system = 3
         info.compress_type = zipfile.ZIP_DEFLATED
         info.external_attr = (0o100644 & 0xFFFF) << 16
         names = [source.relative_to(ROOT).as_posix() for source in sources]

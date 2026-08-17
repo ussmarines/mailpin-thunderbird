@@ -1,4 +1,13 @@
-# Notes pour les reviewers ATN — MailPin 1.7.1 (candidate)
+# Notes pour les reviewers ATN — MailPin 1.7.1
+
+## Statut de soumission
+
+- **Release GitHub :** 1.7.1 publiée le 16 août 2026.
+- **Soumission ATN :** en préparation, non revendiquée comme terminée.
+- **Source reviewer ATN :** régénérée après les correctifs de reproductibilité hors Git et validée depuis une extraction neuve sans `.git`.
+- **Archive source GitHub 1.7.1 publiée le 16 août :** artefact historique, distinct de la source reviewer ATN corrigée.
+
+Les corrections reviewer/build/documentation ne modifient aucun fichier `extension/**`. Sous Python 3.12, le XPI reconstruit depuis la source reviewer corrigée est identique au XPI GitHub 1.7.1.
 
 ## Identité
 
@@ -56,7 +65,7 @@ Voir `PRIVACY.md`, `SECURITY.md`, `SECURITY_AUDIT_1.7.1.md` et `release/BUILD_IN
 
 ## Validation automatisée
 
-`npm run ci` contrôle le dépôt, les permissions, la CSP, les ressources, l’absence de réseau, les contrats de l’Experiment, les migrations, le stockage, les actions de cartes, l’accessibilité, les traductions, la reproductibilité et les secrets.
+`npm run ci`, exécuté depuis une extraction neuve de la source reviewer sans `.git`, contrôle les permissions, la CSP, les ressources, l’absence de réseau, les contrats de l’Experiment, les migrations, le stockage, les actions de cartes, l’accessibilité, les traductions, la reproductibilité et les secrets.
 
 Le banc Thunderbird fonctionnel dédié couvre 50, 100, 500, 1 000 et 2 000 épingles. La validation multi-comptes de référence utilise une portée vide=0, A=18, B=16, A+C=34 et A+B+C=50. Les téléchargements de Thunderbird/geckodriver appartiennent uniquement au banc de test et sont vérifiés par SHA-256 ; ils ne sont pas des dépendances runtime.
 

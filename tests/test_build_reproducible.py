@@ -6,6 +6,8 @@ import json
 from pathlib import Path
 import posixpath
 import re
+import subprocess
+import sys
 import tempfile
 import zipfile
 
@@ -22,6 +24,7 @@ with tempfile.TemporaryDirectory() as directory:
     module.create_xpi(second)
     assert hashlib.sha256(first.read_bytes()).digest() == hashlib.sha256(second.read_bytes()).digest()
     with zipfile.ZipFile(first) as archive:
+        assert all(info.create_system == 3 for info in archive.infolist())
         names = set(archive.namelist())
         assert not any(name.endswith("AGENTS.md") for name in names)
         assert sum(name == "manifest.json" for name in names) == 1
@@ -59,6 +62,7 @@ with tempfile.TemporaryDirectory() as directory:
     assert hashlib.sha256(source_first.read_bytes()).digest() == hashlib.sha256(source_second.read_bytes()).digest()
     version = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))["version"]
     with zipfile.ZipFile(source_first) as archive:
+        assert all(info.create_system == 3 for info in archive.infolist())
         names = set(archive.namelist())
         assert "AGENTS.md" in names
         assert "extension/manifest.json" in names
@@ -85,6 +89,28 @@ with tempfile.TemporaryDirectory() as directory:
     rebuilt_from_source = extracted / "dist" / "rebuilt.xpi"
     archived_module.create_xpi(rebuilt_from_source)
     assert hashlib.sha256(first.read_bytes()).digest() == hashlib.sha256(rebuilt_from_source.read_bytes()).digest()
+
+    # The reviewer command must work from the extracted archive itself, where
+    # no .git metadata exists. This is the regression gate for the ATN blocker.
+    guard = subprocess.run(
+        [sys.executable, ".github/scripts/security_guard.py"],
+        cwd=extracted,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert guard.returncode == 0, guard.stdout + guard.stderr
+    assert "Security guard passed" in guard.stdout
+
+    history = subprocess.run(
+        [sys.executable, ".github/scripts/security_guard.py", "--history"],
+        cwd=extracted,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert history.returncode == 2, history.stdout + history.stderr
+    assert "history scan requires a Git checkout" in history.stderr
 
     # Ignored local material must not be selected merely because it is located
     # below the repository root while the distribution is built.

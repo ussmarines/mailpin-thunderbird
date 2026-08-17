@@ -72,7 +72,7 @@ active_release_docs = {
     "PROJECT_MEMORY.md": (f"Version source : **{source_version}**", f"Dernière release publique : **{public_version}**"),
     "docs/BUG_TRACKER.md": (f"Version source : **{source_version}**", f"Dernière release publique : **{public_version}**"),
     "docs/KNOWN_LIMITATIONS.md": (f"Source {source_version}", f"release publique {public_version}"),
-    "release/BUILD_INSTRUCTIONS.md": (f"candidat {source_version}", f"dernière release publique est **{public_version}**"),
+    "release/BUILD_INSTRUCTIONS.md": (f"MailPin {source_version}", f"release GitHub **{public_version}** est publiée"),
 }
 for relative, tokens in active_release_docs.items():
     text = (ROOT / relative).read_text(encoding="utf-8")

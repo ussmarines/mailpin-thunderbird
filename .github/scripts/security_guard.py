@@ -30,6 +30,7 @@ PRIVATE_KEY_MARKERS = tuple(
     for prefix in (b"PRIVATE", b"ENCRYPTED PRIVATE", b"RSA PRIVATE", b"OPENSSH PRIVATE", b"EC PRIVATE")
 )
 SELF_PATH = ".github/scripts/security_guard.py"
+SOURCE_FILE_MANIFEST = ".mailpin-source-files.json"
 APPROVED_HISTORY_PATH = Path(".security/approved-historical-identity-findings.json")
 APPROVED_HISTORY_CATEGORY = "forbidden personal identifier in historical content"
 APPROVED_HISTORY_LOCATION_RE = re.compile(r"^blob:[0-9a-f]{12}:.+:[1-9][0-9]*$")
@@ -54,6 +55,68 @@ def git(args: list[str], data: bytes | None = None) -> bytes:
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     ).stdout
+
+def reviewed_tree_paths() -> list[Path]:
+    """Return the bounded reviewed tree in a Git checkout or reviewer archive."""
+    try:
+        result = subprocess.run(
+            ["git", "ls-files", "-z"],
+            check=False,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+    except OSError:
+        result = None
+
+    if result is not None and result.returncode == 0:
+        names: object = [os.fsdecode(item) for item in result.stdout.split(b"\0") if item]
+    else:
+        manifest_path = Path(SOURCE_FILE_MANIFEST)
+        if not manifest_path.is_file():
+            raise ValueError(
+                "tracked file list unavailable: neither Git metadata nor "
+                f"{SOURCE_FILE_MANIFEST} is available"
+            )
+        try:
+            names = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            raise ValueError(f"invalid source-file manifest: {exc}") from exc
+
+    if not isinstance(names, list) or not all(isinstance(name, str) for name in names):
+        raise ValueError("source-file manifest must be a list of paths")
+
+    reviewed: list[Path] = []
+    seen: set[str] = set()
+    for name in names:
+        relative = Path(name)
+        normalized = relative.as_posix()
+        if (
+            relative.is_absolute()
+            or ".." in relative.parts
+            or normalized in {"", ".", SOURCE_FILE_MANIFEST}
+        ):
+            raise ValueError(f"invalid reviewed path: {name!r}")
+        if normalized in seen:
+            raise ValueError(f"duplicate reviewed path: {name!r}")
+        path = Path(normalized)
+        if not path.is_file() or path.is_symlink():
+            raise ValueError(f"reviewed file missing or invalid: {name}")
+        seen.add(normalized)
+        reviewed.append(path)
+    return sorted(reviewed, key=lambda path: path.as_posix())
+
+def git_history_available() -> bool:
+    """History scans are meaningful only in an actual Git checkout."""
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "--is-inside-work-tree"],
+            check=False,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+    except OSError:
+        return False
+    return result.returncode == 0 and result.stdout.strip() == b"true"
 
 def tokens(text: str) -> list[str]:
     normalized = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode("ascii").lower()
@@ -105,8 +168,7 @@ def sanitize_identity_text(text: str) -> tuple[str, int]:
 def sanitize_tree() -> int:
     """Sanitize tracked UTF-8 text files without ever printing matched values."""
     changed = 0
-    paths = [Path(os.fsdecode(item)) for item in git(["ls-files", "-z"]).split(b"\0") if item]
-    for path in paths:
+    for path in reviewed_tree_paths():
         if path.as_posix() == SELF_PATH:
             continue
         try:
@@ -154,8 +216,7 @@ def content_categories(data: bytes, check_keys: bool = True) -> list[tuple[int |
 
 def scan_tree() -> list[Finding]:
     findings: list[Finding] = []
-    paths = [Path(os.fsdecode(item)) for item in git(["ls-files", "-z"]).split(b"\0") if item]
-    for path in paths:
+    for path in reviewed_tree_paths():
         findings += [Finding("tracked-tree", str(path), category) for category in path_categories(path)]
         try:
             if path.stat().st_size > MAX_SCAN_BYTES:
@@ -296,15 +357,23 @@ def main() -> int:
     parser.add_argument("--sanitize-tree", action="store_true")
     args = parser.parse_args()
 
+    if args.history and not git_history_available():
+        print(
+            "Security guard history scan requires a Git checkout; "
+            "reviewer archives support the bounded tree scan used by npm run ci.",
+            file=sys.stderr,
+        )
+        return 2
+
     try:
         approved = load_approved_history()
+        if args.sanitize_tree:
+            sanitize_tree()
+        findings = scan_tree()
     except ValueError as exc:
         print(f"Security guard configuration error: {exc}", file=sys.stderr)
         return 2
 
-    if args.sanitize_tree:
-        sanitize_tree()
-    findings = scan_tree()
     if args.history:
         findings += scan_metadata() + scan_blobs()
     findings = sorted(set(findings), key=lambda item: (item.scope, item.location, item.category))

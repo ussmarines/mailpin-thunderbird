@@ -1,5 +1,5 @@
 {
-  "note": "Référence de métadonnées pour le candidat 1.7.1, désormais publié. Dernière release publique : 1.7.1. Les valeurs techniques doivent rester synchronisées avec extension/manifest.json.",
+  "note": "Référence de métadonnées pour MailPin 1.7.1 publié. Soumission ATN en préparation. La source reviewer ATN corrigée a été régénérée et validée hors Git. Les valeurs techniques restent synchronisées avec extension/manifest.json.",
   "browser_specific_settings": {
     "gecko": {
       "id": "ussmarines.mailpin@addons.thunderbird.net",

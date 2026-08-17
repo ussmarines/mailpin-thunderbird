@@ -2,7 +2,7 @@
 
 ## État
 
-- **Version source/candidate :** 1.7.1 — publiée
+- **Version source :** 1.7.1 — publiée
 - **Dernière release publique :** 1.7.1
 - **Publication 1.7.1 :** publiée le **16 août 2026** après autorisation explicite et gates verts
 - **Tag :** `v1.7.1`
@@ -12,7 +12,7 @@
 - **Compatibilité déclarée :** Thunderbird 153.0 à 153.*
 - **Licence :** MailPin Source-Available License 1.1
 
-## Portée du candidat 1.7.1 publié
+## Portée de la release 1.7.1
 
 La 1.7.1 est une maintenance de préparation publique après la release 1.7.0. Elle corrige la dérive de métadonnées active détectée après publication et renforce les gardes qui empêchent une divergence future entre version source, version publique et ressources locales.
 
@@ -39,5 +39,13 @@ Le workflow Release `31951120772` a exécuté `npm run ci`, forcé le checkout d
 - [x] workflow Release 1.7.1 et artefacts publiés — run `31951120772`.
 
 La recette visuelle humaine supplémentaire d’Organic Workspace n’est pas enregistrée comme exécutée. La 1.7.1 ne modifie aucune surface UI/runtime correspondante ; cette validation reste distincte pour ATN.
+
+## Source reviewer ATN post-publication
+
+L’asset source publié avec `v1.7.1` reste l’archive historique du commit de release. L’audit ATN a démontré que sa commande reviewer `npm run ci` échoue hors dépôt Git à cause du garde de sécurité.
+
+La correction post-publication est strictement bornée au tooling de revue, à ses tests et à la documentation de soumission ; elle ne touche aucun fichier `extension/**`. La source reviewer ATN corrigée a été régénérée puis validée depuis une extraction neuve sans `.git`. Sous Python 3.12, le XPI reconstruit est identique au XPI 1.7.1 publié.
+
+Le pack ATN a également été régénéré afin que `PACK_INVENTORY.txt` s’inventorie lui-même et que toutes les empreintes correspondent au contenu réel. La soumission ATN elle-même n’est pas déclarée comme effectuée.
 
 Codex Security n’est pas utilisé.
