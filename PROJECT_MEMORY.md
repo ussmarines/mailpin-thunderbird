@@ -1,14 +1,14 @@
 # Mémoire opérationnelle — MailPin
 
-> Version source : **1.7.1**
+> Version source : **1.7.2**
 > Dernière release publique : **1.7.1**
-> Branche courante : `main` ; release 1.7.1 : `c2b886677413a205d57a191234b1dac6279b86d6`
+> Branche courante : `release/1.7.2-ui-stability` ; baseline candidate : `main` à `5284e39a43513d38ededec5e7f939a685f7fdd2c`
 > Base de l’audit global : `0c0400170aac631d13d795050d669cbb1a83ea7f`
 > Extension ID : `ussmarines.mailpin@addons.thunderbird.net`
 
 ## Résumé
 
-MailPin est une extension Thunderbird Manifest V3 locale qui ajoute un panneau de messages épinglés et transforme ces épingles en suivis actionnables sans remplacer la liste native. La dernière release publique est **1.7.1**, ciblant exactement `c2b886677413a205d57a191234b1dac6279b86d6`. Cette maintenance corrige la cohérence des métadonnées actives et renforce les gardes de release/local-first sans modifier la logique métier, les permissions, les schémas, les dépendances runtime, l’identité ni le réseau. Organic Workspace et les corrections QoL restent le runtime métier issu de 1.7.0. Les nouvelles créations Agenda démarrent sur **Événement**. Le changement d’ID a été introduit volontairement en 1.6.0 avant la première publication ATN.
+MailPin est une extension Thunderbird Manifest V3 locale qui transforme des messages épinglés en suivis actionnables sans remplacer la liste native. La dernière release publique est **1.7.1**. La source **1.7.2** est une candidate corrective issue de la recette réelle du 17 août 2026 : elle stabilise la navigation du Dashboard et des Options, la géométrie des statistiques, la barre Enregistrer/Annuler, les espacements, les cartes Agenda et l’action des raccourcis. Elle ne modifie ni permissions, schémas, stockage, identité, logique métier, dépendances runtime ni politique réseau. La PR #47 a intégré le runtime UI sur `main` après QA et smoke Thunderbird réels verts ; le candidat versionné 1.7.2 doit encore franchir ses propres gates avant publication.
 
 Les futures fonctions **Prochaine action**, **Timeline de conversation**, **Follow-up récurrent** et **Résultat du suivi** restent hors périmètre de cette release.
 
@@ -58,6 +58,7 @@ Les futures fonctions **Prochaine action**, **Timeline de conversation**, **Foll
 - accès aux API internes Messages/Tags/Agenda : uniquement les adaptateurs `thunderbird-*.js` et la façade `compatibility.js`
 - logique métier pure : `extension/api/pinInbox/modules/` (`analytics.js`, `checklists.js`, `saved-views.js`, `workflow.js`, `rules.js`, etc.)
 - apparence du panneau : `extension/styles/pin.css` et `extension/styles/tokens.css`
+- stabilité UI Dashboard/Options issue de la recette 1.7.2 : `extension/styles/interaction-stability.css` et `extension/options/options-navigation-stability.js`
 - paramètres et mode Recommandé : `extension/options/`
 - dashboard, recherche, vues et palette : `extension/dashboard/`
 - contrats de compatibilité : `tests/thunderbird_compatibility_contract.mjs` et `tests/test_thunderbird_compatibility_boundary.py`
@@ -74,33 +75,25 @@ Les futures fonctions **Prochaine action**, **Timeline de conversation**, **Foll
 
 Le DOM `about:3pane` reste volontairement dans l’orchestrateur. Toute extraction future de cette zone doit être progressive, car elle dépend des structures internes `ThreadCard`, des fenêtres et menus natifs.
 
-La portée « Comptes sélectionnés » utilise désormais `account.key` comme identité canonique. La collecte accepte les collections Thunderbird itérables et XPCOM indexées ; `selectedAccountKeys` reste borné et normalisé. Le banc réel a validé la portée vide à 0 épingle ainsi que A=18, B=16, A+C=34 sans B et A+B+C=50.
+La portée « Comptes sélectionnés » utilise `account.key` comme identité canonique. La collecte accepte les collections Thunderbird itérables et XPCOM indexées ; `selectedAccountKeys` reste borné et normalisé. Le banc réel a validé la portée vide à 0 épingle ainsi que A=18, B=16, A+C=34 sans B et A+B+C=50.
 
-### Options
+### Options et Dashboard
 
-Les réglages sont présentés par familles : **Essentiel**, **Automatisation**, **Organisation**, **Avancé**. Le mode stocké `guided` est présenté comme **Recommandé** ; la valeur persistée reste inchangée. En mode Recommandé, les sections techniques avancées sont masquées, mais aucun contrôle avancé n’est supprimé du produit.
+Les réglages sont présentés par familles : **Essentiel**, **Automatisation**, **Organisation**, **Avancé**. Le mode stocké `guided` est présenté comme **Recommandé** ; la valeur persistée reste inchangée. L’action « appliquer les réglages recommandés » produit uniquement un brouillon et conserve les valeurs personnelles/environnementales ; l’utilisateur doit encore cliquer sur Enregistrer.
 
-L’action « appliquer les réglages recommandés » produit uniquement un brouillon et conserve les valeurs personnelles/environnementales telles que calendrier préféré, groupe d’attente, dossier de sauvegarde, couleurs de comptes, activation des boîtes et comptes sélectionnés. L’utilisateur doit encore cliquer sur Enregistrer.
-
-La sélection de comptes apparaît uniquement pour la portée « Comptes sélectionnés », conserve le brouillon lors d’un changement temporaire de portée et affiche les comptes Thunderbird avec leurs libellés lisibles. Le banc 1.5.2 valide automatiquement la sauvegarde Options → panneau et la persistance A+C (34 épingles, B absent) après redémarrage sur le même profil.
-
-`@fluentui/web-components` 3.0.3 a été évalué puis retiré : aucun fichier de l’extension ne l’importait, le build XPI n’a pas de bundler, le paquet exige Node 22/24 alors que le dépôt conserve Node 20 dans sa matrice, et son arbre n’apportait donc aucun composant au produit livré. MailPin garde Organic Workspace local, sans dépendance npm runtime ni lockfile ; Fluent 2 reste uniquement une référence historique de décisions antérieures.
+La correction 1.7.2 garde Enregistrer/Annuler et les notifications dans le viewport, stabilise la section active de la navigation même pour les longues sections, redonne de l’espace entre groupes indépendants et empêche les badges Agenda de chevaucher les noms longs. Le Dashboard garde le contrôle « Plus de statistiques » au même emplacement pendant son ouverture. Ces changements restent purement UI et n’élargissent aucune capacité privilégiée.
 
 ### Banc Thunderbird
 
-Le workflow `.github/workflows/thunderbird-smoke.yml` télécharge un binaire Thunderbird officiel et geckodriver, vérifie leurs empreintes, construit l’XPI, prépare un profil local synthétique, installe temporairement l’extension, contrôle le background MV3 et l’injection, vérifie l’ouverture unique du Dashboard, désinstalle, contrôle le nettoyage puis réinstalle. La PR #24 a repassé ce smoke sur Thunderbird **153.0.1 ESR** Linux avec succès.
+Le workflow `.github/workflows/thunderbird-smoke.yml` télécharge un binaire Thunderbird officiel et geckodriver, vérifie leurs empreintes, construit l’XPI, prépare un profil local synthétique, installe temporairement l’extension, contrôle le background MV3 et l’injection, vérifie l’ouverture unique du Dashboard, désinstalle, contrôle le nettoyage puis réinstalle.
 
-Le banc fonctionnel `.github/workflows/thunderbird-functional-bench.yml` / `tests/thunderbird/functional_bench.py` couvre les volumes 50, 100, 500, 1 000 et 2 000 épingles. En 1.5.2, il sait aussi installer l’extension de façon non temporaire dans un profil jetable exact, redémarrer Thunderbird dans un second processus, vérifier SQLite et les réglages persistés, réveiller naturellement le background MV3 par activation d’onglet et revalider le panneau sans réinstallation artificielle.
+Le banc fonctionnel `.github/workflows/thunderbird-functional-bench.yml` / `tests/thunderbird/functional_bench.py` couvre les volumes 50, 100, 500, 1 000 et 2 000 épingles et les principaux chemins métier. Ces preuves anciennes restent valides pour les zones inchangées ; elles ne remplacent pas le smoke frais exigé pour le runtime UI 1.7.2.
 
-Le 10 août 2026, une nouvelle passe Linux sur Thunderbird 153.0.1 ESR/geckodriver 0.37.1 a revalidé la matrice 50/100/500/1000/2000 après correction d’une assertion erronée du harness : le compteur du panneau reste volontairement le total de la portée pendant une recherche, tandis que seules les cartes rendues sont filtrées. Les cinq volumes passent sans timeout ni exception JavaScript ; à 500/1000/2000, toute la pagination est chargée sans doublon et les positions début/milieu/fin sont présentes.
-
-Avant rebranding, le banc ciblé 50 références sous Thunderbird 153.0.3 a revalidé les chemins métier ensuite conservés : réconciliation cross-entry, transitions workflow, relance, Agenda, Dashboard/Options, cleanup et réinstallation. Le rebranding a été intégré par la PR #35. Le commit runtime `4fdb978e1828325001f95951c115059a931b8b6e` a repassé les workflows QA Linux/Windows, la garde sécurité et le smoke Thunderbird réel avec succès.
+La PR #47 a passé sur son head exact `551841858e974482f046a1980e52cfc84be71a6c` le workflow QA `32024824818` et le smoke Thunderbird réel `32024824756`, puis a été fusionnée par squash dans `main` à `5284e39a43513d38ededec5e7f939a685f7fdd2c`. Aucun contrôle visuel humain post-correction n’est déclaré comme exécuté.
 
 ### Outillage UI Codex
 
-La source de vérité visuelle demeure `docs/UI_SPEC.md`; aucun `PRODUCT.md` ou `DESIGN.md` concurrent n’est nécessaire. Le skill global Impeccable pilote l’UX/UI produit et ses finitions, UI UX Pro Max sert à la recherche de système, et `design-taste-frontend` à une direction artistique explicitement demandée. Le hook projet est silencieux sur les résultats propres, limité aux fichiers UI modifiés et réserve sa passe profonde à la fin de session.
-
-Diagnostiquer l’environnement avec `npx skills ls -g` et le hook avec `node C:\Users\ussma\.agents\skills\impeccable\scripts\hook-admin.mjs status`. Pour une mise à jour, vérifier d’abord le dépôt officiel, la version et les écritures prévues ; utiliser `npx skills update -g` pour les sources suivies et l’installateur officiel Impeccable avec le fournisseur Codex explicite.
+La source de vérité visuelle demeure `docs/UI_SPEC.md`; aucun `PRODUCT.md` ou `DESIGN.md` concurrent n’est nécessaire. Les outils UI restent optionnels et utilisés seulement lorsqu’ils apportent une valeur matérielle. Aucun actif distant ni dépendance UI runtime n’est ajouté.
 
 ## État technique courant
 
@@ -114,10 +107,9 @@ Diagnostiquer l’environnement avec `npx skills ls -g` et le hook avec `node C:
 - détection fournisseurs par domaine exact ou sous-domaine légitime ;
 - portée multi-comptes basée sur `account.key`, sélection maximale bornée à 50 comptes ;
 - volume conseillé : jusqu’à 2 000 épingles, sans blocage technique au-delà ;
-- aucune nouvelle permission, dépendance runtime ou connexion réseau introduite par la 1.7.1 ;
-- recette utilisateur pré-rebranding 1.5.4 verte pour le métier inchangé ; cette preuve n’est pas renommée recette 1.6.1 ;
-- runtime MailPin `4fdb978e1828325001f95951c115059a931b8b6e` : QA Linux/Windows, garde sécurité et smoke Thunderbird 153 réel verts ;
-- 1.7.1 modifie uniquement la version distribuée, les documents actifs et les gardes de dépôt/release ; PR #43, QA Linux/Windows, garde identité/sécurité, smoke Thunderbird réel et publication depuis le commit exact sont PASS.
+- aucune nouvelle permission, dépendance runtime, migration de stockage ou connexion réseau introduite par la 1.7.2 ;
+- 1.7.2 modifie les surfaces UI Dashboard/Options et leurs contrats de régression ; la logique métier et les frontières privilégiées restent inchangées ;
+- le candidat 1.7.2 n’est publiable qu’après QA Linux/Windows, garde sécurité, build reproductible et smoke Thunderbird réel sur le candidat exact.
 
 ## Commandes obligatoires
 
@@ -128,22 +120,24 @@ npm run build
 npm run ci
 ```
 
-Tests ciblés de la frontière et des réglages :
+Tests ciblés de la frontière, des réglages et de l’UI :
 
 ```bash
+python tests/test_organic_workspace_ui.py
+python tests/test_options_controls.py
+python tests/test_recommended_options_ux.py
 python tests/test_thunderbird_compatibility_boundary.py
 node tests/thunderbird_compatibility_contract.mjs
-python tests/test_recommended_options_ux.py
 python tests/test_thunderbird_test_bench.py
 ```
 
 ## Définition de terminé
 
-- `main` publié et déclarations source/release publique 1.7.1 synchronisées après publication ;
+- source candidate 1.7.2 et dernière release publique 1.7.1 déclarées sans ambiguïté avant publication ;
 - tests, scans de secrets et builds reproductibles verts ;
 - frontière Thunderbird vérifiée sans réintroduction d’accès direct ;
-- Options Recommandé/Avancé et portée multi-comptes cohérentes en FR/EN ;
-- README, changelog, état projet, registre, architecture, sécurité et handoff à jour lorsque leur contenu est affecté ;
+- Dashboard/Options 1.7.2 passent leurs contrats UI et un smoke Thunderbird réel sur le candidat exact ;
+- README, changelog, état projet, registre, sécurité, validation et handoff à jour lorsque leur contenu est affecté ;
 - aucune permission, URL distante d’exécution, dépendance runtime ou schéma nouveau non justifié ;
 - résultats runtime décrits honnêtement : preuve réelle verte ou limite documentée, jamais supposée ;
-- tag/release uniquement après autorisation explicite de l’utilisateur — autorisation complète reçue le 16 août 2026 ; release GitHub 1.7.1 publiée après gates techniques verts.
+- tag/release uniquement après autorisation explicite de l’utilisateur — autorisation reçue le 17 août 2026 pour la PR, le merge et une nouvelle release, sous réserve de gates verts.

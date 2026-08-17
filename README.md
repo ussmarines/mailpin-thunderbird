@@ -7,7 +7,7 @@
 
 [![QA](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml)
 ![Release](https://img.shields.io/badge/release-v1.7.1-4F7F75)
-![Source](https://img.shields.io/badge/release-v1.7.1-3D536B)
+![Source](https://img.shields.io/badge/candidate-v1.7.2-3D536B)
 ![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x-3D536B)
 ![Licence](https://img.shields.io/badge/licence-MailPin%20Source--Available%201.1-1A1D21)
 </div>
@@ -25,7 +25,7 @@ MailPin transforme les e-mails importants en suivi actionnable **sans remplacer 
 
 ## Interface
 
-**Organic Workspace** organise l’interface comme un véritable espace de travail : rail de navigation, canvas éditorial, contexte secondaire, panneaux plus organiques et micro-interactions fonctionnelles. La palette Ink / Slate / Sage / Brass évolue vers des tons plus naturels et une typographie locale plus expressive. Aucun dégradé, glow, glassmorphism, asset ou police distante. Les thèmes clair/sombre, le contraste forcé, le focus clavier et la réduction du mouvement restent pris en charge.
+**Organic Workspace** organise l’interface comme un véritable espace de travail : rail de navigation, canvas éditorial, contexte secondaire, panneaux plus organiques et micro-interactions fonctionnelles. La candidate 1.7.2 corrige la stabilité de navigation et plusieurs problèmes de géométrie/espacement observés en usage réel sans modifier les fonctions métier. Aucun dégradé, glow, glassmorphism, asset ou police distante. Les thèmes clair/sombre, le contraste forcé, le focus clavier et la réduction du mouvement restent pris en charge.
 
 <div align="center">
   <img src="assets/brand/mailpin-brand-board.svg" width="92%" alt="Système de marque MailPin">
@@ -33,7 +33,7 @@ MailPin transforme les e-mails importants en suivi actionnable **sans remplacer 
 
 ## Compatibilité
 
-- **Version source :** `1.7.1` — publiée
+- **Version source :** `1.7.2` — candidate de correction UI/navigation
 - **Dernière release publique :** `1.7.1`
 - **Thunderbird :** `153.0` à `153.*`
 - **Format :** MailExtension Manifest V3
@@ -60,10 +60,10 @@ Prérequis : Python 3.11+ et Node.js 20+. Aucune dépendance npm/Python tierce n
 npm run ci
 ```
 
-Livrables reproductibles :
+Livrables reproductibles de la source candidate :
 
-- `dist/MailPin_v1.7.1.xpi`
-- `dist/MailPin_GitHub_Repository_v1.7.1.zip`
+- `dist/MailPin_v1.7.2.xpi`
+- `dist/MailPin_GitHub_Repository_v1.7.2.zip`
 - `dist/SHA256SUMS.txt`
 
 ## Confidentialité & sécurité
@@ -72,8 +72,8 @@ MailPin ne contient aucun appel réseau runtime, aucune télémétrie, aucune pu
 
 - [Politique de confidentialité](PRIVACY.md)
 - [Politique de sécurité](SECURITY.md)
-- [Audit sécurité source 1.7.1](SECURITY_AUDIT_1.7.1.md)
-- [Rapport de validation source 1.7.1](VALIDATION_REPORT_1.7.1.md)
+- [Audit sécurité source 1.7.2](SECURITY_AUDIT_1.7.2.md)
+- [Rapport de validation source 1.7.2](VALIDATION_REPORT_1.7.2.md)
 - [Limites connues](docs/KNOWN_LIMITATIONS.md)
 
 ## Documentation & support

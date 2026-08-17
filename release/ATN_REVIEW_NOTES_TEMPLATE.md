@@ -1,22 +1,32 @@
-# Notes pour les reviewers ATN — MailPin 1.7.1
+# Notes pour les reviewers ATN — MailPin 1.7.2
 
 ## Statut de soumission
 
-- **Release GitHub :** 1.7.1 publiée le 16 août 2026.
+- **Release GitHub publique actuelle :** 1.7.1.
+- **Candidate source :** 1.7.2.
 - **Soumission ATN :** en préparation, non revendiquée comme terminée.
-- **Source reviewer ATN :** régénérée après les correctifs de reproductibilité hors Git et validée depuis une extraction neuve sans `.git`.
-- **Archive source GitHub 1.7.1 publiée le 16 août :** artefact historique, distinct de la source reviewer ATN corrigée.
+- **Version :** 1.7.2
 
-Les corrections reviewer/build/documentation ne modifient aucun fichier `extension/**`. Sous Python 3.12, le XPI reconstruit depuis la source reviewer corrigée est identique au XPI GitHub 1.7.1.
+La 1.7.2 corrige uniquement des comportements UI/navigation observés dans le Dashboard et les Paramètres. Elle ne modifie ni permissions, schémas, stockage, logique métier, identité, dépendances runtime ni politique réseau.
 
 ## Identité
 
 - **Nom :** MailPin — Email Follow-up & Productivity for Thunderbird
 - **Nom court :** MailPin
-- **Version :** 1.7.1
+- **Version :** 1.7.2
 - **ID :** `ussmarines.mailpin@addons.thunderbird.net`
 - **Compatibilité :** Thunderbird 153.0 à 153.*
 - **Langues :** français et anglais
+
+## Correctifs 1.7.2
+
+- contrôle « Plus de statistiques » stable et clairement actionnable ;
+- navigation Options synchronisée avec la section réellement visible ;
+- barre Enregistrer/Annuler et notifications maintenues dans le viewport ;
+- espacement renforcé entre groupes de réglages ;
+- cartes Agenda robustes aux noms longs et badges de capacités ;
+- action d’enregistrement des raccourcis clarifiée ;
+- contrats Organic Workspace ajoutés pour empêcher ces régressions.
 
 ## Fonction principale
 
@@ -24,53 +34,44 @@ MailPin ajoute un panneau local de messages épinglés au-dessus de la liste nat
 
 ## Permission et API privilégiée
 
-La permission WebExtension déclarée est uniquement `menus`. L’extension embarque l’Experiment `pinInbox`, nécessaire pour :
-
-- intégrer le panneau dans `about:3pane` ;
-- résoudre les messages déplacés à partir des bases locales ;
-- gérer le stockage SQLite local ;
-- écouter les notifications de dossiers ;
-- créer et synchroniser les tâches et événements Agenda compatibles ;
-- gérer les tags MailPin locaux lorsque cette option est explicitement activée ;
-- gérer correctement l’arrêt, la mise à jour et la désinstallation.
-
-L’Experiment possède par nature un accès privilégié et provoque l’avertissement d’accès complet de Thunderbird. Les entrées sont validées par schéma et dans l’implémentation privilégiée.
+La permission WebExtension déclarée est uniquement `menus`. L’Experiment `pinInbox` reste nécessaire pour l’intégration `about:3pane`, la résolution des messages, le stockage SQLite local, les notifications de dossiers, Agenda, Tags et le cycle de vie. Aucun de ces contrats privilégiés n’est élargi par la 1.7.2.
 
 ## Réseau, données et code
 
-- aucun appel réseau et `connect-src 'none'` ;
+- aucun appel réseau runtime et `connect-src 'none'` ;
 - aucune télémétrie, publicité ou collecte distante ;
 - aucun code distant, `eval`, fonction générée ou HTML injecté ;
 - aucun corps complet de message ni contenu de pièce jointe copié ;
 - aucune dépendance d’exécution ou de build tierce ;
 - code source lisible, non minifié et build reproductible.
 
-Voir `PRIVACY.md`, `SECURITY.md`, `SECURITY_AUDIT_1.7.1.md` et `release/BUILD_INSTRUCTIONS.md`.
+Voir `PRIVACY.md`, `SECURITY.md`, `SECURITY_AUDIT_1.7.2.md` et `release/BUILD_INSTRUCTIONS.md`.
 
-## Scénario de test rapide
+## Preuves avant versionnement
 
-1. Installer le XPI dans un profil Thunderbird propre.
-2. Épingler un message depuis la liste, le menu contextuel et le bouton du message affiché.
-3. Vérifier que le message apparaît dans le panneau sans quitter la liste native.
-4. Dans Options, tester la portée « Comptes sélectionnés », enregistrer puis vérifier le filtrage du panneau.
-5. Tester clic simple, double-clic, clic droit, menu `…` et désépinglage.
-6. Ajouter une échéance et un rappel.
-7. Créer une tâche ou un événement dans un calendrier compatible choisi explicitement.
-8. Ouvrir le dashboard : tester recherche globale, checklist, vues enregistrées, états de réponse et palette de commandes.
-9. Activer les tags MailPin, modifier statut/priorité puis confirmer qu’un tag personnel témoin reste intact après désactivation.
-10. Ouvrir les paramètres, puis basculer les thèmes clair et sombre et vérifier le zoom 200 %.
-11. Vérifier que les compteurs natifs de dossiers et l’état lu/non lu ne changent pas.
-12. Exporter une sauvegarde, la prévisualiser et la restaurer en mode sûr.
-13. Désinstaller depuis un profil de test et vérifier la purge des données internes et des seuls tags MailPin possédés.
+Le runtime de correction a été validé sur le head exact de la PR #47 : QA Linux/Windows `32024824818` PASS et smoke Thunderbird réel `32024824756` PASS. La candidate versionnée 1.7.2 doit repasser ces gates avant publication ; ces nouveaux numéros de run seront consignés après leur exécution.
+
+## Scénario de test rapide 1.7.2
+
+1. Installer le XPI exact de la candidate dans un profil Thunderbird propre.
+2. Ouvrir le Dashboard et tester « Plus de statistiques » plusieurs fois ; le contrôle ne doit pas sauter.
+3. Ouvrir Options et parcourir plusieurs sections longues ; le rail doit toujours refléter la section affichée.
+4. Modifier un réglage en milieu/bas de page ; Enregistrer/Annuler et le feedback doivent rester visibles.
+5. Vérifier Rappels, Règles, Centre de santé et Sauvegarde à 100/125/200 % sans blocs collés ni overflow horizontal.
+6. Vérifier des calendriers aux noms longs : badge et nom ne doivent jamais se chevaucher.
+7. Vérifier la section Raccourci clavier et son action Enregistrer.
+8. Épingler/désépingler un message et confirmer que l’état lu/non lu et les compteurs natifs restent inchangés.
+9. Créer un événement Agenda compatible et contrôler la persistance après redémarrage.
+10. Refaire les contrôles principaux en clair/sombre et fenêtre réduite.
 
 ## Validation automatisée
 
-`npm run ci`, exécuté depuis une extraction neuve de la source reviewer sans `.git`, contrôle les permissions, la CSP, les ressources, l’absence de réseau, les contrats de l’Experiment, les migrations, le stockage, les actions de cartes, l’accessibilité, les traductions, la reproductibilité et les secrets.
-
-Le banc Thunderbird fonctionnel dédié couvre 50, 100, 500, 1 000 et 2 000 épingles. La validation multi-comptes de référence utilise une portée vide=0, A=18, B=16, A+C=34 et A+B+C=50. Les téléchargements de Thunderbird/geckodriver appartiennent uniquement au banc de test et sont vérifiés par SHA-256 ; ils ne sont pas des dépendances runtime.
+Avant publication, `npm run ci`, la QA Linux/Windows, la garde sécurité/identité, le build reproductible et le smoke Thunderbird réel doivent tous être PASS sur la candidate 1.7.2 exacte. L’archive source reviewer doit également réussir `npm run ci` après extraction sans `.git`.
 
 ## Validation manuelle à renseigner avant soumission
 
 | Thunderbird | Système | Type de compte | Thème | Résultat |
 |---|---|---|---|---|
 | À compléter | À compléter | IMAP/POP/local | clair/sombre | À compléter |
+
+Aucune recette visuelle humaine non exécutée n’est présentée comme PASS.

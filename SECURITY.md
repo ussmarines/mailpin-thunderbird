@@ -49,7 +49,7 @@ npm run build
 npm run ci
 ```
 
-Le rapport de sécurité de la source courante et de la dernière release publique est [SECURITY_AUDIT_1.7.1.md](SECURITY_AUDIT_1.7.1.md).
+Le rapport de sécurité de la **source candidate courante** est [SECURITY_AUDIT_1.7.2.md](SECURITY_AUDIT_1.7.2.md). Le rapport [SECURITY_AUDIT_1.7.1.md](SECURITY_AUDIT_1.7.1.md) reste la référence de la dernière release publique 1.7.1 jusqu’à publication de 1.7.2.
 
 ## Limite importante
 

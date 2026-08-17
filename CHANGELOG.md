@@ -1,5 +1,14 @@
 # Journal des modifications
 
+## 1.7.2 — stabilité de navigation et corrections d’interface
+
+- stabilise le contrôle « Plus de statistiques » du Dashboard afin qu’il reste clairement identifiable et conserve sa géométrie lors de l’ouverture des statistiques secondaires ;
+- corrige le suivi de la section active dans la navigation des Paramètres, y compris les longues sections et les changements de position observés en usage réel ;
+- maintient la barre Enregistrer/Annuler et les notifications dans le viewport sans déformer l’en-tête sticky ;
+- restaure un espacement explicite entre les groupes de réglages et empêche les collisions entre noms de calendriers longs et badges de capacités Agenda ;
+- clarifie l’action d’enregistrement des raccourcis et ajoute des contrats de non-régression Organic Workspace pour ces comportements ;
+- conserve les permissions, schémas, stockage, intégrations Thunderbird, politique réseau local-first et fonctions métier inchangés.
+
 ## 1.7.1 — durcissement pré-publication et cohérence des métadonnées
 
 - corrige la dérive de métadonnées post-release qui laissait plusieurs documents actifs sur « source 1.7.0 / release publique 1.6.1 » après la publication effective de 1.7.0 ;

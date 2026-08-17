@@ -1,14 +1,14 @@
 # Limites connues
 
-## Source 1.7.1 / release publique 1.7.1
+## Source 1.7.2 / release publique 1.7.1
 
-La source **1.7.1** et la release publique **1.7.1** correspondent au même XPI construit depuis `c2b886677413a205d57a191234b1dac6279b86d6`. Le candidat 1.7.1 a repassé ses gates automatisés propres avant publication. Elle ne modifie pas le runtime métier : elle réaligne les métadonnées actives et renforce les gardes de version et de ressources locales.
+La source **1.7.2** est une candidate corrective UI/navigation. La release publique **1.7.1** reste la version installable officielle tant que les gates 1.7.2 et le workflow Release n’ont pas abouti.
 
 ## Interface et accessibilité
 
 - Le smoke Thunderbird valide installation, injection, ouverture du Dashboard, nettoyage et réinstallation ; il ne juge pas la qualité visuelle pixel par pixel.
 - Une recette humaine reste nécessaire sur Dashboard, Options et panneau avec splitter continu, thèmes clair/sombre, zoom 200 %, contraste élevé et lecteurs d’écran.
-- La 1.7.1 ne modifie pas Dashboard/Options/panneau ; la recette humaine visuelle supplémentaire de 1.7.0 reste non consignée et demeure pertinente pour une soumission ATN, sans être présentée comme PASS.
+- Les corrections 1.7.2 couvrent la navigation active, le disclosure des statistiques, Enregistrer/Annuler, notifications, espacements, cartes Agenda et raccourcis ; un contrôle visuel humain post-correction reste recommandé et n’est pas présenté comme PASS.
 
 ## Compatibilité Thunderbird
 
@@ -30,5 +30,5 @@ La source **1.7.1** et la release publique **1.7.1** correspondent au même XPI 
 
 ## Publication
 
-- La release GitHub 1.7.1 est publiée ; la soumission ATN, la matrice fournisseurs et les validations humaines restent des étapes distinctes.
-- La disponibilité juridique de la marque, le portail ATN et la matrice externe restent des validations humaines/externes.
+- La release GitHub 1.7.1 est publiée ; 1.7.2 reste candidate jusqu’aux validations et à la publication explicite.
+- La soumission ATN, la matrice fournisseurs et les validations humaines restent des étapes distinctes.

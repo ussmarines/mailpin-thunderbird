@@ -1,51 +1,51 @@
-# Préparation MailPin 1.7.1
+# Préparation MailPin 1.7.2
 
 ## État
 
-- **Version source :** 1.7.1 — publiée
+- **Version source :** 1.7.2 — candidate
 - **Dernière release publique :** 1.7.1
-- **Publication 1.7.1 :** publiée le **16 août 2026** après autorisation explicite et gates verts
-- **Tag :** `v1.7.1`
-- **Commit release exact :** `c2b886677413a205d57a191234b1dac6279b86d6`
+- **Dernière publication :** `v1.7.1`, commit `c2b886677413a205d57a191234b1dac6279b86d6`
+- **Baseline de la candidate 1.7.2 :** `main` à `5284e39a43513d38ededec5e7f939a685f7fdd2c`
 - **Nom :** MailPin — Email Follow-up & Productivity for Thunderbird
 - **ID permanent :** `ussmarines.mailpin@addons.thunderbird.net`
 - **Compatibilité déclarée :** Thunderbird 153.0 à 153.*
 - **Licence :** MailPin Source-Available License 1.1
 
-## Portée de la release 1.7.1
+## Portée candidate 1.7.2
 
-La 1.7.1 est une maintenance de préparation publique après la release 1.7.0. Elle corrige la dérive de métadonnées active détectée après publication et renforce les gardes qui empêchent une divergence future entre version source, version publique et ressources locales.
+La 1.7.2 corrige des problèmes de navigation et de composition observés en usage réel dans le Dashboard et les Paramètres : contrôle « Plus de statistiques », section active du rail, barre Enregistrer/Annuler, notifications, espacements, cartes Agenda et action d’enregistrement des raccourcis.
 
-Aucune logique métier, permission WebExtension, dépendance runtime, connexion réseau, télémétrie, publicité, code distant, schéma de données ou identité n’est modifié.
+Aucune permission WebExtension, logique métier, migration, schéma, stockage SQLite, dépendance runtime, connexion réseau, télémétrie, publicité, code distant ou identité n’est modifié.
 
-## Artefacts publiés
+## Preuve déjà acquise sur le runtime corrigé
 
-- `MailPin_v1.7.1.xpi` — SHA-256 `4586646a1d6ebe793c52040beeb7faf929e59d771a59a1ff0b0f63c13308e5f0` ;
-- `MailPin_GitHub_Repository_v1.7.1.zip` — SHA-256 `8020b6e2e01b656691855c68f558a4b66a567489776652b4f50e20dfc7840c41` ;
-- `SHA256SUMS.txt` — asset SHA-256 `2c1d7cf2e854e5dea9cdcbe571ae27098e23106bad5e945bd54c79cdd3d10d46`.
+La PR #47 a validé le head exact `551841858e974482f046a1980e52cfc84be71a6c` avec :
 
-Le workflow Release `31951120772` a exécuté `npm run ci`, forcé le checkout du commit release exact puis publié `v1.7.1`. Le XPI publié porte la même empreinte que le build local validé.
+- QA Linux/Windows et garde sécurité : run `32024824818` — PASS ;
+- smoke Thunderbird réel : run `32024824756` — PASS ;
+- merge squash vers `main` : `5284e39a43513d38ededec5e7f939a685f7fdd2c`.
 
-## Gates GitHub publication
+Ces preuves ont déclenché la préparation 1.7.2, mais la candidate versionnée doit repasser ses gates exacts avant publication.
 
-- [x] QA Linux complète sur le candidat — PR run `31950636397` ;
-- [x] contrôles source/modèle Windows — PR run `31950636397` ;
-- [x] garde sécurité/identité — PR run `31950636397` ;
-- [x] build reproductible et structure XPI ;
-- [x] smoke Thunderbird 153 réel sur le candidat exact — run `31950636456` ;
-- [x] merge squash sur `main` — commit `c2b886677413a205d57a191234b1dac6279b86d6` ;
-- [x] QA `main` — run `31950703455` ;
-- [x] smoke Thunderbird `main` — run `31950703452` ;
-- [x] workflow Release 1.7.1 et artefacts publiés — run `31951120772`.
+## Artefacts attendus
 
-La recette visuelle humaine supplémentaire d’Organic Workspace n’est pas enregistrée comme exécutée. La 1.7.1 ne modifie aucune surface UI/runtime correspondante ; cette validation reste distincte pour ATN.
+- `MailPin_v1.7.2.xpi` ;
+- `MailPin_GitHub_Repository_v1.7.2.zip` ;
+- `SHA256SUMS.txt`.
 
-## Source reviewer ATN post-publication
+Les empreintes ne seront inscrites comme définitives qu’après le build/release exact.
 
-L’asset source publié avec `v1.7.1` reste l’archive historique du commit de release. L’audit ATN a démontré que sa commande reviewer `npm run ci` échoue hors dépôt Git à cause du garde de sécurité.
+## Gates 1.7.2 avant publication
 
-La correction post-publication est strictement bornée au tooling de revue, à ses tests et à la documentation de soumission ; elle ne touche aucun fichier `extension/**`. La source reviewer ATN corrigée a été régénérée puis validée depuis une extraction neuve sans `.git`. Sous Python 3.12, le XPI reconstruit est identique au XPI 1.7.1 publié.
+- [ ] `npm run ci` sur la PR de release ;
+- [ ] contrôles source/modèle Windows ;
+- [ ] garde sécurité/identité ;
+- [ ] build reproductible et structure XPI ;
+- [ ] smoke Thunderbird 153 réel sur la candidate exacte ;
+- [ ] merge de la PR de release sur `main` ;
+- [ ] workflow Release exécuté depuis `main` avec `releaseStatus = candidate` ;
+- [ ] release `v1.7.2` et artefacts vérifiés après publication.
 
-Le pack ATN a également été régénéré afin que `PACK_INVENTORY.txt` s’inventorie lui-même et que toutes les empreintes correspondent au contenu réel. La soumission ATN elle-même n’est pas déclarée comme effectuée.
+La recette visuelle humaine supplémentaire post-correction n’est pas déclarée comme exécutée. Elle reste recommandée pour confirmer les détails esthétiques que le smoke automatisé ne peut pas prouver.
 
 Codex Security n’est pas utilisé.

@@ -1,8 +1,18 @@
-# Plan de test manuel MailPin — 1.7.1
+# Plan de test manuel MailPin — 1.7.2
 
 Utiliser de préférence un profil Thunderbird jetable avec des messages synthétiques pour les scénarios destructifs ou de migration. Pour une validation utilisateur finale, un profil réel peut être utilisé après sauvegarde, en évitant toute opération destructive non nécessaire.
 
-Le présent plan complète les validations automatisées de la source 1.7.1. La dernière release publique est 1.7.1. La 1.7.1 ne modifie pas le runtime UI ou métier ; elle durcit les métadonnées et gardes de dépôt. La recette humaine Organic Workspace ci-dessous reste utile pour ATN et pour toute évolution UI future, mais elle n’est pas artificiellement rejouée comme gate de cette maintenance si aucun fichier UI/runtime concerné n’a changé.
+Le présent plan complète les validations automatisées de la source 1.7.2. La dernière release publique est 1.7.1. La 1.7.2 modifie des surfaces UI Dashboard/Options : une recette humaine post-correction est donc recommandée en plus du smoke Thunderbird automatisé. Aucun contrôle non exécuté ne doit être présenté comme PASS.
+
+## Recette 1.7.2 — stabilité UI/navigation
+
+1. Dans le Dashboard, ouvrir/fermer plusieurs fois **Plus de statistiques** : le contrôle doit être clairement identifiable, rester au même emplacement et afficher le détail dessous sans saut latéral.
+2. Dans Options, cliquer successivement sur plusieurs sections courtes et longues puis faire défiler manuellement : le rail doit toujours refléter la section réellement affichée.
+3. Modifier un réglage au milieu puis en bas de page : Enregistrer/Annuler et les notifications doivent rester visibles sans pousser ni redimensionner l’en-tête.
+4. Vérifier Rappels, Règles, Centre de santé et Sauvegarde à 100/125/200 % : aucun groupe indépendant ne doit sembler collé au suivant et aucun scroll horizontal ne doit apparaître.
+5. Avec des calendriers aux noms courts et longs, vérifier que les badges de capacité ne chevauchent jamais le nom et restent lisibles sur une fenêtre réduite.
+6. Vérifier que l’action d’enregistrement des raccourcis reste clairement séparée de la dernière ligne de saisie et accessible au clavier.
+7. Refaire les contrôles principaux en thème clair/sombre, fenêtre réduite et réduction du mouvement si disponible.
 
 ## Recette Organic Workspace conservée — validation humaine/ATN
 
@@ -14,7 +24,7 @@ Le présent plan complète les validations automatisées de la source 1.7.1. La 
 6. Utiliser l’action explicitement conversation puis une entrée générique inverse ; vérifier qu’une seule référence logique subsiste et que notes, checklist, échéance, groupe et Agenda ne sont pas perdus.
 7. Avec une fenêtre Thunderbird globalement large, déplacer continûment le splitter du panneau entre environ 800 et 280 px ; vérifier header, recherche, filtres, cartes, actions et absence de scroll horizontal ou sauts de layout.
 
-Pour GitHub, le GO 1.7.1 a été démontré par QA Linux/Windows, garde sécurité, build reproductible, smoke Thunderbird réel du candidat exact et workflow Release. La recette UI humaine supplémentaire n’est pas déclarée comme exécutée ; elle reste une validation ATN/humaine distincte puisque cette release ne modifie pas ces surfaces.
+Les preuves PR #47 (QA `32024824818`, smoke Thunderbird réel `32024824756`) couvrent le runtime corrigé avant versionnement. La candidate 1.7.2 exacte doit néanmoins repasser QA, build et smoke avant publication. La recette UI humaine supplémentaire n’est pas déclarée comme exécutée.
 
 ## Priorité A — intégration Thunderbird consolidée
 

@@ -1,6 +1,6 @@
 # Registre des bugs MailPin
 
-Version source : **1.7.1**
+Version source : **1.7.2**
 
 Dernière release publique : **1.7.1**
 
@@ -16,6 +16,7 @@ Les entrées corrigées des versions antérieures restent disponibles dans l’h
 
 | ID | Introduit | Symptôme | Cause | Fichiers | Test | Statut | Correction | Validation |
 |---|---|---|---|---|---|---|---|---|
+| MP-2026-056 | recette UI 1.7.1 | Dashboard/Options présentaient un disclosure de statistiques ambigu et mobile, une navigation active instable, une barre Enregistrer/Annuler qui refluait l’en-tête, des groupes trop proches et des collisions de badges Agenda. | Composition Organic Workspace et suivi de navigation trop dépendants de la grille/IntersectionObserver, avec plusieurs surfaces manquant de rythme vertical. | `extension/styles/interaction-stability.css`, `extension/styles/theme.js`, `extension/options/options-bootstrap.js`, `extension/options/options-navigation-stability.js` | `tests/test_organic_workspace_ui.py`, `tests/theme_bridge.mjs`, QA, smoke Thunderbird réel | CORRIGÉ | 1.7.2 | PR #47 : QA `32024824818` et smoke Thunderbird `32024824756` PASS sur le head exact avant squash. La candidate versionnée 1.7.2 doit encore repasser ses gates propres ; recette visuelle humaine post-correction non encore revendiquée. |
 | MP-2026-055 | audit prépublication 1.7.1 | `npm run ci` échouait depuis l’archive source reviewer extraite sans `.git`. | Le garde de sécurité utilisait inconditionnellement `git ls-files -z`, contrairement au fallback borné déjà utilisé par le build. | `.github/scripts/security_guard.py`, `scripts/build.py`, tests et docs reviewer | `tests/test_security_guard.py`, `tests/test_build_reproducible.py`, `npm run ci` hors Git | CORRIGÉ | source reviewer ATN post-release | Fallback limité à `.mailpin-source-files.json`, chemins dangereux/doublons/fichiers absents/symlinks refusés, `--history` hors Git explicite ; CI hors Git PASS et XPI Python 3.12 identique au SHA publié. |
 | MP-2026-054 | audit pré-public 1.7.1 | Une sous-ressource HTML/CSS distante pouvait échapper au garde source même si la CSP runtime la bloquait. | Le parseur vérifiait l’existence des chemins locaux mais ignorait explicitement les références comportant un schéma URL. | `scripts/check_repo.py` | `npm run check`, `npm run ci` | CORRIGÉ | 1.7.1 | Les ressources HTML/CSS à schéma ou URL réseau sont refusées ; les liens externes utilisateur restent autorisés. |
 | MP-2026-053 | post-release 1.7.0 | Plusieurs documents actifs annonçaient encore 1.6.1 comme dernière release après publication de 1.7.0 et la garde de versions ne l’a pas détecté. | `check_versions.py` fusionnait deux dictionnaires ; les clés communes des contrôles publics écrasaient les contrôles source, tandis que mémoire/bug tracker n’imposaient pas la version publique. | `scripts/check_versions.py`, `scripts/check_project_memory.py`, `scripts/check_bug_tracker.py`, docs release | tests de métadonnées, `npm run check`, `npm run ci` | CORRIGÉ | 1.7.1 | Contrôles source/public séparés, cohérence candidate/published imposée et documents actifs réalignés. |

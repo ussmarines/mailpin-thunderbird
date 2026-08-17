@@ -1,6 +1,6 @@
 {
   "name": "mailpin-thunderbird",
-  "version": "1.7.1",
+  "version": "1.7.2",
   "private": true,
   "description": "Build, test, and release tooling for MailPin — Email Follow-up & Productivity for Thunderbird.",
   "author": "ussmarines",

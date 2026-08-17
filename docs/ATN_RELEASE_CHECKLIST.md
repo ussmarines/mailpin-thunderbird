@@ -1,37 +1,35 @@
-# Checklist Add-ons for Thunderbird — MailPin 1.7.1
+# Checklist Add-ons for Thunderbird — MailPin 1.7.2
 
-Dernière release GitHub publique : **1.7.1**. La release **MailPin 1.7.1** est publiée ; la soumission Add-ons for Thunderbird (ATN) reste une étape distincte. La source reviewer ATN corrigée a été régénérée et validée sans modifier `extension/**`.
+Dernière release GitHub publique : **1.7.1**. La **version source 1.7.2** est une candidate corrective UI/navigation ; elle n’est pas encore publiée ni soumise à Add-ons for Thunderbird (ATN).
 
 ## Identité et build
 
-- [x] nom, ID, licence, confidentialité, support et dépôt MailPin cohérents sur `main` courant ;
-- [x] version source 1.7.1 synchronisée dans manifeste/package/build ;
-- [x] aucune dépendance runtime/build tierce ;
+- [x] nom, ID public `ussmarines.mailpin@addons.thunderbird.net`, licence et politique local-first inchangés ;
+- [x] version source 1.7.2 synchronisée dans manifeste/package/état candidate ;
+- [x] aucune nouvelle dépendance runtime/build tierce ;
 - [x] actions GitHub épinglées par SHA ;
-- [x] publication 1.7.1 explicitement autorisée par le propriétaire le 16 août 2026 ;
-- [x] artefacts définitifs 1.7.1 reconstruits depuis `c2b886677413a205d57a191234b1dac6279b86d6` ;
-- [x] gate juridique/marque considéré validé par décision explicite du propriétaire le 16 août 2026 ; aucune revue juridique indépendante n’est revendiquée ;
-- [x] source reviewer ATN régénérée après le correctif de reproductibilité hors Git ;
-- [x] `npm run ci` PASS depuis une extraction neuve de cette source, sans dossier `.git` ;
-- [x] XPI reconstruit sous Python 3.12 identique au XPI publié 1.7.1 (`4586646a1d6ebe793c52040beeb7faf929e59d771a59a1ff0b0f63c13308e5f0`) ;
-- [x] pack ATN régénéré avec `PACK_INVENTORY.txt` présent dans son propre inventaire et empreintes recalculées.
+- [x] autorisation explicite du propriétaire reçue le 17 août 2026 pour PR, merge et nouvelle release sous réserve des gates ;
+- [ ] archive source reviewer 1.7.2 reconstruite et validée hors Git ;
+- [ ] empreintes finales des artefacts 1.7.2 vérifiées après build/release.
 
 ## Compatibilité / UI
 
 - [x] Manifest V3, permission `menus` uniquement, Thunderbird 153.0–153.* ;
-- [x] la 1.7.1 ne modifie pas le runtime Dashboard/Options/panneau ;
-- [x] smoke réel Thunderbird 153 de l’arbre 1.7.1 exact — run `31950636456` ;
-- [ ] recette humaine Organic Workspace supplémentaire — non enregistrée comme exécutée ; pertinente pour ATN ;
+- [x] corrections UI initiales validées avant versionnement par PR #47, QA `32024824818` et smoke Thunderbird réel `32024824756` ;
+- [ ] QA Linux/Windows sur la candidate 1.7.2 exacte ;
+- [ ] smoke Thunderbird réel sur la candidate 1.7.2 exacte ;
+- [ ] recette humaine post-correction — non enregistrée comme exécutée ; recommandée avant soumission ATN ;
 - [ ] Gmail/Microsoft/IMAP et calendriers réseau réels si annoncés ;
 - [ ] matrice Windows/Linux/macOS exhaustive si requise par la soumission ATN.
 
 ## Sécurité / review
 
-- [x] réseau runtime, télémétrie, publicité et code distant interdits ;
-- [x] sous-ressources HTML/CSS distantes refusées par le garde source ;
-- [x] entrées privilégiées, stockage local, imports et cycle de vie restent couverts par les gardes existants ;
-- [x] QA/garde sécurité de la release 1.7.1 — run `31950636397` ;
-- [x] workflow Release 1.7.1 — run `31951120772` ;
+- [x] réseau runtime, télémétrie, publicité, CDN et code distant interdits ;
+- [x] aucune modification de stockage, schéma, permission ou frontière privilégiée dans le correctif UI ;
+- [ ] garde sécurité/identité 1.7.2 sur le candidat exact ;
+- [ ] workflow Release 1.7.2 ;
 - [ ] téléversement ATN et revue humaine ATN.
+
+La source reviewer 1.7.1 corrigée demeure une preuve historique de reproductibilité hors Git ; elle ne remplace pas la validation du futur paquet 1.7.2.
 
 Codex Security n’est pas utilisé. Aucun contrôle non exécuté n’est présenté comme PASS.

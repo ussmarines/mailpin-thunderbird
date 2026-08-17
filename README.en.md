@@ -7,7 +7,7 @@
 
 [![QA](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml)
 ![Release](https://img.shields.io/badge/release-v1.7.1-4F7F75)
-![Source](https://img.shields.io/badge/release-v1.7.1-3D536B)
+![Source](https://img.shields.io/badge/candidate-v1.7.2-3D536B)
 ![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x-3D536B)
 ![License](https://img.shields.io/badge/license-MailPin%20Source--Available%201.1-1A1D21)
 </div>
@@ -25,7 +25,7 @@ MailPin turns important email into actionable follow-up **without replacing Thun
 
 ## Brand & interface
 
-**Organic Workspace** organizes MailPin as a real productivity workspace: persistent navigation, an editorial canvas, on-demand context, compact Thunderbird companion surfaces, and functional micro-interactions. The Ink / Slate / Sage / Brass identity uses natural tones and local typography only. No gradients, glow, glassmorphism, remote assets, or remote fonts. Light/dark themes, forced colors, keyboard focus, and reduced motion remain supported.
+**Organic Workspace** organizes MailPin as a real productivity workspace: persistent navigation, an editorial canvas, on-demand context, compact Thunderbird companion surfaces, and functional micro-interactions. The 1.7.2 candidate fixes navigation stability and several geometry/spacing problems observed in real use without changing business features. No gradients, glow, glassmorphism, remote assets, or remote fonts. Light/dark themes, forced colors, keyboard focus, and reduced motion remain supported.
 
 <div align="center">
   <img src="assets/brand/mailpin-brand-board.svg" width="92%" alt="MailPin brand system">
@@ -33,7 +33,7 @@ MailPin turns important email into actionable follow-up **without replacing Thun
 
 ## Compatibility
 
-- **Source version:** `1.7.1` — published
+- **Source version:** `1.7.2` — UI/navigation corrective candidate
 - **Latest public release:** `1.7.1`
 - **Thunderbird:** `153.0` to `153.*`
 - **Format:** MailExtension Manifest V3
@@ -60,10 +60,10 @@ Requires Python 3.11+ and Node.js 20+. No third-party npm/Python dependency is d
 npm run ci
 ```
 
-Reproducible outputs:
+Reproducible outputs from the candidate source:
 
-- `dist/MailPin_v1.7.1.xpi`
-- `dist/MailPin_GitHub_Repository_v1.7.1.zip`
+- `dist/MailPin_v1.7.2.xpi`
+- `dist/MailPin_GitHub_Repository_v1.7.2.zip`
 - `dist/SHA256SUMS.txt`
 
 ## Privacy & security
@@ -72,8 +72,8 @@ MailPin has no runtime network call, telemetry, advertising or remote code. Full
 
 - [Privacy](PRIVACY.md)
 - [Security](SECURITY.md)
-- [Source security audit 1.7.1](SECURITY_AUDIT_1.7.1.md)
-- [Source validation report 1.7.1](VALIDATION_REPORT_1.7.1.md)
+- [Source security audit 1.7.2](SECURITY_AUDIT_1.7.2.md)
+- [Source validation report 1.7.2](VALIDATION_REPORT_1.7.2.md)
 - [Known limitations](docs/KNOWN_LIMITATIONS.md)
 
 ## Documentation & support
