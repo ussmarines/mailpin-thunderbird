@@ -2,22 +2,15 @@
   "format": "mailperch-project-state",
   "version": 1,
   "project": "MailPin — Email Follow-up & Productivity for Thunderbird",
-  "extensionVersion": "1.7.2",
+  "extensionVersion": "1.7.3",
   "baseGitHub": {
     "branch": "main",
-    "commit": "5284e39a43513d38ededec5e7f939a685f7fdd2c",
-    "role": "MailPin 1.7.2 UI-stability candidate baseline after PR #47"
+    "commit": "ed54686f64626c37d5d38236ebcda8ec8e94a094",
+    "role": "MailPin 1.7.3 hard-coded UI layout candidate baseline after PR #49"
   },
   "extensionId": "ussmarines.mailpin@addons.thunderbird.net",
-  "thunderbird": {
-    "min": "153.0",
-    "max": "153.*"
-  },
-  "schemas": {
-    "sqlite": 5,
-    "settings": 8,
-    "data": 7
-  },
+  "thunderbird": {"min": "153.0", "max": "153.*"},
+  "schemas": {"sqlite": 5, "settings": 8, "data": 7},
   "entrypoints": {
     "manifest": "extension/manifest.json",
     "background": "extension/background.js",
@@ -36,12 +29,7 @@
     "thunderbirdTestBench": "docs/THUNDERBIRD_TEST_BENCH.md",
     "codexHandoff": "docs/CODEX_HANDOFF.md"
   },
-  "commands": [
-    "npm run check",
-    "npm test",
-    "npm run build",
-    "npm run ci"
-  ],
+  "commands": ["npm run check", "npm test", "npm run build", "npm run ci"],
   "invariants": [
     "No native unread/new/total counter mutation",
     "Pinning never changes read state",
@@ -51,78 +39,38 @@
     "SQLite writes remain incremental, transactional and serialized",
     "All injected resources are cleaned up",
     "No remote publication without explicit approval",
-    "No client-side administrator role or privilege switch",
     "Privileged API inputs are bounded and normalized",
-    "Uninstall closes storage before deleting all MailPin profile data",
-    "Missing native install sentinel triggers residue purge before preferences/SQLite load",
-    "CI installs no third-party Python helper and pins GitHub Actions by immutable SHA",
     "Only exact MailPin-owned Thunderbird tags may be managed or removed",
-    "Options and dashboard text has a 12px minimum font-size floor",
-    "Provider detection uses exact domain or legitimate subdomain boundaries, never arbitrary URL substrings",
     "Optional Thunderbird capabilities fail locally instead of disabling the full extension",
     "Business modules do not call Thunderbird core services directly outside compatibility adapters",
     "Recommended mode never auto-saves and preserves profile-specific settings",
-    "Privileged dependencies injected into compatibility adapters are explicitly imported before facade creation",
-    "Organic Workspace uses native HTML plus local CSS tokens, with canonical Dashboard/Options shells written directly in source and no remote UI asset",
+    "Organic Workspace uses one canonical workspace stylesheet rather than stacked runtime patch stylesheets",
     "Selected-account scope uses Thunderbird account.key consistently from Options through runtime filtering"
   ],
   "ui": {
-    "settingsSpacingAffects": [
-      "extension/options"
-    ],
-    "cardDensityAffects": [
-      "MailPin pinned cards"
-    ],
-    "mustNotAffect": [
-      "Thunderbird native thread row height",
-      "native message counters"
-    ]
+    "settingsSpacingAffects": ["extension/options"],
+    "cardDensityAffects": ["MailPin pinned cards"],
+    "mustNotAffect": ["Thunderbird native thread row height", "native message counters"]
   },
   "highRisk": [
-    "_setupAbout3Pane",
-    "PinCompatibility adapters",
-    "PinStructuredStore",
-    "_resolveReference",
-    "calendar observers",
-    "folder observers",
-    "automatic rules",
-    "imports and restores",
-    "uninstall lifecycle",
-    "privileged API input validation",
-    "settings save/cancel lifecycle",
-    "recommended settings draft",
-    "selected-account filtering",
-    "interactive reminders",
-    "snooze lifecycle",
-    "related-conversation merge",
-    "Thunderbird tag synchronization",
-    "saved-view filtering and search",
-    "checklist persistence and editing",
-    "provider hostname classification",
-    "Thunderbird runtime smoke harness"
+    "_setupAbout3Pane", "PinCompatibility adapters", "PinStructuredStore", "_resolveReference",
+    "calendar observers", "folder observers", "automatic rules", "imports and restores",
+    "uninstall lifecycle", "privileged API input validation", "settings save/cancel lifecycle",
+    "selected-account filtering", "Thunderbird runtime smoke harness"
   ],
   "security": {
-    "uninstallLifecycle": "AddonManager early signal + awaited Gecko Management uninstall purge + core-cleared ExtensionStorage reinstall sentinel",
-    "ciSupplyChain": "stdlib-only checks, immutable action SHAs, no persisted checkout credentials, Dependabot monitoring",
-    "providerDetection": "exact recognized domain or dot-boundary subdomain matching; CodeQL incomplete URL substring checks removed in 1.2.1",
-    "thunderbirdBoundary": "MailServices/MailUtils/MessageArchiver and Calendar internals are injected into dedicated compatibility adapters; business logic must not call them directly",
-    "recommendedMode": "recommended values are draft-only, preserve profile-specific fields and require explicit save",
-    "uiDependencyPolicy": "native HTML plus local Organic Workspace CSS tokens; canonical shell in source; no npm runtime dependency, bundler, CDN or remote asset",
-    "runtimeTestSupplyChain": "test-only Thunderbird/geckodriver downloads are checksum-verified and are not runtime dependencies of the extension"
+    "thunderbirdBoundary": "Messages/Tags/Calendar internals remain isolated behind dedicated compatibility adapters",
+    "uiDependencyPolicy": "native HTML plus local Organic Workspace CSS tokens; canonical workspace stylesheet; no runtime patch stylesheet, npm runtime dependency, bundler, CDN or remote asset",
+    "runtimeTestSupplyChain": "test-only Thunderbird/geckodriver downloads are checksum-verified and are not runtime dependencies"
   },
-  "developmentBranch": "release/1.7.2-ui-stability",
+  "developmentBranch": "release/1.7.3-ui-layout",
   "testing": {
-    "contract": [
-      "tests/test_thunderbird_compatibility_boundary.py",
-      "tests/thunderbird_compatibility_contract.mjs",
-      "tests/test_recommended_options_ux.py",
-      "tests/test_thunderbird_test_bench.py"
-    ],
+    "contract": ["tests/test_organic_workspace_ui.py", "tests/test_thunderbird_compatibility_boundary.py", "tests/thunderbird_compatibility_contract.mjs"],
     "runtimeWorkflow": ".github/workflows/thunderbird-smoke.yml",
     "runtimeScript": "tests/thunderbird/real_smoke.py",
-    "browserStatus": "Organic Workspace field-review regression contracts cover dashboard disclosure geometry, Options navigation, viewport-local save/status feedback, spacing, Calendar wrapping and shortcut action clarity. Browser-model evidence complements, but does not replace, real Thunderbird visual acceptance.",
-    "runtimeStatus": "The UI runtime merged by PR #47 passed QA run 32024824818 and real Thunderbird runtime smoke run 32024824756 on exact head 551841858e974482f046a1980e52cfc84be71a6c before squash merge to main 5284e39a43513d38ededec5e7f939a685f7fdd2c. The exact 1.7.2 versioned candidate still requires its own PR QA and Thunderbird smoke before publication. No unexecuted manual control is reported as passed."
+    "browserStatus": "The UI contract requires layout stability to live in extension/styles/workspace.css and forbids the removed interaction-stability.css overlay.",
+    "runtimeStatus": "PR #49 head caee1248495f8ba88e5f398b0dc9ff8db6711b8e passed QA run 32027919000 and real Thunderbird smoke run 32027918991 before squash merge to main at ed54686f64626c37d5d38236ebcda8ec8e94a094. The exact versioned 1.7.3 candidate must pass its own QA and smoke gates before publication."
   },
-  "latestPublicVersion": "1.7.1",
+  "latestPublicVersion": "1.7.2",
   "releaseStatus": "candidate"
 }

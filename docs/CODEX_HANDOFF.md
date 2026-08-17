@@ -1,36 +1,33 @@
-# Passage de relais — MailPin 1.7.2 candidate
+# Passage de relais — MailPin 1.7.3 candidate
 
 ## Référence
 
 - dépôt : `ussmarines/mailpin-thunderbird` ;
-- baseline : `main` à `5284e39a43513d38ededec5e7f939a685f7fdd2c` ;
-- branche release : `release/1.7.2-ui-stability` ;
-- version source : **1.7.2** ;
-- dernière release publique : **1.7.1** ;
+- baseline : `main` à `ed54686f64626c37d5d38236ebcda8ec8e94a094` ;
+- branche release : `release/1.7.3-ui-layout` ;
+- version source : **1.7.3** ;
+- dernière release publique : **1.7.2** ;
 - `releaseStatus` : **candidate** ;
-- identifiant canonique : `ussmarines.mailpin@addons.thunderbird.net`.
+- ID : `ussmarines.mailpin@addons.thunderbird.net`.
 
 ## Résultat visé
 
-Publier une maintenance 1.7.2 dédiée aux problèmes UI/navigation observés dans la recette réelle du 17 août 2026 : statistiques Dashboard, navigation Options, Enregistrer/Annuler, notifications, espacements, cartes Agenda et raccourcis. Aucun élargissement métier, permission, schéma, stockage, réseau ou dépendance runtime.
+Publier 1.7.3 avec les corrections UI intégrées en dur : suppression de `interaction-stability.css`, consolidation dans `workspace.css`, espacement renforcé entre groupes de paramètres et contraste lisible du bouton Annuler en thème sombre et clair.
 
-## Preuves déjà acquises
+## Preuves acquises avant versionnement
 
-- PR UI #47 sur head exact `551841858e974482f046a1980e52cfc84be71a6c` ;
-- QA Linux/Windows et garde sécurité PASS — run `32024824818` ;
-- smoke Thunderbird 153 réel PASS — run `32024824756` ;
-- squash merge UI : `5284e39a43513d38ededec5e7f939a685f7fdd2c`.
+- PR #49 head `caee1248495f8ba88e5f398b0dc9ff8db6711b8e` ;
+- QA Linux/Windows + garde sécurité `32027919000` — PASS ;
+- smoke Thunderbird 153 réel `32027918991` — PASS ;
+- squash runtime : `ed54686f64626c37d5d38236ebcda8ec8e94a094`.
 
-## Gates encore requis pour la candidate versionnée
+## Gates candidate 1.7.3
 
-- QA Linux/Windows sur le head exact de la PR release ;
-- garde sécurité/identité et build reproductible ;
-- smoke Thunderbird réel sur le head exact de la PR release ;
+- QA Linux/Windows et garde sécurité sur le head exact de la PR release ;
+- build reproductible ;
+- smoke Thunderbird réel sur le head exact ;
 - merge release sur `main` ;
-- workflow Release depuis `main` avec `releaseStatus=candidate` ;
-- vérification de `v1.7.2`, des assets et de leurs empreintes ;
-- synchronisation documentaire post-publication.
+- workflow Release ;
+- vérification de `v1.7.3` et des empreintes.
 
-La recette visuelle humaine post-correction n’est pas encore enregistrée comme exécutée. `MP-2026-018` reste `À VALIDER` pour l’identité binaire du conteneur ZIP entre plateformes.
-
-Codex Security n’est pas utilisé.
+Aucun contrôle visuel humain post-correction n’est revendiqué comme exécuté. Codex Security n’est pas utilisé.

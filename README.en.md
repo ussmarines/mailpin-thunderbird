@@ -6,8 +6,8 @@
 **Email Follow-up & Productivity for Thunderbird**
 
 [![QA](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml)
-![Release](https://img.shields.io/badge/release-v1.7.1-4F7F75)
-![Source](https://img.shields.io/badge/candidate-v1.7.2-3D536B)
+![Release](https://img.shields.io/badge/release-v1.7.2-4F7F75)
+![Source](https://img.shields.io/badge/candidate-v1.7.3-3D536B)
 ![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x-3D536B)
 ![License](https://img.shields.io/badge/license-MailPin%20Source--Available%201.1-1A1D21)
 </div>
@@ -25,36 +25,30 @@ MailPin turns important email into actionable follow-up **without replacing Thun
 
 ## Brand & interface
 
-**Organic Workspace** organizes MailPin as a real productivity workspace: persistent navigation, an editorial canvas, on-demand context, compact Thunderbird companion surfaces, and functional micro-interactions. The 1.7.2 candidate fixes navigation stability and several geometry/spacing problems observed in real use without changing business features. No gradients, glow, glassmorphism, remote assets, or remote fonts. Light/dark themes, forced colors, keyboard focus, and reduced motion remain supported.
-
-<div align="center">
-  <img src="assets/brand/mailpin-brand-board.svg" width="92%" alt="MailPin brand system">
-</div>
+**Organic Workspace** is now consolidated directly in its canonical stylesheet. The 1.7.3 candidate removes the `interaction-stability.css` overlay, folds the fixes into `workspace.css`, increases structural spacing between settings groups, and gives the **Cancel** action explicit semantic contrast in the save bar, including dark theme. No remote assets, fonts or runtime UI dependency are added.
 
 ## Compatibility
 
-- **Source version:** `1.7.2` — UI/navigation corrective candidate
-- **Latest public release:** `1.7.1`
+- **Source version:** `1.7.3` — UI corrective candidate
+- **Latest public release:** `1.7.2`
 - **Thunderbird:** `153.0` to `153.*`
 - **Format:** MailExtension Manifest V3
 - **Locales:** French and English
 - **Public ID:** `ussmarines.mailpin@addons.thunderbird.net`
 
-MailPin uses a privileged Thunderbird Experiment for `about:3pane`, local SQLite storage, and selected Messages/Tags/Calendar integration. Thunderbird may therefore show a full-access warning at install time. Messages, Tags and Calendar internals remain isolated behind `PinCompatibility`.
+MailPin uses a privileged Thunderbird Experiment for `about:3pane`, local SQLite storage, and selected Messages/Tags/Calendar integration. Messages, Tags and Calendar internals remain isolated behind `PinCompatibility`.
 
 ## Install
 
 ### GitHub release
 
-1. Download `MailPin_v1.7.1.xpi` from release `v1.7.1`.
+1. Download `MailPin_v1.7.2.xpi` from release `v1.7.2`.
 2. Thunderbird → **Add-ons and Themes** → gear menu → **Install Add-on From File**.
 3. Select the XPI.
 
-> **Migrating from 1.5.4 or a MailPerch build:** 1.6.0 adopts MailPin’s final public ID before the first ATN publication. Export a backup from the previous installation, uninstall it, install MailPin, then import the backup. See [identity migration](docs/IDENTITY_MIGRATION_REQUIRED.md).
-
 ### From source
 
-Requires Python 3.11+ and Node.js 20+. No third-party npm/Python dependency is downloaded.
+Requires Python 3.11+ and Node.js 20+.
 
 ```bash
 npm run ci
@@ -62,8 +56,8 @@ npm run ci
 
 Reproducible outputs from the candidate source:
 
-- `dist/MailPin_v1.7.2.xpi`
-- `dist/MailPin_GitHub_Repository_v1.7.2.zip`
+- `dist/MailPin_v1.7.3.xpi`
+- `dist/MailPin_GitHub_Repository_v1.7.3.zip`
 - `dist/SHA256SUMS.txt`
 
 ## Privacy & security
@@ -72,8 +66,8 @@ MailPin has no runtime network call, telemetry, advertising or remote code. Full
 
 - [Privacy](PRIVACY.md)
 - [Security](SECURITY.md)
-- [Source security audit 1.7.2](SECURITY_AUDIT_1.7.2.md)
-- [Source validation report 1.7.2](VALIDATION_REPORT_1.7.2.md)
+- [Source security audit 1.7.3](SECURITY_AUDIT_1.7.3.md)
+- [Source validation report 1.7.3](VALIDATION_REPORT_1.7.3.md)
 - [Known limitations](docs/KNOWN_LIMITATIONS.md)
 
 ## Documentation & support
@@ -83,8 +77,7 @@ MailPin has no runtime network call, telemetry, advertising or remote code. Full
 - [Thunderbird test bench](docs/THUNDERBIRD_TEST_BENCH.md)
 - [Reviewer build instructions](release/BUILD_INSTRUCTIONS.md)
 - [ATN preparation](STORE_RELEASE.md)
-- [Support and useful report details](SUPPORT.md)
-- [Report an issue](https://github.com/ussmarines/mailpin-thunderbird/issues)
+- [Support](SUPPORT.md)
 
 Maintained by [ussmarines](https://github.com/ussmarines). [PayPal](https://paypal.me/ussmarinesdot) donations are optional and unlock no functionality.
 

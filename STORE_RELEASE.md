@@ -1,51 +1,41 @@
-# Préparation MailPin 1.7.2
+# Préparation MailPin 1.7.3
 
 ## État
 
-- **Version source :** 1.7.2 — candidate
-- **Dernière release publique :** 1.7.1
-- **Dernière publication :** `v1.7.1`, commit `c2b886677413a205d57a191234b1dac6279b86d6`
-- **Baseline de la candidate 1.7.2 :** `main` à `5284e39a43513d38ededec5e7f939a685f7fdd2c`
-- **Nom :** MailPin — Email Follow-up & Productivity for Thunderbird
+- **Version source :** 1.7.3 — candidate
+- **Dernière release publique :** 1.7.2
+- **Dernière publication :** `v1.7.2`, commit `225fcb77aa6b3fa101bbaa56e43e7bb8c5a1c2ad`
+- **Baseline candidate 1.7.3 :** `main` à `ed54686f64626c37d5d38236ebcda8ec8e94a094`
 - **ID permanent :** `ussmarines.mailpin@addons.thunderbird.net`
-- **Compatibilité déclarée :** Thunderbird 153.0 à 153.*
-- **Licence :** MailPin Source-Available License 1.1
+- **Compatibilité :** Thunderbird 153.0 à 153.*
 
-## Portée candidate 1.7.2
+## Portée 1.7.3
 
-La 1.7.2 corrige des problèmes de navigation et de composition observés en usage réel dans le Dashboard et les Paramètres : contrôle « Plus de statistiques », section active du rail, barre Enregistrer/Annuler, notifications, espacements, cartes Agenda et action d’enregistrement des raccourcis.
+La 1.7.3 consolide les corrections UI directement dans `extension/styles/workspace.css`, supprime la feuille corrective `interaction-stability.css`, augmente l’espace entre groupes de paramètres et corrige le contraste du bouton Annuler dans la barre de sauvegarde.
 
-Aucune permission WebExtension, logique métier, migration, schéma, stockage SQLite, dépendance runtime, connexion réseau, télémétrie, publicité, code distant ou identité n’est modifié.
+Aucune permission WebExtension, logique métier, migration, schéma, stockage, dépendance runtime, connexion réseau, télémétrie, publicité, code distant ou identité n’est modifié.
 
-## Preuve déjà acquise sur le runtime corrigé
+## Preuve runtime avant versionnement
 
-La PR #47 a validé le head exact `551841858e974482f046a1980e52cfc84be71a6c` avec :
-
-- QA Linux/Windows et garde sécurité : run `32024824818` — PASS ;
-- smoke Thunderbird réel : run `32024824756` — PASS ;
-- merge squash vers `main` : `5284e39a43513d38ededec5e7f939a685f7fdd2c`.
-
-Ces preuves ont déclenché la préparation 1.7.2, mais la candidate versionnée doit repasser ses gates exacts avant publication.
+PR #49, head `caee1248495f8ba88e5f398b0dc9ff8db6711b8e` :
+- QA Linux/Windows + garde sécurité `32027919000` — PASS ;
+- smoke Thunderbird réel `32027918991` — PASS ;
+- squash dans `main` : `ed54686f64626c37d5d38236ebcda8ec8e94a094`.
 
 ## Artefacts attendus
 
-- `MailPin_v1.7.2.xpi` ;
-- `MailPin_GitHub_Repository_v1.7.2.zip` ;
+- `MailPin_v1.7.3.xpi` ;
+- `MailPin_GitHub_Repository_v1.7.3.zip` ;
 - `SHA256SUMS.txt`.
 
-Les empreintes ne seront inscrites comme définitives qu’après le build/release exact.
+## Gates avant publication
 
-## Gates 1.7.2 avant publication
-
-- [ ] `npm run ci` sur la PR de release ;
-- [ ] contrôles source/modèle Windows ;
+- [ ] QA Linux/Windows sur la candidate 1.7.3 exacte ;
 - [ ] garde sécurité/identité ;
 - [ ] build reproductible et structure XPI ;
 - [ ] smoke Thunderbird 153 réel sur la candidate exacte ;
-- [ ] merge de la PR de release sur `main` ;
-- [ ] workflow Release exécuté depuis `main` avec `releaseStatus = candidate` ;
-- [ ] release `v1.7.2` et artefacts vérifiés après publication.
-
-La recette visuelle humaine supplémentaire post-correction n’est pas déclarée comme exécutée. Elle reste recommandée pour confirmer les détails esthétiques que le smoke automatisé ne peut pas prouver.
+- [ ] merge PR release sur `main` ;
+- [ ] workflow Release depuis `main` ;
+- [ ] vérification de `v1.7.3` et des empreintes des artefacts.
 
 Codex Security n’est pas utilisé.
