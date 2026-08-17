@@ -32,14 +32,13 @@ def test_organic_workspace_shell_is_loaded_and_structural():
 def test_organic_design_avoids_generic_effects_and_remote_assets():
     workspace = text("extension/styles/workspace.css").lower()
     tokens = text("extension/styles/tokens.css").lower()
-    stability = text("extension/styles/interaction-stability.css").lower()
-    combined = workspace + "\n" + tokens + "\n" + stability
+    combined = workspace + "\n" + tokens
 
     assert "linear-gradient" not in combined
     assert "radial-gradient" not in combined
     assert "backdrop-filter" not in combined
     assert "@import url(http" not in combined
-    assert "http://" not in stability and "https://" not in stability
+    assert "http://" not in workspace and "https://" not in workspace
     assert "--mp-font-family-display" in tokens
     assert "--mp-ease-organic" in tokens
     assert "prefers-reduced-motion" in workspace
@@ -95,34 +94,41 @@ def test_organic_workspace_v2_video_driven_contracts():
     assert '`${calendar.name} · ${optionState}`' in options_js
 
 
-def test_field_review_interaction_stability_contracts():
+def test_field_review_stability_is_part_of_canonical_workspace():
     theme = text("extension/styles/theme.js")
-    stability = text("extension/styles/interaction-stability.css")
+    workspace = text("extension/styles/workspace.css")
     bootstrap = text("extension/options/options-bootstrap.js")
     navigation = text("extension/options/options-navigation-stability.js")
 
-    assert 'link.href = `${scriptBase}interaction-stability.css`' in theme
-    assert 'const scriptSource = String(document.currentScript?.src || "")' in theme
+    assert not (ROOT / "extension/styles/interaction-stability.css").exists()
+    assert "interaction-stability.css" not in theme
+    assert 'const scriptSource = String(document.currentScript?.src || "")' not in theme
     assert 'loadClassicScript("./options-navigation-stability.js")' in bootstrap
 
-    # The dashboard disclosure remains full-width before and after expansion,
-    # so the control no longer jumps into another grid cell when clicked.
-    assert 'body.mp-organic-workspace .workspace-stage .stats-grid' in stability
-    assert 'body.mp-organic-workspace .stats-more[open]' in stability
-    assert 'grid-column: auto' in stability
-    assert 'width: 100%' in stability
+    # Dashboard stability is part of the canonical workspace stylesheet: the
+    # disclosure remains full-width before and after expansion.
+    assert '.workspace-stage .stats-grid { display: grid; grid-template-columns: minmax(0, 1fr)' in workspace
+    assert '.stats-more[open] { grid-column: auto; width: 100%; }' in workspace
+    assert '.stats-more > summary::after' in workspace
 
-    # Save/discard and feedback stay viewport-local instead of reflowing the
-    # sticky header, and dense settings groups regain explicit separation.
-    assert 'body.mp-organic-settings .settings-organic-stage .header-save-dock' in stability
-    assert 'position: fixed' in stability
-    assert 'body.mp-organic-settings .settings-organic-stage > #status' in stability
-    assert '#calendar-info .calendar-capability' in stability
-    assert '#save-shortcut' in stability
-    assert 'margin-top: 22px' in stability
+    # Save/discard and status are viewport-local in the canonical stylesheet.
+    # The secondary action uses semantic foreground/background tokens so the
+    # Cancel label remains readable in light and dark themes.
+    assert '.settings-organic-stage .header-save-dock { position: fixed;' in workspace
+    assert 'background: var(--mp-workspace-surface-strong); color: var(--mp-text);' in workspace
+    assert '.header-save-dock .save-dock-actions .secondary' in workspace
+    assert 'background: var(--mp-workspace-surface); color: var(--mp-text);' in workspace
+    assert 'body.mp-organic-settings[data-dirty] .settings-organic-stage > #status' in workspace
 
-    # Navigation is deterministic for long sections: capture before the legacy
-    # smooth-scroll handler and continuously reconcile the active sidebar item.
+    # Major settings groups have canonical vertical rhythm both at section
+    # level and inside organization blocks, including Calendar and health.
+    assert '.settings-section > :is(.setting-grid, .toggle-grid' in workspace
+    assert '.organization-block > :is(.setting-grid, .toggle-grid' in workspace
+    assert 'margin-top: var(--mp-space-8)' in workspace
+    assert '.settings-organic-stage .calendar-capability { grid-template-columns: minmax(0, 1fr)' in workspace
+    assert '.settings-organic-stage #save-shortcut' in workspace
+
+    # Navigation remains deterministic for long sections.
     assert 'event.stopImmediatePropagation()' in navigation
     assert 'section.scrollIntoView({behavior: "auto", block: "start"})' in navigation
     assert 'new MutationObserver' in navigation
@@ -178,6 +184,6 @@ if __name__ == "__main__":
     test_organic_design_avoids_generic_effects_and_remote_assets()
     test_panel_and_spec_follow_organic_workspace_contract()
     test_organic_workspace_v2_video_driven_contracts()
-    test_field_review_interaction_stability_contracts()
+    test_field_review_stability_is_part_of_canonical_workspace()
     test_qol_palette_defaults_and_low_friction_creation_contract()
     print("Organic Workspace UI contracts: OK")
