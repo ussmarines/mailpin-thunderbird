@@ -1,6 +1,6 @@
 # Plan de test manuel MailPin — 1.7.3
 
-Utiliser de préférence un profil Thunderbird jetable pour les scénarios destructifs. Le présent plan complète les validations automatisées de la source 1.7.3 ; la dernière release publique est 1.7.2. Aucun contrôle non exécuté ne doit être présenté comme PASS.
+Utiliser de préférence un profil Thunderbird jetable pour les scénarios destructifs. Le présent plan complète les validations automatisées de la source 1.7.3 ; la dernière release publique est 1.7.3. Aucun contrôle non exécuté ne doit être présenté comme PASS.
 
 ## Recette 1.7.3 — consolidation UI en dur
 
@@ -20,12 +20,14 @@ Utiliser de préférence un profil Thunderbird jetable pour les scénarios destr
 - aucune fonction Agenda/Tags absente ne fait tomber MailPin ;
 - aucune donnée ne quitte le poste ;
 - aucun tag personnel n’est modifié ;
-- le XPI testé correspond au commit candidat exact.
+- le XPI testé doit correspondre à la release publique 1.7.3.
 
-## Preuves déjà acquises avant versionnement
+## Preuves automatisées acquises
 
-- PR #49 QA Linux/Windows + garde sécurité : `32027919000` PASS ;
-- PR #49 smoke Thunderbird réel : `32027918991` PASS ;
-- merge runtime : `ed54686f64626c37d5d38236ebcda8ec8e94a094`.
+- candidate exacte `a247dc53e3b707335b04ae00b227acad52ddb8b5` : QA Linux/Windows + garde sécurité `32028928653` PASS ;
+- candidate exacte : smoke Thunderbird réel `32028928636` PASS ;
+- merge release : `814e07adc82f0a1b19051c83fbb0fec6a22836b0` ;
+- workflow Release `32031451673` : `npm run ci`, build et publication `v1.7.3` PASS ;
+- XPI publié SHA-256 `66a10432457a509b9c9959e3df7bcdd2415d14668284b6104803dfa1d9362bc4`.
 
-La candidate versionnée 1.7.3 doit repasser QA et smoke réels avant release.
+La recette visuelle humaine ci-dessus reste recommandée avant ATN et n’est pas déclarée comme exécutée tant qu’elle n’a pas été réellement réalisée.

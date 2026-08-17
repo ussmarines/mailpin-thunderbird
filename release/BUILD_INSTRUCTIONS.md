@@ -2,7 +2,7 @@
 
 ## État
 
-La release GitHub **1.7.2** est publiée. La source **1.7.3** est une candidate corrective UI.
+La release GitHub **1.7.3** est publiée. La source **1.7.3** correspond à cette release et cible le commit `814e07adc82f0a1b19051c83fbb0fec6a22836b0`.
 
 ## Environnement
 
@@ -15,7 +15,7 @@ La release GitHub **1.7.2** est publiée. La source **1.7.3** est une candidate 
 
 ## Reproduction
 
-Dans le checkout candidat ou dans une archive reviewer extraite sans `.git` :
+Dans un checkout de la source 1.7.3 ou dans l’archive reviewer extraite sans `.git` :
 
 ```bash
 npm run ci
@@ -35,16 +35,17 @@ Le contenu de `extension/` est placé directement à la racine du XPI. Aucun Jav
 
 ## Portée 1.7.3
 
-La candidate supprime `interaction-stability.css` et consolide les corrections UI dans `workspace.css`, renforce l’espacement des groupes de réglages et le contraste Annuler. Elle n’ajoute aucune permission, dépendance runtime, migration, schéma, réseau, télémétrie, publicité ou code distant.
+La release supprime `interaction-stability.css` et consolide les corrections UI dans `workspace.css`, renforce l’espacement des groupes de réglages et le contraste Annuler. Elle n’ajoute aucune permission, dépendance runtime, migration, schéma, réseau, télémétrie, publicité ou code distant.
 
-## Gates
+## Preuves de publication
 
-1. QA Linux/Windows + garde sécurité sur le candidat exact ;
-2. smoke Thunderbird réel sur le candidat exact ;
-3. build reproductible et structure XPI ;
-4. merge PR release vers `main` ;
-5. workflow Release depuis `main` ;
-6. vérification des assets et SHA-256 publiés ;
-7. avant ATN, `npm run ci` depuis une extraction neuve de l’archive source publiée sans `.git`.
+1. QA Linux/Windows + garde sécurité sur la candidate exacte `a247dc53e3b707335b04ae00b227acad52ddb8b5` : run `32028928653` — PASS ;
+2. smoke Thunderbird réel : run `32028928636` — PASS ;
+3. build reproductible et structure XPI : PASS dans la QA et le workflow Release ;
+4. merge PR release vers `main` : `814e07adc82f0a1b19051c83fbb0fec6a22836b0` ;
+5. workflow Release : `32031451673` — PASS ;
+6. XPI publié SHA-256 `66a10432457a509b9c9959e3df7bcdd2415d14668284b6104803dfa1d9362bc4` ;
+7. archive source publiée SHA-256 `ff5999a8b73392b0ad7e6778c69602ddddeeb687a3263d2162b2f93afddaf767` ;
+8. `SHA256SUMS.txt` publié SHA-256 `af405970d942b42cbb1d224538795811ddc00ba3cadba3ab9de6e53eea1194e9`.
 
-La preuve runtime pré-versionnement est PR #49 : QA `32027919000`, smoke `32027918991`, tous deux PASS.
+Avant soumission ATN, exécuter encore exactement `npm run ci` depuis une extraction neuve de l’archive source publiée sans `.git` et consigner le résultat. Ce gate n’est pas déclaré PASS ici tant qu’il n’a pas été exécuté sur l’archive publiée.

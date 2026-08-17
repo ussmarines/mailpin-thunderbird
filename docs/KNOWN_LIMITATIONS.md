@@ -1,8 +1,8 @@
 # Limites connues
 
-## Source 1.7.3 / release publique 1.7.2
+## Source 1.7.3 / release publique 1.7.3
 
-La source **1.7.3** est une candidate corrective UI. La release publique **1.7.2** reste la version installable officielle jusqu’à publication de 1.7.3.
+La source **1.7.3** et la release publique **1.7.3** sont alignées. La publication GitHub `v1.7.3` cible `814e07adc82f0a1b19051c83fbb0fec6a22836b0`.
 
 ## Interface et accessibilité
 
@@ -25,8 +25,9 @@ La source **1.7.3** est une candidate corrective UI. La release publique **1.7.2
 
 - `MP-2026-018` suit encore l’identité binaire inter-plateforme du conteneur ZIP.
 - Les sauvegardes manuelles externes restent sous contrôle utilisateur.
+- Le build Release 1.7.3 a produit l’XPI SHA-256 `66a10432457a509b9c9959e3df7bcdd2415d14668284b6104803dfa1d9362bc4` et l’archive source SHA-256 `ff5999a8b73392b0ad7e6778c69602ddddeeb687a3263d2162b2f93afddaf767`.
 
 ## Publication
 
-- La release GitHub 1.7.2 est publiée ; 1.7.3 est candidate jusqu’aux gates et au workflow Release.
-- ATN et les validations humaines restent distincts de la publication GitHub.
+- La release GitHub 1.7.3 est publiée et le workflow Release `32031451673` est PASS.
+- ATN, la recette visuelle humaine et les matrices fournisseurs restent distincts de la publication GitHub et ne sont pas implicitement considérés comme validés.

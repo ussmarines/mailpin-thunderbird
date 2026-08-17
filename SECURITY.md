@@ -49,7 +49,7 @@ npm run build
 npm run ci
 ```
 
-Le rapport de sécurité de la **source candidate courante** est [SECURITY_AUDIT_1.7.2.md](SECURITY_AUDIT_1.7.2.md). Le rapport [SECURITY_AUDIT_1.7.1.md](SECURITY_AUDIT_1.7.1.md) reste la référence de la dernière release publique 1.7.1 jusqu’à publication de 1.7.2.
+Le rapport de sécurité de la **source et release publique courantes** est [SECURITY_AUDIT_1.7.3.md](SECURITY_AUDIT_1.7.3.md). La publication `v1.7.3` cible `814e07adc82f0a1b19051c83fbb0fec6a22836b0` et le workflow Release `32031451673` est PASS.
 
 ## Limite importante
 

@@ -6,8 +6,8 @@
 **Email Follow-up & Productivity for Thunderbird**
 
 [![QA](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml)
-![Release](https://img.shields.io/badge/release-v1.7.2-4F7F75)
-![Source](https://img.shields.io/badge/candidate-v1.7.3-3D536B)
+![Release](https://img.shields.io/badge/release-v1.7.3-4F7F75)
+![Source](https://img.shields.io/badge/release-v1.7.3-3D536B)
 ![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x-3D536B)
 ![Licence](https://img.shields.io/badge/licence-MailPin%20Source--Available%201.1-1A1D21)
 </div>
@@ -25,12 +25,12 @@ MailPin transforme les e-mails importants en suivi actionnable **sans remplacer 
 
 ## Interface
 
-**Organic Workspace** est désormais consolidé directement dans son stylesheet canonique. La candidate 1.7.3 supprime la feuille corrective `interaction-stability.css`, intègre en dur les corrections dans `workspace.css`, augmente l’espace entre groupes de paramètres et garantit un contraste lisible pour **Annuler** dans la barre de sauvegarde, notamment en thème sombre. Aucun dégradé, asset ou police distante n’est ajouté.
+**Organic Workspace** est consolidé directement dans son stylesheet canonique. La release 1.7.3 supprime la feuille corrective `interaction-stability.css`, intègre en dur les corrections dans `workspace.css`, augmente l’espace entre groupes de paramètres et garantit un contraste lisible pour **Annuler** dans la barre de sauvegarde, notamment en thème sombre. Aucun dégradé, asset ou police distante n’est ajouté.
 
 ## Compatibilité
 
-- **Version source :** `1.7.3` — candidate corrective UI
-- **Dernière release publique :** `1.7.2`
+- **Version source :** `1.7.3` — publiée
+- **Dernière release publique :** `1.7.3`
 - **Thunderbird :** `153.0` à `153.*`
 - **Format :** MailExtension Manifest V3
 - **Langues :** français et anglais
@@ -42,7 +42,7 @@ MailPin utilise une API Experiment privilégiée pour l’intégration `about:3p
 
 ### Release GitHub
 
-1. Téléchargez `MailPin_v1.7.2.xpi` depuis la release `v1.7.2`.
+1. Téléchargez `MailPin_v1.7.3.xpi` depuis la release `v1.7.3`.
 2. Thunderbird → **Extensions et thèmes** → engrenage → **Installer un module depuis un fichier**.
 3. Sélectionnez le XPI.
 
@@ -54,7 +54,7 @@ Prérequis : Python 3.11+ et Node.js 20+.
 npm run ci
 ```
 
-Livrables reproductibles de la source candidate :
+Livrables reproductibles de la source publiée :
 
 - `dist/MailPin_v1.7.3.xpi`
 - `dist/MailPin_GitHub_Repository_v1.7.3.zip`

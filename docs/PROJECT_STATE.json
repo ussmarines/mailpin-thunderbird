@@ -5,8 +5,8 @@
   "extensionVersion": "1.7.3",
   "baseGitHub": {
     "branch": "main",
-    "commit": "ed54686f64626c37d5d38236ebcda8ec8e94a094",
-    "role": "MailPin 1.7.3 hard-coded UI layout candidate baseline after PR #49"
+    "commit": "814e07adc82f0a1b19051c83fbb0fec6a22836b0",
+    "role": "MailPin 1.7.3 published release commit"
   },
   "extensionId": "ussmarines.mailpin@addons.thunderbird.net",
   "thunderbird": {"min": "153.0", "max": "153.*"},
@@ -63,14 +63,14 @@
     "uiDependencyPolicy": "native HTML plus local Organic Workspace CSS tokens; canonical workspace stylesheet; no runtime patch stylesheet, npm runtime dependency, bundler, CDN or remote asset",
     "runtimeTestSupplyChain": "test-only Thunderbird/geckodriver downloads are checksum-verified and are not runtime dependencies"
   },
-  "developmentBranch": "release/1.7.3-ui-layout",
+  "developmentBranch": "main",
   "testing": {
     "contract": ["tests/test_organic_workspace_ui.py", "tests/test_thunderbird_compatibility_boundary.py", "tests/thunderbird_compatibility_contract.mjs"],
     "runtimeWorkflow": ".github/workflows/thunderbird-smoke.yml",
     "runtimeScript": "tests/thunderbird/real_smoke.py",
     "browserStatus": "The UI contract requires layout stability to live in extension/styles/workspace.css and forbids the removed interaction-stability.css overlay.",
-    "runtimeStatus": "PR #49 head caee1248495f8ba88e5f398b0dc9ff8db6711b8e passed QA run 32027919000 and real Thunderbird smoke run 32027918991 before squash merge to main at ed54686f64626c37d5d38236ebcda8ec8e94a094. The exact versioned 1.7.3 candidate must pass its own QA and smoke gates before publication."
+    "runtimeStatus": "The exact 1.7.3 candidate head a247dc53e3b707335b04ae00b227acad52ddb8b5 passed QA run 32028928653 and real Thunderbird smoke run 32028928636 before squash merge to main at 814e07adc82f0a1b19051c83fbb0fec6a22836b0. Release workflow 32031451673 then ran npm run ci, rebuilt the release artifacts and published v1.7.3 successfully from that exact main commit. No unexecuted manual control is reported as passed."
   },
-  "latestPublicVersion": "1.7.2",
-  "releaseStatus": "candidate"
+  "latestPublicVersion": "1.7.3",
+  "releaseStatus": "published"
 }
