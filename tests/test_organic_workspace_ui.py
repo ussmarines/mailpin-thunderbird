@@ -32,12 +32,14 @@ def test_organic_workspace_shell_is_loaded_and_structural():
 def test_organic_design_avoids_generic_effects_and_remote_assets():
     workspace = text("extension/styles/workspace.css").lower()
     tokens = text("extension/styles/tokens.css").lower()
-    combined = workspace + "\n" + tokens
+    stability = text("extension/styles/interaction-stability.css").lower()
+    combined = workspace + "\n" + tokens + "\n" + stability
 
     assert "linear-gradient" not in combined
     assert "radial-gradient" not in combined
     assert "backdrop-filter" not in combined
     assert "@import url(http" not in combined
+    assert "http://" not in stability and "https://" not in stability
     assert "--mp-font-family-display" in tokens
     assert "--mp-ease-organic" in tokens
     assert "prefers-reduced-motion" in workspace
@@ -54,6 +56,7 @@ def test_panel_and_spec_follow_organic_workspace_contract():
     assert "Typographie Fluent 2" not in spec
     assert "pas de dégradé" in spec.lower() or "dégradés" in spec.lower()
     assert "zoom 200 %" in spec
+
 
 def test_organic_workspace_v2_video_driven_contracts():
     workspace_css = text("extension/styles/workspace.css")
@@ -90,6 +93,42 @@ def test_organic_workspace_v2_video_driven_contracts():
     assert 'node("article","group-row case-editor-row case-editor-card")' in options_js
     assert 'const optionState = calendar.taskCompatible && calendar.eventCompatible' in options_js
     assert '`${calendar.name} · ${optionState}`' in options_js
+
+
+def test_field_review_interaction_stability_contracts():
+    theme = text("extension/styles/theme.js")
+    stability = text("extension/styles/interaction-stability.css")
+    bootstrap = text("extension/options/options-bootstrap.js")
+    navigation = text("extension/options/options-navigation-stability.js")
+
+    assert 'link.href = `${scriptBase}interaction-stability.css`' in theme
+    assert 'const scriptSource = String(document.currentScript?.src || "")' in theme
+    assert 'loadClassicScript("./options-navigation-stability.js")' in bootstrap
+
+    # The dashboard disclosure remains full-width before and after expansion,
+    # so the control no longer jumps into another grid cell when clicked.
+    assert 'body.mp-organic-workspace .workspace-stage .stats-grid' in stability
+    assert 'body.mp-organic-workspace .stats-more[open]' in stability
+    assert 'grid-column: auto' in stability
+    assert 'width: 100%' in stability
+
+    # Save/discard and feedback stay viewport-local instead of reflowing the
+    # sticky header, and dense settings groups regain explicit separation.
+    assert 'body.mp-organic-settings .settings-organic-stage .header-save-dock' in stability
+    assert 'position: fixed' in stability
+    assert 'body.mp-organic-settings .settings-organic-stage > #status' in stability
+    assert '#calendar-info .calendar-capability' in stability
+    assert '#save-shortcut' in stability
+    assert 'margin-top: 22px' in stability
+
+    # Navigation is deterministic for long sections: capture before the legacy
+    # smooth-scroll handler and continuously reconcile the active sidebar item.
+    assert 'event.stopImmediatePropagation()' in navigation
+    assert 'section.scrollIntoView({behavior: "auto", block: "start"})' in navigation
+    assert 'new MutationObserver' in navigation
+    assert 'window.addEventListener("scroll", scheduleSync' in navigation
+    assert 'link.setAttribute("aria-current", "location")' in navigation
+
 
 def test_qol_palette_defaults_and_low_friction_creation_contract():
     import re
@@ -139,5 +178,6 @@ if __name__ == "__main__":
     test_organic_design_avoids_generic_effects_and_remote_assets()
     test_panel_and_spec_follow_organic_workspace_contract()
     test_organic_workspace_v2_video_driven_contracts()
+    test_field_review_interaction_stability_contracts()
     test_qol_palette_defaults_and_low_friction_creation_contract()
     print("Organic Workspace UI contracts: OK")

@@ -222,6 +222,9 @@
         throw error;
       }
       await main.startOptions();
+      mark("navigation-stability:requested");
+      await loadClassicScript("./options-navigation-stability.js");
+      mark("navigation-stability:loaded");
     } catch (error) {
       const stage = lastStage === "settings:requested" ? "settings-load"
         : lastStage === "main:requested" ? "main-load"
