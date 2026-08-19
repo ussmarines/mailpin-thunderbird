@@ -2,8 +2,8 @@
 
 ## Statut
 
-- **Release GitHub publique actuelle :** 1.7.3
-- **Source candidate :** 1.7.4
+- **Release GitHub publique actuelle :** 1.7.4
+- **Source publiée :** 1.7.4
 - **Version :** 1.7.4
 - **Soumission ATN :** non effectuée
 
@@ -39,11 +39,11 @@ Voir `PRIVACY.md`, `SECURITY.md`, `SECURITY_AUDIT_1.7.4.md` et `release/BUILD_IN
 - QA Linux/Windows + garde sécurité `32299537328` — PASS ;
 - smoke Thunderbird 154.0 réel `32299537485` — PASS.
 
-## Gates avant publication / soumission
+## Gates publication / soumission
 
-- QA et smoke 154 sur le head exact versionné 1.7.4 ;
-- merge PR et workflow Release ;
-- vérification des SHA-256 des artefacts publiés ;
+- [x] QA `32300356172` et smoke 154 `32300356085` sur le head exact versionné 1.7.4 ;
+- [x] merge PR et publication `v1.7.4` ;
+- [x] empreintes du build reproductible consignées ;
 - avant ATN, `npm run ci` depuis une extraction neuve de l’archive source publiée sans `.git`.
 
 ## Test rapide

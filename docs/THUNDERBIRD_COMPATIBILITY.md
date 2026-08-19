@@ -131,4 +131,4 @@ Toute future adaptation de version doit rester localisée autant que possible da
 
 Le 19 août 2026, le head pré-versionnement `3e1943f2be7a18ebcceef5952810675442e91a33` de la PR #52 a validé le binaire officiel **Thunderbird 154.0** sous Linux, geckodriver 0.37.1 : QA `32299537328` PASS et smoke réel `32299537485` PASS. Le smoke a confirmé vue `about:3pane` prête, Experiment/background à `Startup: Complete`, panneau et bouton injectés une seule fois, ouverture unique du Dashboard, nettoyage après désinstallation puis réinstallation sans duplication.
 
-Cette preuve valide la compatibilité technique 154 avant versionnement. Le head exact de la candidate 1.7.4 doit repasser les mêmes gates avant publication. Les fournisseurs réseau, calendriers distants et la matrice multi-OS restent des validations distinctes.
+La candidate versionnée exacte `c2527b57de4775f4fd228af22b9792937e7ce6ea` a ensuite passé QA `32300356172` et smoke réel Thunderbird 154.0 `32300356085`. Le tag publié `v1.7.4` est identique au commit `b74c0c7f264cf387269be0aaf18e47e99cf07600`. Les fournisseurs réseau, calendriers distants et la matrice multi-OS restent des validations distinctes.

@@ -16,17 +16,25 @@ MailPin 1.7.4 est une maintenance de compatibilité Thunderbird. Le changement r
 - aucune migration ni modification de schéma ;
 - `PinCompatibility` et les adaptateurs Thunderbird sont inchangés.
 
-## Preuves pré-versionnement
+## Preuves de compatibilité
 
-Head exact `3e1943f2be7a18ebcceef5952810675442e91a33` de la PR #52 :
+Head pré-versionnement `3e1943f2be7a18ebcceef5952810675442e91a33` de la PR #52 :
 
 - QA Linux/Windows, garde sécurité/identité et CI complète : `32299537328` — PASS ;
-- smoke sur le binaire officiel Thunderbird 154.0 : `32299537485` — PASS ;
-- téléchargement Thunderbird et geckodriver vérifiés par SHA-256 dans le workflow ;
+- smoke sur le binaire officiel Thunderbird 154.0 : `32299537485` — PASS.
+
+Candidate versionnée exacte `c2527b57de4775f4fd228af22b9792937e7ce6ea` :
+
+- QA Linux/Windows, garde sécurité/identité, build et structure XPI : `32300356172` — PASS ;
+- smoke réel Thunderbird 154.0 : `32300356085` — PASS ;
+- téléchargements Thunderbird et geckodriver vérifiés par SHA-256 dans le workflow ;
 - aucune correction de logique MailPin n’a été nécessaire pour obtenir le PASS 154.
 
-## Gate de candidate versionnée
+## Publication
 
-La candidate MailPin 1.7.4 doit repasser la QA complète et le smoke Thunderbird 154 sur son head exact après le changement de version et de documentation. Ces contrôles ne sont pas déclarés PASS avant leur exécution.
+- déclencheur de publication validé par QA `32300831724` — PASS ;
+- tag `v1.7.4` identique au commit `b74c0c7f264cf387269be0aaf18e47e99cf07600` ;
+- XPI reproductible SHA-256 `f5a9031ed1b3bad059516f659280b447c6654edd9900e5267d576cecc8b377d8` ;
+- archive source reproductible SHA-256 `bf308142f4a27ec091eb0b9bef2744e33df93677b41dcb97243d5070364a91c6`.
 
-Codex Security n’est pas utilisé.
+Aucun finding de sécurité supplémentaire n’a été introduit par la finalisation. Codex Security n’a pas été utilisé.

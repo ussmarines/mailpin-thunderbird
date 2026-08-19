@@ -1,6 +1,6 @@
 # Plan de test manuel MailPin — 1.7.4
 
-Utiliser de préférence un profil Thunderbird jetable pour les scénarios destructifs. Le présent plan complète les validations automatisées de la source 1.7.4 ; la dernière release publique est 1.7.3. Aucun contrôle non exécuté ne doit être présenté comme PASS.
+Utiliser de préférence un profil Thunderbird jetable pour les scénarios destructifs. Le présent plan complète les validations automatisées de la source 1.7.4 ; la dernière release publique est 1.7.4. Aucun contrôle non exécuté ne doit être présenté comme PASS.
 
 ## Recette 1.7.4 — compatibilité Thunderbird 154
 
@@ -21,9 +21,11 @@ Utiliser de préférence un profil Thunderbird jetable pour les scénarios destr
 - aucun tag personnel n’est modifié ;
 - le XPI testé doit correspondre exactement à la candidate/release 1.7.4 concernée.
 
-## Preuves automatisées acquises avant versionnement
+## Preuves automatisées
 
-- head `3e1943f2be7a18ebcceef5952810675442e91a33` : QA Linux/Windows + garde sécurité `32299537328` PASS ;
-- même head : smoke réel Thunderbird 154.0 `32299537485` PASS.
+- candidate versionnée `c2527b57de4775f4fd228af22b9792937e7ce6ea` : QA Linux/Windows + garde sécurité `32300356172` PASS ;
+- même candidate : smoke réel Thunderbird 154.0 `32300356085` PASS ;
+- déclencheur de publication : QA `32300831724` PASS ;
+- tag `v1.7.4` identique au commit publié `b74c0c7f264cf387269be0aaf18e47e99cf07600`.
 
-La candidate versionnée 1.7.4 doit repasser QA et smoke réels avant release. La recette humaine ci-dessus n’est pas déclarée comme exécutée tant qu’elle ne l’a pas été réellement.
+La candidate versionnée 1.7.4 a donc passé QA et smoke réels avant release. La recette humaine ci-dessus n’est pas déclarée comme exécutée tant qu’elle ne l’a pas été réellement.

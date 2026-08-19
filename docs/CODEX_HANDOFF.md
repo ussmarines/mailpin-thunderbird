@@ -1,34 +1,32 @@
-# Passage de relais — MailPin 1.7.4 candidate Thunderbird 154
+# Passage de relais — MailPin 1.7.4 publiée pour Thunderbird 154
 
 ## Référence
 
 - dépôt : `ussmarines/mailpin-thunderbird` ;
-- branche : `fix/thunderbird-154-compatibility` ;
-- baseline `main` : `f7b7c99478c81b7bb4d0cc0f0c549528bc5c72c5` ;
+- branche de finalisation : `release/finalize-1.7.4` ;
 - version source : **1.7.4** ;
-- dernière release publique : **1.7.3** ;
-- `releaseStatus` : **candidate** ;
+- dernière release publique : **1.7.4** ;
+- `releaseStatus` : **published** ;
 - ID : `ussmarines.mailpin@addons.thunderbird.net` ;
-- compatibilité candidate : Thunderbird `153.0` à `154.*`.
+- compatibilité publiée : Thunderbird `153.0` à `154.*`.
 
-## Objectif
+## Résultat
 
-Rétablir la compatibilité avec Thunderbird 154.0 sans modifier la logique métier. La cause initiale était la limite de manifeste `strict_max_version: 153.*`; le smoke runtime est désormais exécuté sur le binaire officiel Thunderbird 154.0.
+MailPin 1.7.4 corrige l’incompatibilité d’installation avec Thunderbird 154. La cause était `strict_max_version: 153.*`. Le correctif étend la plage à `154.*` et déplace le smoke sur le binaire officiel Thunderbird 154.0, sans changement métier, permission, stockage, schéma, dépendance runtime ou réseau.
 
-## Preuves pré-versionnement acquises
+## Preuves
 
-Head exact `3e1943f2be7a18ebcceef5952810675442e91a33` :
+- candidate exacte `c2527b57de4775f4fd228af22b9792937e7ce6ea` : QA `32300356172` PASS ;
+- même candidate : smoke réel Thunderbird 154.0 `32300356085` PASS ;
+- déclencheur de publication : QA `32300831724` PASS ;
+- tag `v1.7.4` identique au commit `b74c0c7f264cf387269be0aaf18e47e99cf07600` ;
+- XPI reproductible : SHA-256 `f5a9031ed1b3bad059516f659280b447c6654edd9900e5267d576cecc8b377d8` ;
+- source reviewer reproductible : SHA-256 `bf308142f4a27ec091eb0b9bef2744e33df93677b41dcb97243d5070364a91c6`.
 
-- QA Linux/Windows + garde sécurité `32299537328` — PASS ;
-- smoke réel Thunderbird 154.0 `32299537485` — PASS ;
-- le job runtime a construit le XPI, vérifié les téléchargements, installé MailPin, atteint `Startup: Complete`, contrôlé l’injection unique, l’ouverture unique du Dashboard, le cleanup et la réinstallation propre.
+## Reste hors gate GitHub
 
-## Gates restants avant publication
+- recette humaine visuelle/fournisseurs si souhaitée ;
+- soumission et revue ATN ;
+- futurs Thunderbird >154 : nouveau smoke réel requis.
 
-- QA complète sur le head exact versionné 1.7.4 ;
-- smoke réel Thunderbird 154.0 sur ce même head ;
-- build/release metadata cohérents ;
-- merge de la PR sur `main` uniquement si les gates sont verts ;
-- workflow Release et vérification des artefacts 1.7.4.
-
-Aucun contrôle non exécuté n’est revendiqué comme PASS. Codex Security n’est pas utilisé.
+Codex Security n’a pas été utilisé.

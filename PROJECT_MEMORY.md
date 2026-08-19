@@ -1,13 +1,13 @@
 # Mémoire opérationnelle — MailPin
 
 > Version source : **1.7.4**
-> Dernière release publique : **1.7.3**
-> Branche courante : `fix/thunderbird-154-compatibility` ; candidate de compatibilité Thunderbird 154
+> Dernière release publique : **1.7.4**
+> Branche courante : `release/finalize-1.7.4` ; finalisation documentaire post-publication
 > Extension ID : `ussmarines.mailpin@addons.thunderbird.net`
 
 ## Résumé
 
-MailPin est une extension Thunderbird Manifest V3 locale. La source 1.7.4 étend la compatibilité déclarée de `153.0` à `154.*` et déplace le smoke automatisé sur le binaire officiel Thunderbird 154.0. Aucun changement de logique métier, permission, stockage, schéma, dépendance runtime ou réseau n’est introduit. Le head pré-versionnement `3e1943f2be7a18ebcceef5952810675442e91a33` a passé la QA `32299537328` et le smoke réel Thunderbird 154.0 `32299537485`; la candidate versionnée doit repasser ces gates avant publication.
+MailPin est une extension Thunderbird Manifest V3 locale. La source 1.7.4 étend la compatibilité déclarée de `153.0` à `154.*` et déplace le smoke automatisé sur le binaire officiel Thunderbird 154.0. Aucun changement de logique métier, permission, stockage, schéma, dépendance runtime ou réseau n’est introduit. La candidate versionnée `c2527b57de4775f4fd228af22b9792937e7ce6ea` a passé la QA `32300356172` et le smoke réel Thunderbird 154.0 `32300356085`. Le déclencheur de publication a passé la QA `32300831724`; le tag `v1.7.4` est identique au commit `b74c0c7f264cf387269be0aaf18e47e99cf07600`.
 
 ## Invariants non négociables
 
@@ -55,14 +55,14 @@ MailPin est une extension Thunderbird Manifest V3 locale. La source 1.7.4 étend
 
 ## État technique courant
 
-- source : 1.7.4 candidate ; dernière release publique : 1.7.3 ;
+- source : 1.7.4 publiée ; dernière release publique : 1.7.4 ;
 - Thunderbird : 153.0 à 154.* ;
 - permission WebExtension : `menus` uniquement ;
 - schémas : SQLite 5, settings 8, data 7 ;
 - aucune migration, permission, dépendance runtime ou connexion réseau introduite par 1.7.4 ;
-- preuve pré-versionnement QA : `32299537328` — PASS ;
-- preuve pré-versionnement smoke Thunderbird 154.0 : `32299537485` — PASS ;
-- candidate versionnée : QA et smoke frais requis avant merge/publication.
+- QA candidate exacte : `32300356172` — PASS ;
+- smoke réel Thunderbird 154.0 candidate exacte : `32300356085` — PASS ;
+- release `v1.7.4` publiée après QA, build et smoke Thunderbird 154 réels.
 
 ## Commandes obligatoires
 

@@ -1,46 +1,42 @@
-# Préparation MailPin 1.7.4
+# Publication MailPin 1.7.4
 
 ## État
 
-- **Version source :** 1.7.4 — candidate
-- **Dernière release publique :** 1.7.3
-- **Dernière publication :** `v1.7.3`, commit `814e07adc82f0a1b19051c83fbb0fec6a22836b0`
+- **Version source :** 1.7.4 — publiée
+- **Dernière release publique :** 1.7.4
+- **Dernière publication :** `v1.7.4`, commit `b74c0c7f264cf387269be0aaf18e47e99cf07600`
 - **ID permanent :** `ussmarines.mailpin@addons.thunderbird.net`
-- **Compatibilité candidate :** Thunderbird 153.0 à 154.*
+- **Compatibilité publiée :** Thunderbird 153.0 à 154.*
 
 ## Portée 1.7.4
 
-La 1.7.4 rétablit l’installation sur Thunderbird 154 en étendant `strict_max_version` à `154.*` et déplace le smoke runtime sur le binaire officiel Thunderbird 154.0. Aucun code métier ni adaptateur `PinCompatibility` n’a dû être modifié pendant la validation pré-versionnement.
+La 1.7.4 rétablit l’installation sur Thunderbird 154 en étendant `strict_max_version` à `154.*` et déplace le smoke runtime sur le binaire officiel Thunderbird 154.0. Aucun code métier ni adaptateur `PinCompatibility` n’a été modifié.
 
 Aucune permission WebExtension, migration, schéma, stockage, dépendance runtime, connexion réseau, télémétrie, publicité, code distant ou identité n’est modifié.
 
-## Preuves pré-versionnement
+## Preuves
 
-Head exact `3e1943f2be7a18ebcceef5952810675442e91a33` :
+- candidate versionnée `c2527b57de4775f4fd228af22b9792937e7ce6ea` : QA `32300356172` — PASS ;
+- même candidate : smoke réel Thunderbird 154.0 `32300356085` — PASS ;
+- déclencheur de publication : QA `32300831724` — PASS ;
+- tag `v1.7.4` : identique au commit `b74c0c7f264cf387269be0aaf18e47e99cf07600` ;
+- build reproductible exact de l’arbre publié : `MailPin_v1.7.4.xpi` — 254 565 octets — SHA-256 `f5a9031ed1b3bad059516f659280b447c6654edd9900e5267d576cecc8b377d8` ;
+- archive source : `MailPin_GitHub_Repository_v1.7.4.zip` — 688 743 octets — SHA-256 `bf308142f4a27ec091eb0b9bef2744e33df93677b41dcb97243d5070364a91c6`.
 
-- QA Linux/Windows + garde sécurité `32299537328` — PASS ;
-- smoke Thunderbird 154.0 réel `32299537485` — PASS.
-
-Ces preuves établissent la compatibilité technique avant le bump de version mais ne remplacent pas les gates du head versionné 1.7.4.
-
-## Artefacts attendus
+## Artefacts
 
 - `MailPin_v1.7.4.xpi` ;
 - `MailPin_GitHub_Repository_v1.7.4.zip` ;
 - `SHA256SUMS.txt`.
 
-Les tailles et SHA-256 ne seront consignés qu’après le workflow Release ; aucune empreinte n’est inventée à l’avance.
+## Gates GitHub
 
-## Gates de publication
+- [x] QA Linux/Windows sur la candidate exacte ;
+- [x] garde sécurité/identité ;
+- [x] build reproductible et structure XPI ;
+- [x] smoke Thunderbird 154.0 réel ;
+- [x] merge sur `main` ;
+- [x] tag/release `v1.7.4` créé sur le commit publié ;
+- [x] workflow one-shot retiré de la branche de finalisation.
 
-- [ ] QA Linux/Windows sur la candidate 1.7.4 exacte ;
-- [ ] garde sécurité/identité sur la candidate ;
-- [ ] build reproductible et structure XPI ;
-- [ ] smoke Thunderbird 154.0 réel sur la candidate exacte ;
-- [ ] merge PR release sur `main` ;
-- [ ] workflow Release depuis `main` ;
-- [ ] `v1.7.4` publique et empreintes des artefacts vérifiées.
-
-La recette visuelle humaine et la soumission ATN restent distinctes des preuves automatisées et ne sont pas déclarées comme exécutées si elles ne l’ont pas été.
-
-Codex Security n’est pas utilisé.
+La recette visuelle humaine et la soumission ATN restent distinctes de la publication GitHub. Codex Security n’a pas été utilisé.

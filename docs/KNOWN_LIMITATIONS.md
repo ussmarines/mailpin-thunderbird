@@ -1,8 +1,8 @@
 # Limites connues
 
-## Source 1.7.4 / release publique 1.7.3
+## Source 1.7.4 / release publique 1.7.4
 
-La source **1.7.4** est une candidate de compatibilité Thunderbird 154. La release publique **1.7.3** reste la dernière version publiée jusqu’aux gates finaux et au workflow Release.
+La source **1.7.4** et la release publique **1.7.4** sont alignées. La compatibilité Thunderbird 154 a été validée par QA et smoke réel avant publication.
 
 ## Interface et accessibilité
 
@@ -12,8 +12,8 @@ La source **1.7.4** est une candidate de compatibilité Thunderbird 154. La rele
 
 ## Compatibilité Thunderbird
 
-- Le manifeste candidate déclare Thunderbird `153.0` à `154.*`.
-- Le head pré-versionnement `3e1943f2be7a18ebcceef5952810675442e91a33` a passé le smoke officiel Thunderbird 154.0 `32299537485`.
+- Le manifeste publié déclare Thunderbird `153.0` à `154.*`.
+- La candidate exacte `c2527b57de4775f4fd228af22b9792937e7ce6ea` a passé le smoke officiel Thunderbird 154.0 `32300356085`.
 - L’Experiment privilégié et les surfaces internes `about:3pane`, Messages, Tags et Agenda restent à surveiller lors de chaque future mise à jour Thunderbird ; une nouvelle version majeure ne doit pas être revendiquée sans preuve runtime fraîche.
 
 ## Fournisseurs / Agenda / Tags
@@ -30,5 +30,5 @@ La source **1.7.4** est une candidate de compatibilité Thunderbird 154. La rele
 
 ## Publication
 
-- La release GitHub 1.7.3 reste publiée ; 1.7.4 demeure candidate jusqu’à QA + smoke 154 sur le head versionné, merge et workflow Release.
+- La release GitHub 1.7.4 est publiée ; les futures versions majeures Thunderbird restent non revendiquées sans smoke réel frais.
 - ATN, la recette visuelle humaine et les matrices fournisseurs restent distincts de la publication GitHub et ne sont pas implicitement considérés comme validés.

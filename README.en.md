@@ -6,8 +6,8 @@
 **Email Follow-up & Productivity for Thunderbird**
 
 [![QA](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml)
-![Release](https://img.shields.io/badge/release-v1.7.3-4F7F75)
-![Source](https://img.shields.io/badge/candidate-v1.7.4-3D536B)
+![Release](https://img.shields.io/badge/release-v1.7.4-4F7F75)
+![Source](https://img.shields.io/badge/source-v1.7.4-3D536B)
 ![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x--154.x-3D536B)
 ![License](https://img.shields.io/badge/license-MailPin%20Source--Available%201.1-1A1D21)
 </div>
@@ -29,20 +29,20 @@ MailPin turns important email into actionable follow-up **without replacing Thun
 
 ## Compatibility
 
-- **Source version:** `1.7.4` — candidate
-- **Latest public release:** `1.7.3`
+- **Source version:** `1.7.4` — published
+- **Latest public release:** `1.7.4`
 - **Thunderbird:** `153.0` to `154.*`
 - **Format:** MailExtension Manifest V3
 - **Locales:** French and English
 - **Public ID:** `ussmarines.mailpin@addons.thunderbird.net`
 
-MailPin uses a privileged Thunderbird Experiment for `about:3pane`, local SQLite storage, and selected Messages/Tags/Calendar integration. Messages, Tags and Calendar internals remain isolated behind `PinCompatibility`. Thunderbird 154 compatibility is checked with a real smoke run against the official 154.0 binary before publication.
+MailPin uses a privileged Thunderbird Experiment for `about:3pane`, local SQLite storage, and selected Messages/Tags/Calendar integration. Messages, Tags and Calendar internals remain isolated behind `PinCompatibility`. Thunderbird 154 compatibility was validated with a real smoke run against the official 154.0 binary before publication.
 
 ## Install
 
 ### GitHub release
 
-1. Download `MailPin_v1.7.3.xpi` from release `v1.7.3` while 1.7.4 remains a candidate.
+1. Download `MailPin_v1.7.4.xpi` from release `v1.7.4`.
 2. Thunderbird → **Add-ons and Themes** → gear menu → **Install Add-on From File**.
 3. Select the XPI.
 
@@ -54,7 +54,7 @@ Requires Python 3.11+ and Node.js 20+.
 npm run ci
 ```
 
-Reproducible outputs from the candidate source:
+Reproducible outputs from the published source:
 
 - `dist/MailPin_v1.7.4.xpi`
 - `dist/MailPin_GitHub_Repository_v1.7.4.zip`

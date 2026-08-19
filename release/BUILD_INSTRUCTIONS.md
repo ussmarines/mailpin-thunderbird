@@ -2,7 +2,7 @@
 
 ## État
 
-La release GitHub **1.7.3** est publiée. La source **1.7.4** est une candidate de compatibilité Thunderbird 154 et n’est pas encore publiée.
+La release GitHub **1.7.4** est publiée. La source **1.7.4** correspond à la version publiée compatible Thunderbird 154.
 
 ## Environnement
 
@@ -35,13 +35,15 @@ Le contenu de `extension/` est placé directement à la racine du XPI. Aucun Jav
 
 ## Portée 1.7.4
 
-La candidate étend la compatibilité déclarée de Thunderbird `153.0` à `154.*` et teste le runtime sur le binaire officiel Thunderbird 154.0. Elle n’ajoute aucune permission, dépendance runtime, migration, schéma, réseau, télémétrie, publicité ou code distant.
+La version publiée étend la compatibilité déclarée de Thunderbird `153.0` à `154.*` et teste le runtime sur le binaire officiel Thunderbird 154.0. Elle n’ajoute aucune permission, dépendance runtime, migration, schéma, réseau, télémétrie, publicité ou code distant.
 
-## Preuves pré-versionnement
+## Preuves
 
-1. QA Linux/Windows + garde sécurité sur `3e1943f2be7a18ebcceef5952810675442e91a33` : `32299537328` — PASS ;
-2. smoke réel Thunderbird 154.0 sur le même head : `32299537485` — PASS.
+1. candidate exacte `c2527b57de4775f4fd228af22b9792937e7ce6ea` : QA Linux/Windows + garde sécurité `32300356172` — PASS ;
+2. même candidate : smoke réel Thunderbird 154.0 `32300356085` — PASS ;
+3. déclencheur de publication : QA `32300831724` — PASS ;
+4. tag `v1.7.4` : identique au commit `b74c0c7f264cf387269be0aaf18e47e99cf07600`.
 
-La candidate versionnée 1.7.4 doit repasser QA, build et smoke 154 sur son head exact avant merge/publication. Les SHA-256 des artefacts seront consignés uniquement après le workflow Release.
+XPI SHA-256 : `f5a9031ed1b3bad059516f659280b447c6654edd9900e5267d576cecc8b377d8`. Archive source SHA-256 : `bf308142f4a27ec091eb0b9bef2744e33df93677b41dcb97243d5070364a91c6`.
 
 Avant soumission ATN, exécuter encore exactement `npm run ci` depuis une extraction neuve de l’archive source publiée sans `.git` et consigner le résultat. Ce gate n’est pas déclaré PASS ici tant qu’il n’a pas été exécuté sur l’archive publiée.

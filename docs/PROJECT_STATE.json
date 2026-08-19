@@ -5,8 +5,8 @@
   "extensionVersion": "1.7.4",
   "baseGitHub": {
     "branch": "main",
-    "commit": "f7b7c99478c81b7bb4d0cc0f0c549528bc5c72c5",
-    "role": "published 1.7.3 baseline for the Thunderbird 154 compatibility candidate"
+    "commit": "b74c0c7f264cf387269be0aaf18e47e99cf07600",
+    "role": "published v1.7.4 tag target after Thunderbird 154 compatibility validation"
   },
   "extensionId": "ussmarines.mailpin@addons.thunderbird.net",
   "thunderbird": {"min": "153.0", "max": "154.*"},
@@ -63,14 +63,14 @@
     "uiDependencyPolicy": "native HTML plus local Organic Workspace CSS tokens; canonical workspace stylesheet; no runtime patch stylesheet, npm runtime dependency, bundler, CDN or remote asset",
     "runtimeTestSupplyChain": "test-only Thunderbird/geckodriver downloads are checksum-verified and are not runtime dependencies"
   },
-  "developmentBranch": "fix/thunderbird-154-compatibility",
+  "developmentBranch": "release/finalize-1.7.4",
   "testing": {
     "contract": ["tests/test_organic_workspace_ui.py", "tests/test_thunderbird_compatibility_boundary.py", "tests/thunderbird_compatibility_contract.mjs"],
     "runtimeWorkflow": ".github/workflows/thunderbird-smoke.yml",
     "runtimeScript": "tests/thunderbird/real_smoke.py",
     "browserStatus": "No UI implementation change in 1.7.4; Organic Workspace contracts remain unchanged.",
-    "runtimeStatus": "Pre-version compatibility head 3e1943f2be7a18ebcceef5952810675442e91a33 passed QA run 32299537328 and real Thunderbird 154.0 smoke run 32299537485. The versioned 1.7.4 candidate must rerun both gates before publication."
+    "runtimeStatus": "Versioned candidate c2527b57de4775f4fd228af22b9792937e7ce6ea passed QA 32300356172 and real Thunderbird 154.0 smoke 32300356085. Release trigger QA 32300831724 passed, and tag v1.7.4 resolves exactly to b74c0c7f264cf387269be0aaf18e47e99cf07600."
   },
-  "latestPublicVersion": "1.7.3",
-  "releaseStatus": "candidate"
+  "latestPublicVersion": "1.7.4",
+  "releaseStatus": "published"
 }
