@@ -1,13 +1,13 @@
 # Mémoire opérationnelle — MailPin
 
-> Version source : **1.7.3**
+> Version source : **1.7.4**
 > Dernière release publique : **1.7.3**
-> Branche courante : `main` ; release : `v1.7.3` sur `814e07adc82f0a1b19051c83fbb0fec6a22836b0`
+> Branche courante : `fix/thunderbird-154-compatibility` ; candidate de compatibilité Thunderbird 154
 > Extension ID : `ussmarines.mailpin@addons.thunderbird.net`
 
 ## Résumé
 
-MailPin est une extension Thunderbird Manifest V3 locale. La release 1.7.3 consolide en dur dans `extension/styles/workspace.css` les corrections UI auparavant portées par `interaction-stability.css`, désormais supprimé. Elle augmente le rythme vertical des groupes de paramètres et rend le bouton Annuler lisible dans la barre de sauvegarde, notamment en thème sombre. La candidate exacte `a247dc53e3b707335b04ae00b227acad52ddb8b5` a passé QA `32028928653` et smoke Thunderbird réel `32028928636`, puis a été fusionnée dans `main` à `814e07adc82f0a1b19051c83fbb0fec6a22836b0`. Le workflow Release `32031451673` a ensuite exécuté `npm run ci`, reconstruit les artefacts et publié `v1.7.3` avec succès.
+MailPin est une extension Thunderbird Manifest V3 locale. La source 1.7.4 étend la compatibilité déclarée de `153.0` à `154.*` et déplace le smoke automatisé sur le binaire officiel Thunderbird 154.0. Aucun changement de logique métier, permission, stockage, schéma, dépendance runtime ou réseau n’est introduit. Le head pré-versionnement `3e1943f2be7a18ebcceef5952810675442e91a33` a passé la QA `32299537328` et le smoke réel Thunderbird 154.0 `32299537485`; la candidate versionnée doit repasser ces gates avant publication.
 
 ## Invariants non négociables
 
@@ -55,16 +55,14 @@ MailPin est une extension Thunderbird Manifest V3 locale. La release 1.7.3 conso
 
 ## État technique courant
 
-- source : 1.7.3 ; dernière release publique : 1.7.3 ;
-- Thunderbird : 153.0 à 153.* ;
+- source : 1.7.4 candidate ; dernière release publique : 1.7.3 ;
+- Thunderbird : 153.0 à 154.* ;
 - permission WebExtension : `menus` uniquement ;
 - schémas : SQLite 5, settings 8, data 7 ;
-- aucune migration, permission, dépendance runtime ou connexion réseau introduite par 1.7.3 ;
-- QA candidate : `32028928653` — PASS ;
-- smoke Thunderbird réel candidate : `32028928636` — PASS ;
-- workflow Release : `32031451673` — PASS ;
-- XPI : `66a10432457a509b9c9959e3df7bcdd2415d14668284b6104803dfa1d9362bc4` ;
-- archive source : `ff5999a8b73392b0ad7e6778c69602ddddeeb687a3263d2162b2f93afddaf767`.
+- aucune migration, permission, dépendance runtime ou connexion réseau introduite par 1.7.4 ;
+- preuve pré-versionnement QA : `32299537328` — PASS ;
+- preuve pré-versionnement smoke Thunderbird 154.0 : `32299537485` — PASS ;
+- candidate versionnée : QA et smoke frais requis avant merge/publication.
 
 ## Commandes obligatoires
 
@@ -79,7 +77,7 @@ npm run ci
 
 - version source et dernière release publique déclarées sans ambiguïté ;
 - tests et build verts sur le diff applicable ;
-- smoke Thunderbird réel frais lorsque `extension/**` change ;
+- smoke Thunderbird 154 réel frais sur le head versionné ;
 - aucune permission, schéma, réseau ou dépendance runtime injustifiée ;
 - documentation active alignée avec les preuves exactes ;
-- publication uniquement après autorisation explicite et gates applicables démontrés.
+- publication uniquement après les gates applicables démontrés.

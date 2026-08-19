@@ -1,36 +1,34 @@
-# Passage de relais — MailPin 1.7.3 publiée
+# Passage de relais — MailPin 1.7.4 candidate Thunderbird 154
 
 ## Référence
 
 - dépôt : `ussmarines/mailpin-thunderbird` ;
-- release commit : `main` à `814e07adc82f0a1b19051c83fbb0fec6a22836b0` ;
-- tag/release : `v1.7.3` ;
-- version source : **1.7.3** ;
+- branche : `fix/thunderbird-154-compatibility` ;
+- baseline `main` : `f7b7c99478c81b7bb4d0cc0f0c549528bc5c72c5` ;
+- version source : **1.7.4** ;
 - dernière release publique : **1.7.3** ;
-- `releaseStatus` : **published** ;
-- ID : `ussmarines.mailpin@addons.thunderbird.net`.
+- `releaseStatus` : **candidate** ;
+- ID : `ussmarines.mailpin@addons.thunderbird.net` ;
+- compatibilité candidate : Thunderbird `153.0` à `154.*`.
 
-## Résultat livré
+## Objectif
 
-La 1.7.3 publie les corrections UI intégrées en dur : suppression de `interaction-stability.css`, consolidation dans `workspace.css`, espacement renforcé entre groupes de paramètres et contraste lisible du bouton Annuler en thème sombre et clair.
+Rétablir la compatibilité avec Thunderbird 154.0 sans modifier la logique métier. La cause initiale était la limite de manifeste `strict_max_version: 153.*`; le smoke runtime est désormais exécuté sur le binaire officiel Thunderbird 154.0.
 
-## Preuves acquises
+## Preuves pré-versionnement acquises
 
-- candidate exacte `a247dc53e3b707335b04ae00b227acad52ddb8b5` ;
-- QA Linux/Windows + garde sécurité `32028928653` — PASS ;
-- smoke Thunderbird 153 réel `32028928636` — PASS ;
-- squash release : `814e07adc82f0a1b19051c83fbb0fec6a22836b0` ;
-- workflow Release `32031451673` — PASS ;
-- `v1.7.3` publique, non draft, non prerelease, ciblant exactement le commit release ;
-- XPI SHA-256 `66a10432457a509b9c9959e3df7bcdd2415d14668284b6104803dfa1d9362bc4` ;
-- archive source SHA-256 `ff5999a8b73392b0ad7e6778c69602ddddeeb687a3263d2162b2f93afddaf767` ;
-- `SHA256SUMS.txt` SHA-256 `af405970d942b42cbb1d224538795811ddc00ba3cadba3ab9de6e53eea1194e9`.
+Head exact `3e1943f2be7a18ebcceef5952810675442e91a33` :
 
-## Restant hors publication GitHub
+- QA Linux/Windows + garde sécurité `32299537328` — PASS ;
+- smoke réel Thunderbird 154.0 `32299537485` — PASS ;
+- le job runtime a construit le XPI, vérifié les téléchargements, installé MailPin, atteint `Startup: Complete`, contrôlé l’injection unique, l’ouverture unique du Dashboard, le cleanup et la réinstallation propre.
 
-- recette visuelle humaine post-correction avant ATN ;
-- `npm run ci` depuis une extraction neuve de la source reviewer 1.7.3 sans `.git` avant soumission ATN ;
-- téléversement et revue ATN ;
-- matrices fournisseurs/systèmes réels uniquement si elles sont nécessaires à la soumission.
+## Gates restants avant publication
 
-Aucun contrôle manuel non exécuté n’est revendiqué comme PASS. Codex Security n’est pas utilisé.
+- QA complète sur le head exact versionné 1.7.4 ;
+- smoke réel Thunderbird 154.0 sur ce même head ;
+- build/release metadata cohérents ;
+- merge de la PR sur `main` uniquement si les gates sont verts ;
+- workflow Release et vérification des artefacts 1.7.4.
+
+Aucun contrôle non exécuté n’est revendiqué comme PASS. Codex Security n’est pas utilisé.

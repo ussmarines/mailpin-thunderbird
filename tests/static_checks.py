@@ -13,7 +13,7 @@ assert manifest["manifest_version"] == 3
 assert manifest["permissions"] == ["menus"]
 assert manifest["browser_specific_settings"]["gecko"]["id"] == "ussmarines.mailpin@addons.thunderbird.net"
 assert manifest["browser_specific_settings"]["gecko"]["strict_min_version"] == "153.0"
-assert manifest["browser_specific_settings"]["gecko"]["strict_max_version"] == "153.*"
+assert manifest["browser_specific_settings"]["gecko"]["strict_max_version"] == "154.*"
 assert manifest["default_locale"] == "fr"
 package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
 assert package["version"] == version

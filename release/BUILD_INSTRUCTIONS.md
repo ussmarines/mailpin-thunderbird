@@ -1,8 +1,8 @@
-# Instructions de build pour les reviewers — MailPin 1.7.3
+# Instructions de build pour les reviewers — MailPin 1.7.4
 
 ## État
 
-La release GitHub **1.7.3** est publiée. La source **1.7.3** correspond à cette release et cible le commit `814e07adc82f0a1b19051c83fbb0fec6a22836b0`.
+La release GitHub **1.7.3** est publiée. La source **1.7.4** est une candidate de compatibilité Thunderbird 154 et n’est pas encore publiée.
 
 ## Environnement
 
@@ -15,7 +15,7 @@ La release GitHub **1.7.3** est publiée. La source **1.7.3** correspond à cett
 
 ## Reproduction
 
-Dans un checkout de la source 1.7.3 ou dans l’archive reviewer extraite sans `.git` :
+Dans un checkout de la source MailPin 1.7.4 ou dans l’archive reviewer extraite sans `.git` :
 
 ```bash
 npm run ci
@@ -24,8 +24,8 @@ npm run ci
 Livrables :
 
 ```text
-dist/MailPin_v1.7.3.xpi
-dist/MailPin_GitHub_Repository_v1.7.3.zip
+dist/MailPin_v1.7.4.xpi
+dist/MailPin_GitHub_Repository_v1.7.4.zip
 dist/SHA256SUMS.txt
 ```
 
@@ -33,19 +33,15 @@ Sans `.git`, le garde de sécurité et le build utilisent exclusivement `.mailpi
 
 Le contenu de `extension/` est placé directement à la racine du XPI. Aucun JavaScript/CSS n’est minifié, transpilé, concaténé, généré ou obfusqué.
 
-## Portée 1.7.3
+## Portée 1.7.4
 
-La release supprime `interaction-stability.css` et consolide les corrections UI dans `workspace.css`, renforce l’espacement des groupes de réglages et le contraste Annuler. Elle n’ajoute aucune permission, dépendance runtime, migration, schéma, réseau, télémétrie, publicité ou code distant.
+La candidate étend la compatibilité déclarée de Thunderbird `153.0` à `154.*` et teste le runtime sur le binaire officiel Thunderbird 154.0. Elle n’ajoute aucune permission, dépendance runtime, migration, schéma, réseau, télémétrie, publicité ou code distant.
 
-## Preuves de publication
+## Preuves pré-versionnement
 
-1. QA Linux/Windows + garde sécurité sur la candidate exacte `a247dc53e3b707335b04ae00b227acad52ddb8b5` : run `32028928653` — PASS ;
-2. smoke Thunderbird réel : run `32028928636` — PASS ;
-3. build reproductible et structure XPI : PASS dans la QA et le workflow Release ;
-4. merge PR release vers `main` : `814e07adc82f0a1b19051c83fbb0fec6a22836b0` ;
-5. workflow Release : `32031451673` — PASS ;
-6. XPI publié SHA-256 `66a10432457a509b9c9959e3df7bcdd2415d14668284b6104803dfa1d9362bc4` ;
-7. archive source publiée SHA-256 `ff5999a8b73392b0ad7e6778c69602ddddeeb687a3263d2162b2f93afddaf767` ;
-8. `SHA256SUMS.txt` publié SHA-256 `af405970d942b42cbb1d224538795811ddc00ba3cadba3ab9de6e53eea1194e9`.
+1. QA Linux/Windows + garde sécurité sur `3e1943f2be7a18ebcceef5952810675442e91a33` : `32299537328` — PASS ;
+2. smoke réel Thunderbird 154.0 sur le même head : `32299537485` — PASS.
+
+La candidate versionnée 1.7.4 doit repasser QA, build et smoke 154 sur son head exact avant merge/publication. Les SHA-256 des artefacts seront consignés uniquement après le workflow Release.
 
 Avant soumission ATN, exécuter encore exactement `npm run ci` depuis une extraction neuve de l’archive source publiée sans `.git` et consigner le résultat. Ce gate n’est pas déclaré PASS ici tant qu’il n’a pas été exécuté sur l’archive publiée.

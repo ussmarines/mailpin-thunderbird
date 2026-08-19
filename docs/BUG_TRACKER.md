@@ -1,6 +1,6 @@
 # Registre des bugs MailPin
 
-Version source : **1.7.3**
+Version source : **1.7.4**
 
 Dernière release publique : **1.7.3**
 
@@ -16,6 +16,7 @@ Les détails historiques complets restent dans Git et les audits archivés. Le r
 
 | ID | Introduit | Symptôme | Cause | Fichiers | Test | Statut | Correction | Validation |
 |---|---|---|---|---|---|---|---|---|
+| MP-2026-059 | 1.7.3 | Thunderbird 154 refuse MailPin comme incompatible avant le démarrage de l’extension. | Le manifeste et les gardes de compatibilité limitaient `strict_max_version` à `153.*`; le smoke runtime était lui aussi épinglé sur Thunderbird 153.0.1 ESR. | `extension/manifest.json`, `.github/workflows/thunderbird-smoke.yml`, gardes et documentation de compatibilité | QA + smoke réel Thunderbird 154.0 | À VALIDER | 1.7.4 | Head pré-versionnement `3e1943f2be7a18ebcceef5952810675442e91a33` : QA `32299537328` PASS et smoke 154 `32299537485` PASS ; candidate 1.7.4 exacte encore à revalider avant publication. |
 | MP-2026-004 | 3.2.x | Le rail d’actions d’une carte pouvait dupliquer ou déplacer les contrôles natifs lors du rendu Thunderbird. | L’injection initiale mélangeait contrôles MailPin et nœuds natifs de la ligne. | `extension/api/pinInbox/implementation.js`, `extension/styles/pin.css` | gardes 3.2.5/3.2.6/3.2.8 et smoke réel | CORRIGÉ | 3.2.8 | Thunderbird 153.0.1 avec messages synthétiques : rail structurel validé, étoile native conservée et bouton MailPin indépendant. |
 | MP-2026-005 | 3.2.x | Enregistrer/Annuler pouvaient perdre leur comportement dans l’onglet Options. | Association formulaire et chemins de clic n’étaient pas suffisamment explicites pour l’intégration Thunderbird. | `extension/options/options.html`, `extension/options/options.js` | gardes 3.2.5/3.2.6/3.2.8 | CORRIGÉ | 3.2.10 | Form events et click handlers explicites avec readback de persistance ; validation Thunderbird conservée. |
 | MP-2026-006 | 3.2.x | Des fins de ligne Windows pouvaient contaminer des noms de chemins transmis aux sous-processus Git. | Flux texte non borné pour des chemins Git. | `scripts/deep_audit.py` | garde 3.2.5 et CI Windows | CORRIGÉ | 3.2.10 | Utilisation de flux binaires NUL-delimited ; contrôles Windows passés. |

@@ -123,10 +123,12 @@ Avant d’ajouter une nouvelle capacité Thunderbird :
 
 ## Compatibilité de versions
 
-Depuis 1.5.1, le manifeste déclare Thunderbird `153.0` à `153.*`. Cette plage a été resserrée après des essais réels : 128/140 injectent le panneau après activation mais ne garantissent pas l’ouverture du Dashboard via le pont MV3 Experiment → background. MailPin ne revendique donc que la branche 153 réellement validée.
+Depuis 1.5.1, la branche 153 était la seule plage revendiquée après essais réels. MailPin 1.7.4 étend cette plage à Thunderbird `154.*` après validation directe du runtime 154.0. Le minimum reste `153.0` : les essais antérieurs sur 128/140 injectaient le panneau mais ne garantissaient pas l’ouverture fiable du Dashboard via le pont MV3 Experiment → background.
 
-Toute future adaptation de version doit rester localisée autant que possible dans ces adaptateurs et être documentée dans `docs/KNOWN_LIMITATIONS.md` et `docs/BUG_TRACKER.md` si elle corrige une régression observée.
+Toute future adaptation de version doit rester localisée autant que possible dans ces adaptateurs et être documentée dans `docs/KNOWN_LIMITATIONS.md` et `docs/BUG_TRACKER.md` si elle corrige une régression observée. Une nouvelle version majeure Thunderbird ne doit pas être ajoutée à `strict_max_version` sans smoke réel frais lorsque l’Experiment ou le DOM interne sont concernés.
 
 ### Preuve runtime actuelle
 
-Le 8 août 2026, le banc réel a validé Thunderbird **153.0.1 ESR** Linux sur un profil local synthétique : vue `about:3pane` prête, Experiment/background à `Startup: Complete`, panneau et bouton injectés une seule fois, nettoyage après désinstallation, puis réinstallation sans duplication. Cela valide le bootstrap et le cycle de vie de la frontière sur la branche 153 déclarée, pas les fournisseurs réels.
+Le 19 août 2026, le head pré-versionnement `3e1943f2be7a18ebcceef5952810675442e91a33` de la PR #52 a validé le binaire officiel **Thunderbird 154.0** sous Linux, geckodriver 0.37.1 : QA `32299537328` PASS et smoke réel `32299537485` PASS. Le smoke a confirmé vue `about:3pane` prête, Experiment/background à `Startup: Complete`, panneau et bouton injectés une seule fois, ouverture unique du Dashboard, nettoyage après désinstallation puis réinstallation sans duplication.
+
+Cette preuve valide la compatibilité technique 154 avant versionnement. Le head exact de la candidate 1.7.4 doit repasser les mêmes gates avant publication. Les fournisseurs réseau, calendriers distants et la matrice multi-OS restent des validations distinctes.

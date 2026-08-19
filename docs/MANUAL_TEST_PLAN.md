@@ -1,18 +1,17 @@
-# Plan de test manuel MailPin — 1.7.3
+# Plan de test manuel MailPin — 1.7.4
 
-Utiliser de préférence un profil Thunderbird jetable pour les scénarios destructifs. Le présent plan complète les validations automatisées de la source 1.7.3 ; la dernière release publique est 1.7.3. Aucun contrôle non exécuté ne doit être présenté comme PASS.
+Utiliser de préférence un profil Thunderbird jetable pour les scénarios destructifs. Le présent plan complète les validations automatisées de la source 1.7.4 ; la dernière release publique est 1.7.3. Aucun contrôle non exécuté ne doit être présenté comme PASS.
 
-## Recette 1.7.3 — consolidation UI en dur
+## Recette 1.7.4 — compatibilité Thunderbird 154
 
-1. Ouvrir Dashboard et Options, inspecter les ressources chargées : `interaction-stability.css` ne doit plus exister ni être chargé ; la composition doit provenir de `workspace.css`.
-2. Dans Agenda, vérifier un espace visuel net entre les quatre cartes d’activation/synchronisation et la rangée Type par défaut / Calendrier préféré.
-3. Dans Règles et actions automatiques, vérifier un espace net entre la rangée Activer les règles / Simulation / Conserver l’épingle et Groupe En attente / Erreurs / Actions max/minute.
-4. Dans Centre de santé, vérifier un espace net entre les quatre cartes supérieures et Niveau minimal du journal / Événements conservés.
-5. Modifier un réglage pour afficher la barre de sauvegarde : le bouton **Annuler** doit rester parfaitement lisible en thème sombre et clair ; tester hover et focus clavier.
-6. Vérifier Enregistrer/Annuler et notifications au milieu et en bas d’une longue page : ils doivent rester dans le viewport sans déformer l’en-tête.
-7. Ouvrir/fermer Plus de statistiques : aucun déplacement latéral du contrôle.
-8. Vérifier les calendriers aux noms longs et les raccourcis clavier.
-9. Refaire les points 2 à 8 à 100/125/200 %, largeur réduite, thèmes clair/sombre et contraste forcé.
+1. Installer le XPI 1.7.4 dans Thunderbird 154.0 et confirmer qu’il n’est plus signalé incompatible.
+2. Ouvrir `about:3pane` et confirmer une seule instance du panneau MailPin et du bouton Quick Filter.
+3. Épingler puis désépingler un message synthétique ; confirmer que lu/non-lu et compteurs natifs ne changent pas.
+4. Ouvrir le Dashboard depuis le bouton du panneau et confirmer qu’un seul onglet Dashboard s’ouvre.
+5. Ouvrir Options et vérifier que les réglages existants restent accessibles sans nouvelle erreur.
+6. Si Agenda/Tags ne sont pas disponibles, confirmer que ces capacités se dégradent localement sans empêcher le cœur MailPin de démarrer.
+7. Désinstaller MailPin et confirmer le nettoyage du panneau/bouton ; réinstaller et confirmer une injection unique.
+8. Refaire les contrôles UI pertinents en thème clair/sombre et largeur réduite si une validation humaine est effectuée avant ATN.
 
 ## Invariants fonctionnels
 
@@ -20,14 +19,11 @@ Utiliser de préférence un profil Thunderbird jetable pour les scénarios destr
 - aucune fonction Agenda/Tags absente ne fait tomber MailPin ;
 - aucune donnée ne quitte le poste ;
 - aucun tag personnel n’est modifié ;
-- le XPI testé doit correspondre à la release publique 1.7.3.
+- le XPI testé doit correspondre exactement à la candidate/release 1.7.4 concernée.
 
-## Preuves automatisées acquises
+## Preuves automatisées acquises avant versionnement
 
-- candidate exacte `a247dc53e3b707335b04ae00b227acad52ddb8b5` : QA Linux/Windows + garde sécurité `32028928653` PASS ;
-- candidate exacte : smoke Thunderbird réel `32028928636` PASS ;
-- merge release : `814e07adc82f0a1b19051c83fbb0fec6a22836b0` ;
-- workflow Release `32031451673` : `npm run ci`, build et publication `v1.7.3` PASS ;
-- XPI publié SHA-256 `66a10432457a509b9c9959e3df7bcdd2415d14668284b6104803dfa1d9362bc4`.
+- head `3e1943f2be7a18ebcceef5952810675442e91a33` : QA Linux/Windows + garde sécurité `32299537328` PASS ;
+- même head : smoke réel Thunderbird 154.0 `32299537485` PASS.
 
-La recette visuelle humaine ci-dessus reste recommandée avant ATN et n’est pas déclarée comme exécutée tant qu’elle n’a pas été réellement réalisée.
+La candidate versionnée 1.7.4 doit repasser QA et smoke réels avant release. La recette humaine ci-dessus n’est pas déclarée comme exécutée tant qu’elle ne l’a pas été réellement.

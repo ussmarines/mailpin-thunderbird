@@ -56,7 +56,7 @@ Thunderbird documente officiellement `mach`/xpcshell/Mochitest pour ses propres 
 Le job :
 
 1. construit l’XPI depuis le checkout ;
-2. télécharge Thunderbird `153.0.1esr` depuis l’archive officielle Mozilla ;
+2. télécharge Thunderbird `154.0` depuis l’archive officielle Mozilla ;
 3. vérifie l’archive avec le `SHA256SUMS` officiel Mozilla ;
 4. télécharge geckodriver `0.37.1` depuis la release Mozilla officielle ;
 5. vérifie le SHA-256 de l’asset fourni par GitHub ;
@@ -91,7 +91,7 @@ Lorsque le job réussit réellement, il démontre au minimum sur la version épi
 
 Il ne prouve pas à lui seul :
 
-- toute extension future de la plage Thunderbird au-delà de 153 ;
+- toute extension future de la plage Thunderbird au-delà de 154 ;
 - Windows ou macOS ;
 - IMAP/POP/Gmail/Microsoft réels ;
 - les dossiers virtuels réels ;
@@ -118,7 +118,7 @@ Après publication de la branche, lancer **Thunderbird functional and scale benc
 ```bash
 python tests/thunderbird/functional_bench.py \
   --binary /chemin/vers/thunderbird \
-  --xpi dist/MailPin_v1.7.0.xpi \
+  --xpi dist/MailPin_v1.7.4.xpi \
   --geckodriver /chemin/vers/geckodriver \
   --output-dir artifacts/thunderbird-bench \
   --volumes 50,100,500,1000,2000 \
@@ -136,7 +136,7 @@ Pour préparer cette validation manuelle sans automatiser l’onglet Options, ut
 ```bash
 python tests/thunderbird/functional_bench.py \
   --binary /chemin/vers/thunderbird \
-  --xpi dist/MailPin_v1.7.0.xpi \
+  --xpi dist/MailPin_v1.7.4.xpi \
   --geckodriver /chemin/vers/geckodriver \
   --output-dir artifacts/thunderbird-manual-scope \
   --prepare-manual-scope-validation \
@@ -146,7 +146,7 @@ python tests/thunderbird/functional_bench.py \
 ```bash
 python tests/thunderbird/functional_bench.py \
   --binary /chemin/vers/thunderbird \
-  --xpi dist/MailPin_v1.7.0.xpi \
+  --xpi dist/MailPin_v1.7.4.xpi \
   --geckodriver /chemin/vers/geckodriver \
   --output-dir artifacts/thunderbird-multi-account \
   --scope-validation-only \
@@ -182,7 +182,7 @@ Sous Windows x64, l’installation utilisateur validée est `C:\Users\ussma\AppD
 ```bash
 python tests/thunderbird/real_smoke.py \
   --binary /chemin/vers/thunderbird \
-  --xpi dist/MailPin_v1.7.0.xpi \
+  --xpi dist/MailPin_v1.7.4.xpi \
   --geckodriver /chemin/vers/geckodriver \
   --output-dir artifacts/thunderbird-smoke \
   --timeout 45
@@ -217,3 +217,5 @@ Le 10 août 2026, le banc a été relancé sous Linux avec Thunderbird 153.0.1 E
 Ces preuves ne remplacent pas les tests utilisateur avec fournisseurs réels ni la matrice multi-versions/multi-OS.
 
 Le 12 août 2026, l’audit pré-store 1.5.3 a repassé sous Windows Thunderbird 153.0.2/geckodriver 0.37.1 : smoke, matrice 50/100/500/1000/2000, DOM Dashboard/Options, éditeur XUL, thèmes clair/sombre et cinq portées persistantes sur deux processus. Tous les scénarios ont réussi sans timeout ni exception JavaScript MailPin ; les détails courants sont enregistrés dans `docs/AI_VALIDATION_STATE.json`.
+
+Le 19 août 2026, la PR #52 a exécuté le smoke sur le binaire officiel **Thunderbird 154.0** sous Linux avec geckodriver 0.37.1. Le head pré-versionnement `3e1943f2be7a18ebcceef5952810675442e91a33` a passé QA `32299537328` et smoke `32299537485`; le job a confirmé démarrage de l’extension, `Startup: Complete`, injection unique, ouverture unique du Dashboard, nettoyage après désinstallation et réinstallation propre. La candidate versionnée 1.7.4 doit repasser ces gates avant publication.

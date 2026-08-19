@@ -7,8 +7,8 @@
 
 [![QA](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml)
 ![Release](https://img.shields.io/badge/release-v1.7.3-4F7F75)
-![Source](https://img.shields.io/badge/release-v1.7.3-3D536B)
-![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x-3D536B)
+![Source](https://img.shields.io/badge/candidate-v1.7.4-3D536B)
+![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x--154.x-3D536B)
 ![License](https://img.shields.io/badge/license-MailPin%20Source--Available%201.1-1A1D21)
 </div>
 
@@ -25,24 +25,24 @@ MailPin turns important email into actionable follow-up **without replacing Thun
 
 ## Brand & interface
 
-**Organic Workspace** is consolidated directly in its canonical stylesheet. Release 1.7.3 removes the `interaction-stability.css` overlay, folds the fixes into `workspace.css`, increases structural spacing between settings groups, and gives the **Cancel** action explicit semantic contrast in the save bar, including dark theme. No remote assets, fonts or runtime UI dependency are added.
+**Organic Workspace** remains consolidated directly in its canonical stylesheet. Source 1.7.4 does not change UI logic: it keeps the 1.7.3 fixes and only extends validated compatibility to Thunderbird 154.
 
 ## Compatibility
 
-- **Source version:** `1.7.3` — published
+- **Source version:** `1.7.4` — candidate
 - **Latest public release:** `1.7.3`
-- **Thunderbird:** `153.0` to `153.*`
+- **Thunderbird:** `153.0` to `154.*`
 - **Format:** MailExtension Manifest V3
 - **Locales:** French and English
 - **Public ID:** `ussmarines.mailpin@addons.thunderbird.net`
 
-MailPin uses a privileged Thunderbird Experiment for `about:3pane`, local SQLite storage, and selected Messages/Tags/Calendar integration. Messages, Tags and Calendar internals remain isolated behind `PinCompatibility`.
+MailPin uses a privileged Thunderbird Experiment for `about:3pane`, local SQLite storage, and selected Messages/Tags/Calendar integration. Messages, Tags and Calendar internals remain isolated behind `PinCompatibility`. Thunderbird 154 compatibility is checked with a real smoke run against the official 154.0 binary before publication.
 
 ## Install
 
 ### GitHub release
 
-1. Download `MailPin_v1.7.3.xpi` from release `v1.7.3`.
+1. Download `MailPin_v1.7.3.xpi` from release `v1.7.3` while 1.7.4 remains a candidate.
 2. Thunderbird → **Add-ons and Themes** → gear menu → **Install Add-on From File**.
 3. Select the XPI.
 
@@ -54,10 +54,10 @@ Requires Python 3.11+ and Node.js 20+.
 npm run ci
 ```
 
-Reproducible outputs from the published source:
+Reproducible outputs from the candidate source:
 
-- `dist/MailPin_v1.7.3.xpi`
-- `dist/MailPin_GitHub_Repository_v1.7.3.zip`
+- `dist/MailPin_v1.7.4.xpi`
+- `dist/MailPin_GitHub_Repository_v1.7.4.zip`
 - `dist/SHA256SUMS.txt`
 
 ## Privacy & security
@@ -66,8 +66,8 @@ MailPin has no runtime network call, telemetry, advertising or remote code. Full
 
 - [Privacy](PRIVACY.md)
 - [Security](SECURITY.md)
-- [Source security audit 1.7.3](SECURITY_AUDIT_1.7.3.md)
-- [Source validation report 1.7.3](VALIDATION_REPORT_1.7.3.md)
+- [Source security audit 1.7.4](SECURITY_AUDIT_1.7.4.md)
+- [Source validation report 1.7.4](VALIDATION_REPORT_1.7.4.md)
 - [Known limitations](docs/KNOWN_LIMITATIONS.md)
 
 ## Documentation & support

@@ -57,7 +57,7 @@ assert "clean-reinstall" in HARNESS
 assert "workflow_dispatch:" in WORKFLOW
 assert re.search(r"branches:\s*\n\s*- main", WORKFLOW)
 assert "pull_request:" in WORKFLOW
-assert 'THUNDERBIRD_VERSION: "153.0.1esr"' in WORKFLOW
+assert 'THUNDERBIRD_VERSION: "154.0"' in WORKFLOW
 assert 'GECKODRIVER_VERSION: "0.37.1"' in WORKFLOW
 assert "archive.mozilla.org/pub/thunderbird/releases" in WORKFLOW
 assert "SHA256SUMS" in WORKFLOW

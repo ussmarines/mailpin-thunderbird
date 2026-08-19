@@ -1,5 +1,13 @@
 # Journal des modifications
 
+## 1.7.4 — compatibilité Thunderbird 154
+
+- étend la compatibilité déclarée de Thunderbird `153.0` jusqu’à `154.*` afin de rétablir l’installation sur Thunderbird 154 ;
+- déplace le smoke runtime automatisé sur le binaire officiel Thunderbird 154.0, téléchargé et vérifié par SHA-256 ;
+- valide sur Thunderbird 154 le démarrage de l’Experiment/background MV3, l’injection unique du panneau, l’ouverture unique du Dashboard, le nettoyage après désinstallation et la réinstallation propre ;
+- conserve `PinCompatibility`, la logique métier, les schémas, le stockage et l’identité inchangés ;
+- n’ajoute aucune permission, dépendance runtime, connexion réseau, télémétrie, publicité, CDN ou code distant.
+
 ## 1.7.3 — consolidation UI en dur et contraste
 
 - supprime la couche runtime `interaction-stability.css` et son chargement dynamique depuis `theme.js` ;

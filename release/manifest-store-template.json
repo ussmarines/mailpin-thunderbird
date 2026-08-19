@@ -1,10 +1,10 @@
 {
-  "note": "Référence de métadonnées pour MailPin 1.7.3 publié. La source et la dernière release publique sont alignées sur 1.7.3 ; les valeurs techniques restent synchronisées avec extension/manifest.json.",
+  "note": "Référence de métadonnées pour MailPin 1.7.4 candidat. MailPin 1.7.3 publié reste la dernière release publique jusqu'aux gates et à la publication 1.7.4. Les valeurs techniques restent synchronisées avec extension/manifest.json.",
   "browser_specific_settings": {
     "gecko": {
       "id": "ussmarines.mailpin@addons.thunderbird.net",
       "strict_min_version": "153.0",
-      "strict_max_version": "153.*"
+      "strict_max_version": "154.*"
     }
   },
   "homepage_url": "https://github.com/ussmarines/mailpin-thunderbird",

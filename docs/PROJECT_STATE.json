@@ -2,14 +2,14 @@
   "format": "mailperch-project-state",
   "version": 1,
   "project": "MailPin — Email Follow-up & Productivity for Thunderbird",
-  "extensionVersion": "1.7.3",
+  "extensionVersion": "1.7.4",
   "baseGitHub": {
     "branch": "main",
-    "commit": "814e07adc82f0a1b19051c83fbb0fec6a22836b0",
-    "role": "MailPin 1.7.3 published release commit"
+    "commit": "f7b7c99478c81b7bb4d0cc0f0c549528bc5c72c5",
+    "role": "published 1.7.3 baseline for the Thunderbird 154 compatibility candidate"
   },
   "extensionId": "ussmarines.mailpin@addons.thunderbird.net",
-  "thunderbird": {"min": "153.0", "max": "153.*"},
+  "thunderbird": {"min": "153.0", "max": "154.*"},
   "schemas": {"sqlite": 5, "settings": 8, "data": 7},
   "entrypoints": {
     "manifest": "extension/manifest.json",
@@ -63,14 +63,14 @@
     "uiDependencyPolicy": "native HTML plus local Organic Workspace CSS tokens; canonical workspace stylesheet; no runtime patch stylesheet, npm runtime dependency, bundler, CDN or remote asset",
     "runtimeTestSupplyChain": "test-only Thunderbird/geckodriver downloads are checksum-verified and are not runtime dependencies"
   },
-  "developmentBranch": "main",
+  "developmentBranch": "fix/thunderbird-154-compatibility",
   "testing": {
     "contract": ["tests/test_organic_workspace_ui.py", "tests/test_thunderbird_compatibility_boundary.py", "tests/thunderbird_compatibility_contract.mjs"],
     "runtimeWorkflow": ".github/workflows/thunderbird-smoke.yml",
     "runtimeScript": "tests/thunderbird/real_smoke.py",
-    "browserStatus": "The UI contract requires layout stability to live in extension/styles/workspace.css and forbids the removed interaction-stability.css overlay.",
-    "runtimeStatus": "The exact 1.7.3 candidate head a247dc53e3b707335b04ae00b227acad52ddb8b5 passed QA run 32028928653 and real Thunderbird smoke run 32028928636 before squash merge to main at 814e07adc82f0a1b19051c83fbb0fec6a22836b0. Release workflow 32031451673 then ran npm run ci, rebuilt the release artifacts and published v1.7.3 successfully from that exact main commit. No unexecuted manual control is reported as passed."
+    "browserStatus": "No UI implementation change in 1.7.4; Organic Workspace contracts remain unchanged.",
+    "runtimeStatus": "Pre-version compatibility head 3e1943f2be7a18ebcceef5952810675442e91a33 passed QA run 32299537328 and real Thunderbird 154.0 smoke run 32299537485. The versioned 1.7.4 candidate must rerun both gates before publication."
   },
   "latestPublicVersion": "1.7.3",
-  "releaseStatus": "published"
+  "releaseStatus": "candidate"
 }
