@@ -1,0 +1,118 @@
+name: Release MailPin 1.7.5 one-shot
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/release-1.7.5.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mailpin-release
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Verify reviewer source and publish v1.7.5
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          package-manager-cache: false
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+
+      - name: Verify exact release state
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          package = json.loads(Path('package.json').read_text(encoding='utf-8'))
+          manifest = json.loads(Path('extension/manifest.json').read_text(encoding='utf-8'))
+          state = json.loads(Path('docs/PROJECT_STATE.json').read_text(encoding='utf-8'))
+          fr = json.loads(Path('extension/_locales/fr/messages.json').read_text(encoding='utf-8'))
+          en = json.loads(Path('extension/_locales/en/messages.json').read_text(encoding='utf-8'))
+          expected_name = 'MailPin — Email Follow-up & Productivity'
+
+          assert package['version'] == '1.7.5'
+          assert manifest['version'] == '1.7.5'
+          assert state['extensionVersion'] == '1.7.5'
+          assert state['releaseStatus'] == 'candidate'
+          assert state['latestPublicVersion'] == '1.7.4'
+          assert manifest['browser_specific_settings']['gecko']['id'] == 'ussmarines.mailpin@addons.thunderbird.net'
+          assert manifest['browser_specific_settings']['gecko']['strict_min_version'] == '153.0'
+          assert manifest['browser_specific_settings']['gecko']['strict_max_version'] == '154.*'
+          assert manifest['permissions'] == ['menus']
+          assert fr['extensionName']['message'] == expected_name
+          assert en['extensionName']['message'] == expected_name
+          assert len(expected_name) == 40
+          assert len(fr['extensionName']['message']) <= 50
+          assert len(en['extensionName']['message']) <= 50
+          print('Exact 1.7.5 release state: OK; localized ATN name = 40 characters')
+          PY
+
+      - name: Verify and build release
+        run: npm run ci
+
+      - name: Rebuild from fresh reviewer source without Git
+        shell: bash
+        run: |
+          set -euo pipefail
+          ORIGINAL_XPI_SHA="$(sha256sum dist/MailPin_v1.7.5.xpi | awk '{print $1}')"
+          ORIGINAL_SOURCE_SHA="$(sha256sum dist/MailPin_GitHub_Repository_v1.7.5.zip | awk '{print $1}')"
+          REVIEW_DIR="$(mktemp -d)"
+          trap 'rm -rf "$REVIEW_DIR"' EXIT
+          unzip -q dist/MailPin_GitHub_Repository_v1.7.5.zip -d "$REVIEW_DIR"
+          test ! -e "$REVIEW_DIR/.git"
+          (
+            cd "$REVIEW_DIR"
+            npm run ci
+          )
+          REBUILT_XPI_SHA="$(sha256sum "$REVIEW_DIR/dist/MailPin_v1.7.5.xpi" | awk '{print $1}')"
+          test "$REBUILT_XPI_SHA" = "$ORIGINAL_XPI_SHA"
+          printf 'Reviewer source gate: PASS\nXPI SHA-256: %s\nSource SHA-256: %s\n' "$ORIGINAL_XPI_SHA" "$ORIGINAL_SOURCE_SHA"
+
+      - name: Prepare release notes
+        shell: bash
+        run: |
+          set -euo pipefail
+          awk '
+            $0 ~ "^## 1\\.7\\.5([[:space:]]|$)" {found=1; next}
+            found && /^## / {exit}
+            found {print}
+          ' CHANGELOG.md > release-notes.md
+          test -s release-notes.md
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view "v1.7.5" >/dev/null 2>&1; then
+            echo "Release v1.7.5 already exists; keeping it unchanged."
+            exit 0
+          fi
+          gh release create "v1.7.5" \
+            "dist/MailPin_v1.7.5.xpi" \
+            "dist/MailPin_GitHub_Repository_v1.7.5.zip" \
+            "dist/SHA256SUMS.txt" \
+            --target "$GITHUB_SHA" \
+            --title "MailPin 1.7.5" \
+            --notes-file release-notes.md \
+            --latest
