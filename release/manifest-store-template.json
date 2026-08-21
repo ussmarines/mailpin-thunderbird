@@ -1,5 +1,5 @@
 {
-  "note": "Référence de métadonnées pour MailPin 1.7.5 candidat. MailPin 1.7.4 publié reste la dernière release publique jusqu’aux gates et à la publication 1.7.5. Le nom public/localisé est raccourci à 40 caractères pour ATN.",
+  "note": "Référence de métadonnées pour MailPin 1.7.5 publié, dernière release publique. Le nom public/localisé fait 40 caractères et respecte la limite ATN de 50 caractères.",
   "browser_specific_settings": {
     "gecko": {
       "id": "ussmarines.mailpin@addons.thunderbird.net",

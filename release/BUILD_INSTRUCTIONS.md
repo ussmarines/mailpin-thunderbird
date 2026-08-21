@@ -2,7 +2,7 @@
 
 ## État
 
-La release GitHub **1.7.4** est publiée. La source **1.7.5** est une candidate de conformité ATN ; elle conserve la compatibilité Thunderbird 153.0–154.*.
+La release GitHub **1.7.5** est publiée. La source **1.7.5** correspond à la version officielle destinée à ATN et conserve la compatibilité Thunderbird 153.0–154.*.
 
 ## Environnement
 
@@ -11,7 +11,7 @@ La release GitHub **1.7.4** est publiée. La source **1.7.5** est une candidate 
 - Node.js 20+ et npm 10+ ;
 - Git uniquement pour un checkout ou les contrôles d’historique.
 
-Git n’est pas requis pour reproduire le build depuis l’archive source extraite. Aucune dépendance npm/Python tierce n’est installée.
+**Git n’est pas requis** pour reproduire le build depuis l’archive source extraite. Aucune dépendance npm/Python tierce n’est installée.
 
 ## Reproduction
 
@@ -35,4 +35,14 @@ Le contenu de `extension/` est placé directement à la racine du XPI. Aucun Jav
 
 La 1.7.5 raccourcit uniquement le nom localisé à `MailPin — Email Follow-up & Productivity` pour respecter la limite ATN de 50 caractères. Elle n’ajoute aucune permission, dépendance runtime, migration, schéma, réseau, télémétrie, publicité ou code distant.
 
-Les SHA-256 et preuves du head exact seront consignés après les gates et la publication.
+## Preuves
+
+- candidate exacte `19cf23c21e983be924ffd9e6af8fdb1e8e612947` : QA `32480175617` — PASS ;
+- smoke réel Thunderbird 154.0 `32480175435` — PASS ;
+- tag `v1.7.5` : `2384ee52df95a711424dfeb817ef114888634ed0` ;
+- le publisher a exécuté `npm run ci` depuis une extraction neuve de l’archive reviewer sans `.git` et a vérifié que le XPI reconstruit avait le même SHA-256 que le XPI initial ;
+- artefacts publics revérifiés dans le run `32481646372` — PASS.
+
+XPI SHA-256 : `247e314911ce1006f40b78c6050f3697b7f6b1beb3f0489214e84410c668dc12`.
+Archive source SHA-256 : `af555557bc0d3b80d35e34a7ec1447b77ebe356c75a95ece9f28b8238fdfb1fd`.
+SHA256SUMS.txt SHA-256 : `db052f49548aa70e46208808084be3e5ef2ac8d454267e1babc53aeeb647ad26`.

@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "purpose": "Cache machine-readable des dernières preuves de validation réutilisables. Ce fichier ne remplace ni AGENTS.md ni les règles de sécurité et ne doit jamais servir à inventer un test non exécuté.",
-  "recorded_at": "2026-08-13T18:34:14+02:00",
+  "recorded_at": "2026-08-21T14:25:00+02:00",
   "baseline": {
     "repository": "ussmarines/mailpin-thunderbird",
-    "branch": "audit/global-repo-cleanup-2026-08-13",
-    "commit_sha": "88ba52cd6bdb3e3c81a41e456e72042f8c84c587",
-    "tree_sha": "154e9cc1ae193241fdeedeb808501e89577c801d",
+    "branch": "main",
+    "commit_sha": "2384ee52df95a711424dfeb817ef114888634ed0",
+    "tree_sha": "",
     "working_tree_patch_id": "",
     "untracked_candidate_files": []
   },
@@ -34,20 +34,17 @@
   },
   "repository_checks": [
     {
-      "id": "github-pr-global-audit-1-7-gate",
+      "id": "github-release-1-7-5-gate",
       "result": "success",
-      "validated_commit": "88ba52cd6bdb3e3c81a41e456e72042f8c84c587",
+      "validated_commit": "2384ee52df95a711424dfeb817ef114888634ed0",
       "working_tree_patch_id": "",
-      "validated_at": "2026-08-13T18:08:10+02:00",
-      "command": "GitHub Actions PR #40 QA run 31719085457 + Thunderbird runtime smoke run 31719085416",
+      "validated_at": "2026-08-21T14:25:00+02:00",
+      "command": "PR #55 QA 32480175617 + Thunderbird runtime smoke 32480175435 + published-asset verification 32481646372",
       "environment": {
         "ci": "GitHub Actions",
         "linux": "ubuntu-24.04",
         "windows": "windows-latest",
-        "node": "24",
-        "python": "3.12",
-        "thunderbird": "153.0.1esr",
-        "geckodriver": "0.37.1"
+        "thunderbird": "154.0"
       },
       "invalidates_on": [
         "extension/**",
@@ -59,60 +56,15 @@
         "docs/PROJECT_STATE.json"
       ],
       "evidence": {
-        "kind": "github-pr-global-audit-gate",
-        "summary": "Source 1.7.0 auditée : npm run ci complet et structure XPI verts sous Linux ; contrôles source/modèles Windows verts ; garde sécurité et identité historique verte ; smoke réel Thunderbird 153 vert.",
-        "development_artifact_id": 9188508237,
-        "thunderbird_smoke_artifact_id": 9188512378
-      }
-    },
-    {
-      "id": "standard-security-full-history-audit",
-      "result": "success",
-      "validated_commit": "88ba52cd6bdb3e3c81a41e456e72042f8c84c587",
-      "working_tree_patch_id": "",
-      "validated_at": "2026-08-13T18:32:26+02:00",
-      "command": "GitHub Actions standard security run 31721145559 on ephemeral branch based exactly on validated_commit",
-      "environment": {
-        "ci": "GitHub Actions",
-        "linux": "ubuntu-24.04",
-        "python": "3.12"
-      },
-      "invalidates_on": [
-        "extension/**",
-        "package.json",
-        "package-lock.json",
-        ".github/workflows/**",
-        ".github/scripts/security_guard.py",
-        ".security/**",
-        ".gitleaks.toml"
-      ],
-      "evidence": {
-        "kind": "standard-security-audit",
-        "summary": "Identity full-history, Gitleaks, Opengrep, Trivy vuln/misconfig, SBOM CycloneDX et Zizmor offline ont tous terminé avec succès et l'enforcement final est vert. Codex Security non utilisé.",
-        "artifact_id": 9189352790
+        "kind": "github-release-gate",
+        "summary": "MailPin 1.7.5: localized ATN name 40 chars; QA Linux/Windows, identity/security guard, reproducible build, real Thunderbird 154 smoke, reviewer-source build without .git, and public release asset verification all passed.",
+        "qa_run": 32480175617,
+        "thunderbird_smoke_run": 32480175435,
+        "public_asset_verification_run": 32481646372,
+        "xpi_sha256": "247e314911ce1006f40b78c6050f3697b7f6b1beb3f0489214e84410c668dc12",
+        "source_sha256": "af555557bc0d3b80d35e34a7ec1447b77ebe356c75a95ece9f28b8238fdfb1fd"
       }
     }
   ],
-  "targeted_checks": [
-    {
-      "id": "organic-workspace-post-global-audit",
-      "result": "success",
-      "validated_commit": "88ba52cd6bdb3e3c81a41e456e72042f8c84c587",
-      "validated_at": "2026-08-13T18:08:03+02:00",
-      "command": "npm test within PR #40 QA run 31719085457",
-      "invalidates_on": [
-        "extension/styles/**",
-        "extension/dashboard/**",
-        "extension/options/**",
-        "docs/UI_SPEC.md",
-        "tests/test_organic_workspace_ui.py",
-        "tests/test_ui_regressions.py",
-        "tests/test_ui_polish_3_2_3.py"
-      ],
-      "evidence": {
-        "kind": "targeted-ui-contract",
-        "summary": "Organic Workspace, Dashboard DOM, Options registry, accessibilité/localisation et gardes UI restent verts après l'audit global."
-      }
-    }
-  ]
+  "targeted_checks": []
 }

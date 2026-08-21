@@ -2,15 +2,15 @@
 
 ## Statut
 
-- **Dernière release GitHub publique :** 1.7.4
-- **Source candidate :** 1.7.5
+- **Dernière release GitHub publique :** 1.7.5
+- **Source publiée :** 1.7.5
 - **Version :** 1.7.5
-- **Soumission ATN :** à effectuer après publication
+- **Soumission ATN :** prête à effectuer
 
 ## Identité
 
 - **Nom :** MailPin — Email Follow-up & Productivity
-- **Version :** 1.7.5
+- **Longueur du nom :** 40 caractères
 - **ID :** `ussmarines.mailpin@addons.thunderbird.net`
 - **Compatibilité :** Thunderbird 153.0 à 154.*
 - **Permission WebExtension :** `menus` uniquement
@@ -23,7 +23,10 @@ Aucune permission, migration, dépendance runtime, télémétrie, publicité, co
 
 ## Build
 
-Voir `release/BUILD_INSTRUCTIONS.md`. La commande reviewer est `npm run ci` depuis l’archive source extraite.
+Voir `release/BUILD_INSTRUCTIONS.md`. La commande reviewer est `npm run ci` depuis l’archive source extraite. Le build hors `.git` a été exécuté avant publication et le XPI reconstruit est SHA-identique au XPI publié.
+
+XPI SHA-256 : `247e314911ce1006f40b78c6050f3697b7f6b1beb3f0489214e84410c668dc12`.
+Archive source SHA-256 : `af555557bc0d3b80d35e34a7ec1447b77ebe356c75a95ece9f28b8238fdfb1fd`.
 
 ## Test rapide
 

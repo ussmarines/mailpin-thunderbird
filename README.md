@@ -6,8 +6,8 @@
 **Email Follow-up & Productivity for Thunderbird**
 
 [![QA](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml)
-![Release](https://img.shields.io/badge/release-v1.7.4-4F7F75)
-![Source](https://img.shields.io/badge/candidate-v1.7.5-3D536B)
+![Release](https://img.shields.io/badge/release-v1.7.5-4F7F75)
+![Source](https://img.shields.io/badge/source-v1.7.5-3D536B)
 ![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x--154.x-3D536B)
 ![Licence](https://img.shields.io/badge/licence-MailPin%20Source--Available%201.1-1A1D21)
 </div>
@@ -25,12 +25,12 @@ MailPin transforme les e-mails importants en suivi actionnable **sans remplacer 
 
 ## Interface
 
-**Organic Workspace** reste inchangé dans la source 1.7.5 ; cette candidate modifie uniquement le nom public/localisé requis par ATN.
+**Organic Workspace** reste inchangé dans la release 1.7.5 ; cette maintenance modifie uniquement le nom public/localisé afin de respecter la limite ATN de 50 caractères.
 
 ## Compatibilité
 
-- **Version source :** `1.7.5` — candidate
-- **Dernière release publique :** `1.7.4`
+- **Version source :** `1.7.5` — publiée
+- **Dernière release publique :** `1.7.5`
 - **Thunderbird :** `153.0` à `154.*`
 - **Format :** MailExtension Manifest V3
 - **Langues :** français et anglais
@@ -42,7 +42,7 @@ MailPin utilise une API Experiment privilégiée pour l’intégration `about:3p
 
 ### Release GitHub
 
-1. Téléchargez `MailPin_v1.7.4.xpi` depuis la release `v1.7.4`.
+1. Téléchargez `MailPin_v1.7.5.xpi` depuis la release `v1.7.5`.
 2. Thunderbird → **Extensions et thèmes** → engrenage → **Installer un module depuis un fichier**.
 3. Sélectionnez le XPI.
 

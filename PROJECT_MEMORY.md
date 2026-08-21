@@ -1,13 +1,13 @@
 # Mémoire opérationnelle — MailPin
 
 > Version source : **1.7.5**
-> Dernière release publique : **1.7.4**
-> Branche courante : `release/atn-name-1.7.5` ; candidate de conformité ATN
+> Dernière release publique : **1.7.5**
+> Branche courante : `release/finalize-1.7.5` ; finalisation documentaire post-publication
 > Extension ID : `ussmarines.mailpin@addons.thunderbird.net`
 
 ## Résumé
 
-MailPin est une extension Thunderbird Manifest V3 locale. La source 1.7.5 raccourcit uniquement le nom public/localisé à **MailPin — Email Follow-up & Productivity** afin de respecter la limite ATN de 50 caractères. La logique métier, l’API Experiment, `PinCompatibility`, les schémas, le stockage, les permissions et la plage Thunderbird 153.0–154.* restent inchangés. La release 1.7.4 a passé la QA `32300356172` et le smoke réel Thunderbird 154.0 `32300356085`; la candidate 1.7.5 doit repasser les gates applicables sur son head exact avant publication.
+MailPin est une extension Thunderbird Manifest V3 locale. La release 1.7.5 raccourcit uniquement le nom public/localisé à **MailPin — Email Follow-up & Productivity** (40 caractères) afin de respecter la limite ATN de 50 caractères. La logique métier, l’API Experiment, `PinCompatibility`, les schémas, le stockage, les permissions et la plage Thunderbird 153.0–154.* restent inchangés. La candidate exacte `19cf23c21e983be924ffd9e6af8fdb1e8e612947` a passé la QA `32480175617` et le smoke réel Thunderbird 154.0 `32480175435`. Le tag `v1.7.5` cible exactement `2384ee52df95a711424dfeb817ef114888634ed0` et les artefacts publics ont été vérifiés dans le run `32481646372`.
 
 ## Invariants non négociables
 
@@ -53,13 +53,13 @@ MailPin est une extension Thunderbird Manifest V3 locale. La source 1.7.5 raccou
 
 ## État technique courant
 
-- source : 1.7.5 candidate ; dernière release publique : 1.7.4 ;
+- source : 1.7.5 publiée ; dernière release publique : 1.7.5 ;
 - Thunderbird : 153.0 à 154.* ;
 - permission WebExtension : `menus` uniquement ;
 - schémas : SQLite 5, settings 8, data 7 ;
 - aucune migration, permission, dépendance runtime ou connexion réseau introduite par 1.7.5 ;
-- release 1.7.4 : QA `32300356172` — PASS ; smoke Thunderbird 154.0 `32300356085` — PASS ;
-- candidate 1.7.5 : contrôle du nom, QA/build et smoke Thunderbird 154.0 frais requis avant merge/publication.
+- candidate exacte 1.7.5 `19cf23c21e983be924ffd9e6af8fdb1e8e612947` : QA `32480175617` — PASS ; smoke Thunderbird 154.0 `32480175435` — PASS ;
+- release `v1.7.5` : tag `2384ee52df95a711424dfeb817ef114888634ed0`, build reviewer hors `.git` PASS, artefacts publics vérifiés `32481646372` — PASS.
 
 ## Commandes obligatoires
 

@@ -5,8 +5,8 @@
   "extensionVersion": "1.7.5",
   "baseGitHub": {
     "branch": "main",
-    "commit": "dbc67e903e682af37182c7a252f9f669ed2c48e2",
-    "role": "published v1.7.4 baseline for the ATN name-compliance candidate"
+    "commit": "2384ee52df95a711424dfeb817ef114888634ed0",
+    "role": "published v1.7.5 tag target after ATN name-compliance gates"
   },
   "extensionId": "ussmarines.mailpin@addons.thunderbird.net",
   "thunderbird": {
@@ -91,7 +91,7 @@
     "uiDependencyPolicy": "native HTML plus local Organic Workspace CSS tokens; canonical workspace stylesheet; no runtime patch stylesheet, npm runtime dependency, bundler, CDN or remote asset",
     "runtimeTestSupplyChain": "test-only Thunderbird/geckodriver downloads are checksum-verified and are not runtime dependencies"
   },
-  "developmentBranch": "release/atn-name-1.7.5",
+  "developmentBranch": "release/finalize-1.7.5",
   "testing": {
     "contract": [
       "tests/test_organic_workspace_ui.py",
@@ -100,9 +100,9 @@
     ],
     "runtimeWorkflow": ".github/workflows/thunderbird-smoke.yml",
     "runtimeScript": "tests/thunderbird/real_smoke.py",
-    "browserStatus": "No UI/runtime behavior change in 1.7.5; only the localized/public add-on name is shortened for ATN.",
-    "runtimeStatus": "Published 1.7.4 passed QA 32300356172 and real Thunderbird 154.0 smoke 32300356085. The exact 1.7.5 candidate must pass fresh QA/build and Thunderbird 154 smoke before publication."
+    "browserStatus": "No UI/runtime behavior change in 1.7.5; only the localized/public add-on name was shortened to 40 characters for ATN.",
+    "runtimeStatus": "Exact 1.7.5 candidate 19cf23c21e983be924ffd9e6af8fdb1e8e612947 passed QA 32480175617 and real Thunderbird 154.0 smoke 32480175435. The release publisher rebuilt from the reviewer archive without .git before publishing v1.7.5 at 2384ee52df95a711424dfeb817ef114888634ed0; public assets were independently verified in run 32481646372."
   },
-  "latestPublicVersion": "1.7.4",
-  "releaseStatus": "candidate"
+  "latestPublicVersion": "1.7.5",
+  "releaseStatus": "published"
 }

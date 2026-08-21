@@ -1,6 +1,6 @@
 # Plan de test manuel MailPin — 1.7.5
 
-Utiliser de préférence un profil Thunderbird jetable pour les scénarios destructifs. Le présent plan complète les validations automatisées de la source 1.7.5 ; la dernière release publique est 1.7.4. Aucun contrôle non exécuté ne doit être présenté comme PASS.
+Utiliser de préférence un profil Thunderbird jetable pour les scénarios destructifs. Le présent plan complète les validations automatisées de la source 1.7.5 ; la dernière release publique est 1.7.5. Aucun contrôle non exécuté ne doit être présenté comme PASS.
 
 ## Recette 1.7.5 — identité ATN
 
@@ -11,4 +11,4 @@ Utiliser de préférence un profil Thunderbird jetable pour les scénarios destr
 5. Épingler/désépingler un message et confirmer l’absence de changement lu/non-lu ou des compteurs natifs.
 6. Désinstaller/réinstaller et confirmer le nettoyage puis l’injection unique.
 
-Le XPI testé doit correspondre exactement à la candidate/release 1.7.5 concernée. La recette humaine n’est pas déclarée PASS tant qu’elle n’a pas été exécutée.
+Le XPI testé doit correspondre exactement à la release publique 1.7.5. La recette humaine n’est pas déclarée PASS tant qu’elle n’a pas été exécutée.

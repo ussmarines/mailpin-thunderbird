@@ -6,8 +6,8 @@
 **Email Follow-up & Productivity for Thunderbird**
 
 [![QA](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml)
-![Release](https://img.shields.io/badge/release-v1.7.4-4F7F75)
-![Source](https://img.shields.io/badge/candidate-v1.7.5-3D536B)
+![Release](https://img.shields.io/badge/release-v1.7.5-4F7F75)
+![Source](https://img.shields.io/badge/source-v1.7.5-3D536B)
 ![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x--154.x-3D536B)
 ![License](https://img.shields.io/badge/license-MailPin%20Source--Available%201.1-1A1D21)
 </div>
@@ -25,12 +25,12 @@ MailPin turns important email into actionable follow-up **without replacing Thun
 
 ## Brand & interface
 
-**Organic Workspace** is unchanged in source 1.7.5; this candidate only changes the public/localized add-on name required by ATN.
+**Organic Workspace** is unchanged in release 1.7.5; this maintenance only shortens the public/localized add-on name to comply with ATN's 50-character limit.
 
 ## Compatibility
 
-- **Source version:** `1.7.5` — candidate
-- **Latest public release:** `1.7.4`
+- **Source version:** `1.7.5` — published
+- **Latest public release:** `1.7.5`
 - **Thunderbird:** `153.0` to `154.*`
 - **Format:** MailExtension Manifest V3
 - **Locales:** French and English
@@ -42,7 +42,7 @@ MailPin uses a privileged Thunderbird Experiment for `about:3pane`, local SQLite
 
 ### GitHub release
 
-1. Download `MailPin_v1.7.4.xpi` from release `v1.7.4`.
+1. Download `MailPin_v1.7.5.xpi` from release `v1.7.5`.
 2. Thunderbird → **Add-ons and Themes** → gear menu → **Install Add-on From File**.
 3. Select the XPI.
 
