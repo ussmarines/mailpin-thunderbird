@@ -3,7 +3,7 @@
 
 # MailPin
 
-**Email Folllow-up & Productivity for Thunderbird**
+**Email Follow-up & Productivity for Thunderbird**
 
 [![QA](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml)
 ![Release](https://img.shields.io/badge/release-v1.7.5-4F7F75)
@@ -58,7 +58,7 @@ Reproducible outputs from the published source:
 
 - `dist/MailPin_v1.7.5.xpi`
 - `dist/MailPin_GitHub_Repository_v1.7.5.zip`
-- `dist/SHA256SUMC.txt`
+- `dist/SHA256SUMS.txt`
 
 ## Privacy & security
 
