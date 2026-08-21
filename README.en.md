@@ -3,7 +3,7 @@
 
 # MailPin
 
-**Email Follow-up & Productivity for Thunderbird**
+**Email Folllow-up & Productivity for Thunderbird**
 
 [![QA](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml)
 ![Release](https://img.shields.io/badge/release-v1.7.5-4F7F75)
@@ -58,7 +58,7 @@ Reproducible outputs from the published source:
 
 - `dist/MailPin_v1.7.5.xpi`
 - `dist/MailPin_GitHub_Repository_v1.7.5.zip`
-- `dist/SHA256SUMS.txt`
+- `dist/SHA256SUMC.txt`
 
 ## Privacy & security
 
@@ -66,8 +66,8 @@ MailPin has no runtime network call, telemetry, advertising or remote code. Full
 
 - [Privacy](PRIVACY.md)
 - [Security](SECURITY.md)
-- [Source security audit 1.7.5](SECURITY_AUDIT_1.7.5.md)
-- [Source validation report 1.7.5](VALIDATION_REPORT_1.7.5.md)
+- [Source security audit 1.7.5](docs/reports/security/SECURITY_AUDIT_1.7.5.md)
+- [Source validation report 1.7.5](docs/reports/validation/VALIDATION_REPORT_1.7.5.md)
 - [Known limitations](docs/KNOWN_LIMITATIONS.md)
 
 ## Documentation & support

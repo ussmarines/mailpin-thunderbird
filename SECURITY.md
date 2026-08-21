@@ -49,7 +49,7 @@ npm run build
 npm run ci
 ```
 
-Le rapport de sécurité de la **source et release publique courantes** est [SECURITY_AUDIT_1.7.3.md](SECURITY_AUDIT_1.7.3.md). La publication `v1.7.3` cible `814e07adc82f0a1b19051c83fbb0fec6a22836b0` et le workflow Release `32031451673` est PASS.
+Le rapport de sécurité de la **source et release publique courantes** est [docs/reports/security/SECURITY_AUDIT_1.7.5.md](docs/reports/security/SECURITY_AUDIT_1.7.5.md). La release publique `v1.7.5` cible `2384ee52df95a711424dfeb817ef114888634ed0`. Les preuves de publication et de soumission ATN sont consignées dans `STORE_RELEASE.md` et `release/ATN_SUBMISSION_1.7.5.md`.
 
 ## Limite importante
 

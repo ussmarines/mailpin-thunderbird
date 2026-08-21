@@ -8,3 +8,7 @@ Ces fichiers conservent les versions détaillées complètes présentes avant la
 - `MANUAL_TEST_PLAN_1.1.1_FULL.md` : matrice manuelle exhaustive avant le scénario responsive 1.1.2.
 
 L’historique Git reste la source canonique pour consulter les versions antérieures exactes et leurs commits.
+
+## Release reports
+
+Historical security audits and validation reports are retained under `reports/` for traceability. Current release evidence is indexed in [`../reports/`](../reports/).

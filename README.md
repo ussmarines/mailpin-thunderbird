@@ -9,7 +9,7 @@
 ![Release](https://img.shields.io/badge/release-v1.7.5-4F7F75)
 ![Source](https://img.shields.io/badge/source-v1.7.5-3D536B)
 ![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x--154.x-3D536B)
-![Licence](https://img.shields.io/badge/licence-MailPin%20Source--Available%201.1-1A1D21)
+![Licence](https://img.shields.io/badge/license-MailPin%20Source--Available%201.1-1A1D21)
 </div>
 
 MailPin transforme les e-mails importants en suivi actionnable **sans remplacer la boîte de réception Thunderbird**. Épinglez un message, ajoutez une note ou une checklist, planifiez une relance, organisez vos vues et, lorsque l’agenda le permet, créez un événement ou une tâche — le tout localement.
@@ -66,8 +66,8 @@ MailPin ne contient aucun appel réseau runtime, aucune télémétrie, aucune pu
 
 - [Politique de confidentialité](PRIVACY.md)
 - [Politique de sécurité](SECURITY.md)
-- [Audit sécurité source 1.7.5](SECURITY_AUDIT_1.7.5.md)
-- [Rapport de validation source 1.7.5](VALIDATION_REPORT_1.7.5.md)
+- [Audit sécurité source 1.7.5](docs/reports/security/SECURITY_AUDIT_1.7.5.md)
+- [Rapport de validation source 1.7.5](docs/reports/validation/VALIDATION_REPORT_1.7.5.md)
 - [Limites connues](docs/KNOWN_LIMITATIONS.md)
 
 ## Documentation & support

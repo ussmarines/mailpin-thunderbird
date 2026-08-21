@@ -15,8 +15,8 @@
     "ignore_for_invalidation": [
       "docs/AI_VALIDATION_STATE.json",
       "docs/CODEX_HANDOFF.md",
-      "SECURITY_AUDIT_1.7.0.md",
-      "VALIDATION_REPORT_1.7.0.md"
+      "docs/archive/reports/security/SECURITY_AUDIT_1.7.0.md",
+      "docs/archive/reports/validation/VALIDATION_REPORT_1.7.0.md"
     ],
     "reuse_requires": [
       "result == success",
