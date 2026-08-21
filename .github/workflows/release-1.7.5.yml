@@ -1,4 +1,5 @@
 name: Release MailPin 1.7.5 one-shot
+# Second main-branch change intentionally triggers the already-installed one-shot publisher.
 
 on:
   push:
