@@ -3,7 +3,7 @@
 ## Identité canonique
 
 - **Nom du produit :** MailPin
-- **Nom complet pour le store :** MailPin — Email Follow-up & Productivity for Thunderbird
+- **Nom complet pour le store :** MailPin — Email Follow-up & Productivity
 - **Baseline canonique :** Email Follow-up & Productivity for Thunderbird
 - **Signature secondaire EN :** Stay on top. Follow through. Get results.
 - **Signature secondaire FR :** Gardez le cap. Assurez le suivi. Avancez.
@@ -53,7 +53,7 @@ Le changement d’ID depuis `pin-mails@MailPerch.local` est volontaire et docume
 
 ## Métadonnées GitHub recommandées
 
-- **Description :** MailPin — Email Follow-up & Productivity for Thunderbird.
+- **Description :** MailPin — Email Follow-up & Productivity.
 - **Topics :** `thunderbird`, `mail-extension`, `email-productivity`, `email-follow-up`, `pinned-email`, `productivity`.
 
 Une recherche de disponibilité a identifié un produit tiers « Mailpin » dans l’univers e-mail. L’utilisateur a explicitement choisi de conserver le nom MailPin le 13 août 2026 ; cette décision de naming n’est pas une conclusion juridique sur les marques.

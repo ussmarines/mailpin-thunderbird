@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="assets/brand/mailpin-hero.svg" width="100%" alt="MailPin — Email Follow-up & Productivity for Thunderbird">
+  <img src="assets/brand/mailpin-hero.svg" width="100%" alt="MailPin — Email Follow-up & Productivity">
 
 # MailPin
 
@@ -7,7 +7,7 @@
 
 [![QA](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml)
 ![Release](https://img.shields.io/badge/release-v1.7.4-4F7F75)
-![Source](https://img.shields.io/badge/source-v1.7.4-3D536B)
+![Source](https://img.shields.io/badge/candidate-v1.7.5-3D536B)
 ![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x--154.x-3D536B)
 ![License](https://img.shields.io/badge/license-MailPin%20Source--Available%201.1-1A1D21)
 </div>
@@ -25,11 +25,11 @@ MailPin turns important email into actionable follow-up **without replacing Thun
 
 ## Brand & interface
 
-**Organic Workspace** remains consolidated directly in its canonical stylesheet. Source 1.7.4 does not change UI logic: it keeps the 1.7.3 fixes and only extends validated compatibility to Thunderbird 154.
+**Organic Workspace** is unchanged in source 1.7.5; this candidate only changes the public/localized add-on name required by ATN.
 
 ## Compatibility
 
-- **Source version:** `1.7.4` — published
+- **Source version:** `1.7.5` — candidate
 - **Latest public release:** `1.7.4`
 - **Thunderbird:** `153.0` to `154.*`
 - **Format:** MailExtension Manifest V3
@@ -56,8 +56,8 @@ npm run ci
 
 Reproducible outputs from the published source:
 
-- `dist/MailPin_v1.7.4.xpi`
-- `dist/MailPin_GitHub_Repository_v1.7.4.zip`
+- `dist/MailPin_v1.7.5.xpi`
+- `dist/MailPin_GitHub_Repository_v1.7.5.zip`
 - `dist/SHA256SUMS.txt`
 
 ## Privacy & security
@@ -66,8 +66,8 @@ MailPin has no runtime network call, telemetry, advertising or remote code. Full
 
 - [Privacy](PRIVACY.md)
 - [Security](SECURITY.md)
-- [Source security audit 1.7.4](SECURITY_AUDIT_1.7.4.md)
-- [Source validation report 1.7.4](VALIDATION_REPORT_1.7.4.md)
+- [Source security audit 1.7.5](SECURITY_AUDIT_1.7.5.md)
+- [Source validation report 1.7.5](VALIDATION_REPORT_1.7.5.md)
 - [Known limitations](docs/KNOWN_LIMITATIONS.md)
 
 ## Documentation & support

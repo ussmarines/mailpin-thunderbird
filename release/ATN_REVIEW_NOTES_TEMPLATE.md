@@ -1,57 +1,36 @@
-# Notes pour les reviewers ATN — MailPin 1.7.4
+# Notes pour les reviewers ATN — MailPin 1.7.5
 
 ## Statut
 
-- **Release GitHub publique actuelle :** 1.7.4
-- **Source publiée :** 1.7.4
-- **Version :** 1.7.4
-- **Soumission ATN :** non effectuée
+- **Dernière release GitHub publique :** 1.7.4
+- **Source candidate :** 1.7.5
+- **Version :** 1.7.5
+- **Soumission ATN :** à effectuer après publication
 
 ## Identité
 
-- **Nom :** MailPin — Email Follow-up & Productivity for Thunderbird
-- **Version :** 1.7.4
+- **Nom :** MailPin — Email Follow-up & Productivity
+- **Version :** 1.7.5
 - **ID :** `ussmarines.mailpin@addons.thunderbird.net`
 - **Compatibilité :** Thunderbird 153.0 à 154.*
 - **Permission WebExtension :** `menus` uniquement
 
-## Correctif 1.7.4
+## Correctif 1.7.5
 
-- extension de `strict_max_version` de `153.*` à `154.*` afin de rétablir l’installation avec Thunderbird 154 ;
-- smoke runtime déplacé sur le binaire officiel Thunderbird 154.0 ;
-- aucune modification de logique métier, `PinCompatibility`, stockage, schéma ou identité.
+Le nom localisé précédent contenait 56 caractères et dépassait la limite ATN de 50 caractères. La 1.7.5 utilise `MailPin — Email Follow-up & Productivity` (40 caractères). Aucun comportement runtime n’est modifié.
 
-Aucune permission, migration, dépendance runtime, télémétrie, publicité, connexion réseau ou code distant n’est ajoutée.
+Aucune permission, migration, dépendance runtime, télémétrie, publicité, connexion réseau ou code distant n’est ajouté.
 
-## Réseau, données et code
+## Build
 
-- `connect-src 'none'` et aucun appel réseau runtime ;
-- aucune télémétrie, publicité ou code distant ;
-- aucun corps complet de message ni pièce jointe copié ;
-- aucune dépendance runtime/build tierce ;
-- source non minifiée et build reproductible.
-
-Voir `PRIVACY.md`, `SECURITY.md`, `SECURITY_AUDIT_1.7.4.md` et `release/BUILD_INSTRUCTIONS.md`.
-
-## Preuves pré-versionnement
-
-- head `3e1943f2be7a18ebcceef5952810675442e91a33` ;
-- QA Linux/Windows + garde sécurité `32299537328` — PASS ;
-- smoke Thunderbird 154.0 réel `32299537485` — PASS.
-
-## Gates publication / soumission
-
-- [x] QA `32300356172` et smoke 154 `32300356085` sur le head exact versionné 1.7.4 ;
-- [x] merge PR et publication `v1.7.4` ;
-- [x] empreintes du build reproductible consignées ;
-- avant ATN, `npm run ci` depuis une extraction neuve de l’archive source publiée sans `.git`.
+Voir `release/BUILD_INSTRUCTIONS.md`. La commande reviewer est `npm run ci` depuis l’archive source extraite.
 
 ## Test rapide
 
-1. Installer le XPI dans Thunderbird 154.0 et confirmer qu’il est accepté.
+1. Installer le XPI dans Thunderbird 154.0 et confirmer le nom `MailPin — Email Follow-up & Productivity`.
 2. Confirmer l’injection unique du panneau et du bouton Quick Filter.
 3. Ouvrir le Dashboard depuis le panneau et confirmer un seul onglet.
 4. Épingler/désépingler et confirmer l’absence de modification lu/non-lu ou compteurs natifs.
 5. Désinstaller/réinstaller et confirmer le nettoyage puis l’injection unique.
 
-Aucune recette humaine non exécutée n’est présentée comme PASS.
+Voir `PRIVACY.md`, `SECURITY.md`, `SECURITY_AUDIT_1.7.5.md` et `release/BUILD_INSTRUCTIONS.md`.

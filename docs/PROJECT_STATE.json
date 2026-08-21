@@ -1,16 +1,23 @@
 {
   "format": "mailperch-project-state",
   "version": 1,
-  "project": "MailPin — Email Follow-up & Productivity for Thunderbird",
-  "extensionVersion": "1.7.4",
+  "project": "MailPin — Email Follow-up & Productivity",
+  "extensionVersion": "1.7.5",
   "baseGitHub": {
     "branch": "main",
-    "commit": "b74c0c7f264cf387269be0aaf18e47e99cf07600",
-    "role": "published v1.7.4 tag target after Thunderbird 154 compatibility validation"
+    "commit": "dbc67e903e682af37182c7a252f9f669ed2c48e2",
+    "role": "published v1.7.4 baseline for the ATN name-compliance candidate"
   },
   "extensionId": "ussmarines.mailpin@addons.thunderbird.net",
-  "thunderbird": {"min": "153.0", "max": "154.*"},
-  "schemas": {"sqlite": 5, "settings": 8, "data": 7},
+  "thunderbird": {
+    "min": "153.0",
+    "max": "154.*"
+  },
+  "schemas": {
+    "sqlite": 5,
+    "settings": 8,
+    "data": 7
+  },
   "entrypoints": {
     "manifest": "extension/manifest.json",
     "background": "extension/background.js",
@@ -29,7 +36,12 @@
     "thunderbirdTestBench": "docs/THUNDERBIRD_TEST_BENCH.md",
     "codexHandoff": "docs/CODEX_HANDOFF.md"
   },
-  "commands": ["npm run check", "npm test", "npm run build", "npm run ci"],
+  "commands": [
+    "npm run check",
+    "npm test",
+    "npm run build",
+    "npm run ci"
+  ],
   "invariants": [
     "No native unread/new/total counter mutation",
     "Pinning never changes read state",
@@ -48,29 +60,49 @@
     "Selected-account scope uses Thunderbird account.key consistently from Options through runtime filtering"
   ],
   "ui": {
-    "settingsSpacingAffects": ["extension/options"],
-    "cardDensityAffects": ["MailPin pinned cards"],
-    "mustNotAffect": ["Thunderbird native thread row height", "native message counters"]
+    "settingsSpacingAffects": [
+      "extension/options"
+    ],
+    "cardDensityAffects": [
+      "MailPin pinned cards"
+    ],
+    "mustNotAffect": [
+      "Thunderbird native thread row height",
+      "native message counters"
+    ]
   },
   "highRisk": [
-    "_setupAbout3Pane", "PinCompatibility adapters", "PinStructuredStore", "_resolveReference",
-    "calendar observers", "folder observers", "automatic rules", "imports and restores",
-    "uninstall lifecycle", "privileged API input validation", "settings save/cancel lifecycle",
-    "selected-account filtering", "Thunderbird runtime smoke harness"
+    "_setupAbout3Pane",
+    "PinCompatibility adapters",
+    "PinStructuredStore",
+    "_resolveReference",
+    "calendar observers",
+    "folder observers",
+    "automatic rules",
+    "imports and restores",
+    "uninstall lifecycle",
+    "privileged API input validation",
+    "settings save/cancel lifecycle",
+    "selected-account filtering",
+    "Thunderbird runtime smoke harness"
   ],
   "security": {
     "thunderbirdBoundary": "Messages/Tags/Calendar internals remain isolated behind dedicated compatibility adapters",
     "uiDependencyPolicy": "native HTML plus local Organic Workspace CSS tokens; canonical workspace stylesheet; no runtime patch stylesheet, npm runtime dependency, bundler, CDN or remote asset",
     "runtimeTestSupplyChain": "test-only Thunderbird/geckodriver downloads are checksum-verified and are not runtime dependencies"
   },
-  "developmentBranch": "release/finalize-1.7.4",
+  "developmentBranch": "release/atn-name-1.7.5",
   "testing": {
-    "contract": ["tests/test_organic_workspace_ui.py", "tests/test_thunderbird_compatibility_boundary.py", "tests/thunderbird_compatibility_contract.mjs"],
+    "contract": [
+      "tests/test_organic_workspace_ui.py",
+      "tests/test_thunderbird_compatibility_boundary.py",
+      "tests/thunderbird_compatibility_contract.mjs"
+    ],
     "runtimeWorkflow": ".github/workflows/thunderbird-smoke.yml",
     "runtimeScript": "tests/thunderbird/real_smoke.py",
-    "browserStatus": "No UI implementation change in 1.7.4; Organic Workspace contracts remain unchanged.",
-    "runtimeStatus": "Versioned candidate c2527b57de4775f4fd228af22b9792937e7ce6ea passed QA 32300356172 and real Thunderbird 154.0 smoke 32300356085. Release trigger QA 32300831724 passed, and tag v1.7.4 resolves exactly to b74c0c7f264cf387269be0aaf18e47e99cf07600."
+    "browserStatus": "No UI/runtime behavior change in 1.7.5; only the localized/public add-on name is shortened for ATN.",
+    "runtimeStatus": "Published 1.7.4 passed QA 32300356172 and real Thunderbird 154.0 smoke 32300356085. The exact 1.7.5 candidate must pass fresh QA/build and Thunderbird 154 smoke before publication."
   },
   "latestPublicVersion": "1.7.4",
-  "releaseStatus": "published"
+  "releaseStatus": "candidate"
 }

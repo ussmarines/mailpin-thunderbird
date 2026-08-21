@@ -20,8 +20,11 @@ assert package["version"] == version
 fr_locale = json.loads((EXT / "_locales/fr/messages.json").read_text(encoding="utf-8"))
 en_locale = json.loads((EXT / "_locales/en/messages.json").read_text(encoding="utf-8"))
 assert package["name"] == "mailpin-thunderbird"
-assert fr_locale["extensionName"]["message"] == "MailPin — Email Follow-up & Productivity for Thunderbird"
-assert en_locale["extensionName"]["message"] == "MailPin — Email Follow-up & Productivity for Thunderbird"
+expected_extension_name = "MailPin — Email Follow-up & Productivity"
+assert fr_locale["extensionName"]["message"] == expected_extension_name
+assert en_locale["extensionName"]["message"] == expected_extension_name
+assert len(fr_locale["extensionName"]["message"]) <= 50
+assert len(en_locale["extensionName"]["message"]) <= 50
 assert fr_locale["brandSubtitle"]["message"] == "Suivi d’e-mails & productivité pour Thunderbird."
 assert en_locale["brandSubtitle"]["message"] == "Email Follow-up & Productivity for Thunderbird"
 assert en_locale["brandSlogan"]["message"] == "Stay on top. Follow through. Get results."

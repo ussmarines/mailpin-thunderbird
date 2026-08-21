@@ -1,5 +1,11 @@
 # Journal des modifications
 
+## 1.7.5 — conformité du nom Add-ons for Thunderbird
+
+- raccourcit le nom localisé de l’extension à `MailPin — Email Follow-up & Productivity` afin de respecter la limite ATN de 50 caractères ;
+- conserve l’identifiant public `ussmarines.mailpin@addons.thunderbird.net` et la compatibilité Thunderbird `153.0` à `154.*` ;
+- ne modifie aucune logique métier, API Experiment, frontière `PinCompatibility`, permission, schéma, stockage, dépendance runtime, connexion réseau, télémétrie, publicité, CDN ou code distant.
+
 ## 1.7.4 — compatibilité Thunderbird 154
 
 - étend la compatibilité déclarée de Thunderbird `153.0` jusqu’à `154.*` afin de rétablir l’installation sur Thunderbird 154 ;

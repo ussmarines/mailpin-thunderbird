@@ -1,13 +1,13 @@
 # Mémoire opérationnelle — MailPin
 
-> Version source : **1.7.4**
+> Version source : **1.7.5**
 > Dernière release publique : **1.7.4**
-> Branche courante : `release/finalize-1.7.4` ; finalisation documentaire post-publication
+> Branche courante : `release/atn-name-1.7.5` ; candidate de conformité ATN
 > Extension ID : `ussmarines.mailpin@addons.thunderbird.net`
 
 ## Résumé
 
-MailPin est une extension Thunderbird Manifest V3 locale. La source 1.7.4 étend la compatibilité déclarée de `153.0` à `154.*` et déplace le smoke automatisé sur le binaire officiel Thunderbird 154.0. Aucun changement de logique métier, permission, stockage, schéma, dépendance runtime ou réseau n’est introduit. La candidate versionnée `c2527b57de4775f4fd228af22b9792937e7ce6ea` a passé la QA `32300356172` et le smoke réel Thunderbird 154.0 `32300356085`. Le déclencheur de publication a passé la QA `32300831724`; le tag `v1.7.4` est identique au commit `b74c0c7f264cf387269be0aaf18e47e99cf07600`.
+MailPin est une extension Thunderbird Manifest V3 locale. La source 1.7.5 raccourcit uniquement le nom public/localisé à **MailPin — Email Follow-up & Productivity** afin de respecter la limite ATN de 50 caractères. La logique métier, l’API Experiment, `PinCompatibility`, les schémas, le stockage, les permissions et la plage Thunderbird 153.0–154.* restent inchangés. La release 1.7.4 a passé la QA `32300356172` et le smoke réel Thunderbird 154.0 `32300356085`; la candidate 1.7.5 doit repasser les gates applicables sur son head exact avant publication.
 
 ## Invariants non négociables
 
@@ -45,9 +45,7 @@ MailPin est une extension Thunderbird Manifest V3 locale. La source 1.7.4 étend
 
 - composition Dashboard/Options : `extension/styles/workspace.css` ;
 - tokens et thèmes : `extension/styles/tokens.css`, `extension/styles/theme.js` ;
-- navigation Options : `extension/options/options-navigation-stability.js` ;
-- paramètres : `extension/options/` ;
-- dashboard : `extension/dashboard/` ;
+- paramètres : `extension/options/` ; dashboard : `extension/dashboard/` ;
 - logique métier : `extension/api/pinInbox/modules/` ;
 - frontière Thunderbird : `extension/api/pinInbox/modules/compatibility.js` et adaptateurs `thunderbird-*.js` ;
 - smoke réel : `tests/thunderbird/real_smoke.py`, `.github/workflows/thunderbird-smoke.yml` ;
@@ -55,14 +53,13 @@ MailPin est une extension Thunderbird Manifest V3 locale. La source 1.7.4 étend
 
 ## État technique courant
 
-- source : 1.7.4 publiée ; dernière release publique : 1.7.4 ;
+- source : 1.7.5 candidate ; dernière release publique : 1.7.4 ;
 - Thunderbird : 153.0 à 154.* ;
 - permission WebExtension : `menus` uniquement ;
 - schémas : SQLite 5, settings 8, data 7 ;
-- aucune migration, permission, dépendance runtime ou connexion réseau introduite par 1.7.4 ;
-- QA candidate exacte : `32300356172` — PASS ;
-- smoke réel Thunderbird 154.0 candidate exacte : `32300356085` — PASS ;
-- release `v1.7.4` publiée après QA, build et smoke Thunderbird 154 réels.
+- aucune migration, permission, dépendance runtime ou connexion réseau introduite par 1.7.5 ;
+- release 1.7.4 : QA `32300356172` — PASS ; smoke Thunderbird 154.0 `32300356085` — PASS ;
+- candidate 1.7.5 : contrôle du nom, QA/build et smoke Thunderbird 154.0 frais requis avant merge/publication.
 
 ## Commandes obligatoires
 
@@ -75,6 +72,7 @@ npm run ci
 
 ## Définition de terminé
 
+- nom localisé ≤ 50 caractères et garde anti-régression ;
 - version source et dernière release publique déclarées sans ambiguïté ;
 - tests et build verts sur le diff applicable ;
 - smoke Thunderbird 154 réel frais sur le head versionné ;

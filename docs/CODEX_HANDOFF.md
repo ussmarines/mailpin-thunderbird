@@ -1,32 +1,23 @@
-# Passage de relais — MailPin 1.7.4 publiée pour Thunderbird 154
+# Passage de relais — MailPin 1.7.5 candidate ATN
 
-## Référence
+## État
 
-- dépôt : `ussmarines/mailpin-thunderbird` ;
-- branche de finalisation : `release/finalize-1.7.4` ;
-- version source : **1.7.4** ;
+- branche : `release/atn-name-1.7.5` ;
+- version source : **1.7.5** ;
 - dernière release publique : **1.7.4** ;
-- `releaseStatus` : **published** ;
-- ID : `ussmarines.mailpin@addons.thunderbird.net` ;
-- compatibilité publiée : Thunderbird `153.0` à `154.*`.
+- Thunderbird : 153.0 à 154.* ;
+- ID : `ussmarines.mailpin@addons.thunderbird.net`.
 
-## Résultat
+## Objectif
 
-MailPin 1.7.4 corrige l’incompatibilité d’installation avec Thunderbird 154. La cause était `strict_max_version: 153.*`. Le correctif étend la plage à `154.*` et déplace le smoke sur le binaire officiel Thunderbird 154.0, sans changement métier, permission, stockage, schéma, dépendance runtime ou réseau.
+Publier une maintenance 1.7.5 qui raccourcit uniquement le nom localisé/store à `MailPin — Email Follow-up & Productivity` afin de respecter la limite ATN de 50 caractères.
 
-## Preuves
+## Périmètre
 
-- candidate exacte `c2527b57de4775f4fd228af22b9792937e7ce6ea` : QA `32300356172` PASS ;
-- même candidate : smoke réel Thunderbird 154.0 `32300356085` PASS ;
-- déclencheur de publication : QA `32300831724` PASS ;
-- tag `v1.7.4` identique au commit `b74c0c7f264cf387269be0aaf18e47e99cf07600` ;
-- XPI reproductible : SHA-256 `f5a9031ed1b3bad059516f659280b447c6654edd9900e5267d576cecc8b377d8` ;
-- source reviewer reproductible : SHA-256 `bf308142f4a27ec091eb0b9bef2744e33df93677b41dcb97243d5070364a91c6`.
+Locales FR/EN, métadonnées de nom, version/release/docs/tests associés. Aucun changement de logique métier, API Experiment, `PinCompatibility`, stockage, schéma, permission ou réseau.
 
-## Reste hors gate GitHub
+## Gates
 
-- recette humaine visuelle/fournisseurs si souhaitée ;
-- soumission et revue ATN ;
-- futurs Thunderbird >154 : nouveau smoke réel requis.
+Contrôle ciblé du nom ; QA Linux/Windows + build reproductible ; smoke Thunderbird 154.0 sur la candidate exacte ; merge puis publication `v1.7.5` ; reproduction `npm run ci` depuis l’archive reviewer publiée sans `.git`.
 
-Codex Security n’a pas été utilisé.
+Codex Security n’est pas requis.

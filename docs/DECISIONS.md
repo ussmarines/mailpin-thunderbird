@@ -26,7 +26,7 @@ Le propriétaire ne souhaite ni vente ni redistribution publique du code. Le pro
 
 ## D007 — MailPin comme identité publique
 
-Le nom public canonique est **MailPin** et le nom complet du store est **MailPin — Email Follow-up & Productivity for Thunderbird**. Les anciens noms faisant référence à Outlook sont retirés des surfaces publiques. Les identifiants techniques `pin-mails-*` restent conservés jusqu’à une migration dédiée afin de préserver les données et les mises à niveau.
+Le nom public canonique est **MailPin** et le nom complet du store est **MailPin — Email Follow-up & Productivity**. Les anciens noms faisant référence à Outlook sont retirés des surfaces publiques. Les identifiants techniques `pin-mails-*` restent conservés jusqu’à une migration dédiée afin de préserver les données et les mises à niveau.
 
 ## 2026-07-31 — séparation des densités
 

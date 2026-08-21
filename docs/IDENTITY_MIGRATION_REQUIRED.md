@@ -8,7 +8,7 @@ Identifiant public définitif :
 
 `ussmarines.mailpin@addons.thunderbird.net`
 
-Nom public : **MailPin — Email Follow-up & Productivity for Thunderbird**.
+Nom public : **MailPin — Email Follow-up & Productivity** (forme ATN ≤ 50 caractères depuis 1.7.5).
 
 ## Pourquoi l’identifiant change
 
