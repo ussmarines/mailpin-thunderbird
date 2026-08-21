@@ -8,6 +8,8 @@
 - **Nom public/localisé :** `MailPin — Email Follow-up & Productivity` — 40 caractères
 - **ID permanent :** `ussmarines.mailpin@addons.thunderbird.net`
 - **Compatibilité publiée :** Thunderbird 153.0 à 154.*
+- **Soumission Add-ons for Thunderbird :** envoyée le 21 août 2026 ; revue en attente
+- **Fiche ATN :** https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/
 
 ## Portée 1.7.5
 
@@ -23,10 +25,11 @@ Aucune logique métier, API Experiment, frontière `PinCompatibility`, permissio
 - publisher : `npm run ci` depuis le checkout puis depuis l’archive reviewer fraîche sans `.git`, XPI reconstruit SHA-identique — PASS ;
 - vérification indépendante des artefacts publics : run `32481646372` — PASS ;
 - `MailPin_v1.7.5.xpi` — 254 557 octets — SHA-256 `247e314911ce1006f40b78c6050f3697b7f6b1beb3f0489214e84410c668dc12` ;
-- `MailPin_GitHub_Repository_v1.7.5.zip` — 689 068 octets — SHA-256 `af555557bc0d3b80d35e34a7ec1447b77ebe356c75a95ece9f28b8238fdfb1fd` ;
+- asset source GitHub `MailPin_GitHub_Repository_v1.7.5.zip` — 689 068 octets — SHA-256 `af555557bc0d3b80d35e34a7ec1447b77ebe356c75a95ece9f28b8238fdfb1fd` ;
+- source reviewer effectivement soumise à ATN : `MailPin_ATN_Reviewer_Source_v1.7.5.zip` — SHA-256 `88ab540dcf9c3acd9f9bc8f6ded6d9c78d09be7fedf99a52e5c212e9edd499fe` ;
 - `SHA256SUMS.txt` — SHA-256 `db052f49548aa70e46208808084be3e5ef2ac8d454267e1babc53aeeb647ad26`.
 
-## Gates GitHub
+## Gates GitHub / ATN
 
 - [x] nom localisé FR/EN = 40 caractères et garde anti-régression ≤ 50 ;
 - [x] QA Linux/Windows sur la candidate exacte ;
@@ -37,6 +40,7 @@ Aucune logique métier, API Experiment, frontière `PinCompatibility`, permissio
 - [x] archive reviewer reconstruite sans `.git` ;
 - [x] tag/release `v1.7.5` publié ;
 - [x] artefacts publics et empreintes vérifiés ;
-- [ ] soumission/revue ATN.
+- [x] soumission ATN 1.7.5 téléversée ;
+- [ ] revue humaine / approbation ATN.
 
 La recette humaine 1.7.5 et les fournisseurs/calendriers réseau réels restent des validations distinctes lorsqu’ils sont revendiqués. Codex Security n’a pas été utilisé.

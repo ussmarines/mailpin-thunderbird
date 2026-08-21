@@ -35,10 +35,15 @@ MailPin turns important email into actionable follow-up **without replacing Thun
 - **Format:** MailExtension Manifest V3
 - **Locales:** French and English
 - **Public ID:** `ussmarines.mailpin@addons.thunderbird.net`
+- **Add-ons for Thunderbird listing:** [MailPin](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/) — version 1.7.5 submitted, review pending
 
 MailPin uses a privileged Thunderbird Experiment for `about:3pane`, local SQLite storage, and selected Messages/Tags/Calendar integration. Messages, Tags and Calendar internals remain isolated behind `PinCompatibility`. Thunderbird 154 compatibility was validated with a real smoke run against the official 154.0 binary before publication.
 
 ## Install
+
+### Add-ons for Thunderbird
+
+The [MailPin listing on Add-ons for Thunderbird](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/) exists and version 1.7.5 has been submitted for review. Until that review is approved, the verified GitHub release below remains the public reference build.
 
 ### GitHub release
 

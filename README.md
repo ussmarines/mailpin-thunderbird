@@ -35,10 +35,15 @@ MailPin transforme les e-mails importants en suivi actionnable **sans remplacer 
 - **Format :** MailExtension Manifest V3
 - **Langues :** français et anglais
 - **ID public :** `ussmarines.mailpin@addons.thunderbird.net`
+- **Fiche Add-ons for Thunderbird :** [MailPin](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/) — soumission 1.7.5 en attente de revue
 
 MailPin utilise une API Experiment privilégiée pour l’intégration `about:3pane`, le stockage SQLite local et certaines fonctions Messages/Tags/Agenda. Les frontières Messages, Tags et Agenda restent isolées derrière `PinCompatibility`. La compatibilité Thunderbird 154 a été validée par un smoke réel sur le binaire officiel 154.0 avant publication.
 
 ## Installation
+
+### Add-ons for Thunderbird
+
+La [fiche MailPin sur Add-ons for Thunderbird](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/) existe et la soumission 1.7.5 est en attente de revue. Tant que cette revue n’est pas approuvée, la release GitHub ci-dessous reste la référence publique vérifiée.
 
 ### Release GitHub
 
