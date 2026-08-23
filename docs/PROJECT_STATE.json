@@ -2,11 +2,11 @@
   "format": "mailperch-project-state",
   "version": 1,
   "project": "MailPin — Email Follow-up & Productivity",
-  "extensionVersion": "1.7.5",
+  "extensionVersion": "1.7.6",
   "baseGitHub": {
     "branch": "main",
-    "commit": "2384ee52df95a711424dfeb817ef114888634ed0",
-    "role": "published v1.7.5 tag target after ATN name-compliance gates"
+    "commit": "fa6782f8ecfaf259d9b8e54a08e5cf361172c669",
+    "role": "main baseline with the Thunderbird cold-start pin initialization fix merged via PR #64"
   },
   "extensionId": "ussmarines.mailpin@addons.thunderbird.net",
   "thunderbird": {
@@ -91,7 +91,7 @@
     "uiDependencyPolicy": "native HTML plus local Organic Workspace CSS tokens; canonical workspace stylesheet; no runtime patch stylesheet, npm runtime dependency, bundler, CDN or remote asset",
     "runtimeTestSupplyChain": "test-only Thunderbird/geckodriver downloads are checksum-verified and are not runtime dependencies"
   },
-  "developmentBranch": "release/finalize-1.7.5",
+  "developmentBranch": "release/startup-fix-1.7.6",
   "testing": {
     "contract": [
       "tests/test_organic_workspace_ui.py",
@@ -100,9 +100,9 @@
     ],
     "runtimeWorkflow": ".github/workflows/thunderbird-smoke.yml",
     "runtimeScript": "tests/thunderbird/real_smoke.py",
-    "browserStatus": "No UI/runtime behavior change in 1.7.5; only the localized/public add-on name was shortened to 40 characters for ATN.",
-    "runtimeStatus": "Exact 1.7.5 candidate 19cf23c21e983be924ffd9e6af8fdb1e8e612947 passed QA 32480175617 and real Thunderbird 154.0 smoke 32480175435. The release publisher rebuilt from the reviewer archive without .git before publishing v1.7.5 at 2384ee52df95a711424dfeb817ef114888634ed0; public assets were independently verified in run 32481646372."
+    "browserStatus": "1.7.6 packages the cold-start initialization correction merged by PR #64; no UI redesign is included.",
+    "runtimeStatus": "PR #64 head 26fc0ac9b4d35009f125f543eefc5de9338bef71 passed QA 32639780333 and real Thunderbird 154.0 smoke 32639780313 before merge to main fa6782f8ecfaf259d9b8e54a08e5cf361172c669. The exact versioned 1.7.6 candidate must pass fresh QA/build and Thunderbird 154 smoke before publication."
   },
   "latestPublicVersion": "1.7.5",
-  "releaseStatus": "published"
+  "releaseStatus": "candidate"
 }
