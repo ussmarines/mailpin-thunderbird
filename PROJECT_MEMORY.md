@@ -1,13 +1,15 @@
 # Mémoire opérationnelle — MailPin
 
-> Version source : **1.7.5**
+> Version source : **1.7.6**
 > Dernière release publique : **1.7.5**
-> Branche courante : `release/finalize-1.7.5` ; finalisation documentaire post-publication
+> Branche courante : `release/startup-fix-1.7.6` ; candidate du correctif de démarrage
 > Extension ID : `ussmarines.mailpin@addons.thunderbird.net`
 
 ## Résumé
 
-MailPin est une extension Thunderbird Manifest V3 locale. La release 1.7.5 raccourcit uniquement le nom public/localisé à **MailPin — Email Follow-up & Productivity** (40 caractères) afin de respecter la limite ATN de 50 caractères. La logique métier, l’API Experiment, `PinCompatibility`, les schémas, le stockage, les permissions et la plage Thunderbird 153.0–154.* restent inchangés. La candidate exacte `19cf23c21e983be924ffd9e6af8fdb1e8e612947` a passé la QA `32480175617` et le smoke réel Thunderbird 154.0 `32480175435`. Le tag `v1.7.5` cible exactement `2384ee52df95a711424dfeb817ef114888634ed0` et les artefacts publics ont été vérifiés dans le run `32481646372`.
+MailPin est une extension Thunderbird Manifest V3 locale. La candidate 1.7.6 corrige le chargement des épingles persistées après un démarrage complet de Thunderbird : le background MV3 s’enregistre désormais sur `runtime.onStartup` et initialise les onglets mail existants sans dépendre de l’ouverture du Dashboard. Le banc persistant ne réactive plus artificiellement l’onglet mail. La logique reste idempotente et ne change ni `PinCompatibility`, ni les schémas, le stockage, les permissions, la plage Thunderbird 153.0–154.* ou la politique réseau local-first.
+
+Le correctif runtime exact de la PR #64 (`26fc0ac9b4d35009f125f543eefc5de9338bef71`) a passé la QA `32639780333` et le smoke réel Thunderbird 154.0 `32639780313`, puis a été fusionné dans `main` à `fa6782f8ecfaf259d9b8e54a08e5cf361172c669`. La candidate versionnée 1.7.6 doit repasser les gates applicables sur son head exact avant publication.
 
 ## Invariants non négociables
 
@@ -53,13 +55,14 @@ MailPin est une extension Thunderbird Manifest V3 locale. La release 1.7.5 racco
 
 ## État technique courant
 
-- source : 1.7.5 publiée ; dernière release publique : 1.7.5 ;
+- source : 1.7.6 candidate ; dernière release publique : 1.7.5 ;
 - Thunderbird : 153.0 à 154.* ;
 - permission WebExtension : `menus` uniquement ;
 - schémas : SQLite 5, settings 8, data 7 ;
-- aucune migration, permission, dépendance runtime ou connexion réseau introduite par 1.7.5 ;
-- candidate exacte 1.7.5 `19cf23c21e983be924ffd9e6af8fdb1e8e612947` : QA `32480175617` — PASS ; smoke Thunderbird 154.0 `32480175435` — PASS ;
-- release `v1.7.5` : tag `2384ee52df95a711424dfeb817ef114888634ed0`, build reviewer hors `.git` PASS, artefacts publics vérifiés `32481646372` — PASS.
+- aucune migration, permission, dépendance runtime ou connexion réseau introduite par 1.7.6 ;
+- PR #64, head runtime `26fc0ac9b4d35009f125f543eefc5de9338bef71` : QA `32639780333` — PASS ; smoke Thunderbird 154.0 `32639780313` — PASS ;
+- merge du correctif sur `main` : `fa6782f8ecfaf259d9b8e54a08e5cf361172c669` ;
+- candidate 1.7.6 : QA/build et smoke Thunderbird 154.0 frais requis avant publication.
 
 ## Commandes obligatoires
 
@@ -72,10 +75,10 @@ npm run ci
 
 ## Définition de terminé
 
-- nom localisé ≤ 50 caractères et garde anti-régression ;
 - version source et dernière release publique déclarées sans ambiguïté ;
 - tests et build verts sur le diff applicable ;
 - smoke Thunderbird 154 réel frais sur le head versionné ;
+- cold start avec épingles persistées sans Dashboard validé ;
 - aucune permission, schéma, réseau ou dépendance runtime injustifiée ;
 - documentation active alignée avec les preuves exactes ;
 - publication uniquement après les gates applicables démontrés.
