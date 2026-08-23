@@ -18,6 +18,12 @@ Le banc Thunderbird persistant ne réactive plus artificiellement l’onglet mai
 
 Aucune permission WebExtension, migration, schéma, stockage, dépendance runtime, connexion réseau, télémétrie, publicité, CDN ou code distant n’est ajouté. `PinCompatibility` reste inchangé.
 
+## Artefacts publiés
+
+- `MailPin_v1.7.6.xpi`
+- `MailPin_GitHub_Repository_v1.7.6.zip`
+- `SHA256SUMS.txt`
+
 ## Preuves
 
 - correctif runtime PR #64 head `26fc0ac9b4d35009f125f543eefc5de9338bef71` : QA `32639780333` — PASS ; smoke réel Thunderbird 154.0 `32639780313` — PASS ;
