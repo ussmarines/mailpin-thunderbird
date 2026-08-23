@@ -33,6 +33,15 @@ async function setupTab(tabId) {
   }
 }
 
+async function setupExistingMailTabs() {
+  try {
+    const tabs = await messenger.mailTabs.query({});
+    await Promise.all(tabs.map(tab => setupTab(tab.id ?? tab.tabId)));
+  } catch (error) {
+    logError("initialisation des onglets impossible", error);
+  }
+}
+
 async function toggleSelected(tabId, state) {
   try {
     const args = typeof state === "boolean" ? [state] : [];
@@ -230,6 +239,7 @@ messenger.commands.onCommand.addListener(async (command, tab) => {
 messenger.messageDisplayAction?.onClicked.addListener(tab => toggleDisplayed(tab.id));
 messenger.action?.onClicked.addListener(openDashboard);
 messenger.pinInbox?.onDashboardRequested.addListener(openDashboard);
+messenger.runtime.onStartup.addListener(setupExistingMailTabs);
 messenger.tabs.onCreated.addListener(tab => {
   if (tab.type === "mail") setupTab(tab.id);
 });
@@ -241,6 +251,4 @@ async function initializeMenus() {
 }
 
 initializeMenus().catch(error => logError("initialisation des menus impossible", error));
-messenger.mailTabs.query({})
-  .then(tabs => Promise.all(tabs.map(tab => setupTab(tab.id ?? tab.tabId))))
-  .catch(error => logError("initialisation des onglets impossible", error));
+setupExistingMailTabs();

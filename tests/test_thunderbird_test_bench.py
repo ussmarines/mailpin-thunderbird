@@ -140,9 +140,10 @@ assert "ordinaryTwoFit" in BENCH
 assert "ordinaryCardHeights" in BENCH
 assert "listClientHeight" in BENCH
 assert "temporary=False" in BENCH
-assert "persistent-addon-loaded-after-restart" in BENCH
-assert "WAKE_PERSISTED_EXTENSION_SCRIPT" in BENCH
-assert "natural-tab-activation-wake" in BENCH
+assert "cold-start-auto-initialization" in BENCH
+assert "persisted MailPin cold-start auto-initialization without user interaction" in BENCH
+assert "WAKE_PERSISTED_EXTENSION_SCRIPT" not in BENCH
+assert "natural-tab-activation-wake" not in BENCH
 assert "internal Dashboard and Options tabs are not exposed" not in BENCH
 assert "untrusted synthetic XUL menuitem commands" not in BENCH
 assert "userDisabled" not in BENCH
