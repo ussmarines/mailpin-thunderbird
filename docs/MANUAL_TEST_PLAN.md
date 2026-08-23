@@ -1,14 +1,17 @@
-# Plan de test manuel MailPin — 1.7.5
+# Plan de test manuel MailPin — 1.7.6
 
-Utiliser de préférence un profil Thunderbird jetable pour les scénarios destructifs. Le présent plan complète les validations automatisées de la source 1.7.5 ; la dernière release publique est 1.7.5. Aucun contrôle non exécuté ne doit être présenté comme PASS.
+Utiliser de préférence un profil Thunderbird jetable pour les scénarios destructifs. Le présent plan complète les validations automatisées de la source 1.7.6 ; la dernière release publique est 1.7.5. Aucun contrôle non exécuté ne doit être présenté comme PASS.
 
-## Recette 1.7.5 — identité ATN
+## Recette 1.7.6 — cold start des épingles persistées
 
-1. Installer le XPI 1.7.5 dans Thunderbird 154.0.
-2. Vérifier que le nom affiché est `MailPin — Email Follow-up & Productivity`.
-3. Confirmer que l’extension démarre et que le panneau MailPin est injecté une seule fois.
-4. Ouvrir le Dashboard et confirmer un seul onglet.
-5. Épingler/désépingler un message et confirmer l’absence de changement lu/non-lu ou des compteurs natifs.
-6. Désinstaller/réinstaller et confirmer le nettoyage puis l’injection unique.
+1. Installer le XPI 1.7.6 dans Thunderbird 154.0 sur un profil de test.
+2. Épingler plusieurs messages puis fermer complètement Thunderbird.
+3. Relancer Thunderbird normalement et ne cliquer sur aucune action MailPin.
+4. Sans ouvrir le Dashboard, confirmer que le panneau MailPin et les épingles persistées apparaissent automatiquement une fois l’interface prête.
+5. Confirmer qu’un seul panneau et un seul toggle Quick Filter sont présents.
+6. Ouvrir ensuite le Dashboard et confirmer qu’un seul onglet s’ouvre et que cette action n’est plus nécessaire au chargement de la boîte mail.
+7. Réactiver/changer d’onglet mail et confirmer l’absence de duplication de panneau, boutons, listeners visibles ou cartes.
+8. Épingler/désépingler un message et confirmer l’absence de changement lu/non-lu ou des compteurs natifs.
+9. Désinstaller/réinstaller et confirmer le nettoyage puis l’injection unique.
 
-Le XPI testé doit correspondre exactement à la release publique 1.7.5. La recette humaine n’est pas déclarée PASS tant qu’elle n’a pas été exécutée.
+Le XPI testé doit correspondre exactement à la candidate/release 1.7.6 concernée. La recette humaine n’est pas déclarée PASS tant qu’elle n’a pas été exécutée.
