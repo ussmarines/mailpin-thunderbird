@@ -1,5 +1,13 @@
 # Journal des modifications
 
+## 1.7.6 — chargement des épingles au démarrage
+
+- initialise automatiquement les onglets mail existants via `runtime.onStartup` lors d’un démarrage complet de Thunderbird ;
+- restaure l’affichage des mails épinglés persistés sans exiger l’ouverture préalable du Dashboard ou une autre interaction utilisateur ;
+- retire du banc Thunderbird l’activation artificielle d’onglet qui masquait le défaut de cold start ;
+- conserve l’initialisation idempotente afin d’éviter les panneaux, boutons, listeners ou injections en double ;
+- conserve Thunderbird `153.0` à `154.*`, les permissions, `PinCompatibility`, les schémas, le stockage local-first et l’absence de réseau runtime inchangés.
+
 ## 1.7.5 — conformité du nom Add-ons for Thunderbird
 
 - raccourcit le nom localisé de l’extension à `MailPin — Email Follow-up & Productivity` afin de respecter la limite ATN de 50 caractères ;
