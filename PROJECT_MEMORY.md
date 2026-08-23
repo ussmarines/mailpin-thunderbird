@@ -1,15 +1,15 @@
 # Mémoire opérationnelle — MailPin
 
 > Version source : **1.7.6**
-> Dernière release publique : **1.7.5**
-> Branche courante : `release/startup-fix-1.7.6` ; candidate du correctif de démarrage
+> Dernière release publique : **1.7.6**
+> Branche courante : `release/finalize-1.7.6` ; finalisation documentaire post-publication
 > Extension ID : `ussmarines.mailpin@addons.thunderbird.net`
 
 ## Résumé
 
-MailPin est une extension Thunderbird Manifest V3 locale. La candidate 1.7.6 corrige le chargement des épingles persistées après un démarrage complet de Thunderbird : le background MV3 s’enregistre désormais sur `runtime.onStartup` et initialise les onglets mail existants sans dépendre de l’ouverture du Dashboard. Le banc persistant ne réactive plus artificiellement l’onglet mail. La logique reste idempotente et ne change ni `PinCompatibility`, ni les schémas, le stockage, les permissions, la plage Thunderbird 153.0–154.* ou la politique réseau local-first.
+MailPin est une extension Thunderbird Manifest V3 locale. La release 1.7.6 corrige le chargement des épingles persistées après un démarrage complet de Thunderbird : le background MV3 s’enregistre sur `runtime.onStartup` et initialise les onglets mail existants sans dépendre de l’ouverture du Dashboard. Le banc persistant ne réactive plus artificiellement l’onglet mail. La logique reste idempotente et ne change ni `PinCompatibility`, ni les schémas, le stockage, les permissions, la plage Thunderbird 153.0–154.* ou la politique réseau local-first.
 
-Le correctif runtime exact de la PR #64 (`26fc0ac9b4d35009f125f543eefc5de9338bef71`) a passé la QA `32639780333` et le smoke réel Thunderbird 154.0 `32639780313`, puis a été fusionné dans `main` à `fa6782f8ecfaf259d9b8e54a08e5cf361172c669`. La candidate versionnée 1.7.6 doit repasser les gates applicables sur son head exact avant publication.
+La candidate versionnée `c502175041c85e3cb6e37666a0784f7df0a9e367` a passé la QA `32640198347` et le smoke réel Thunderbird 154.0 `32640198339`. La release `v1.7.6` cible `522042df08c2eb7a18a13cbb83631943e54abf2c`. Le téléchargement indépendant des assets publics n’est pas exposé par le connecteur utilisé ici ; aucune empreinte d’asset non observée n’est donc inventée dans cet état final.
 
 ## Invariants non négociables
 
@@ -55,14 +55,13 @@ Le correctif runtime exact de la PR #64 (`26fc0ac9b4d35009f125f543eefc5de9338bef
 
 ## État technique courant
 
-- source : 1.7.6 candidate ; dernière release publique : 1.7.5 ;
+- source : 1.7.6 publiée ; dernière release publique : 1.7.6 ;
 - Thunderbird : 153.0 à 154.* ;
 - permission WebExtension : `menus` uniquement ;
 - schémas : SQLite 5, settings 8, data 7 ;
 - aucune migration, permission, dépendance runtime ou connexion réseau introduite par 1.7.6 ;
-- PR #64, head runtime `26fc0ac9b4d35009f125f543eefc5de9338bef71` : QA `32639780333` — PASS ; smoke Thunderbird 154.0 `32639780313` — PASS ;
-- merge du correctif sur `main` : `fa6782f8ecfaf259d9b8e54a08e5cf361172c669` ;
-- candidate 1.7.6 : QA/build et smoke Thunderbird 154.0 frais requis avant publication.
+- candidate exacte 1.7.6 `c502175041c85e3cb6e37666a0784f7df0a9e367` : QA `32640198347` — PASS ; smoke Thunderbird 154.0 `32640198339` — PASS ;
+- release `v1.7.6` : tag ciblant `522042df08c2eb7a18a13cbb83631943e54abf2c`.
 
 ## Commandes obligatoires
 
@@ -81,4 +80,4 @@ npm run ci
 - cold start avec épingles persistées sans Dashboard validé ;
 - aucune permission, schéma, réseau ou dépendance runtime injustifiée ;
 - documentation active alignée avec les preuves exactes ;
-- publication uniquement après les gates applicables démontrés.
+- aucun workflow one-shot de publication laissé actif après finalisation.

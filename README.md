@@ -6,8 +6,8 @@
 **Email Follow-up & Productivity for Thunderbird**
 
 [![QA](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml)
-![Release](https://img.shields.io/badge/release-v1.7.5-4F7F75)
-![Source](https://img.shields.io/badge/candidate-v1.7.6-3D536B)
+![Release](https://img.shields.io/badge/release-v1.7.6-4F7F75)
+![Source](https://img.shields.io/badge/source-v1.7.6-3D536B)
 ![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x--154.x-3D536B)
 ![Licence](https://img.shields.io/badge/license-MailPin%20Source--Available%201.1-1A1D21)
 </div>
@@ -25,29 +25,29 @@ MailPin transforme les e-mails importants en suivi actionnable **sans remplacer 
 
 ## Interface
 
-La candidate **1.7.6** corrige le chargement à froid des épingles persistées : le background Manifest V3 initialise désormais les onglets mail existants via `runtime.onStartup`, sans exiger l’ouverture préalable du Dashboard. Aucun redesign UI n’est inclus.
+La release **1.7.6** corrige le chargement à froid des épingles persistées : le background Manifest V3 initialise désormais les onglets mail existants via `runtime.onStartup`, sans exiger l’ouverture préalable du Dashboard. Aucun redesign UI n’est inclus.
 
 ## Compatibilité
 
-- **Version source :** `1.7.6` — candidate
-- **Dernière release publique :** `1.7.5`
+- **Version source :** `1.7.6` — publiée
+- **Dernière release publique :** `1.7.6`
 - **Thunderbird :** `153.0` à `154.*`
 - **Format :** MailExtension Manifest V3
 - **Langues :** français et anglais
 - **ID public :** `ussmarines.mailpin@addons.thunderbird.net`
-- **Fiche Add-ons for Thunderbird :** [MailPin](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/) — soumission 1.7.5 en attente de revue
+- **Fiche Add-ons for Thunderbird :** [MailPin](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/) — la soumission 1.7.5 reste en revue ; une soumission 1.7.6 est distincte de la release GitHub
 
-MailPin utilise une API Experiment privilégiée pour l’intégration `about:3pane`, le stockage SQLite local et certaines fonctions Messages/Tags/Agenda. Les frontières Messages, Tags et Agenda restent isolées derrière `PinCompatibility`. Le correctif de démarrage a été validé sur Thunderbird 154.0 réel avant la préparation de la candidate 1.7.6 ; la candidate versionnée doit repasser ses gates exacts avant publication.
+MailPin utilise une API Experiment privilégiée pour l’intégration `about:3pane`, le stockage SQLite local et certaines fonctions Messages/Tags/Agenda. Les frontières Messages, Tags et Agenda restent isolées derrière `PinCompatibility`. La candidate versionnée 1.7.6 a passé la QA et un smoke réel sur Thunderbird 154.0 avant publication.
 
 ## Installation
 
 ### Add-ons for Thunderbird
 
-La [fiche MailPin sur Add-ons for Thunderbird](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/) existe et la soumission 1.7.5 est en attente de revue. Tant que la 1.7.6 n’est pas publiée, la release GitHub 1.7.5 reste la référence publique vérifiée.
+La [fiche MailPin sur Add-ons for Thunderbird](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/) existe. La publication GitHub 1.7.6 est distincte du cycle de revue Add-ons for Thunderbird.
 
 ### Release GitHub
 
-1. Téléchargez `MailPin_v1.7.5.xpi` depuis la release `v1.7.5`.
+1. Téléchargez `MailPin_v1.7.6.xpi` depuis la release `v1.7.6`.
 2. Thunderbird → **Extensions et thèmes** → engrenage → **Installer un module depuis un fichier**.
 3. Sélectionnez le XPI.
 
@@ -59,7 +59,7 @@ Prérequis : Python 3.11+ et Node.js 20+.
 npm run ci
 ```
 
-Livrables reproductibles de la source candidate :
+Livrables reproductibles de la source publiée :
 
 - `dist/MailPin_v1.7.6.xpi`
 - `dist/MailPin_GitHub_Repository_v1.7.6.zip`

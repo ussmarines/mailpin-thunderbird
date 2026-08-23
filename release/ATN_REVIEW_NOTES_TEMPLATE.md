@@ -2,10 +2,10 @@
 
 ## Statut
 
-- **Dernière release GitHub publique :** 1.7.5
-- **Source candidate :** 1.7.6
+- **Dernière release GitHub publique :** 1.7.6
+- **Source publiée :** 1.7.6
 - **Version :** 1.7.6
-- **Soumission ATN :** à effectuer uniquement après publication et gates 1.7.6
+- **Soumission ATN :** prête à préparer séparément de la release GitHub
 
 ## Identité
 
@@ -23,9 +23,13 @@ Le banc Thunderbird persistant ne provoque plus d’activation artificielle de l
 
 Aucune permission, migration, dépendance runtime, télémétrie, publicité, connexion réseau ou code distant n’est ajouté. `PinCompatibility`, les schémas et le stockage sont inchangés.
 
-## Build
+## Build et validation
 
-Voir `release/BUILD_INSTRUCTIONS.md`. La commande reviewer reste `npm run ci` depuis l’archive source extraite. Les empreintes officielles seront consignées après publication ; elles ne sont pas inventées dans la candidate.
+Voir `release/BUILD_INSTRUCTIONS.md`. La commande reviewer est `npm run ci` depuis l’archive source extraite.
+
+La candidate versionnée `c502175041c85e3cb6e37666a0784f7df0a9e367` a passé la QA `32640198347` et le smoke réel Thunderbird 154.0 `32640198339`. La release `v1.7.6` cible `522042df08c2eb7a18a13cbb83631943e54abf2c`.
+
+Les SHA-256 publics ne sont pas recopiés ici tant qu’un téléchargement indépendant des assets n’a pas été effectué.
 
 ## Test rapide
 

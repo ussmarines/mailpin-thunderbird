@@ -1,13 +1,12 @@
 {
   "schema_version": 1,
   "purpose": "Cache machine-readable des dernières preuves de validation réutilisables. Ce fichier ne remplace ni AGENTS.md ni les règles de sécurité et ne doit jamais servir à inventer un test non exécuté.",
-  "recorded_at": "2026-08-23T14:27:33+02:00",
+  "recorded_at": "2026-08-23T14:55:33+02:00",
   "baseline": {
     "repository": "ussmarines/mailpin-thunderbird",
-    "branch": "fix/startup-pin-initialization",
-    "commit_sha": "25d3a80bd02065b3d5a454276c5a9ac7ce3a2133",
-    "tree_sha": "c9b5d068decbc8bb8a0d51bb46f8c1dd28a83efc",
-    "working_tree_patch_id": "1e073df4b0b617a3e6a8c996376ed432c306599c",
+    "branch": "release/finalize-1.7.6",
+    "commit_sha": "8cf29c0d64fb0ea2b49c9568655be45514586747",
+    "working_tree_patch_id": "",
     "untracked_candidate_files": []
   },
   "policy": {
@@ -34,12 +33,12 @@
   },
   "repository_checks": [
     {
-      "id": "github-release-1-7-5-gate",
+      "id": "github-candidate-1-7-6-gate",
       "result": "success",
-      "validated_commit": "2384ee52df95a711424dfeb817ef114888634ed0",
+      "validated_commit": "c502175041c85e3cb6e37666a0784f7df0a9e367",
       "working_tree_patch_id": "",
-      "validated_at": "2026-08-21T14:25:00+02:00",
-      "command": "PR #55 QA 32480175617 + Thunderbird runtime smoke 32480175435 + published-asset verification 32481646372",
+      "validated_at": "2026-08-23T14:43:13+02:00",
+      "command": "PR #65 QA 32640198347 + Thunderbird runtime smoke 32640198339",
       "environment": {
         "ci": "GitHub Actions",
         "linux": "ubuntu-24.04",
@@ -52,17 +51,16 @@
         "scripts/**",
         "tests/**",
         ".github/workflows/ci.yml",
-        ".github/workflows/thunderbird-smoke.yml",
-        "docs/PROJECT_STATE.json"
+        ".github/workflows/thunderbird-smoke.yml"
       ],
       "evidence": {
-        "kind": "github-release-gate",
-        "summary": "MailPin 1.7.5: localized ATN name 40 chars; QA Linux/Windows, identity/security guard, reproducible build, real Thunderbird 154 smoke, reviewer-source build without .git, and public release asset verification all passed.",
-        "qa_run": 32480175617,
-        "thunderbird_smoke_run": 32480175435,
-        "public_asset_verification_run": 32481646372,
-        "xpi_sha256": "247e314911ce1006f40b78c6050f3697b7f6b1beb3f0489214e84410c668dc12",
-        "source_sha256": "af555557bc0d3b80d35e34a7ec1447b77ebe356c75a95ece9f28b8238fdfb1fd"
+        "kind": "github-candidate-gate",
+        "summary": "MailPin 1.7.6 exact candidate passed Linux/Windows QA, identity/security guard, build/XPI checks and real Thunderbird 154 smoke before publication.",
+        "qa_run": 32640198347,
+        "thunderbird_smoke_run": 32640198339,
+        "release_tag": "v1.7.6",
+        "release_target": "522042df08c2eb7a18a13cbb83631943e54abf2c",
+        "public_asset_verification": "not independently downloaded in this session"
       }
     }
   ],
@@ -70,8 +68,8 @@
     {
       "id": "startup-persisted-pins-thunderbird-154",
       "result": "success",
-      "validated_commit": "25d3a80bd02065b3d5a454276c5a9ac7ce3a2133",
-      "working_tree_patch_id": "1e073df4b0b617a3e6a8c996376ed432c306599c",
+      "validated_commit": "26fc0ac9b4d35009f125f543eefc5de9338bef71",
+      "working_tree_patch_id": "",
       "validated_at": "2026-08-23T14:27:33+02:00",
       "command": "functional_bench._run_scope_case volume=50 scope=A-and-C on two Thunderbird processes without Dashboard or tab activation",
       "environment": {
@@ -91,26 +89,24 @@
       }
     },
     {
-      "id": "startup-fix-local-ci-and-smoke",
+      "id": "startup-fix-github-runtime",
       "result": "success",
-      "validated_commit": "25d3a80bd02065b3d5a454276c5a9ac7ce3a2133",
-      "working_tree_patch_id": "1e073df4b0b617a3e6a8c996376ed432c306599c",
-      "validated_at": "2026-08-23T14:27:33+02:00",
-      "command": "npm run ci + tests/thunderbird/real_smoke.py on Thunderbird 154.0",
+      "validated_commit": "c502175041c85e3cb6e37666a0784f7df0a9e367",
+      "working_tree_patch_id": "",
+      "validated_at": "2026-08-23T14:43:13+02:00",
+      "command": "GitHub Actions Thunderbird runtime smoke 32640198339 on exact 1.7.6 candidate",
       "environment": {
-        "os": "Windows",
-        "thunderbird": "154.0",
-        "geckodriver": "0.37.1"
+        "ci": "GitHub Actions",
+        "thunderbird": "154.0"
       },
       "invalidates_on": [
         "extension/**",
-        "package.json",
-        "scripts/**",
-        "tests/**"
+        "tests/thunderbird/**",
+        ".github/workflows/thunderbird-smoke.yml"
       ],
       "evidence": {
-        "kind": "local-ci-and-real-thunderbird-smoke",
-        "summary": "Full local CI passed. The real smoke passed unique panel and toggle injection, one Dashboard tab, uninstall cleanup, and unique reinjection."
+        "kind": "real-thunderbird-smoke",
+        "summary": "Exact versioned 1.7.6 candidate passed the real Thunderbird 154 runtime smoke before GitHub publication."
       }
     }
   ]

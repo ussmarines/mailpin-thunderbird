@@ -5,8 +5,8 @@
   "extensionVersion": "1.7.6",
   "baseGitHub": {
     "branch": "main",
-    "commit": "fa6782f8ecfaf259d9b8e54a08e5cf361172c669",
-    "role": "main baseline with the Thunderbird cold-start pin initialization fix merged via PR #64"
+    "commit": "522042df08c2eb7a18a13cbb83631943e54abf2c",
+    "role": "GitHub release v1.7.6 tag target after validated candidate and bounded publisher"
   },
   "extensionId": "ussmarines.mailpin@addons.thunderbird.net",
   "thunderbird": {
@@ -91,7 +91,7 @@
     "uiDependencyPolicy": "native HTML plus local Organic Workspace CSS tokens; canonical workspace stylesheet; no runtime patch stylesheet, npm runtime dependency, bundler, CDN or remote asset",
     "runtimeTestSupplyChain": "test-only Thunderbird/geckodriver downloads are checksum-verified and are not runtime dependencies"
   },
-  "developmentBranch": "release/startup-fix-1.7.6",
+  "developmentBranch": "release/finalize-1.7.6",
   "testing": {
     "contract": [
       "tests/test_organic_workspace_ui.py",
@@ -100,9 +100,9 @@
     ],
     "runtimeWorkflow": ".github/workflows/thunderbird-smoke.yml",
     "runtimeScript": "tests/thunderbird/real_smoke.py",
-    "browserStatus": "1.7.6 packages the cold-start initialization correction merged by PR #64; no UI redesign is included.",
-    "runtimeStatus": "PR #64 head 26fc0ac9b4d35009f125f543eefc5de9338bef71 passed QA 32639780333 and real Thunderbird 154.0 smoke 32639780313 before merge to main fa6782f8ecfaf259d9b8e54a08e5cf361172c669. The exact versioned 1.7.6 candidate must pass fresh QA/build and Thunderbird 154 smoke before publication."
+    "browserStatus": "1.7.6 publishes the cold-start initialization correction merged by PR #64; no UI redesign is included.",
+    "runtimeStatus": "Exact versioned 1.7.6 candidate c502175041c85e3cb6e37666a0784f7df0a9e367 passed QA 32640198347 and real Thunderbird 154.0 smoke 32640198339. GitHub release v1.7.6 targets 522042df08c2eb7a18a13cbb83631943e54abf2c."
   },
-  "latestPublicVersion": "1.7.5",
-  "releaseStatus": "candidate"
+  "latestPublicVersion": "1.7.6",
+  "releaseStatus": "published"
 }
