@@ -7,7 +7,7 @@
 
 [![QA](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml)
 ![Release](https://img.shields.io/badge/release-v1.7.5-4F7F75)
-![Source](https://img.shields.io/badge/source-v1.7.5-3D536B)
+![Source](https://img.shields.io/badge/candidate-v1.7.6-3D536B)
 ![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x--154.x-3D536B)
 ![License](https://img.shields.io/badge/license-MailPin%20Source--Available%201.1-1A1D21)
 </div>
@@ -25,11 +25,11 @@ MailPin turns important email into actionable follow-up **without replacing Thun
 
 ## Brand & interface
 
-**Organic Workspace** is unchanged in release 1.7.5; this maintenance only shortens the public/localized add-on name to comply with ATN's 50-character limit.
+Candidate **1.7.6** fixes persisted-pin cold-start loading: the Manifest V3 background now initializes existing mail tabs through `runtime.onStartup`, without requiring the Dashboard to be opened first. No UI redesign is included.
 
 ## Compatibility
 
-- **Source version:** `1.7.5` — published
+- **Source version:** `1.7.6` — candidate
 - **Latest public release:** `1.7.5`
 - **Thunderbird:** `153.0` to `154.*`
 - **Format:** MailExtension Manifest V3
@@ -37,13 +37,13 @@ MailPin turns important email into actionable follow-up **without replacing Thun
 - **Public ID:** `ussmarines.mailpin@addons.thunderbird.net`
 - **Add-ons for Thunderbird listing:** [MailPin](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/) — version 1.7.5 submitted, review pending
 
-MailPin uses a privileged Thunderbird Experiment for `about:3pane`, local SQLite storage, and selected Messages/Tags/Calendar integration. Messages, Tags and Calendar internals remain isolated behind `PinCompatibility`. Thunderbird 154 compatibility was validated with a real smoke run against the official 154.0 binary before publication.
+MailPin uses a privileged Thunderbird Experiment for `about:3pane`, local SQLite storage, and selected Messages/Tags/Calendar integration. Messages, Tags and Calendar internals remain isolated behind `PinCompatibility`. The startup correction was validated on real Thunderbird 154.0 before preparing 1.7.6; the exact versioned candidate must pass fresh gates before publication.
 
 ## Install
 
 ### Add-ons for Thunderbird
 
-The [MailPin listing on Add-ons for Thunderbird](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/) exists and version 1.7.5 has been submitted for review. Until that review is approved, the verified GitHub release below remains the public reference build.
+The [MailPin listing on Add-ons for Thunderbird](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/) exists and version 1.7.5 has been submitted for review. Until 1.7.6 is published, GitHub release 1.7.5 remains the verified public reference build.
 
 ### GitHub release
 
@@ -59,10 +59,10 @@ Requires Python 3.11+ and Node.js 20+.
 npm run ci
 ```
 
-Reproducible outputs from the published source:
+Reproducible outputs from the candidate source:
 
-- `dist/MailPin_v1.7.5.xpi`
-- `dist/MailPin_GitHub_Repository_v1.7.5.zip`
+- `dist/MailPin_v1.7.6.xpi`
+- `dist/MailPin_GitHub_Repository_v1.7.6.zip`
 - `dist/SHA256SUMS.txt`
 
 ## Privacy & security
@@ -71,8 +71,8 @@ MailPin has no runtime network call, telemetry, advertising or remote code. Full
 
 - [Privacy](PRIVACY.md)
 - [Security](SECURITY.md)
-- [Source security audit 1.7.5](docs/reports/security/SECURITY_AUDIT_1.7.5.md)
-- [Source validation report 1.7.5](docs/reports/validation/VALIDATION_REPORT_1.7.5.md)
+- [Source security audit 1.7.6](SECURITY_AUDIT_1.7.6.md)
+- [Source validation report 1.7.6](VALIDATION_REPORT_1.7.6.md)
 - [Known limitations](docs/KNOWN_LIMITATIONS.md)
 
 ## Documentation & support
