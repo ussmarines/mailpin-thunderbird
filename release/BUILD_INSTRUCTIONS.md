@@ -2,7 +2,7 @@
 
 ## État
 
-La release GitHub **1.7.5** est publiée. La source **1.7.6** est une candidate de maintenance pour le correctif de chargement des épingles au démarrage et conserve la compatibilité Thunderbird 153.0–154.*.
+La release GitHub **1.7.6** est publiée. La source **1.7.6** correspond à la maintenance du correctif de chargement des épingles au démarrage et conserve la compatibilité Thunderbird 153.0–154.*.
 
 ## Environnement
 
@@ -37,11 +37,10 @@ La 1.7.6 corrige le cold start des épingles persistées. Le background Manifest
 
 La version n’ajoute aucune permission, dépendance runtime, migration, schéma, réseau, télémétrie, publicité ou code distant. `PinCompatibility` et le stockage restent inchangés.
 
-## Preuves avant versionnement
+## Preuves
 
-- correctif runtime PR #64 head `26fc0ac9b4d35009f125f543eefc5de9338bef71` : QA `32639780333` — PASS ;
-- même head : smoke réel Thunderbird 154.0 `32639780313` — PASS ;
-- cold start réel sans Dashboard : PASS ;
-- merge dans `main` : `fa6782f8ecfaf259d9b8e54a08e5cf361172c669`.
-
-Les QA/build, smoke Thunderbird 154.0, build reviewer hors `.git` et SHA-256 officiels de la candidate 1.7.6 seront consignés uniquement après exécution sur le head versionné exact. Aucun résultat futur n’est présenté ici comme PASS.
+- candidate versionnée `c502175041c85e3cb6e37666a0784f7df0a9e367` : QA `32640198347` — PASS ;
+- smoke réel Thunderbird 154.0 `32640198339` — PASS ;
+- tag `v1.7.6` : cible `522042df08c2eb7a18a13cbb83631943e54abf2c` ;
+- le publisher one-shot qui a créé la release exécute `npm run ci` puis reconstruit depuis une archive source fraîche sans `.git` et compare le SHA-256 du XPI avant la publication ;
+- la vérification indépendante des fichiers publics après publication reste non consignée car le connecteur disponible ne permet pas leur téléchargement.
