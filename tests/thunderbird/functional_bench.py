@@ -650,29 +650,6 @@ try {
 }
 """
 
-WAKE_PERSISTED_EXTENSION_SCRIPT = r"""
-const done = arguments[arguments.length - 1];
-(async () => {
-  const win = Services.wm.getMostRecentWindow("mail:3pane");
-  const tabmail = win?.document.getElementById("tabmail");
-  if (!win || !tabmail) throw new Error("mail:3pane tabmail is unavailable");
-  const mailTab = Array.from(tabmail.tabInfo || []).find(tab =>
-    tab.mode?.name === "mail3PaneTab" ||
-    String(tab.browser?.currentURI?.spec || tab.chromeBrowser?.currentURI?.spec || "") === "about:3pane"
-  );
-  if (!mailTab) throw new Error("mail tab is unavailable for MV3 wake validation");
-  const probe = tabmail.openTab("contentTab", {url:"about:blank", background:false});
-  await new Promise(resolve => win.setTimeout(resolve, 150));
-  if (probe && typeof tabmail.switchToTab === "function") tabmail.switchToTab(probe);
-  await new Promise(resolve => win.setTimeout(resolve, 150));
-  tabmail.switchToTab(mailTab);
-  await new Promise(resolve => win.setTimeout(resolve, 150));
-  try { if (probe) tabmail.closeTab(probe); } catch {}
-  done({opened:true, reactivatedMailTab:true});
-})().catch(error => done({__mailperchSmokeError: `${error?.name || "Error"}: ${error?.message || error}\n${error?.stack || ""}`}));
-"""
-
-
 PROFILE_STATE_SCRIPT = r"""
 const done = arguments[arguments.length - 1];
 (async () => {
@@ -1227,14 +1204,14 @@ def _run_scope_case(
                     seed, first_state, second_state, profile, selected_account_keys, volume
                 )
                 result["checks"].append("same-profile-distinct-thunderbird-processes")
-                wake = client.execute_async(WAKE_PERSISTED_EXTENSION_SCRIPT)
-                if not wake.get("reactivatedMailTab"):
-                    raise SmokeFailure(f"Persisted MV3 wake interaction failed: {wake!r}")
-                result["session2Wake"] = wake
-                result["checks"].append("natural-tab-activation-wake")
-
-                _wait_for_state(client, _panel_is_ready, "Persisted MailPin add-on after tab activation", args.timeout)
-                result["checks"].append("persistent-addon-loaded-after-restart")
+                cold_start = _wait_for_state(
+                    client,
+                    _panel_is_ready,
+                    "persisted MailPin cold-start auto-initialization without user interaction",
+                    args.timeout,
+                )
+                result["session2ColdStart"] = cold_start
+                result["checks"].append("cold-start-auto-initialization")
                 selected_panel = client.execute_async(
                     ACCOUNT_SCOPE_PANEL_SCRIPT,
                     [selected_count, "selectedAccounts", selected_accounts, excluded_accounts],

@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "purpose": "Cache machine-readable des dernières preuves de validation réutilisables. Ce fichier ne remplace ni AGENTS.md ni les règles de sécurité et ne doit jamais servir à inventer un test non exécuté.",
-  "recorded_at": "2026-08-21T14:25:00+02:00",
+  "recorded_at": "2026-08-23T14:27:33+02:00",
   "baseline": {
     "repository": "ussmarines/mailpin-thunderbird",
-    "branch": "main",
-    "commit_sha": "2384ee52df95a711424dfeb817ef114888634ed0",
-    "tree_sha": "",
-    "working_tree_patch_id": "",
+    "branch": "fix/startup-pin-initialization",
+    "commit_sha": "25d3a80bd02065b3d5a454276c5a9ac7ce3a2133",
+    "tree_sha": "c9b5d068decbc8bb8a0d51bb46f8c1dd28a83efc",
+    "working_tree_patch_id": "1e073df4b0b617a3e6a8c996376ed432c306599c",
     "untracked_candidate_files": []
   },
   "policy": {
@@ -66,5 +66,52 @@
       }
     }
   ],
-  "targeted_checks": []
+  "targeted_checks": [
+    {
+      "id": "startup-persisted-pins-thunderbird-154",
+      "result": "success",
+      "validated_commit": "25d3a80bd02065b3d5a454276c5a9ac7ce3a2133",
+      "working_tree_patch_id": "1e073df4b0b617a3e6a8c996376ed432c306599c",
+      "validated_at": "2026-08-23T14:27:33+02:00",
+      "command": "functional_bench._run_scope_case volume=50 scope=A-and-C on two Thunderbird processes without Dashboard or tab activation",
+      "environment": {
+        "os": "Windows",
+        "thunderbird": "154.0",
+        "geckodriver": "0.37.1"
+      },
+      "invalidates_on": [
+        "extension/background.js",
+        "extension/api/pinInbox/**",
+        "tests/thunderbird/functional_bench.py",
+        "tests/thunderbird/real_smoke.py"
+      ],
+      "evidence": {
+        "kind": "real-thunderbird-cold-start",
+        "summary": "Baseline failed with the MV3 background stopped and no panel. The corrected worktree passed on the same persistent profile shape: APP_STARTUP background running, 50 SQLite refs preserved, 34 A+C cards rendered, one panel, one toggle, zero timeout and zero MailPin JavaScript exception."
+      }
+    },
+    {
+      "id": "startup-fix-local-ci-and-smoke",
+      "result": "success",
+      "validated_commit": "25d3a80bd02065b3d5a454276c5a9ac7ce3a2133",
+      "working_tree_patch_id": "1e073df4b0b617a3e6a8c996376ed432c306599c",
+      "validated_at": "2026-08-23T14:27:33+02:00",
+      "command": "npm run ci + tests/thunderbird/real_smoke.py on Thunderbird 154.0",
+      "environment": {
+        "os": "Windows",
+        "thunderbird": "154.0",
+        "geckodriver": "0.37.1"
+      },
+      "invalidates_on": [
+        "extension/**",
+        "package.json",
+        "scripts/**",
+        "tests/**"
+      ],
+      "evidence": {
+        "kind": "local-ci-and-real-thunderbird-smoke",
+        "summary": "Full local CI passed. The real smoke passed unique panel and toggle injection, one Dashboard tab, uninstall cleanup, and unique reinjection."
+      }
+    }
+  ]
 }
