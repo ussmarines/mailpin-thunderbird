@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MailPin Workbench</title>
+  <link rel="stylesheet" href="workbench.css">
+</head>
+<body>
+  <header>
+    <div>
+      <h1>MailPin Workbench</h1>
+      <p id="subtitle">Advanced WebExtension-native tools</p>
+    </div>
+    <button id="open-dashboard" type="button">Dashboard</button>
+  </header>
+
+  <main>
+    <section>
+      <h2>Thunderbird integration</h2>
+      <label class="toggle"><span><strong>Visual status in the message list</strong><small>Uses MailPin-owned Thunderbird tags only. Personal tags are preserved.</small></span><input id="visual-tags" type="checkbox"></label>
+      <div class="actions"><button id="sync-tags" type="button">Sync visual tags now</button><span id="sync-status" role="status"></span></div>
+    </section>
+
+    <section>
+      <h2>Templates</h2>
+      <p>Create reusable follow-up presets. Apply them to selected items from the Dashboard bulk-action menu.</p>
+      <div class="grid">
+        <label>Name <input id="template-name" type="text" maxlength="120"></label>
+        <label>Status <select id="template-status"><option value="">Keep current</option><option value="active">To do</option><option value="planned">Planned</option><option value="waiting">Waiting</option><option value="completed">Completed</option></select></label>
+        <label>Priority <select id="template-priority"><option value="">Keep current</option><option value="low">Low</option><option value="normal">Normal</option><option value="high">High</option></select></label>
+        <label>Project <input id="template-project" type="text" maxlength="200"></label>
+        <label>Labels <input id="template-labels" type="text" placeholder="client, urgent"></label>
+        <label>Due in hours <input id="template-due" type="number" min="0" max="8760" step="1"></label>
+        <label class="toggle compact">Wait for reply <input id="template-waiting-reply" type="checkbox"></label>
+      </div>
+      <button id="add-template" type="button">Add template</button>
+      <div id="templates" class="items"></div>
+    </section>
+
+    <section>
+      <h2>Cases</h2>
+      <p>Group related follow-ups without changing their Thunderbird folders. Add selected follow-ups from the Dashboard.</p>
+      <div class="grid">
+        <label>Name <input id="case-name" type="text" maxlength="120"></label>
+        <label>Status <select id="case-status"><option value="open">Open</option><option value="waiting">Waiting</option><option value="closed">Closed</option></select></label>
+        <label class="wide">Note <textarea id="case-note" maxlength="4000"></textarea></label>
+      </div>
+      <button id="add-case" type="button">Add case</button>
+      <div id="cases" class="items"></div>
+    </section>
+
+    <section>
+      <h2>Rules</h2>
+      <p>Rules are deliberately local and explicit. They can be applied to the selected follow-ups from the Dashboard.</p>
+      <div class="grid">
+        <label>Name <input id="rule-name" type="text" maxlength="120"></label>
+        <label>Subject contains <input id="rule-subject" type="text" maxlength="200"></label>
+        <label>Sender contains <input id="rule-sender" type="text" maxlength="200"></label>
+        <label>Status <select id="rule-status"><option value="">Keep current</option><option value="active">To do</option><option value="planned">Planned</option><option value="waiting">Waiting</option><option value="completed">Completed</option></select></label>
+        <label>Priority <select id="rule-priority"><option value="">Keep current</option><option value="low">Low</option><option value="normal">Normal</option><option value="high">High</option></select></label>
+        <label>Project <input id="rule-project" type="text" maxlength="200"></label>
+        <label>Due in hours <input id="rule-due" type="number" min="0" max="8760" step="1"></label>
+      </div>
+      <button id="add-rule" type="button">Add rule</button>
+      <div id="rules" class="items"></div>
+    </section>
+
+    <section>
+      <h2>Migration and maintenance</h2>
+      <p>These tools use public Thunderbird APIs only.</p>
+      <div class="actions wrap">
+        <button id="import-stars" type="button">Import starred messages</button>
+        <button id="repair-missing" type="button">Remove broken follow-ups</button>
+        <button id="diagnostics" type="button">Run diagnostics</button>
+        <button id="export-tools" type="button">Export Workbench data</button>
+        <label class="file-button">Import Workbench data <input id="import-tools" type="file" accept="application/json,.json"></label>
+      </div>
+      <pre id="diagnostic-output"></pre>
+    </section>
+
+    <section>
+      <h2>Recent activity</h2>
+      <div id="history" class="history"></div>
+    </section>
+  </main>
+
+  <script type="module" src="workbench.js"></script>
+</body>
+</html>
