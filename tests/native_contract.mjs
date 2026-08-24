@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 
 const manifest = JSON.parse(fs.readFileSync(new URL('../extension/manifest.json', import.meta.url), 'utf8'));
 assert.equal(manifest.manifest_version, 3);
-assert.equal(manifest.version, '2.1.0');
+assert.equal(manifest.version, '2.1.1');
 assert.ok(!('experiment_apis' in manifest));
 
 for (const permission of [
