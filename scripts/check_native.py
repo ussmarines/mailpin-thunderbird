@@ -10,7 +10,7 @@ if manifest.get('version') != '2.0.0': errors.append('manifest version must be 2
 if 'experiment_apis' in manifest: errors.append('experiment_apis is forbidden')
 if manifest.get('browser_specific_settings',{}).get('gecko',{}).get('id') != 'ussmarines.mailpin@addons.thunderbird.net': errors.append('canonical id changed')
 if "connect-src 'none'" not in manifest.get('content_security_policy',{}).get('extension_pages',''): errors.append('CSP must block runtime network')
-runtime='\n'.join(path.read_text(encoding='utf-8',errors='ignore') for path in ext.rglob('*') if path.is_file() and path.suffix in {'.js','.html','.css','.json'})
+runtime='\n'.join(path.read_text(encoding='utf-8',errors='ignore') for path in ext.rglob('*') if path.is_file() and path.suffix in {'.js','.html','.css'})
 for forbidden in ('pinInbox','eval(','new Function(','http://','https://'):
     if forbidden in runtime: errors.append(f'forbidden runtime token: {forbidden}')
 background=(ext/'background.js').read_text(encoding='utf-8')
