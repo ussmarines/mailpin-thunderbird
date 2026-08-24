@@ -34,7 +34,7 @@
   ],
   "background": {
     "type": "module",
-    "scripts": ["background.js", "native-parity.js"]
+    "scripts": ["native-parity.js", "background.js"]
   },
   "commands": {
     "toggle-pin-selected": {
