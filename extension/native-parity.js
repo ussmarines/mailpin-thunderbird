@@ -11,19 +11,6 @@ const OWNED_TAG_SPECS = Object.freeze({
 
 let syncQueue = Promise.resolve();
 
-function emptyParityState() {
-  return {
-    schemaVersion: 1,
-    visualTagsEnabled: true,
-    ownedTags: {},
-    savedViews: [],
-    templates: [],
-    cases: [],
-    rules: [],
-    ruleLog: []
-  };
-}
-
 function normalizeParityState(raw) {
   const source = raw && typeof raw === "object" ? raw : {};
   const cleanArray = (value, max) => Array.isArray(value) ? value.slice(0, max) : [];
@@ -90,24 +77,24 @@ function isOverdue(pin) {
   return Number.isFinite(due) && due < Date.now() && !isToday(pin.dueAt);
 }
 
-async function ensureOwnedTags() {
-  const state = await loadParityState();
-  if (!state.visualTagsEnabled) return state;
+async function ensureOwnedTags(state = null) {
+  const parity = state || await loadParityState();
+  if (!parity.visualTagsEnabled) return parity;
   const existing = await messenger.messages.tags.list();
   const existingKeys = new Set(existing.map(tag => tag.key));
   let changed = false;
 
   for (const [role, spec] of Object.entries(OWNED_TAG_SPECS)) {
-    const storedKey = state.ownedTags[role];
+    const storedKey = parity.ownedTags[role];
     if (storedKey && existingKeys.has(storedKey)) continue;
     const key = await messenger.messages.tags.create(undefined, spec.name, spec.color);
-    state.ownedTags[role] = key;
+    parity.ownedTags[role] = key;
     existingKeys.add(key);
     changed = true;
   }
 
-  if (changed) await saveParityState(state);
-  return state;
+  if (changed) await saveParityState(parity);
+  return parity;
 }
 
 function desiredOwnedKeys(pin, parity) {
@@ -155,13 +142,13 @@ async function clearRemovedPin(oldPin, parity) {
 }
 
 async function syncAllVisualTags() {
-  const parity = await ensureOwnedTags();
-  if (!parity.visualTagsEnabled) return {synced: 0};
+  let parity = await loadParityState();
+  if (parity.visualTagsEnabled) parity = await ensureOwnedTags(parity);
   const core = await loadCoreState();
   const pins = Object.values(core.pins || {}).slice(0, 1000);
   for (const pin of pins) await syncPin(pin, parity);
   await updateGlobalActionBadge(core);
-  return {synced: pins.length};
+  return {synced: pins.length, visualTagsEnabled: parity.visualTagsEnabled};
 }
 
 function queueSync(task) {
@@ -170,7 +157,8 @@ function queueSync(task) {
 }
 
 async function handleCoreStorageChange(change) {
-  const parity = await ensureOwnedTags();
+  let parity = await loadParityState();
+  if (parity.visualTagsEnabled) parity = await ensureOwnedTags(parity);
   const oldPins = change.oldValue?.pins && typeof change.oldValue.pins === "object" ? change.oldValue.pins : {};
   const newPins = change.newValue?.pins && typeof change.newValue.pins === "object" ? change.newValue.pins : {};
   const touched = new Set([...Object.keys(oldPins), ...Object.keys(newPins)]);
@@ -231,7 +219,9 @@ async function refreshVisibleMessageAction() {
 
 async function updateContextMenu(data, tab) {
   if (!data?.contexts?.includes("message_list") || !Number.isInteger(tab?.id)) return;
-  const messages = data.selectedMessages ? await collect(data.selectedMessages) : await collect(await messenger.mailTabs.getSelectedMessages(tab.id));
+  const messages = data.selectedMessages
+    ? await collect(data.selectedMessages)
+    : await collect(await messenger.mailTabs.getSelectedMessages(tab.id));
   const core = await loadCoreState();
   const ids = messages.map(message => stablePinId(message.headerMessageId, message.id));
   const allPinned = ids.length > 0 && ids.every(id => core.pins?.[id] && core.pins[id].status !== "completed");
@@ -274,19 +264,13 @@ async function diagnostics() {
 }
 
 function handleRuntimeMessage(request) {
-  if (request?.type === "mailpin:parity:get") {
-    return loadParityState();
-  }
+  if (request?.type === "mailpin:parity:get") return loadParityState();
   if (request?.type === "mailpin:parity:set") {
     const next = normalizeParityState(request.state);
     return saveParityState(next).then(() => queueSync(syncAllVisualTags)).then(() => next);
   }
-  if (request?.type === "mailpin:parity:diagnostics") {
-    return diagnostics();
-  }
-  if (request?.type === "mailpin:parity:syncTags") {
-    return queueSync(syncAllVisualTags);
-  }
+  if (request?.type === "mailpin:parity:diagnostics") return diagnostics();
+  if (request?.type === "mailpin:parity:syncTags") return queueSync(syncAllVisualTags);
   return undefined;
 }
 
