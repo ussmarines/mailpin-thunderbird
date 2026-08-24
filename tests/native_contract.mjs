@@ -25,7 +25,7 @@ assert.ok(!manifest.permissions.includes('accountsRead'));
 assert.ok(!manifest.permissions.includes('compose'));
 assert.equal(manifest.browser_specific_settings.gecko.id, 'ussmarines.mailpin@addons.thunderbird.net');
 assert.equal(manifest.default_locale, 'en');
-assert.deepEqual(manifest.background.scripts, ['background.js', 'native-parity.js']);
+assert.deepEqual(manifest.background.scripts, ['native-parity.js', 'background.js']);
 
 const background = fs.readFileSync(new URL('../extension/background.js', import.meta.url), 'utf8');
 for (const token of [
