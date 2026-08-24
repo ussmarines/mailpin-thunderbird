@@ -23,11 +23,9 @@
     "messagesMove",
     "messagesDelete",
     "messagesTagsList",
-    "accountsRead",
     "storage",
     "alarms",
-    "notifications",
-    "compose"
+    "notifications"
   ],
   "background": {
     "type": "module",
