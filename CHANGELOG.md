@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.1.1 — native tag cleanup (candidate)
+
+### Fixed
+- Désactiver le feedback visuel retire désormais les tags appartenant à MailPin des messages déjà suivis au lieu de les laisser affichés.
+- Les tags personnels Thunderbird restent préservés pendant cette opération.
+
+### Safety / ATN
+- Aucun changement de frontière : zéro Experiment API, zéro réseau runtime et aucun changement lu/non-lu.
+
 ## 2.1.0 — native feature parity (candidate)
 
 ### Added

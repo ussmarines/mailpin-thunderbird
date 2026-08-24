@@ -50,5 +50,8 @@ assert.ok(!/https?:\/\//.test(parity));
 assert.ok(!/https?:\/\//.test(dashboard));
 assert.ok(!/https?:\/\//.test(workbench));
 assert.ok(!/\.(read|new)\s*=/.test(parity), 'parity code must not change read/new state');
+const syncBlock = parity.match(/async function syncAllVisualTags\(\) \{[\s\S]*?\n\}/)?.[0] || '';
+assert.ok(syncBlock.includes('for (const pin of pins) await syncPin(pin, parity)'), 'visual tag sync must visit pins even when feedback is disabled');
+assert.ok(!syncBlock.includes('if (!parity.visualTagsEnabled) return'), 'disabling visual feedback must clean owned tags instead of returning early');
 
 console.log('PASS: native parity contract');
