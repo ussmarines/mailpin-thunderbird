@@ -1,9 +1,10 @@
 {
   "manifest_version": 3,
-  "name": "MailPin — Email Follow-up & Productivity",
+  "name": "__MSG_extensionName__",
   "short_name": "MailPin",
-  "description": "Pin, organize and follow up important email locally in Thunderbird with notes, tasks, reminders, views and a dedicated dashboard.",
+  "description": "__MSG_extensionDescription__",
   "version": "2.0.0",
+  "default_locale": "en",
   "author": "ussmarines",
   "developer": {
     "name": "ussmarines",
@@ -34,31 +35,31 @@
   "commands": {
     "toggle-pin-selected": {
       "suggested_key": {"default": "Alt+P"},
-      "description": "Pin or unpin selected messages"
+      "description": "__MSG_commandToggle__"
     },
     "open-pin-dashboard": {
       "suggested_key": {"default": "Ctrl+Shift+P"},
-      "description": "Open MailPin dashboard"
+      "description": "__MSG_commandDashboard__"
     },
     "quick-today-selected": {
-      "description": "Pin selected messages for today"
+      "description": "__MSG_commandToday__"
     },
     "wait-selected-pin": {
-      "description": "Mark selected pinned messages as waiting"
+      "description": "__MSG_commandWaiting__"
     },
     "complete-selected-pin": {
-      "description": "Mark selected pinned messages as completed"
+      "description": "__MSG_commandCompleted__"
     }
   },
   "message_display_action": {
-    "default_title": "Pin or unpin this message",
+    "default_title": "__MSG_messageActionTitle__",
     "default_icon": {
       "16": "icons/pin-regular.svg",
       "32": "icons/pin-regular.svg"
     }
   },
   "action": {
-    "default_title": "Open MailPin dashboard",
+    "default_title": "__MSG_dashboardActionTitle__",
     "default_icon": {
       "16": "icons/mailpin-icon.svg",
       "32": "icons/mailpin-icon.svg"
