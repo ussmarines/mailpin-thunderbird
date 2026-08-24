@@ -1,26 +1,67 @@
-name: MailPin native CI
+name: QA
+
 on:
-  pull_request:
   push:
-    branches: [main]
+  pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: mailpin-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  ci:
+  security-guard:
+    name: Security guard regression
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: WebExtension-native guard
+        run: python scripts/check_native.py
+      - name: Full-history identity guard
+        run: python .github/scripts/security_guard.py --history
+
+  verify:
+    name: Full verification (Linux)
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          node-version: '20'
-      - uses: actions/setup-python@v5
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          python-version: '3.12'
-      - name: Project gates
+          node-version: 24
+          package-manager-cache: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: Complete CI
         run: npm run ci
+      - name: Verify XPI layout
+        run: |
+          python - <<'PY'
+          import json, pathlib, zipfile
+          xpi = next(pathlib.Path('dist').glob('*.xpi'))
+          with zipfile.ZipFile(xpi) as z:
+              names = z.namelist()
+              assert 'manifest.json' in names
+              manifest = json.loads(z.read('manifest.json'))
+              assert manifest['manifest_version'] == 3
+              assert 'experiment_apis' not in manifest
+              assert all(not name.startswith('extension/') for name in names)
+              assert not any(name.startswith('api/') for name in names)
+          print('XPI native layout: OK')
+          PY
       - name: Thunderbird ATN webext-linter 1.9.0
         shell: bash
         run: |
@@ -29,3 +70,31 @@ jobs:
           git -C "$RUNNER_TEMP/webext-linter" checkout --quiet fb6bc3f387d99d693a9c15dd618b29de3dd2289d
           npm --prefix "$RUNNER_TEMP/webext-linter" ci
           node "$RUNNER_TEMP/webext-linter/verify.js" extension
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: mailpin-2.0.0-candidate
+          if-no-files-found: error
+          retention-days: 14
+          include-hidden-files: false
+          path: |
+            dist/*.xpi
+            dist/*Repository*.zip
+            dist/SHA256SUMS.txt
+
+  windows-smoke:
+    name: Source and model checks (Windows)
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: Cross-platform checks
+        run: npm run check && npm test
