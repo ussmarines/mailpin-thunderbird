@@ -1,0 +1,1308 @@
+[
+  {
+    "namespace": "pinInbox",
+    "description": "Panneau local avancé de messages épinglés, stockage structuré, rappels, règles et agenda.",
+    "functions": [
+      {
+        "name": "setup",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "tabId",
+            "type": "integer"
+          }
+        ]
+      },
+      {
+        "name": "toggleSelected",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "tabId",
+            "type": "integer"
+          },
+          {
+            "name": "forceState",
+            "type": "boolean",
+            "optional": true
+          }
+        ]
+      },
+      {
+        "name": "toggleConversationSelected",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "tabId",
+            "type": "integer"
+          },
+          {
+            "name": "forceState",
+            "type": "boolean",
+            "optional": true
+          }
+        ]
+      },
+      {
+        "name": "toggleDisplayed",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "tabId",
+            "type": "integer"
+          },
+          {
+            "name": "forceState",
+            "type": "boolean",
+            "optional": true
+          }
+        ]
+      },
+      {
+        "name": "getSelectionState",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "tabId",
+            "type": "integer"
+          }
+        ]
+      },
+      {
+        "name": "performSelected",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "tabId",
+            "type": "integer"
+          },
+          {
+            "name": "action",
+            "type": "string",
+            "maxLength": 64
+          }
+        ]
+      },
+      {
+        "name": "quickCaptureSelected",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "tabId",
+            "type": "integer"
+          },
+          {
+            "name": "preset",
+            "type": "string",
+            "maxLength": 32,
+            "optional": true
+          }
+        ]
+      },
+      {
+        "name": "getConfiguration",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "setConfiguration",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "configuration",
+            "$ref": "ConfigurationInput"
+          }
+        ]
+      },
+      {
+        "name": "exportConfiguration",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "importConfiguration",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "configuration",
+            "$ref": "ConfigurationInput"
+          }
+        ]
+      },
+      {
+        "name": "resetConfiguration",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "cleanupBroken",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "rescanPinned",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "undoLast",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "repairReferences",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "resetInterface",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "importNativeStars",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "clearStars",
+            "type": "boolean",
+            "optional": true
+          }
+        ]
+      },
+      {
+        "name": "getDiagnosticReport",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "exportDiagnosticBundle",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "clearDiagnostics",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "getHealthReport",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "repairHealthIssues",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "options",
+            "$ref": "HealthRepairOptions",
+            "optional": true
+          }
+        ]
+      },
+      {
+        "name": "runProviderCompatibilityCheck",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "previewImport",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "configuration",
+            "$ref": "ConfigurationInput"
+          }
+        ]
+      },
+      {
+        "name": "restoreConfiguration",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "configuration",
+            "$ref": "ConfigurationInput"
+          },
+          {
+            "name": "strategy",
+            "type": "string",
+            "optional": true,
+            "maxLength": 64
+          }
+        ]
+      },
+      {
+        "name": "setNoReplyTracking",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "stableKeys",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 8192
+            },
+            "maxItems": 500
+          },
+          {
+            "name": "options",
+            "$ref": "NoReplyOptions",
+            "optional": true
+          }
+        ]
+      },
+      {
+        "name": "getDashboardData",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "options",
+            "$ref": "DashboardOptions",
+            "optional": true
+          }
+        ]
+      },
+      {
+        "name": "openReference",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "stableKey",
+            "type": "string",
+            "maxLength": 8192
+          }
+        ]
+      },
+      {
+        "name": "performReferenceAction",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "stableKeys",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 8192
+            },
+            "maxItems": 500
+          },
+          {
+            "name": "action",
+            "type": "string",
+            "maxLength": 64
+          },
+          {
+            "name": "options",
+            "$ref": "ReferenceActionOptions",
+            "optional": true
+          }
+        ]
+      },
+      {
+        "name": "mergeRelatedReferences",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "stableKeys",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 8192
+            },
+            "maxItems": 50
+          }
+        ]
+      },
+      {
+        "name": "getCalendars",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "createCalendarItem",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "stableKey",
+            "type": "string",
+            "maxLength": 8192
+          },
+          {
+            "name": "itemType",
+            "type": "string",
+            "optional": true,
+            "maxLength": 64
+          },
+          {
+            "name": "calendarId",
+            "type": "string",
+            "optional": true,
+            "maxLength": 512
+          },
+          {
+            "name": "options",
+            "$ref": "ReferenceActionOptions",
+            "optional": true
+          }
+        ]
+      },
+      {
+        "name": "createCaseCalendarItem",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "caseId",
+            "type": "string",
+            "maxLength": 512
+          },
+          {
+            "name": "itemType",
+            "type": "string",
+            "optional": true,
+            "maxLength": 64
+          },
+          {
+            "name": "calendarId",
+            "type": "string",
+            "optional": true,
+            "maxLength": 512
+          }
+        ]
+      },
+      {
+        "name": "snoozeReminder",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "stableKey",
+            "type": "string",
+            "maxLength": 8192
+          },
+          {
+            "name": "durationMs",
+            "type": "number"
+          }
+        ]
+      },
+      {
+        "name": "runCompatibilityCheck",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "getPerformanceReport",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "checkStorageIntegrity",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "runBackup",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "reason",
+            "type": "string",
+            "optional": true,
+            "maxLength": 128
+          }
+        ]
+      },
+      {
+        "name": "getBackupStatus",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "chooseBackupDirectory",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "simulateRules",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "options",
+            "$ref": "RuleSimulationOptions",
+            "optional": true
+          }
+        ]
+      },
+      {
+        "name": "clearRuleLog",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "getCases",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "getTemplates",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "getHistory",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "options",
+            "$ref": "HistoryOptions",
+            "optional": true
+          }
+        ]
+      },
+      {
+        "name": "setWorkflowStatus",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "stableKeys",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 8192
+            },
+            "maxItems": 500
+          },
+          {
+            "name": "status",
+            "type": "string",
+            "maxLength": 64
+          },
+          {
+            "name": "options",
+            "$ref": "WorkflowOptions",
+            "optional": true
+          }
+        ]
+      },
+      {
+        "name": "createCase",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "details",
+            "$ref": "CaseDetails"
+          }
+        ]
+      },
+      {
+        "name": "updateCase",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "caseId",
+            "type": "string",
+            "maxLength": 512
+          },
+          {
+            "name": "details",
+            "$ref": "CaseDetails"
+          }
+        ]
+      },
+      {
+        "name": "deleteCase",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "caseId",
+            "type": "string",
+            "maxLength": 512
+          }
+        ]
+      },
+      {
+        "name": "createTemplate",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "details",
+            "$ref": "TemplateDetails"
+          }
+        ]
+      },
+      {
+        "name": "updateTemplate",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "templateId",
+            "type": "string",
+            "maxLength": 512
+          },
+          {
+            "name": "details",
+            "$ref": "TemplateDetails"
+          }
+        ]
+      },
+      {
+        "name": "deleteTemplate",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "templateId",
+            "type": "string",
+            "maxLength": 512
+          }
+        ]
+      },
+      {
+        "name": "applyTemplate",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "stableKeys",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 8192
+            },
+            "maxItems": 500
+          },
+          {
+            "name": "templateId",
+            "type": "string",
+            "maxLength": 512
+          }
+        ]
+      },
+      {
+        "name": "syncCalendarLinks",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      },
+      {
+        "name": "updateReferenceDetails",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "stableKey",
+            "type": "string",
+            "maxLength": 8192
+          },
+          {
+            "name": "details",
+            "$ref": "ReferenceDetails"
+          }
+        ]
+      },
+      {
+        "name": "createSavedView",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "details",
+            "$ref": "SavedViewDetails"
+          }
+        ]
+      },
+      {
+        "name": "updateSavedView",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "viewId",
+            "type": "string",
+            "maxLength": 80
+          },
+          {
+            "name": "details",
+            "$ref": "SavedViewDetails"
+          }
+        ]
+      },
+      {
+        "name": "deleteSavedView",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "viewId",
+            "type": "string",
+            "maxLength": 80
+          }
+        ]
+      },
+      {
+        "name": "syncTags",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          {
+            "name": "stableKeys",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 8192
+            },
+            "optional": true,
+            "maxItems": 500
+          }
+        ]
+      }
+    ],
+    "events": [
+      {
+        "name": "onDashboardRequested",
+        "type": "function",
+        "description": "Émis lorsque l’interface privilégiée demande l’ouverture du tableau de bord.",
+        "parameters": []
+      }
+    ],
+    "types": [
+      {
+        "id": "ConfigurationInput",
+        "type": "object",
+        "properties": {
+          "format": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 64
+          },
+          "version": {
+            "type": "integer",
+            "optional": true
+          },
+          "exportedAt": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 64
+          },
+          "shortcut": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 64
+          },
+          "settings": {
+            "type": "any",
+            "optional": true
+          },
+          "groups": {
+            "type": "array",
+            "items": {
+              "type": "any"
+            },
+            "optional": true,
+            "maxItems": 40
+          },
+          "rules": {
+            "type": "array",
+            "items": {
+              "type": "any"
+            },
+            "optional": true,
+            "maxItems": 200
+          },
+          "cases": {
+            "type": "array",
+            "items": {
+              "type": "any"
+            },
+            "optional": true,
+            "maxItems": 200
+          },
+          "templates": {
+            "type": "array",
+            "items": {
+              "type": "any"
+            },
+            "optional": true,
+            "maxItems": 100
+          },
+          "data": {
+            "type": "any",
+            "optional": true
+          },
+          "formatVersion": {
+            "type": "integer",
+            "optional": true
+          },
+          "createdAt": {
+            "type": "number",
+            "optional": true
+          },
+          "checksum": {
+            "type": "string",
+            "maxLength": 128,
+            "optional": true
+          },
+          "metadata": {
+            "type": "any",
+            "optional": true
+          },
+          "undo": {
+            "type": "array",
+            "items": {
+              "type": "any"
+            },
+            "maxItems": 20,
+            "optional": true
+          },
+          "shortcuts": {
+            "type": "any",
+            "optional": true
+          }
+        },
+        "additionalProperties": {
+          "type": "any"
+        }
+      },
+      {
+        "id": "DashboardOptions",
+        "type": "object",
+        "properties": {
+          "filter": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 64
+          },
+          "search": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 500
+          },
+          "view": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 64
+          },
+          "historySearch": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 500
+          },
+          "smartView": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 64
+          },
+          "useSmartView": {
+            "type": "boolean",
+            "optional": true
+          },
+          "reviewMode": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 32
+          },
+          "savedViewId": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 80
+          }
+        }
+      },
+      {
+        "id": "ReferenceActionOptions",
+        "type": "object",
+        "properties": {
+          "durationMs": {
+            "type": "number",
+            "optional": true
+          },
+          "itemType": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 64
+          },
+          "calendarId": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 512
+          },
+          "groupId": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 64
+          },
+          "caseId": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 64
+          },
+          "templateId": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 64
+          },
+          "note": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 4000
+          },
+          "dueAt": {
+            "type": "number",
+            "optional": true
+          },
+          "startAt": {
+            "type": "number",
+            "optional": true
+          },
+          "endAt": {
+            "type": "number",
+            "optional": true
+          },
+          "reminderAt": {
+            "type": "number",
+            "optional": true
+          },
+          "priorityLevel": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 32
+          },
+          "workflowStatus": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 32
+          },
+          "completed": {
+            "type": "boolean",
+            "optional": true
+          },
+          "repeatRule": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 32
+          },
+          "recurrenceRule": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 32
+          },
+          "recurrenceInterval": {
+            "type": "number",
+            "optional": true
+          },
+          "followUpAt": {
+            "type": "number",
+            "optional": true
+          },
+          "reminderLeadMinutes": {
+            "type": "number",
+            "optional": true
+          },
+          "snoozeUntil": {
+            "type": "number",
+            "optional": true
+          },
+          "clearFollowUp": {
+            "type": "boolean",
+            "optional": true
+          },
+          "action": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 64
+          },
+          "days": {
+            "type": "number",
+            "optional": true
+          },
+          "enabled": {
+            "type": "boolean",
+            "optional": true
+          },
+          "at": {
+            "type": "number",
+            "optional": true
+          },
+          "keepWaiting": {
+            "type": "boolean",
+            "optional": true
+          },
+          "until": {
+            "type": "number",
+            "optional": true
+          }
+        }
+      },
+      {
+        "id": "RuleSimulationOptions",
+        "type": "object",
+        "properties": {
+          "trigger": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 64
+          },
+          "limit": {
+            "type": "integer",
+            "optional": true
+          },
+          "accountKey": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 256
+          },
+          "folderURI": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 4096
+          },
+          "rules": {
+            "type": "array",
+            "items": {
+              "type": "any"
+            },
+            "optional": true,
+            "maxItems": 200
+          }
+        }
+      },
+      {
+        "id": "HistoryOptions",
+        "type": "object",
+        "properties": {
+          "search": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 500
+          },
+          "caseId": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 64
+          },
+          "limit": {
+            "type": "integer",
+            "optional": true
+          }
+        }
+      },
+      {
+        "id": "WorkflowOptions",
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 64
+          },
+          "followUpAt": {
+            "type": "number",
+            "optional": true
+          },
+          "clearFollowUp": {
+            "type": "boolean",
+            "optional": true
+          }
+        }
+      },
+      {
+        "id": "CaseDetails",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "optional": true
+          },
+          "name": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 120
+          },
+          "color": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 16
+          },
+          "note": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 4000
+          },
+          "dueAt": {
+            "type": "number",
+            "optional": true
+          },
+          "status": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 32
+          },
+          "createdAt": {
+            "type": "number",
+            "optional": true
+          },
+          "updatedAt": {
+            "type": "number",
+            "optional": true
+          },
+          "calendarId": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 512
+          },
+          "calendarItemId": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 1024
+          }
+        }
+      },
+      {
+        "id": "TemplateDetails",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "optional": true
+          },
+          "name": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 120
+          },
+          "groupId": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 64
+          },
+          "caseId": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 64
+          },
+          "priorityLevel": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 32
+          },
+          "workflowStatus": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 32
+          },
+          "dueOffsetDays": {
+            "type": "number",
+            "optional": true
+          },
+          "reminderLeadMinutes": {
+            "type": "number",
+            "optional": true
+          },
+          "followUpDelayDays": {
+            "type": "number",
+            "optional": true
+          },
+          "recurrenceRule": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 32
+          },
+          "recurrenceInterval": {
+            "type": "number",
+            "optional": true
+          },
+          "notePrefix": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 500
+          },
+          "updatedAt": {
+            "type": "number",
+            "optional": true
+          }
+        }
+      },
+      {
+        "id": "HealthRepairOptions",
+        "type": "object",
+        "properties": {
+          "actions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "optional": true,
+            "maxItems": 50
+          }
+        }
+      },
+      {
+        "id": "NoReplyOptions",
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "optional": true
+          },
+          "days": {
+            "type": "number",
+            "optional": true
+          },
+          "at": {
+            "type": "number",
+            "optional": true
+          },
+          "keepWaiting": {
+            "type": "boolean",
+            "optional": true
+          }
+        }
+      },
+      {
+        "id": "ChecklistItem",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 80
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "completed": {
+            "type": "boolean",
+            "optional": true
+          },
+          "createdAt": {
+            "type": "number",
+            "optional": true
+          },
+          "completedAt": {
+            "type": "number",
+            "optional": true
+          }
+        }
+      },
+      {
+        "id": "ReferenceDetails",
+        "type": "object",
+        "properties": {
+          "note": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 4000
+          },
+          "checklist": {
+            "type": "array",
+            "items": {
+              "$ref": "ChecklistItem"
+            },
+            "optional": true,
+            "maxItems": 50
+          }
+        }
+      },
+      {
+        "id": "SavedViewDetails",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 100
+          },
+          "smartView": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 32
+          },
+          "search": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 500
+          },
+          "groupId": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 48
+          },
+          "caseId": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 64
+          },
+          "priority": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 16
+          },
+          "responseState": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 32
+          },
+          "checklist": {
+            "type": "string",
+            "optional": true,
+            "maxLength": 16
+          }
+        }
+      }
+    ]
+  }
+]

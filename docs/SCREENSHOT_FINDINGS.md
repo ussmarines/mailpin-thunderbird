@@ -1,0 +1,80 @@
+# Constats issus des captures du 30 juillet 2026
+
+## Capture du panneau
+
+- les anciens contrôles « C », « ↗ » et « + » étaient cryptiques ; remplacés par des icônes avec libellés accessibles ;
+- une carte sélectionnée affichait trop d’actions symboliques ; la barre rapide est réduite et le reste passe dans un menu ;
+- le clic droit ne produisait pas de résultat visible ; le menu est désormais un `menupopup` Thunderbird natif, accessible au bouton, au pointeur et au clavier.
+
+## Capture du dashboard
+
+- la page apparaissait comme du HTML non stylé, sans données ; l’ancienne implémentation l’ouvrait directement depuis le contexte privilégié ; cette route empêchait une validation fiable du chargement des ressources ;
+- l’ouverture passe maintenant par un événement vers le background puis `tabs.create` ;
+- la page comprend une feuille de style, un état de chargement, un état d’erreur et des vues vides explicites.
+
+## Capture avec contour bleu pointillé
+
+- le panneau conservait un attribut de cible de drop après certaines sorties de drag ;
+- les attributs visuels sont nettoyés à chaque dragover, dragend, dragleave, drop, blur, resize et changement de dossier ;
+- la règle CSS est limitée au panneau.
+
+Ces correctifs restent à confirmer dans une session Thunderbird réelle.
+
+## Captures du 31 juillet 2026 — passe 3.2.3
+
+- l’étoile native et la punaise MailPin étaient réparties entre deux sous-lignes et trop proches des bordures ;
+  elles sont regroupées avec le bouton « Plus » dans un rail centré ;
+- le réglage de confort visuel modifiait également le panneau principal ; il est désormais limité aux paramètres ;
+- les toggles plaçaient l’aide comme troisième colonne flex, provoquant des chevauchements ;
+- plusieurs classes HTML/JS n’avaient aucune règle CSS (`button-row`, `account-header`, `form-footer`, etc.) ;
+- les aides de boutons se concaténaient, les groupes se répartissaient sur deux lignes incohérentes et les comptes
+  répétaient leur adresse ;
+- le libellé Agenda « Inscriptible » ne décrivait pas les capacités réelles ;
+- le bouton de fermeture du toast occupait une seconde ligne à cause d’une grille à deux colonnes pour trois éléments ;
+- le footer ajoutait un second bouton Enregistrer alors que le dock persistant suffisait ;
+- la CI Windows conservait un retour chariot dans un chemin Git suivi.
+
+Les règles 3.2.3 corrigent ces points et une garde vérifie désormais que chaque classe utilisée par les paramètres
+possède une règle CSS.
+
+
+## Captures du 31 juillet 2026 — passe 3.2.4
+
+- le bandeau Enregistrer/Annuler apparaissait mais ses actions pouvaient rester inopérantes lorsque l’état de configuration n’était pas initialisé ; les états `configurationReady`, `dirty` et `saveInFlight` sont désormais explicites et protégés ;
+- la liste native pouvait afficher deux glyphes d’étoile lorsque Thunderbird exposait simultanément `.button-star` et `.tree-button-flag` ; un seul contrôle canonique est conservé et les attributs sont nettoyés à la fermeture ;
+- une réinstallation conservait les données de profil historiques ; le cycle de désinstallation ferme maintenant SQLite avant de purger base, récupération, sauvegardes internes et préférences, et une sentinelle native déclenche une purge avant initialisation si des résidus subsistent ;
+- les valeurs recommandées d’une installation neuve sont Recommandé, Équilibré, densité Normale et automatismes sensibles désactivés ;
+- la demande de sécurité a conduit à documenter la frontière réelle : aucune notion d’administrateur client, validation au niveau Experiment, imports non fiables et chemins de fichiers réservés au sélecteur natif.
+
+
+## Captures du 31 juillet 2026 — passe 3.2.5
+
+### Constats
+
+- deux contrôles étoile restent visibles dans certaines lignes en mode indépendant ;
+- la barre Enregistrer/Annuler est visible mais les commandes ne produisent pas le résultat attendu ;
+- le job Windows transmet un retour chariot à `git check-ignore`, qui affiche `dist/.gitkeep\r`.
+
+### Corrections
+
+- les annotations et déplacements de l’étoile sont limités au mode `nativeStar` ; le mode indépendant restaure chaque contrôle natif à partir d’un instantané ;
+- Enregistrer et Annuler deviennent des actions natives du formulaire (`submit`/`reset`) et l’objet retourné par l’API est cloné avant enrichissement ;
+- `deep_audit.py` utilise des flux NUL-délimités binaires pour les chemins Git ;
+- les trois incidents sont inscrits dans `docs/BUG_TRACKER.md` avec statut `À VALIDER` ou `CORRIGÉ`.
+
+
+## Captures du 31 juillet 2026 — bugs rouverts après 3.2.5
+
+- plusieurs symboles apparaissent à droite des cartes malgré le mode indépendant ;
+- la punaise héritait encore de classes d’icône Thunderbird et l’étoile était déplacée par le CSS MailPin ;
+- la barre Enregistrer/Annuler était visible mais les contrôles restaient hors du formulaire et dépendaient de `form=`, non fiable dans l’onglet Options ;
+- ces constats correspondent à MP-2026-004 et MP-2026-005 dans `docs/BUG_TRACKER.md`.
+
+## Vidéos du 13 août 2026 — Organic Workspace
+
+- la première refonte Organic Workspace conservait trop de densité, des grilles complexes comprimées et plusieurs surfaces flottantes susceptibles de recouvrir le contenu ;
+- les menus `•••`, statistiques secondaires, inspector et commandes Enregistrer/Annuler ont été ramenés dans le flux ou dans le layout ;
+- Rule Builder, Affaires, modèles et Agenda ont reçu une structure de champs explicite et davantage de respiration ;
+- `workspace.css` a été consolidé en une feuille canonique au lieu d’empiler une nouvelle couche V3 ;
+- l’audit post-vidéo a supprimé le re-parenting runtime Dashboard/Options : le shell final est désormais écrit directement dans le HTML ;
+- la recette visuelle humaine reste ouverte : le smoke Thunderbird confirme le cycle de vie et les erreurs runtime, pas le jugement pixel/ergonomie.

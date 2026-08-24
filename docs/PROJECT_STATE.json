@@ -1,20 +1,108 @@
 {
-  "project": "MailPin",
-  "version": "2.1.1",
-  "architecture": "webextension-native",
-  "manifestVersion": 3,
-  "experimentApis": 0,
-  "runtimeNetwork": false,
-  "storage": "storage.local",
-  "primaryUi": "dashboard+workbench",
-  "nativeListFeedback": "mailpin-owned-thunderbird-tags",
-  "dynamicMessageActionState": true,
-  "savedViews": true,
-  "templates": true,
-  "cases": true,
-  "manualRules": true,
-  "starImport": "optional-accountsRead",
-  "visualTagDisableCleanup": true,
-  "archiveBranch": "archive/mailpin-1.7.6-experiment",
-  "status": "candidate-native-feature-parity-awaiting-owner-smoke"
+  "format": "mailperch-project-state",
+  "version": 1,
+  "project": "MailPin — Email Follow-up & Productivity",
+  "extensionVersion": "1.7.6",
+  "baseGitHub": {
+    "branch": "main",
+    "commit": "522042df08c2eb7a18a13cbb83631943e54abf2c",
+    "role": "GitHub release v1.7.6 tag target after validated candidate and bounded publisher"
+  },
+  "extensionId": "ussmarines.mailpin@addons.thunderbird.net",
+  "thunderbird": {
+    "min": "153.0",
+    "max": "154.*"
+  },
+  "schemas": {
+    "sqlite": 5,
+    "settings": 8,
+    "data": 7
+  },
+  "entrypoints": {
+    "manifest": "extension/manifest.json",
+    "background": "extension/background.js",
+    "experimentSchema": "extension/api/pinInbox/schema.json",
+    "experiment": "extension/api/pinInbox/implementation.js",
+    "options": "extension/options/options.html",
+    "dashboard": "extension/dashboard/dashboard.html",
+    "projectMemory": "PROJECT_MEMORY.md",
+    "securityBoundary": "docs/SECURITY_BOUNDARY.md",
+    "bugTracker": "docs/BUG_TRACKER.md",
+    "compatibilityFacade": "extension/api/pinInbox/modules/compatibility.js",
+    "thunderbirdMessages": "extension/api/pinInbox/modules/thunderbird-messages.js",
+    "thunderbirdTags": "extension/api/pinInbox/modules/thunderbird-tags.js",
+    "thunderbirdCalendar": "extension/api/pinInbox/modules/thunderbird-calendar.js",
+    "thunderbirdCompatibilityDoc": "docs/THUNDERBIRD_COMPATIBILITY.md",
+    "thunderbirdTestBench": "docs/THUNDERBIRD_TEST_BENCH.md",
+    "codexHandoff": "docs/CODEX_HANDOFF.md"
+  },
+  "commands": [
+    "npm run check",
+    "npm test",
+    "npm run build",
+    "npm run ci"
+  ],
+  "invariants": [
+    "No native unread/new/total counter mutation",
+    "Pinning never changes read state",
+    "No network, telemetry, ads, CDN or remote code",
+    "No message bodies or attachment contents stored",
+    "No eval/new Function/innerHTML/outerHTML",
+    "SQLite writes remain incremental, transactional and serialized",
+    "All injected resources are cleaned up",
+    "No remote publication without explicit approval",
+    "Privileged API inputs are bounded and normalized",
+    "Only exact MailPin-owned Thunderbird tags may be managed or removed",
+    "Optional Thunderbird capabilities fail locally instead of disabling the full extension",
+    "Business modules do not call Thunderbird core services directly outside compatibility adapters",
+    "Recommended mode never auto-saves and preserves profile-specific settings",
+    "Organic Workspace uses one canonical workspace stylesheet rather than stacked runtime patch stylesheets",
+    "Selected-account scope uses Thunderbird account.key consistently from Options through runtime filtering"
+  ],
+  "ui": {
+    "settingsSpacingAffects": [
+      "extension/options"
+    ],
+    "cardDensityAffects": [
+      "MailPin pinned cards"
+    ],
+    "mustNotAffect": [
+      "Thunderbird native thread row height",
+      "native message counters"
+    ]
+  },
+  "highRisk": [
+    "_setupAbout3Pane",
+    "PinCompatibility adapters",
+    "PinStructuredStore",
+    "_resolveReference",
+    "calendar observers",
+    "folder observers",
+    "automatic rules",
+    "imports and restores",
+    "uninstall lifecycle",
+    "privileged API input validation",
+    "settings save/cancel lifecycle",
+    "selected-account filtering",
+    "Thunderbird runtime smoke harness"
+  ],
+  "security": {
+    "thunderbirdBoundary": "Messages/Tags/Calendar internals remain isolated behind dedicated compatibility adapters",
+    "uiDependencyPolicy": "native HTML plus local Organic Workspace CSS tokens; canonical workspace stylesheet; no runtime patch stylesheet, npm runtime dependency, bundler, CDN or remote asset",
+    "runtimeTestSupplyChain": "test-only Thunderbird/geckodriver downloads are checksum-verified and are not runtime dependencies"
+  },
+  "developmentBranch": "release/finalize-1.7.6",
+  "testing": {
+    "contract": [
+      "tests/test_organic_workspace_ui.py",
+      "tests/test_thunderbird_compatibility_boundary.py",
+      "tests/thunderbird_compatibility_contract.mjs"
+    ],
+    "runtimeWorkflow": ".github/workflows/thunderbird-smoke.yml",
+    "runtimeScript": "tests/thunderbird/real_smoke.py",
+    "browserStatus": "1.7.6 publishes the cold-start initialization correction merged by PR #64; no UI redesign is included.",
+    "runtimeStatus": "Exact versioned 1.7.6 candidate c502175041c85e3cb6e37666a0784f7df0a9e367 passed QA 32640198347 and real Thunderbird 154.0 smoke 32640198339. GitHub release v1.7.6 targets 522042df08c2eb7a18a13cbb83631943e54abf2c."
+  },
+  "latestPublicVersion": "1.7.6",
+  "releaseStatus": "published"
 }
