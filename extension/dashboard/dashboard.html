@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>MailPin</title>
   <link rel="stylesheet" href="dashboard.css">
+  <link rel="stylesheet" href="smoke-hardening.css">
 </head>
 <body>
   <header class="topbar">
@@ -34,7 +35,7 @@
     <section class="workspace">
       <div class="toolbar">
         <label><input id="select-all" type="checkbox"> <span data-i18n="selectAll"></span></label>
-        <select id="bulk-action" aria-label="Bulk action">
+        <select id="bulk-action" aria-label="Bulk action" disabled>
           <option value="" data-i18n="bulkAction"></option>
           <option value="active" data-i18n="viewActive"></option>
           <option value="planned" data-i18n="viewPlanned"></option>
@@ -70,5 +71,6 @@
     </article>
   </template>
   <script type="module" src="dashboard.js"></script>
+  <script type="module" src="smoke-hardening.js"></script>
 </body>
 </html>

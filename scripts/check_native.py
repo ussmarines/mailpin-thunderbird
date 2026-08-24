@@ -6,7 +6,7 @@ ext=ROOT/'extension'
 manifest=json.loads((ext/'manifest.json').read_text(encoding='utf-8'))
 errors=[]
 if manifest.get('manifest_version') != 3: errors.append('manifest_version must be 3')
-if manifest.get('version') != '2.0.0': errors.append('manifest version must be 2.0.0')
+if manifest.get('version') != '2.0.1': errors.append('manifest version must be 2.0.1')
 if 'experiment_apis' in manifest: errors.append('experiment_apis is forbidden')
 if manifest.get('browser_specific_settings',{}).get('gecko',{}).get('id') != 'ussmarines.mailpin@addons.thunderbird.net': errors.append('canonical id changed')
 if "connect-src 'none'" not in manifest.get('content_security_policy',{}).get('extension_pages',''): errors.append('CSP must block runtime network')

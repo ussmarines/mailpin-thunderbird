@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.0.1 — owner-smoke hardening (candidate)
+
+### Changed
+- Renforcement de l’ergonomie du Dashboard observée pendant le premier smoke réel Thunderbird 154.
+- Barre d’outils rendue persistante pendant le défilement et sélection visuelle renforcée.
+- Action groupée désactivée tant qu’aucun suivi n’est sélectionné, avec état de sélection globale synchronisé.
+- Bouton Enregistrer rendu plus visible et accessible via `Ctrl+S`/`Cmd+S` dans la fiche d’un suivi.
+
+### Safety
+- Confirmation explicite avant les actions destructives exposées dans la fiche (Corbeille et Désépingler).
+- Aucun changement de frontière : toujours zéro Experiment API, zéro réseau runtime et stockage `storage.local`.
+
+### Validation
+- Cette candidate doit repasser les trois checks obligatoires, le build XPI et `webext-linter` avant un second smoke propriétaire.
+
 ## 2.0.0 — WebExtension-native rebuild (candidate)
 
 ### Changed
@@ -23,4 +38,4 @@
 ### Archive
 - La dernière version historique 1.7.6 reste disponible sur `archive/mailpin-1.7.6-experiment`.
 
-La publication finale 2.0.0 reste conditionnée au smoke réel du propriétaire.
+La publication finale reste conditionnée au smoke réel du propriétaire.
