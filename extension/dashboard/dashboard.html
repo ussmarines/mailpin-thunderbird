@@ -1,77 +1,164 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>MailPin</title>
-  <link rel="stylesheet" href="dashboard.css">
-  <link rel="stylesheet" href="smoke-hardening.css">
+  <title data-i18n="dashboardTitle">Tableau de bord MailPin</title>
+  <script src="../styles/theme.js"></script>
+  <link rel="stylesheet" href="../styles/tokens.css">
+  <link rel="stylesheet" href="./dashboard.css">
+  <link rel="stylesheet" href="../styles/workspace.css">
+  <script src="./dashboard.js" defer></script>
 </head>
-<body>
-  <header class="topbar">
-    <div><strong>MailPin</strong> <span class="muted">WebExtension-native 2.1</span></div>
-    <div class="top-actions">
-      <input id="search" type="search" data-i18n-placeholder="searchPlaceholder" autocomplete="off">
-      <button id="refresh" type="button" data-i18n="refresh"></button>
-      <button id="settings" type="button" data-i18n="settings"></button>
+<body class="mp-organic-workspace" data-loading>
+  <a class="skip-link" href="#dashboard-main" data-i18n="skipToDashboard">Aller directement au contenu</a>
+  <div id="fatal-error" class="fatal-error" role="alert" hidden>
+    <div><strong data-i18n="dashboardUnavailable">Le tableau de bord ne peut pas être chargé.</strong><p id="fatal-message"></p></div>
+    <button id="retry" type="button" class="button primary" data-i18n="retry">Réessayer</button>
+  </div>
+
+  <main id="dashboard-main" class="dashboard-shell" tabindex="-1">
+  <div class="workspace-frame" data-inspector-open="false">
+    <aside class="workspace-rail" aria-label="MailPin" data-i18n-aria-label="dashboardTitle">
+      <div class="workspace-rail-brand"><img src="../icons/mailpin-icon.svg" width="34" height="34" alt=""><div class="workspace-rail-brand-copy"><strong>MailPin</strong><span data-i18n="dashboardHeading">Tableau de bord</span></div></div>
+      <label class="search-field">
+                <span data-i18n="searchPins">Rechercher</span>
+                <input id="search" type="search" placeholder="Objet, expéditeur, note, groupe…" data-i18n-placeholder="dashboardSearchPlaceholder" autocomplete="off">
+              </label>
+      <nav class="view-tabs" aria-label="Vues principales" data-i18n-aria-label="ariaMainViews">
+            <button type="button" data-view="today" aria-pressed="true" data-i18n="viewToday">Aujourd’hui</button>
+            <button type="button" data-view="list" aria-pressed="false" data-i18n="viewList">Liste</button>
+            <button type="button" data-view="kanban" aria-pressed="false" data-i18n="viewKanban">Kanban</button>
+            <button type="button" data-view="cases" aria-pressed="false" data-i18n="viewCases">Affaires</button>
+            <button type="button" data-view="review" aria-pressed="false" data-i18n="viewReview">Revue</button>
+            <button type="button" data-view="history" aria-pressed="false" data-i18n="viewHistory">Historique</button>
+            <button type="button" data-view="health" aria-pressed="false" data-i18n="viewHealth">Centre de santé</button>
+          </nav>
+
+      <section class="smart-section" aria-labelledby="smart-title">
+        <div class="sidebar-heading"><h2 id="smart-title" data-i18n="smartViews">Vues intelligentes</h2><button id="clear-filters" type="button" class="text-button" data-i18n="clear">Effacer</button></div>
+        <div id="smart-views" class="smart-views"></div>
+      </section>
+      <section class="smart-section" aria-labelledby="saved-views-title">
+        <div class="sidebar-heading"><h2 id="saved-views-title" data-i18n="savedViews">Vues enregistrées</h2><button id="save-current-view" type="button" class="text-button" data-i18n="saveCurrentView">Enregistrer la vue</button></div>
+        <div id="saved-views" class="saved-views"></div>
+      </section>
+      <section class="sidebar-help">
+        <strong data-i18n="dashboardTipTitle">Astuce</strong>
+        <p data-i18n="dashboardTip">Sélectionnez plusieurs messages pour appliquer une action groupée. Les opérations destructives demandent confirmation.</p>
+      </section>
+
+    </aside>
+    <div class="workspace-stage">
+      <header class="dashboard-header">
+            <div class="brand-lockup">
+              <span class="brand-mark" aria-hidden="true"><img src="../icons/mailpin-icon.svg" width="88" height="88" alt=""></span>
+              <div class="brand-copy"><span class="brand-overline">MailPin</span><div class="title-line"><h1 data-i18n="dashboardHeading">Tableau de bord</h1><span id="app-version" class="version"></span></div><p data-i18n="dashboardIntro">Retrouvez rapidement ce qui demande votre attention, sans parcourir tous vos dossiers.</p></div>
+            </div>
+            <div class="header-actions">
+              <div class="header-primary-actions"><button id="context-toggle" type="button" class="button secondary context-toggle" aria-expanded="false" aria-controls="workspace-inspector" data-i18n="contextPanel">Contexte</button><button id="commands" type="button" class="button secondary" data-i18n="commandPalette">Commandes</button><button id="settings" type="button" class="button secondary" data-i18n="settings">Paramètres</button><button id="refresh" type="button" class="button primary" data-i18n="refresh">Actualiser</button></div>
+              <a id="header-support" class="support-button" href="https://paypal.me/ussmarinesdot" target="_blank" rel="noopener noreferrer" data-i18n="supportProject">Soutenir le projet</a>
+            </div>
+          </header>
+      <div id="status" class="status" role="status" aria-live="polite" aria-atomic="true" hidden><span id="status-message"></span><button id="status-close" type="button" aria-label="Fermer" data-i18n-aria-label="close">×</button></div>
+      <section id="stats" class="stats-grid" aria-label="Résumé MailPin" data-i18n-aria-label="ariaMailPinSummary"></section>
+      <section id="reminder-center" class="reminder-center" aria-labelledby="reminder-center-title" hidden></section>
+      <div class="dashboard-content">
+              <section id="selection-bar" class="selection-bar" hidden aria-label="Actions groupées" data-i18n-aria-label="bulkActions">
+                <div><strong id="selection-count">0 message sélectionné</strong><button id="select-visible" type="button" class="text-button" data-i18n="selectVisible">Tout sélectionner dans la vue</button><button id="clear-selection" type="button" class="text-button" data-i18n="clearSelection">Effacer la sélection</button></div>
+                <div class="bulk-controls">
+                  <label><span class="visually-hidden" data-i18n="bulkAction">Action groupée</span><select id="bulk-action">
+                    <option value="" data-i18n="chooseAction">Choisir une action…</option>
+                    <optgroup label="Suivi">
+                      <option value="active" data-i18n="statusActive">À traiter</option><option value="waiting" data-i18n="statusWaiting">En attente</option><option value="planned" data-i18n="statusPlanned">Planifier</option><option value="complete" data-i18n="statusComplete">Terminer</option>
+                      <option value="trackNoReply" data-i18n="trackNoReply">Me relancer si aucune réponse</option><option value="cancelNoReply" data-i18n="cancelNoReplyTracking">Arrêter le suivi sans réponse</option>
+                      <option value="snooze" data-i18n="bulkSnooze">Mettre en veille</option><option value="wake" data-i18n="bulkWake">Réveiller</option>
+                      <option value="priority" data-i18n="changePriority">Changer la priorité</option><option value="deadline" data-i18n="changeDeadline">Changer l’échéance</option>
+                    </optgroup>
+                    <optgroup label="Organisation">
+                      <option value="group" data-i18n="assignGroup">Assigner un groupe</option><option value="case" data-i18n="assignCase">Assigner une affaire</option><option value="template" data-i18n="applyTemplate">Appliquer un modèle</option>
+                    </optgroup>
+                    <optgroup label="Message">
+                      <option value="read" data-i18n="markRead">Marquer lu</option><option value="unread" data-i18n="markUnread">Marquer non lu</option><option value="archive" data-i18n="archive">Archiver</option><option value="unpin" data-i18n="unpin">Désépingler</option><option value="delete" data-i18n="delete">Supprimer</option>
+                    </optgroup>
+                  </select></label>
+                  <label id="bulk-priority-wrap" hidden><span class="visually-hidden" data-i18n="priority">Priorité</span><select id="bulk-priority"><option value="normal" data-i18n="priorityNormal">Normale</option><option value="high" data-i18n="priorityHigh">Haute</option><option value="urgent" data-i18n="priorityUrgent">Urgente</option></select></label>
+                  <label id="bulk-deadline-wrap" hidden><span class="visually-hidden" data-i18n="deadline">Échéance</span><input id="bulk-deadline" type="datetime-local"></label>
+                  <label id="bulk-snooze-wrap" hidden><span class="visually-hidden" data-i18n="snoozeDuration">Durée de veille</span><select id="bulk-snooze"><option value="3600000" data-i18n="snoozeOneHour">Reporter d’une heure</option><option value="tomorrow" data-i18n="snoozeOneDay">Jusqu’à demain</option><option value="604800000" data-i18n="snoozeOneWeek">Pendant une semaine</option></select></label>
+                  <label id="bulk-group-wrap" hidden><span class="visually-hidden" data-i18n="group">Groupe</span><select id="bulk-group"></select></label>
+                  <label id="bulk-case-wrap" hidden><span class="visually-hidden" data-i18n="case">Affaire</span><select id="bulk-case"></select></label>
+                  <label id="bulk-template-wrap" hidden><span class="visually-hidden" data-i18n="template">Modèle</span><select id="bulk-template"></select></label>
+                  <button id="apply" type="button" class="button primary" data-i18n="apply">Appliquer</button>
+                </div>
+              </section>
+
+              <section id="today" class="focus-board" aria-label="Aujourd’hui" data-i18n-aria-label="viewToday"></section>
+              <section id="items" class="items" aria-label="Messages épinglés" data-i18n-aria-label="ariaPinnedMessages" hidden></section>
+              <section id="kanban" class="kanban" aria-label="Vue Kanban" data-i18n-aria-label="viewKanban" hidden></section>
+              <section id="cases" class="case-board" aria-label="Affaires" data-i18n-aria-label="viewCases" hidden></section>
+              <section id="review" class="review-board" aria-label="Revue de suivi" data-i18n-aria-label="reviewHeading" hidden></section>
+              <section id="history" class="history-board" aria-label="Historique" data-i18n-aria-label="viewHistory" hidden></section>
+              <section id="health" class="health-board" aria-label="Centre de santé" data-i18n-aria-label="viewHealth" hidden></section>
+            </div>
     </div>
-  </header>
+    <aside id="workspace-inspector" class="workspace-inspector" aria-label="Contexte" data-i18n-aria-label="contextPanel" hidden>
+      <div class="workspace-inspector-header"><strong data-i18n="contextPanel">Contexte</strong><button id="workspace-inspector-close" type="button" class="icon-button workspace-inspector-close" aria-label="Fermer le contexte" data-i18n-aria-label="closeContext">×</button></div>
+      <aside class="technical-panel">
+            <details><summary data-i18n="ruleLog">Journal des règles</summary><div id="rule-log" class="activity-list"></div></details>
+            <details><summary data-i18n="recentActivity">Activité récente</summary><div id="activity" class="activity-list"></div></details>
+          </aside>
+      <aside class="support-panel" aria-labelledby="dashboard-support-title"><div><h2 id="dashboard-support-title" data-i18n="supportTitle">Soutenir le projet</h2></div><a class="button secondary" href="https://paypal.me/ussmarinesdot" target="_blank" rel="noopener noreferrer" data-i18n="supportProject">Soutenir le projet</a></aside>
+    </aside>
+  </div>
+</main>
 
-  <main class="layout">
-    <nav class="sidebar" aria-label="MailPin views">
-      <button class="view" data-view="all"><span data-i18n="viewAll"></span><span id="count-all">0</span></button>
-      <button class="view active" data-view="active"><span data-i18n="viewActive"></span><span id="count-active">0</span></button>
-      <button class="view" data-view="today"><span data-i18n="viewToday"></span><span id="count-today">0</span></button>
-      <button class="view" data-view="overdue"><span data-i18n="viewOverdue"></span><span id="count-overdue">0</span></button>
-      <button class="view" data-view="planned"><span data-i18n="viewPlanned"></span><span id="count-planned">0</span></button>
-      <button class="view" data-view="waiting"><span data-i18n="viewWaiting"></span><span id="count-waiting">0</span></button>
-      <button class="view" data-view="noReply"><span data-i18n="viewNoReply"></span><span id="count-noReply">0</span></button>
-      <button class="view" data-view="completed"><span data-i18n="viewCompleted"></span><span id="count-completed">0</span></button>
-      <hr>
-      <button class="view" data-view="planner"><span data-i18n="viewPlanner"></span></button>
-      <button class="view" data-view="stats"><span data-i18n="viewStats"></span></button>
-    </nav>
 
-    <section class="workspace">
-      <div class="toolbar">
-        <label><input id="select-all" type="checkbox"> <span data-i18n="selectAll"></span></label>
-        <select id="bulk-action" aria-label="Bulk action" disabled>
-          <option value="" data-i18n="bulkAction"></option>
-          <option value="active" data-i18n="viewActive"></option>
-          <option value="planned" data-i18n="viewPlanned"></option>
-          <option value="waiting" data-i18n="viewWaiting"></option>
-          <option value="completed" data-i18n="viewCompleted"></option>
-          <option value="unpin" data-i18n="unpin"></option>
-        </select>
-        <select id="sort" aria-label="Sort">
-          <option value="updated" data-i18n="sortUpdated"></option>
-          <option value="due" data-i18n="sortDue"></option>
-          <option value="date" data-i18n="sortDate"></option>
-          <option value="priority" data-i18n="sortPriority"></option>
-          <option value="subject" data-i18n="sortSubject"></option>
-        </select>
-        <span id="status" class="muted" role="status"></span>
-      </div>
-      <div class="content">
-        <div id="pin-list" class="pin-list" aria-live="polite"></div>
-        <aside id="detail" class="detail empty"><p data-i18n="selectFollowup"></p></aside>
-      </div>
-    </section>
-  </main>
 
-  <template id="pin-template">
-    <article class="pin-card" tabindex="0">
-      <input class="pin-select" type="checkbox" data-i18n-aria="selectItem">
-      <div class="pin-main">
-        <div class="pin-title"></div>
-        <div class="pin-meta"></div>
-        <div class="pin-badges"></div>
-      </div>
-      <button class="pin-open" type="button" data-i18n="open"></button>
-    </article>
-  </template>
-  <script type="module" src="dashboard.js"></script>
-  <script type="module" src="smoke-hardening.js"></script>
-  <script type="module" src="parity-dashboard.js"></script>
+  <dialog id="calendar-dialog" class="calendar-dialog">
+    <form method="dialog">
+      <header><div><h2 data-i18n="calendarCreate">Créer dans l’Agenda</h2><p data-i18n="calendarCreateHelp">Seuls les calendriers compatibles et inscriptibles peuvent être sélectionnés.</p></div><button value="cancel" class="icon-button" aria-label="Fermer" data-i18n-aria-label="close">×</button></header>
+      <label><span data-i18n="calendarItemType">Type</span><select id="calendar-item-type"><option value="task" data-i18n="task">Tâche</option><option value="event" data-i18n="event">Événement</option></select></label>
+      <label id="calendar-target-field"><span data-i18n="calendarTarget">Calendrier</span><select id="calendar-target"></select></label>
+      <p id="calendar-availability" class="dialog-error" role="alert" aria-live="polite" hidden></p>
+      <fieldset id="calendar-event-schedule" class="schedule-fields" hidden><legend data-i18n="eventSchedule">Date et heure de l’événement</legend><div class="schedule-grid"><label><span data-i18n="startDate">Date de début</span><input id="calendar-event-start-date" type="date" required></label><label><span data-i18n="startTime">Heure de début</span><input id="calendar-event-start-time" type="time" step="60" required></label><label><span data-i18n="endDate">Date de fin</span><input id="calendar-event-end-date" type="date" required></label><label><span data-i18n="endTime">Heure de fin</span><input id="calendar-event-end-time" type="time" step="60" required></label></div></fieldset>
+      <fieldset id="calendar-task-schedule" class="schedule-fields"><legend data-i18n="taskSchedule">Échéance de la tâche</legend><div class="schedule-grid"><label><span data-i18n="dueDate">Date d’échéance</span><input id="calendar-task-due-date" type="date" required></label><label><span data-i18n="dueTime">Heure d’échéance</span><input id="calendar-task-due-time" type="time" step="60" required></label></div></fieldset>
+      <p id="calendar-error" class="dialog-error" role="alert" aria-live="polite" hidden></p>
+      <footer><button value="cancel" class="button secondary" data-i18n="cancel">Annuler</button><button id="calendar-confirm" type="submit" class="button primary" data-i18n="create">Créer</button></footer>
+    </form>
+  </dialog>
+
+  <dialog id="no-reply-dialog" class="calendar-dialog compact-dialog">
+    <form method="dialog">
+      <header><div><h2 data-i18n="noReplyDialogTitle">Relancer sans réponse</h2><p data-i18n="noReplyDialogHelp">Choisissez le moment où cette épingle devra revenir à votre attention.</p></div><button value="cancel" class="icon-button" aria-label="Fermer" data-i18n-aria-label="close">×</button></header>
+      <label><span data-i18n="noReplyDelay">Délai</span><select id="no-reply-preset"><option value="default" data-i18n="defaultDelay">Délai par défaut</option><option value="tomorrow" data-i18n="tomorrowMorning">Demain matin</option><option value="3" data-i18n="inThreeDays">Dans 3 jours</option><option value="5" data-i18n="inFiveDays">Dans 5 jours</option><option value="7" data-i18n="inSevenDays">Dans 7 jours</option><option value="custom" data-i18n="customDate">Date personnalisée</option></select></label>
+      <div id="no-reply-custom" class="schedule-grid" hidden><label><span data-i18n="dueDate">Date</span><input id="no-reply-date" type="date"></label><label><span data-i18n="dueTime">Heure</span><input id="no-reply-time" type="time" step="60"></label></div>
+      <p class="dialog-preview"><span data-i18n="noReplyResult">Relance prévue</span> : <strong id="no-reply-preview"></strong></p>
+      <p id="no-reply-error" class="dialog-error" role="alert" aria-live="polite" hidden></p>
+      <footer><button id="no-reply-stop" value="stop" class="button danger" data-i18n="cancelNoReplyTracking" hidden>Arrêter le suivi</button><button value="cancel" class="button secondary" data-i18n="cancel">Annuler</button><button id="no-reply-confirm" type="submit" class="button primary" data-i18n="apply">Appliquer</button></footer>
+    </form>
+  </dialog>
+
+  <dialog id="saved-view-dialog" class="calendar-dialog compact-dialog">
+    <form method="dialog" class="saved-view-form">
+      <header><div><h2 data-i18n="saveCurrentView">Enregistrer la vue</h2><p data-i18n="savedViews">Vues enregistrées</p></div><button value="cancel" class="icon-button" aria-label="Fermer" data-i18n-aria-label="close">×</button></header>
+      <label><span data-i18n="viewName">Nom de la vue</span><input id="saved-view-name" type="text" maxlength="100" required></label>
+      <label><span data-i18n="smartViews">Vue intelligente</span><select id="saved-view-smart"></select></label>
+      <label><span data-i18n="group">Groupe</span><select id="saved-view-group"><option value="">—</option></select></label>
+      <label><span data-i18n="case">Affaire</span><select id="saved-view-case"><option value="">—</option></select></label>
+      <label><span data-i18n="priority">Priorité</span><select id="saved-view-priority"><option value="">—</option><option value="normal" data-i18n="priorityNormal">Normale</option><option value="high" data-i18n="priorityHigh">Haute</option><option value="urgent" data-i18n="priorityUrgent">Urgente</option></select></label>
+      <label><span data-i18n="responseState">État de réponse</span><select id="saved-view-response"><option value="">—</option><option value="waitingForThem" data-i18n="waitingForThem">J’attends</option><option value="needsReply" data-i18n="needsReply">Je dois répondre</option></select></label>
+      <label><span data-i18n="pendingSubtasks">Sous-tâches en attente</span><select id="saved-view-checklist"><option value="">—</option><option value="pending" data-i18n="pendingSubtasks">Sous-tâches en attente</option><option value="complete" data-i18n="statusComplete">Terminées</option><option value="none" data-i18n="none">Aucune</option></select></label>
+      <footer><button value="cancel" class="button secondary" data-i18n="cancel">Annuler</button><button id="saved-view-confirm" value="default" class="button primary" data-i18n="saveView">Enregistrer</button></footer>
+    </form>
+  </dialog>
+
+  <dialog id="command-palette" class="command-palette">
+    <div class="command-palette-shell">
+      <header><div><h2 data-i18n="commandPalette">Commandes</h2><p data-i18n="commandPaletteHelp">Accédez rapidement aux vues et actions principales.</p></div><button id="command-close" type="button" class="icon-button" aria-label="Fermer" data-i18n-aria-label="close">×</button></header>
+      <label class="search-field"><span class="visually-hidden" data-i18n="commandPalette">Commandes</span><input id="command-search" type="search" autocomplete="off" placeholder="Rechercher une commande…" data-i18n-placeholder="commandPalettePlaceholder"></label>
+      <div id="command-list" class="command-list" role="list" aria-label="Commandes MailPin" data-i18n-aria-label="commandPalette"></div>
+    </div>
+  </dialog>
+  <noscript>JavaScript doit être activé pour afficher le tableau de bord.</noscript>
 </body>
 </html>

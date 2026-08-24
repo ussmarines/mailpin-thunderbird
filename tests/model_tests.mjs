@@ -1,0 +1,203 @@
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import path from "node:path";
+import vm from "node:vm";
+import {fileURLToPath} from "node:url";
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const scope = {Date, Math, String, Number, Boolean, Object, Array, Set, Map, JSON};
+vm.createContext(scope);
+for (const name of ["identity.js", "storage.js", "workflow.js", "rules.js", "calendar.js", "diagnostics.js"]) {
+  vm.runInContext(fs.readFileSync(path.join(root, "extension/api/pinInbox/modules", name), "utf8"), scope, {filename: name});
+}
+
+function header({messageId="", refs=[], threadId=0, gmThread="", subject="", author="a@example.test", date=1, size=10, messageKey=1, folderURI="mailbox://local/Inbox"}={}) {
+  return {
+    messageId, numReferences: refs.length, threadId, date, messageSize: size, messageKey,
+    folder: {URI: folderURI},
+    getStringReference(index){ return refs[index] || ""; },
+    getStringProperty(name){
+      if (name === "x-gm-thrid") return gmThread;
+      if (name === "references") return refs.map(value => `<${value}>`).join(" ");
+      return "";
+    },
+    subject, author
+  };
+}
+
+const original = header({messageId:"root@example.test", threadId:7, subject:"Facture"});
+const reply = header({messageId:"reply@example.test", refs:["root@example.test"], threadId:7, subject:"Re: Facture"});
+const unrelated = header({messageId:"other@example.test", threadId:8, subject:"Facture"});
+const sigOriginal = scope.PinIdentity.signature(original, "account1", original.subject, original.author);
+const sigReply = scope.PinIdentity.signature(reply, "account1", reply.subject, reply.author);
+const sigUnrelated = scope.PinIdentity.signature(unrelated, "account1", unrelated.subject, unrelated.author);
+assert.equal(scope.PinIdentity.sameConversation(sigOriginal, sigReply), true, "References must link replies");
+assert.equal(scope.PinIdentity.sameConversation(sigOriginal, sigUnrelated), false, "Distinct Message-ID/thread must not merge solely by subject");
+const sameThreadMissingRefsA = header({messageId:"thread-a@example.test", threadId:99, subject:"Sujet"});
+const sameThreadMissingRefsB = header({messageId:"thread-b@example.test", threadId:99, subject:"Re: Sujet"});
+assert.equal(scope.PinIdentity.sameConversation(
+  scope.PinIdentity.signature(sameThreadMissingRefsA,"account1",sameThreadMissingRefsA.subject,sameThreadMissingRefsA.author),
+  scope.PinIdentity.signature(sameThreadMissingRefsB,"account1",sameThreadMissingRefsB.subject,sameThreadMissingRefsB.author)
+), true, "Thunderbird threadId should link a thread even when References are unavailable");
+assert.equal(scope.PinIdentity.conversationIdentity(reply, "account1", reply.subject), scope.PinIdentity.conversationIdentity(original, "account1", original.subject));
+
+const gmailA = header({messageId:"a", gmThread:"999", subject:"A"});
+const gmailB = header({messageId:"b", gmThread:"999", subject:"B"});
+assert.equal(scope.PinIdentity.conversationIdentity(gmailA,"g",gmailA.subject), scope.PinIdentity.conversationIdentity(gmailB,"g",gmailB.subject));
+assert.equal(scope.PinIdentity.strongConversationKey(scope.PinIdentity.conversationIdentity(gmailA,"g",gmailA.subject)), true);
+
+const noIdentityA = header({messageId:"", threadId:0, subject:"Generic subject", messageKey:10});
+const noIdentityB = header({messageId:"", threadId:0, subject:"Generic subject", messageKey:11});
+const noIdentitySigA = scope.PinIdentity.signature(noIdentityA, "account1", noIdentityA.subject, noIdentityA.author);
+const noIdentitySigB = scope.PinIdentity.signature(noIdentityB, "account1", noIdentityB.subject, noIdentityB.author);
+assert.equal(scope.PinIdentity.sameConversation(noIdentitySigA, noIdentitySigB), false, "Subject alone must never link messages");
+assert.notEqual(scope.PinIdentity.conversationIdentity(noIdentityA, "account1", noIdentityA.subject), scope.PinIdentity.conversationIdentity(noIdentityB, "account1", noIdentityB.subject));
+assert.equal(scope.PinIdentity.strongConversationKey(scope.PinIdentity.conversationIdentity(noIdentityA, "account1", noIdentityA.subject)), false);
+
+for (const [settings, expected] of [
+  [{defaultPinTarget: "message", enableConversationPins: false}, "message"],
+  [{defaultPinTarget: "message", enableConversationPins: true}, "message"],
+  [{defaultPinTarget: "conversation", enableConversationPins: false}, "message"],
+  [{defaultPinTarget: "conversation", enableConversationPins: true}, "conversation"]
+]) {
+  assert.equal(scope.PinIdentity.genericTrackingMode(settings), expected, JSON.stringify(settings));
+}
+assert.deepEqual(
+  JSON.parse(JSON.stringify(scope.PinIdentity.pinKeyPlan("message", "message-key", "conversation-key"))),
+  {targetKey: "message-key", oppositeKey: "conversation-key"},
+  "A generic message pin must remove a legacy parallel conversation key"
+);
+assert.deepEqual(
+  JSON.parse(JSON.stringify(scope.PinIdentity.pinKeyPlan("conversation", "message-key", "conversation-key"))),
+  {targetKey: "conversation-key", oppositeKey: "message-key"},
+  "An explicit conversation pin must remove a legacy parallel message key"
+);
+
+const diagnosticInput = [
+  "person@example.test", "C:\\Users\\Person\\mail.txt", "\\\\server\\share\\mail.txt", "/tmp/private/mail.txt",
+  "github_" + "pat_" + "A".repeat(40), "sk-" + "proj-" + "B".repeat(24),
+  "https://" + "user:" + "password@" + "example.test/path"
+].join(" ");
+const diagnosticOutput = scope.PinDiagnostics.redact(diagnosticInput);
+for (const privateFragment of ["person@example.test", "Person", "server", "private", "github_pat_", "sk-proj-", "user:password"]) {
+  assert.equal(diagnosticOutput.includes(privateFragment), false, privateFragment);
+}
+assert.equal(diagnosticOutput.includes("<email>"), true);
+assert.equal(diagnosticOutput.includes("<local-path>"), true);
+assert.equal(diagnosticOutput.includes("<secret>"), true);
+assert.equal(diagnosticOutput.includes("<credential-url>"), true);
+
+const diff = scope.PinStorageHelpers.mapDiff({a:{x:1}, b:{x:2}}, {a:{x:1}, b:{x:3}, c:{x:4}});
+assert.deepEqual(JSON.parse(JSON.stringify(diff.upsert)), [["b",{x:3}],["c",{x:4}]]);
+assert.deepEqual(JSON.parse(JSON.stringify(diff.remove)), []);
+assert.deepEqual(JSON.parse(JSON.stringify(scope.PinStorageHelpers.mapDiff({a:1},{b:2}).remove)), ["a"]);
+
+const inheritedPrevious = Object.create({inherited: {x: 1}});
+const inheritedDiff = scope.PinStorageHelpers.mapDiff(inheritedPrevious, {inherited: {x: 1}});
+assert.deepEqual(
+  JSON.parse(JSON.stringify(inheritedDiff.upsert)),
+  [["inherited", {x: 1}]],
+  "Inherited properties must never be treated as stored records"
+);
+const inheritedNext = Object.create({kept: 1});
+assert.deepEqual(
+  JSON.parse(JSON.stringify(scope.PinStorageHelpers.mapDiff({kept: 1}, inheritedNext).remove)),
+  ["kept"],
+  "Inherited properties in the next map must not suppress removals"
+);
+const envelope = scope.PinStorageHelpers.backupEnvelope({refs:{a:{x:1}}}, [], {schemaVersion:5});
+assert.equal(scope.PinStorageHelpers.verifyBackupEnvelope(envelope), true);
+envelope.data.refs.a.x = 2;
+assert.equal(scope.PinStorageHelpers.verifyBackupEnvelope(envelope), false, "Backup checksum must detect corruption");
+
+const monday = new Date("2026-08-03T10:00:00Z").getTime();
+assert.equal(new Date(scope.PinWorkflow.nextOccurrence(monday,"weekly",2)).toISOString(), "2026-08-17T10:00:00.000Z");
+assert.equal(new Date(scope.PinWorkflow.nextOccurrence(new Date("2026-08-07T10:00:00Z").getTime(),"weekdays",1)).toISOString(), "2026-08-10T10:00:00.000Z");
+assert.equal(new Date(scope.PinWorkflow.nextOccurrence(new Date("2026-01-31T10:00:00Z").getTime(),"monthly",1)).getUTCMonth(), 1);
+const oldDaily = new Date("2026-07-01T10:00:00Z").getTime();
+const futureDaily = scope.PinWorkflow.nextFutureOccurrence(oldDaily,"daily",1,new Date("2026-07-30T10:00:00Z").getTime());
+assert.equal(futureDaily > new Date("2026-07-30T10:00:00Z").getTime(), true, "Recurring work must advance beyond now");
+
+const veryOldDaily = new Date("2010-01-01T10:00:00Z").getTime();
+const currentDaily = new Date("2026-07-30T10:00:00Z").getTime();
+assert.equal(
+  scope.PinWorkflow.nextFutureOccurrence(veryOldDaily, "daily", 1, currentDaily) > currentDaily,
+  true,
+  "Fixed recurrences must jump beyond now even after more than 1000 occurrences"
+);
+
+const transitionNow = new Date("2026-08-12T12:00:00Z").getTime();
+const transitionDay = 86_400_000;
+const trackedWaiting = {
+  workflowStatus: "waiting", completedAt: 0, waitingSince: transitionNow - transitionDay,
+  followUpAt: transitionNow + transitionDay, noReplyTracking: true, noReplyAt: transitionNow + transitionDay,
+  noReplyStartedAt: transitionNow - transitionDay, noReplyBaselineMessageId: "reply@example.test"
+};
+scope.PinWorkflow.applyStatus(trackedWaiting, "completed", {now: transitionNow, defaultFollowUpDays: 3});
+assert.deepEqual(
+  {
+    workflowStatus: trackedWaiting.workflowStatus,
+    completedAt: trackedWaiting.completedAt,
+    waitingSince: trackedWaiting.waitingSince,
+    followUpAt: trackedWaiting.followUpAt,
+    noReplyTracking: trackedWaiting.noReplyTracking,
+    noReplyAt: trackedWaiting.noReplyAt,
+    noReplyStartedAt: trackedWaiting.noReplyStartedAt,
+    noReplyBaselineMessageId: trackedWaiting.noReplyBaselineMessageId
+  },
+  {
+    workflowStatus: "completed", completedAt: transitionNow, waitingSince: 0, followUpAt: 0,
+    noReplyTracking: false, noReplyAt: 0, noReplyStartedAt: 0, noReplyBaselineMessageId: ""
+  },
+  "Completing tracked waiting work must remove every pending-wait marker"
+);
+
+const replanned = {
+  workflowStatus: "waiting", completedAt: transitionNow - transitionDay, waitingSince: transitionNow - transitionDay,
+  dueAt: transitionNow + 2 * transitionDay, followUpAt: transitionNow + transitionDay,
+  noReplyTracking: true, noReplyAt: transitionNow + transitionDay,
+  noReplyStartedAt: transitionNow - transitionDay, noReplyBaselineMessageId: "reply@example.test"
+};
+scope.PinWorkflow.applyStatus(replanned, "planned", {now: transitionNow, followUpAt: replanned.dueAt});
+assert.deepEqual(
+  {
+    workflowStatus: replanned.workflowStatus,
+    completedAt: replanned.completedAt,
+    waitingSince: replanned.waitingSince,
+    followUpAt: replanned.followUpAt,
+    noReplyTracking: replanned.noReplyTracking,
+    noReplyAt: replanned.noReplyAt
+  },
+  {
+    workflowStatus: "planned", completedAt: 0, waitingSince: 0,
+    followUpAt: transitionNow + 2 * transitionDay, noReplyTracking: false, noReplyAt: 0
+  },
+  "Planning tracked waiting work must replace the old waiting schedule"
+);
+
+const protectedArchive = scope.PinWorkflow.archiveRecord(
+  {stableKey: "original", subject: "Subject", pinnedAt: 1},
+  "completed",
+  {id: "forged", stableKey: "forged", action: "forged", custom: "preserved"}
+);
+assert.notEqual(protectedArchive.id, "forged");
+assert.equal(protectedArchive.stableKey, "original");
+assert.equal(protectedArchive.action, "completed");
+assert.equal(protectedArchive.custom, "preserved");
+
+const rules = [
+  {id:"b", enabled:true, priority:200, accountKey:"", folderURI:"", senderContains:"", subjectContains:"facture", tagKey:""},
+  {id:"a", enabled:true, priority:100, accountKey:"acc", folderURI:"folder", senderContains:"client", subjectContains:"", tagKey:"important"}
+];
+assert.equal(scope.PinRules.ordered(rules)[0].id, "a");
+assert.equal(scope.PinRules.matches({accountKey:"acc",folderURI:"folder",sender:"Client X",subject:"Bonjour",tags:["important"]}, rules[1]).matched, true);
+assert.equal(scope.PinRules.matches({accountKey:"acc",folderURI:"other",sender:"Client X",subject:"Bonjour",tags:["important"]}, rules[1]).matched, false);
+assert.equal(scope.PinRules.rateAllowed([1000,2000],2,3000).allowed, false);
+
+const item = {getProperty(name){return name === "X-PIN-MAILS-STABLE-KEY" ? "stable" : name === "X-PIN-MAILS-CASE-ID" ? "case" : "";}, dueDate:{jsDate:new Date(1234)}, percentComplete:100};
+assert.equal(scope.PinCalendarHelpers.itemStableKey(item), "stable");
+assert.equal(scope.PinCalendarHelpers.itemCaseId(item), "case");
+assert.equal(scope.PinCalendarHelpers.itemDueAt(item), 1234);
+assert.equal(scope.PinCalendarHelpers.itemCompleted(item), true);
+
+console.log("Model tests 3.2.8: OK");

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="MailPin">
+  <style>.mark{fill:none;stroke:#1A1D21;stroke-width:9;stroke-linecap:round;stroke-linejoin:round}@media(prefers-color-scheme:dark){.mark{stroke:#F7F5F0}}</style>
+  <path class="mark" d="M16 53v51c0 5 4 8 9 8h78c5 0 9-3 9-8V53L78 79c-8 6-20 6-28 0L16 53Z"/>
+  <path class="mark" d="m18 55 37 30c5 4 13 4 18 0l37-30"/>
+  <path class="mark" d="M64 10c-18 0-32 14-32 32 0 24 32 57 32 57s32-33 32-57c0-18-14-32-32-32Z"/>
+  <circle class="mark" cx="64" cy="42" r="14"/>
+</svg>

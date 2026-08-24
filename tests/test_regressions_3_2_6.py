@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+"""Regression guards for the 3.2.6 real-Thunderbird fixes."""
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+IMPLEMENTATION = (ROOT / "extension/api/pinInbox/implementation.js").read_text(encoding="utf-8")
+PIN_CSS = (ROOT / "extension/styles/pin.css").read_text(encoding="utf-8")
+OPTIONS_JS = (ROOT / "extension/options/options.js").read_text(encoding="utf-8")
+OPTIONS_HTML = (ROOT / "extension/options/options.html").read_text(encoding="utf-8")
+TRACKER = (ROOT / "docs/BUG_TRACKER.md").read_text(encoding="utf-8")
+
+# The MailPin pin is a fully custom button. Thunderbird's generic icon
+# classes must never be attached because they can paint an additional icon.
+assert 'button = createNode("button", INDEPENDENT_BUTTON_CLASS);' in IMPLEMENTATION
+assert '`${INDEPENDENT_BUTTON_CLASS} button icon-button icon-only`' not in IMPLEMENTATION
+assert 'button.classList.remove("button", "icon-button", "icon-only", "button-star", "tree-button-flag");' in IMPLEMENTATION
+
+# In independent mode, Thunderbird still owns the native star node. MailPin
+# may align it visually, but implementation.js must never reparent it.
+independent = IMPLEMENTATION.split('const ensureIndependentButton', 1)[1].split('const patchRow', 1)[0]
+assert 'iconInfo?.insertBefore(button, nativeStar || null);' in independent
+assert 'insertBefore(star' not in independent
+assert 'appendChild(star' not in independent
+
+# Save/cancel live in the canonical sticky header so they cannot cover fields.
+# Explicit form association preserves semantics; direct click handlers remain
+# authoritative in Thunderbird embedding.
+form_start = OPTIONS_HTML.index('<form id="settings-form"')
+form_end = OPTIONS_HTML.index('</form>', form_start)
+dock_pos = OPTIONS_HTML.index('id="save-dock"')
+assert dock_pos < form_start < form_end
+assert 'class="save-dock header-save-dock"' in OPTIONS_HTML
+assert 'id="discard-changes" type="reset" form="settings-form"' in OPTIONS_HTML
+assert 'id="save-all-floating" type="submit" form="settings-form"' in OPTIONS_HTML
+assert 'save?.addEventListener("click", saveAll);' in OPTIONS_JS
+assert 'discard?.addEventListener("click", discardChanges);' in OPTIONS_JS
+assert 'document.addEventListener("click", event => {' not in OPTIONS_JS
+assert 'form.addEventListener("submit", saveAll);' in OPTIONS_JS
+assert 'event?.stopPropagation?.();' in OPTIONS_JS
+assert 'form.requestSubmit($("save-all-floating"));' not in OPTIONS_JS
+
+# The card rail still needs a populated Thunderbird list; Options save/cancel
+# has now completed its real Thunderbird validation.
+card_row = next(line for line in TRACKER.splitlines() if line.startswith("| MP-2026-004 |"))
+options_row = next(line for line in TRACKER.splitlines() if line.startswith("| MP-2026-005 |"))
+assert "| CORRIGÉ | 3.2.8 |" in card_row
+assert "Thunderbird 153.0.1" in card_row and "messages synthétiques" in card_row
+assert "| CORRIGÉ | 3.2.10 |" in options_row
+
+print("MailPin 3.2.6/3.2.8 real-interaction regression guards: OK")
