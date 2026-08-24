@@ -1,5 +1,29 @@
 # Changelog
 
+## 2.1.0 — native feature parity (candidate)
+
+### Added
+- Feedback directement visible dans la liste des messages via des tags Thunderbird créés et gérés exclusivement par MailPin, sans modifier les tags personnels existants.
+- État dynamique du bouton MailPin sur le message affiché : badge, libellé, tooltip et icône épinglée/non épinglée.
+- Compteur global de suivis actifs sur le bouton MailPin.
+- Menu contextuel adaptatif `Épingler` / `Désépingler` selon la sélection courante.
+- Vues enregistrées depuis le Dashboard (vue, recherche et tri).
+- Modèles de suivi réutilisables applicables aux sélections.
+- Dossiers/cases locaux regroupant plusieurs suivis sans déplacer les e-mails Thunderbird.
+- Règles locales explicites applicables aux sélections selon l’objet et l’expéditeur.
+- Report rapide d’une heure ou d’un jour depuis les actions groupées.
+- Workbench dédié pour modèles, dossiers, règles, maintenance, diagnostic et historique.
+- Import manuel des messages étoilés via permission optionnelle `accountsRead` demandée uniquement lors de l’action.
+- Réparation des références cassées et diagnostic WebExtension-native.
+
+### Safety / ATN
+- Toujours zéro `experiment_apis`, zéro accès DOM à `about:3pane`, zéro réseau runtime et aucun stockage du corps ou des pièces jointes.
+- Les tags visuels MailPin utilisent leurs propres clés ; aucun tag personnel n’est renommé, adopté ou supprimé.
+- Aucun épinglage ne modifie l’état lu/non-lu.
+
+### Publication
+- Candidate uniquement : publication publique interdite avant smoke réel propriétaire.
+
 ## 2.0.1 — owner-smoke hardening (candidate)
 
 ### Changed

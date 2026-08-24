@@ -1,12 +1,19 @@
 {
   "project": "MailPin",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "architecture": "webextension-native",
   "manifestVersion": 3,
   "experimentApis": 0,
   "runtimeNetwork": false,
   "storage": "storage.local",
-  "primaryUi": "dashboard",
+  "primaryUi": "dashboard+workbench",
+  "nativeListFeedback": "mailpin-owned-thunderbird-tags",
+  "dynamicMessageActionState": true,
+  "savedViews": true,
+  "templates": true,
+  "cases": true,
+  "manualRules": true,
+  "starImport": "optional-accountsRead",
   "archiveBranch": "archive/mailpin-1.7.6-experiment",
-  "status": "candidate-ready-for-owner-smoke-round-2"
+  "status": "candidate-native-feature-parity-awaiting-owner-smoke"
 }

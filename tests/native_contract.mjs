@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 
 const manifest = JSON.parse(fs.readFileSync(new URL('../extension/manifest.json', import.meta.url), 'utf8'));
 assert.equal(manifest.manifest_version, 3);
-assert.equal(manifest.version, '2.0.1');
+assert.equal(manifest.version, '2.1.0');
 assert.ok(!('experiment_apis' in manifest));
 
 for (const permission of [
@@ -13,16 +13,19 @@ for (const permission of [
   'messagesMove',
   'messagesDelete',
   'messagesTagsList',
+  'messagesTags',
   'storage',
   'alarms',
   'notifications'
 ]) {
   assert.ok(manifest.permissions.includes(permission), `missing permission ${permission}`);
 }
+assert.ok(manifest.optional_permissions.includes('accountsRead'));
 assert.ok(!manifest.permissions.includes('accountsRead'));
 assert.ok(!manifest.permissions.includes('compose'));
 assert.equal(manifest.browser_specific_settings.gecko.id, 'ussmarines.mailpin@addons.thunderbird.net');
 assert.equal(manifest.default_locale, 'en');
+assert.deepEqual(manifest.background.scripts, ['native-parity.js', 'background.js']);
 
 const background = fs.readFileSync(new URL('../extension/background.js', import.meta.url), 'utf8');
 for (const token of [
@@ -41,6 +44,7 @@ assert.ok(!background.includes('onMessage.addListener(async'));
 const dashboardHtml = fs.readFileSync(new URL('../extension/dashboard/dashboard.html', import.meta.url), 'utf8');
 assert.ok(dashboardHtml.includes('smoke-hardening.css'));
 assert.ok(dashboardHtml.includes('smoke-hardening.js'));
+assert.ok(dashboardHtml.includes('parity-dashboard.js'));
 const hardening = fs.readFileSync(new URL('../extension/dashboard/smoke-hardening.js', import.meta.url), 'utf8');
 assert.ok(hardening.includes('window.confirm'));
 assert.ok(hardening.includes('syncSelectionControls'));
