@@ -1,9 +1,10 @@
 {
   "manifest_version": 3,
   "name": "__MSG_extensionName__",
-  "short_name": "__MSG_extensionShortName__",
+  "short_name": "MailPin",
   "description": "__MSG_extensionDescription__",
-  "version": "1.7.6",
+  "version": "2.0.0",
+  "default_locale": "en",
   "author": "ussmarines",
   "developer": {
     "name": "ussmarines",
@@ -13,78 +14,49 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "ussmarines.mailpin@addons.thunderbird.net",
-      "strict_min_version": "153.0",
-      "strict_max_version": "154.*"
+      "strict_min_version": "153.0"
     }
   },
   "permissions": [
-    "menus"
+    "menus",
+    "messagesRead",
+    "messagesUpdate",
+    "messagesMove",
+    "messagesDelete",
+    "messagesTagsList",
+    "storage",
+    "alarms",
+    "notifications"
   ],
   "background": {
     "type": "module",
-    "scripts": [
-      "background.js"
-    ]
+    "scripts": ["background.js"]
   },
   "commands": {
     "toggle-pin-selected": {
-      "suggested_key": {
-        "default": "Alt+P"
-      },
+      "suggested_key": {"default": "Alt+P"},
       "description": "__MSG_commandToggle__"
     },
-    "toggle-conversation-selected": {
-      "description": "__MSG_commandConversation__"
-    },
-    "complete-selected-pin": {
-      "description": "__MSG_commandComplete__"
-    },
     "open-pin-dashboard": {
+      "suggested_key": {"default": "Ctrl+Shift+P"},
       "description": "__MSG_commandDashboard__"
     },
-    "wait-selected-pin": {
-      "description": "__MSG_commandWait__"
-    },
-    "plan-selected-pin": {
-      "description": "__MSG_commandPlan__"
-    },
-    "activate-selected-pin": {
-      "description": "__MSG_commandActivate__"
-    },
-    "snooze-selected-pin": {
-      "description": "__MSG_commandSnooze__"
-    },
-    "track-no-reply-selected": {
-      "description": "__MSG_commandTrackNoReply__"
-    },
     "quick-today-selected": {
-      "description": "__MSG_commandQuickToday__"
+      "description": "__MSG_commandToday__"
     },
-    "open-command-palette": {
-      "suggested_key": {
-        "default": "Ctrl+Shift+K"
-      },
-      "description": "__MSG_commandPalette__"
+    "wait-selected-pin": {
+      "description": "__MSG_commandWaiting__"
+    },
+    "complete-selected-pin": {
+      "description": "__MSG_commandCompleted__"
     }
   },
   "message_display_action": {
-    "default_title": "__MSG_messageDisplayActionTitle__",
+    "default_title": "__MSG_messageActionTitle__",
     "default_icon": {
       "16": "icons/pin-regular.svg",
       "32": "icons/pin-regular.svg"
-    },
-    "theme_icons": [
-      {
-        "light": "icons/pin-regular-light.svg",
-        "dark": "icons/pin-regular.svg",
-        "size": 16
-      },
-      {
-        "light": "icons/pin-regular-light.svg",
-        "dark": "icons/pin-regular.svg",
-        "size": 32
-      }
-    ]
+    }
   },
   "action": {
     "default_title": "__MSG_dashboardActionTitle__",
@@ -99,30 +71,12 @@
   },
   "icons": {
     "16": "icons/mailpin-icon.svg",
-    "24": "icons/mailpin-icon.svg",
     "32": "icons/mailpin-icon.svg",
     "48": "icons/mailpin-icon.svg",
     "64": "icons/mailpin-icon.svg",
     "96": "icons/mailpin-icon.svg",
     "128": "icons/mailpin-icon.svg"
   },
-  "experiment_apis": {
-    "pinInbox": {
-      "schema": "api/pinInbox/schema.json",
-      "parent": {
-        "scopes": [
-          "addon_parent"
-        ],
-        "paths": [
-          [
-            "pinInbox"
-          ]
-        ],
-        "script": "api/pinInbox/implementation.js"
-      }
-    }
-  },
-  "default_locale": "fr",
   "content_security_policy": {
     "extension_pages": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; connect-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'"
   }
