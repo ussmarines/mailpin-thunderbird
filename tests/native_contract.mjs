@@ -1,0 +1,12 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const manifest=JSON.parse(fs.readFileSync(new URL('../extension/manifest.json',import.meta.url),'utf8'));
+assert.equal(manifest.manifest_version,3);
+assert.equal(manifest.version,'2.0.0');
+assert.ok(!('experiment_apis' in manifest));
+for(const permission of ['menus','messagesRead','messagesUpdate','messagesMove','messagesDelete','messagesTagsList','accountsRead','storage','alarms','notifications','compose']) assert.ok(manifest.permissions.includes(permission),`missing permission ${permission}`);
+assert.equal(manifest.browser_specific_settings.gecko.id,'ussmarines.mailpin@addons.thunderbird.net');
+const background=fs.readFileSync(new URL('../extension/background.js',import.meta.url),'utf8');
+for(const token of ['headerMessageId','messenger.storage.local','messenger.alarms','messenger.mailTabs.getSelectedMessages','messenger.messages.query','messenger.compose.beginReply']) assert.ok(background.includes(token),`missing ${token}`);
+assert.ok(!background.includes('pinInbox'));
+console.log('PASS: native contract');
