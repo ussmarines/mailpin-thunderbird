@@ -1,13 +1,13 @@
 {
   "name": "mailpin-thunderbird",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "private": true,
-  "description": "MailPin WebExtension-native 2.0 for Thunderbird.",
+  "description": "MailPin WebExtension-native 2.1 for Thunderbird.",
   "author": "ussmarines",
   "repository": {"type":"git","url":"git+https://github.com/ussmarines/mailpin-thunderbird.git"},
   "scripts": {
     "check": "python scripts/check_native.py && python tests/js_syntax.py",
-    "test": "node tests/native_contract.mjs",
+    "test": "node tests/native_contract.mjs && node tests/native_parity_contract.mjs",
     "build": "python scripts/build.py --source",
     "ci": "npm run check && npm test && npm run build"
   },
