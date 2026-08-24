@@ -1,6 +1,6 @@
 {
   "project": "MailPin",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "architecture": "webextension-native",
   "manifestVersion": 3,
   "experimentApis": 0,
@@ -8,5 +8,5 @@
   "storage": "storage.local",
   "primaryUi": "dashboard",
   "archiveBranch": "archive/mailpin-1.7.6-experiment",
-  "status": "candidate-ready-for-owner-smoke"
+  "status": "candidate-ready-for-owner-smoke-round-2"
 }
