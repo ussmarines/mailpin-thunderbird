@@ -23,7 +23,11 @@ env:
 
 jobs:
   runtime:
-    name: MessageListAction on Thunderbird 154
+    name: MessageListAction Thunderbird 154 (${{ matrix.layout }})
+    strategy:
+      fail-fast: false
+      matrix:
+        layout: [table, cards]
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -39,7 +43,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p .runtime artifacts/upstream-experiment-runtime
+          mkdir -p .runtime "artifacts/upstream-experiment-runtime-${{ matrix.layout }}"
           (
             cd upstream/webext-experiments/MessageListAction
             zip -q -r "$OLDPWD/.runtime/MessageListAction.xpi" .
@@ -106,14 +110,15 @@ jobs:
             --binary .runtime/thunderbird/thunderbird/thunderbird \
             --xpi .runtime/MessageListAction.xpi \
             --geckodriver .runtime/geckodriver/geckodriver \
-            --output-dir artifacts/upstream-experiment-runtime \
+            --output-dir "artifacts/upstream-experiment-runtime-${{ matrix.layout }}" \
+            --layout "${{ matrix.layout }}" \
             --timeout 45
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()
         with:
-          name: upstream-experiment-runtime
+          name: upstream-experiment-runtime-${{ matrix.layout }}
           if-no-files-found: warn
           retention-days: 14
           include-hidden-files: false
-          path: artifacts/upstream-experiment-runtime/
+          path: artifacts/upstream-experiment-runtime-${{ matrix.layout }}/
