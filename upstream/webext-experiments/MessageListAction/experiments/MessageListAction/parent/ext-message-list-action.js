@@ -104,8 +104,12 @@
     }
 
     _headersEqual(left, right) {
-      if (!left || !right) return false;
-      if (left === right) return true;
+      if (!left || !right) {
+        return false;
+      }
+      if (left === right) {
+        return true;
+      }
       try {
         return left.folder === right.folder && left.messageKey === right.messageKey;
       } catch {
@@ -141,9 +145,13 @@
     }
 
     _attachPane(pane, nativeTab) {
-      if ([...this.panes].some(item => item.pane === pane)) return;
+      if ([...this.panes].some(item => item.pane === pane)) {
+        return;
+      }
       const threadTree = pane.document.getElementById("threadTree");
-      if (!threadTree) return;
+      if (!threadTree) {
+        return;
+      }
 
       const refresh = () => this._patchPane(pane, nativeTab);
       const observer = new pane.MutationObserver(refresh);
@@ -158,16 +166,22 @@
 
       const click = event => {
         const button = event.target?.closest?.(`.${BUTTON_CLASS}`);
-        if (!button) return;
+        if (!button) {
+          return;
+        }
         const row = button.closest("tr");
         const index = Number(row?.index);
-        if (!Number.isInteger(index) || index < 0) return;
+        if (!Number.isInteger(index) || index < 0) {
+          return;
+        }
         let header = null;
         try {
           header = pane.gDBView?.getMsgHdrAt(index) || null;
         } catch {}
         const entry = this._entryForHeader(header);
-        if (!entry || entry.state.enabled === false) return;
+        if (!entry || entry.state.enabled === false) {
+          return;
+        }
         event.preventDefault();
         event.stopPropagation();
         this.emitter.emit("clicked", entry.messageId, nativeTab);
@@ -191,7 +205,9 @@
     }
 
     _patchPane(pane) {
-      if (!this.details) return;
+      if (!this.details) {
+        return;
+      }
       const icon = this._resolveIcon();
       for (const row of pane.document.querySelectorAll("#threadTree tr")) {
         const index = Number(row?.index);
@@ -234,13 +250,21 @@
 
     _refreshAll() {
       for (const {refresh} of this.panes) {
-        try { refresh(); } catch (error) { console.error("MessageListAction refresh failed", error); }
+        try {
+          refresh();
+        } catch (error) {
+          console.error("MessageListAction refresh failed", error);
+        }
       }
     }
 
     _detachAllPanes() {
       for (const {cleanup} of [...this.panes]) {
-        try { cleanup(); } catch (error) { console.error("MessageListAction cleanup failed", error); }
+        try {
+          cleanup();
+        } catch (error) {
+          console.error("MessageListAction cleanup failed", error);
+        }
       }
       this.panes.clear();
     }
