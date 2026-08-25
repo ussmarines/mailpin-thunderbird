@@ -35,9 +35,21 @@ La release **1.7.6** corrige le chargement à froid des épingles persistées : 
 - **Format :** MailExtension Manifest V3
 - **Langues :** français et anglais
 - **ID public :** `ussmarines.mailpin@addons.thunderbird.net`
-- **Fiche Add-ons for Thunderbird :** [MailPin](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/) — la soumission 1.7.5 reste en revue ; une soumission 1.7.6 est distincte de la release GitHub
+- **Fiche Add-ons for Thunderbird :** [MailPin](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/)
+- **ATN :** la soumission 1.7.5 a été rejetée le 23 août 2026 car l’Experiment privée `pinInbox` ne correspond pas à un draft officiel de `thunderbird/webext-experiments`. La 1.7.6 GitHub n’est donc pas présentée comme candidate ATN acceptable en l’état.
 
-MailPin utilise une API Experiment privilégiée pour l’intégration `about:3pane`, le stockage SQLite local et certaines fonctions Messages/Tags/Agenda. Les frontières Messages, Tags et Agenda restent isolées derrière `PinCompatibility`. La candidate versionnée 1.7.6 a passé la QA et un smoke réel sur Thunderbird 154.0 avant publication.
+MailPin 1.7.6 utilise encore l’API Experiment privilégiée `pinInbox` pour l’intégration `about:3pane`, le stockage SQLite local et certaines fonctions Messages/Tags/Agenda. Les frontières Messages, Tags et Agenda restent isolées derrière `PinCompatibility`.
+
+## Travail upstream Thunderbird
+
+Le dépôt contient désormais un chantier dédié à l’extraction d’une API générique, indépendante de MailPin, destinée à être discutée avec Thunderbird avant toute nouvelle soumission ATN :
+
+- stratégie : [`docs/UPSTREAM_EXPERIMENT_STRATEGY.md`](docs/UPSTREAM_EXPERIMENT_STRATEGY.md) ;
+- contribution staging : [`upstream/webext-experiments/MessageListAction/`](upstream/webext-experiments/MessageListAction/) ;
+- brouillon d’issue upstream : [`ISSUE_DRAFT.md`](upstream/webext-experiments/MessageListAction/ISSUE_DRAFT.md) ;
+- brouillon de PR upstream : [`PR_DRAFT.md`](upstream/webext-experiments/MessageListAction/PR_DRAFT.md).
+
+La cible proposée, `MessageListAction`, est une primitive UI de liste de messages : action par ligne, état de présentation et événement de clic. Toute logique de pin, workflow, stockage ou suivi reste hors de l’Experiment. Ce chantier est **un draft de contribution**, pas une preuve d’acceptation par Thunderbird.
 
 ## Installation
 
@@ -80,6 +92,7 @@ MailPin ne contient aucun appel réseau runtime, aucune télémétrie, aucune pu
 - [Architecture](docs/ARCHITECTURE.md)
 - [Compatibilité Thunderbird](docs/THUNDERBIRD_COMPATIBILITY.md)
 - [Banc Thunderbird](docs/THUNDERBIRD_TEST_BENCH.md)
+- [Stratégie Experiment upstream](docs/UPSTREAM_EXPERIMENT_STRATEGY.md)
 - [Build reviewers](release/BUILD_INSTRUCTIONS.md)
 - [Préparation ATN](STORE_RELEASE.md)
 - [Support](SUPPORT.md)
@@ -89,3 +102,5 @@ Maintenu par [ussmarines](https://github.com/ussmarines). Les dons [PayPal](http
 ## Licence
 
 MailPin est distribué sous la **MailPin Source-Available License 1.1**. Consultez [LICENSE](LICENSE).
+
+La contribution préparée sous `upstream/webext-experiments/` est séparément offerte sous **MPL-2.0** afin de pouvoir être proposée au projet Thunderbird.
