@@ -88,7 +88,7 @@
             context,
             name: "MessageListAction.onClicked",
             register: fire => {
-              const listener = async (messageId, nativeTab) => {
+              const listener = async (_event, messageId, nativeTab) => {
                 const message = await context.extension.messageManager.convert(
                   this.states.get(messageId)?.header
                 );
