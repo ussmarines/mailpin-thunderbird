@@ -1,0 +1,58 @@
+name: Upstream Experiment lint
+
+on:
+  push:
+    branches:
+      - feat/upstream-message-list-action-draft
+    paths:
+      - "upstream/webext-experiments/MessageListAction/**"
+      - ".github/workflows/upstream-experiment-lint.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: upstream-experiment-lint-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout MailPin staging
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: mailpin
+          persist-credentials: false
+
+      - name: Checkout Thunderbird webext-experiments
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: thunderbird/webext-experiments
+          ref: b7f7cb3e76807903a785a03784d6e7df7b213f21
+          path: webext-experiments
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: webext-experiments/package-lock.json
+
+      - name: Install upstream lint dependencies
+        working-directory: webext-experiments
+        run: npm ci
+
+      - name: Stage MessageListAction in upstream checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -e webext-experiments/MessageListAction
+          cp -a mailpin/upstream/webext-experiments/MessageListAction webext-experiments/MessageListAction
+
+      - name: Run upstream lint
+        working-directory: webext-experiments
+        run: npm run lint
