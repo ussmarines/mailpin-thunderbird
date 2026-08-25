@@ -105,13 +105,19 @@
   },
   "upstreamExperiment": {
     "workingName": "MessageListAction",
-    "status": "source-contract-and-upstream-lint-validated-awaiting-runtime",
+    "status": "design-issue-ready",
     "publicSubmissionOpened": false,
     "runtime176Modified": false,
     "messageAndTabConversionValidated": true,
     "upstreamLintValidated": true,
+    "upstreamRuntimeValidated": true,
     "upstreamRepositoryCommit": "b7f7cb3e76807903a785a03784d6e7df7b213f21",
-    "upstreamLintWorkflowRun": 32836061265
+    "upstreamLintWorkflowRun": 32836541308,
+    "upstreamRuntimeWorkflowRun": 32837227578,
+    "upstreamRuntimeLayouts": [
+      "table",
+      "cards"
+    ]
   },
   "developmentBranch": "feat/upstream-message-list-action-draft",
   "testing": {
@@ -121,10 +127,10 @@
       "tests/thunderbird_compatibility_contract.mjs",
       "scripts/check_upstream_experiment.py"
     ],
-    "runtimeWorkflow": ".github/workflows/thunderbird-smoke.yml",
-    "runtimeScript": "tests/thunderbird/real_smoke.py",
-    "browserStatus": "MailPin 1.7.6 remains the current runtime. MessageListAction source contracts for message/tab conversion and the official webext-experiments ESLint gate are validated; dedicated MessageListAction runtime validation remains pending.",
-    "runtimeStatus": "Exact versioned 1.7.6 candidate c502175041c85e3cb6e37666a0784f7df0a9e367 passed QA 32640198347 and real Thunderbird 154.0 smoke 32640198339. GitHub release v1.7.6 targets 522042df08c2eb7a18a13cbb83631943e54abf2c."
+    "runtimeWorkflow": ".github/workflows/upstream-experiment-runtime.yml",
+    "runtimeScript": "tests/thunderbird/upstream_experiment_smoke.py",
+    "browserStatus": "MailPin 1.7.6 remains unchanged. MessageListAction source contracts, official upstream lint, and dedicated Thunderbird 154 runtime smoke are green in both table and cards layouts; the design issue is ready to open.",
+    "runtimeStatus": "MessageListAction runtime matrix 32837227578 passed on official Thunderbird 154.0 in table and cards layouts, including one-action injection, onClicked message/tab conversion, unchanged native flags/counters, and uninstall cleanup. Branch QA 32837227261 passed on Linux and Windows."
   },
   "latestPublicVersion": "1.7.6",
   "releaseStatus": "published"
