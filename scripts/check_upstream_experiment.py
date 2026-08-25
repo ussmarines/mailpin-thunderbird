@@ -69,7 +69,11 @@ def main() -> None:
     for term in forbidden_public_terms:
         require(term not in schema_text, f"MailPin-specific term leaked into public schema: {term}")
 
-    require("MPL-2.0" in (DRAFT / "README.md").read_text(encoding="utf-8"), "MPL-2.0 offer missing")
+    readme_text = (DRAFT / "README.md").read_text(encoding="utf-8")
+    require(
+        "Mozilla Public License 2.0" in readme_text or "MPL-2.0" in readme_text,
+        "MPL-2.0 offer missing",
+    )
     require("Mozilla Public" in (DRAFT / "experiments" / "MessageListAction" / "parent" / "ext-message-list-action.js").read_text(encoding="utf-8"), "MPL source header missing")
     require("browser.storage" not in combined, "sample must not silently require storage permission")
 
