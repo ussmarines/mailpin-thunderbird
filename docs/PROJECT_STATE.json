@@ -105,10 +105,10 @@
   },
   "upstreamExperiment": {
     "workingName": "MessageListAction",
-    "status": "design-prototype-preparation",
+    "status": "source-contract-validated-awaiting-upstream-lint-and-runtime",
     "publicSubmissionOpened": false,
     "runtime176Modified": false,
-    "messageAndTabConversionValidated": false,
+    "messageAndTabConversionValidated": true,
     "upstreamLintValidated": false
   },
   "developmentBranch": "feat/upstream-message-list-action-draft",
@@ -121,7 +121,7 @@
     ],
     "runtimeWorkflow": ".github/workflows/thunderbird-smoke.yml",
     "runtimeScript": "tests/thunderbird/real_smoke.py",
-    "browserStatus": "MailPin 1.7.6 remains the current runtime; the upstream MessageListAction workstream is staged separately and does not alter the extension runtime yet.",
+    "browserStatus": "MailPin 1.7.6 remains the current runtime; MessageListAction source contracts for message and tab conversion were validated against current Thunderbird/Gecko sources on 2026-08-25. Upstream lint and dedicated runtime validation remain pending.",
     "runtimeStatus": "Exact versioned 1.7.6 candidate c502175041c85e3cb6e37666a0784f7df0a9e367 passed QA 32640198347 and real Thunderbird 154.0 smoke 32640198339. GitHub release v1.7.6 targets 522042df08c2eb7a18a13cbb83631943e54abf2c."
   },
   "latestPublicVersion": "1.7.6",
