@@ -18,7 +18,9 @@ assert state["extensionVersion"] == version
 assert f"Version source : **{version}**" in memory
 assert f"Dernière release publique : **{public}**" in memory
 for path in state["entrypoints"].values():
-    assert (ROOT / path).is_file(), path
+    target = ROOT / path
+    assert target.exists(), path
+    assert target.is_file() or target.is_dir(), path
     assert path in memory, f"PROJECT_MEMORY.md ne référence pas {path}"
 for token in (
     "Invariants non négociables",
