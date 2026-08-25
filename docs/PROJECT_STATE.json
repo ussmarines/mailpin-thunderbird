@@ -105,8 +105,10 @@
   },
   "upstreamExperiment": {
     "workingName": "MessageListAction",
-    "status": "design-issue-ready",
-    "publicSubmissionOpened": false,
+    "status": "design-issue-open-awaiting-maintainer-feedback",
+    "publicSubmissionOpened": true,
+    "publicIssue": 72,
+    "publicIssueUrl": "https://github.com/thunderbird/webext-experiments/issues/72",
     "runtime176Modified": false,
     "messageAndTabConversionValidated": true,
     "upstreamLintValidated": true,
@@ -129,7 +131,7 @@
     ],
     "runtimeWorkflow": ".github/workflows/upstream-experiment-runtime.yml",
     "runtimeScript": "tests/thunderbird/upstream_experiment_smoke.py",
-    "browserStatus": "MailPin 1.7.6 remains unchanged. MessageListAction source contracts, official upstream lint, and dedicated Thunderbird 154 runtime smoke are green in both table and cards layouts; the design issue is ready to open.",
+    "browserStatus": "MailPin 1.7.6 remains unchanged. MessageListAction source contracts, official upstream lint, and dedicated Thunderbird 154 runtime smoke are green in both table and cards layouts. Upstream design issue #72 is open and awaiting maintainer feedback before any upstream PR is opened.",
     "runtimeStatus": "MessageListAction runtime matrix 32837227578 passed on official Thunderbird 154.0 in table and cards layouts, including one-action injection, onClicked message/tab conversion, unchanged native flags/counters, and uninstall cleanup. Branch QA 32837227261 passed on Linux and Windows."
   },
   "latestPublicVersion": "1.7.6",
