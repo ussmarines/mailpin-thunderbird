@@ -1,5 +1,15 @@
 # Journal des modifications
 
+## Non publié — préparation de l’API Thunderbird upstream
+
+- documente le rejet ATN de la 1.7.5 du 23 août 2026 et interdit de présenter la 1.7.6 comme recevable ATN en l’état ;
+- extrait le besoin d’intégration de liste de messages sous la forme d’un draft générique `MessageListAction`, indépendant de MailPin ;
+- ajoute un staging compatible avec la structure de `thunderbird/webext-experiments`, avec schéma, manifeste d’exemple, consommateur minimal, prototype parent, README et brouillons d’issue/PR ;
+- offre le code du staging upstream sous MPL-2.0 sans modifier la licence du produit MailPin ;
+- ajoute une garde fail-closed qui empêche la dérive de la surface publique et la fuite de concepts MailPin dans le schéma upstream ;
+- conserve le runtime MailPin 1.7.6 et son Experiment `pinInbox` inchangés tant que la forme de l’API générique n’a pas reçu de retour upstream ;
+- ne revendique ni acceptation Thunderbird, ni validation ATN, ni validation runtime du prototype upstream avant preuve correspondante.
+
 ## 1.7.6 — chargement des épingles au démarrage
 
 - initialise automatiquement les onglets mail existants via `runtime.onStartup` lors d’un démarrage complet de Thunderbird ;
