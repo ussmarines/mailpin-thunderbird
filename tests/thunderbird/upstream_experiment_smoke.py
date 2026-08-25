@@ -177,13 +177,18 @@ const done = arguments[arguments.length - 1];
   if (!pane) {
     throw new Error("No current about:3pane");
   }
-  const command = target === "cards" ? "cmd_threadPaneViewCards" : "cmd_threadPaneViewTable";
-  if (typeof pane.goDoCommand !== "function") {
-    throw new Error("about:3pane goDoCommand is unavailable");
+  const itemId = target === "cards" ? "threadPaneCardsView" : "threadPaneTableView";
+  const menuitem = pane.document.getElementById(itemId);
+  if (!menuitem) {
+    throw new Error(`Missing Thunderbird layout menuitem: ${itemId}`);
   }
-  pane.goDoCommand(command);
+  if (typeof menuitem.doCommand === "function") {
+    menuitem.doCommand();
+  } else {
+    menuitem.dispatchEvent(new pane.Event("command", {bubbles: true, cancelable: true}));
+  }
   await new Promise(resolve => win.setTimeout(resolve, 250));
-  done({target, command});
+  done({target, itemId});
 })().catch(error => done({
   __mailperchSmokeError: `${String(error?.name || "Error")}: ${String(error?.message || error)}`,
 }));
@@ -303,17 +308,6 @@ def run(args: argparse.Namespace) -> int:
             result["checks"].append("onclick-message-conversion-and-state")
             result["checks"].append("native-message-state-unchanged")
 
-            client.execute_async(SWITCH_LAYOUT_SCRIPT, ["cards"])
-            cards = _wait_state(
-                client,
-                lambda state: state.get("cardRows", 0) >= 1 and state.get("buttonCount") == 1,
-                "cards layout action",
-                args.timeout,
-            )
-            _assert_native_state_unchanged(baseline, cards)
-            result["cards"] = cards
-            result["checks"].append("cards-layout")
-
             client.execute_async(SWITCH_LAYOUT_SCRIPT, ["table"])
             table = _wait_state(
                 client,
@@ -326,6 +320,17 @@ def run(args: argparse.Namespace) -> int:
             _assert_native_state_unchanged(baseline, table)
             result["table"] = table
             result["checks"].append("table-layout")
+
+            client.execute_async(SWITCH_LAYOUT_SCRIPT, ["cards"])
+            cards = _wait_state(
+                client,
+                lambda state: state.get("cardRows", 0) >= 1 and state.get("buttonCount") == 1,
+                "cards layout action",
+                args.timeout,
+            )
+            _assert_native_state_unchanged(baseline, cards)
+            result["cards"] = cards
+            result["checks"].append("cards-layout")
 
             screenshot = client.full_screenshot()
             if screenshot:
