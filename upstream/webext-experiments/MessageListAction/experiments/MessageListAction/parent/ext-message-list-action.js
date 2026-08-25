@@ -65,10 +65,9 @@
               throw new ExtensionCommon.ExtensionError("MessageListAction is not registered");
             }
 
-            // The exact messageManager conversion contract must be checked
-            // against the Thunderbird version targeted by the upstream PR.
-            // Keeping that implementation detail here prevents it from
-            // leaking into the public schema.
+            // Current Thunderbird exposes MessageManager.get(id) as the
+            // message-id -> nsIMsgDBHdr bridge. Keep that privileged detail
+            // here so the public API remains expressed in WebExtension ids.
             const header = context.extension.messageManager.get(messageId);
             if (!header) {
               throw new ExtensionCommon.ExtensionError(`Unknown message id: ${messageId}`);
