@@ -1,0 +1,88 @@
+[
+  {
+    "namespace": "MessageListAction",
+    "description": "Adds a high-level extension action to messages shown in Thunderbird's message list.",
+    "types": [
+      {
+        "id": "ActionDetails",
+        "type": "object",
+        "properties": {
+          "title": {"type": "string", "minLength": 1, "maxLength": 128},
+          "icons": {
+            "type": "object",
+            "optional": true,
+            "additionalProperties": {"type": "string"}
+          }
+        }
+      },
+      {
+        "id": "MessageState",
+        "type": "object",
+        "properties": {
+          "visible": {"type": "boolean", "optional": true},
+          "enabled": {"type": "boolean", "optional": true},
+          "active": {"type": "boolean", "optional": true},
+          "title": {"type": "string", "optional": true, "maxLength": 128}
+        }
+      }
+    ],
+    "functions": [
+      {
+        "name": "register",
+        "type": "function",
+        "async": true,
+        "description": "Registers the extension-owned message-list action.",
+        "parameters": [{"name": "details", "$ref": "ActionDetails"}]
+      },
+      {
+        "name": "update",
+        "type": "function",
+        "async": true,
+        "description": "Updates the action's default presentation.",
+        "parameters": [{"name": "details", "$ref": "ActionDetails"}]
+      },
+      {
+        "name": "unregister",
+        "type": "function",
+        "async": true,
+        "description": "Removes the action and all ephemeral presentation state.",
+        "parameters": []
+      },
+      {
+        "name": "setState",
+        "type": "function",
+        "async": true,
+        "description": "Sets ephemeral presentation state for a standard WebExtension message identifier.",
+        "parameters": [
+          {"name": "messageId", "type": "integer"},
+          {"name": "state", "$ref": "MessageState"}
+        ]
+      },
+      {
+        "name": "clearState",
+        "type": "function",
+        "async": true,
+        "description": "Clears presentation state for one message.",
+        "parameters": [{"name": "messageId", "type": "integer"}]
+      },
+      {
+        "name": "clearAllStates",
+        "type": "function",
+        "async": true,
+        "description": "Clears all ephemeral per-message presentation state.",
+        "parameters": []
+      }
+    ],
+    "events": [
+      {
+        "name": "onClicked",
+        "type": "function",
+        "description": "Fires when the user invokes the action for a message.",
+        "parameters": [
+          {"name": "message", "$ref": "messages.MessageHeader"},
+          {"name": "tab", "$ref": "tabs.Tab"}
+        ]
+      }
+    ]
+  }
+]

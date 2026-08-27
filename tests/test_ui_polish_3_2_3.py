@@ -131,7 +131,9 @@ for token in (
 ):
     assert token in memory, token
 for path in state["entrypoints"].values():
-    assert (ROOT / path).is_file(), path
+    target = ROOT / path
+    assert target.exists(), path
+    assert target.is_file() or target.is_dir(), path
     assert path in memory, path
 
 print("MailPin 3.2.8 UI polish and project-memory guards: OK")

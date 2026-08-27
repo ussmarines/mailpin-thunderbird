@@ -5,8 +5,8 @@
   "extensionVersion": "1.7.6",
   "baseGitHub": {
     "branch": "main",
-    "commit": "522042df08c2eb7a18a13cbb83631943e54abf2c",
-    "role": "GitHub release v1.7.6 tag target after validated candidate and bounded publisher"
+    "commit": "2d21a924741f16dfa331494b8a169c86e3855f06",
+    "role": "current main after restoration of MailPin 1.7.6 as the primary line"
   },
   "extensionId": "ussmarines.mailpin@addons.thunderbird.net",
   "thunderbird": {
@@ -34,6 +34,8 @@
     "thunderbirdCalendar": "extension/api/pinInbox/modules/thunderbird-calendar.js",
     "thunderbirdCompatibilityDoc": "docs/THUNDERBIRD_COMPATIBILITY.md",
     "thunderbirdTestBench": "docs/THUNDERBIRD_TEST_BENCH.md",
+    "upstreamExperimentStrategy": "docs/UPSTREAM_EXPERIMENT_STRATEGY.md",
+    "upstreamExperimentDraft": "upstream/webext-experiments/MessageListAction",
     "codexHandoff": "docs/CODEX_HANDOFF.md"
   },
   "commands": [
@@ -57,7 +59,9 @@
     "Business modules do not call Thunderbird core services directly outside compatibility adapters",
     "Recommended mode never auto-saves and preserves profile-specific settings",
     "Organic Workspace uses one canonical workspace stylesheet rather than stacked runtime patch stylesheets",
-    "Selected-account scope uses Thunderbird account.key consistently from Options through runtime filtering"
+    "Selected-account scope uses Thunderbird account.key consistently from Options through runtime filtering",
+    "No MailPin business concept may leak into the public MessageListAction upstream schema",
+    "The GitHub 1.7.6 runtime stays unchanged until the upstream Experiment design is reviewed"
   ],
   "ui": {
     "settingsSpacingAffects": [
@@ -84,24 +88,51 @@
     "privileged API input validation",
     "settings save/cancel lifecycle",
     "selected-account filtering",
-    "Thunderbird runtime smoke harness"
+    "Thunderbird runtime smoke harness",
+    "upstream MessageListAction parent implementation"
   ],
   "security": {
     "thunderbirdBoundary": "Messages/Tags/Calendar internals remain isolated behind dedicated compatibility adapters",
     "uiDependencyPolicy": "native HTML plus local Organic Workspace CSS tokens; canonical workspace stylesheet; no runtime patch stylesheet, npm runtime dependency, bundler, CDN or remote asset",
     "runtimeTestSupplyChain": "test-only Thunderbird/geckodriver downloads are checksum-verified and are not runtime dependencies"
   },
-  "developmentBranch": "release/finalize-1.7.6",
+  "atn": {
+    "lastReviewedVersion": "1.7.5",
+    "lastReviewDate": "2026-08-23",
+    "lastReviewResult": "rejected",
+    "blocker": "private pinInbox Experiment does not correspond to an official thunderbird/webext-experiments draft",
+    "resubmit176AsIs": false
+  },
+  "upstreamExperiment": {
+    "workingName": "MessageListAction",
+    "status": "design-issue-open-awaiting-maintainer-feedback",
+    "publicSubmissionOpened": true,
+    "publicIssue": 72,
+    "publicIssueUrl": "https://github.com/thunderbird/webext-experiments/issues/72",
+    "runtime176Modified": false,
+    "messageAndTabConversionValidated": true,
+    "upstreamLintValidated": true,
+    "upstreamRuntimeValidated": true,
+    "upstreamRepositoryCommit": "b7f7cb3e76807903a785a03784d6e7df7b213f21",
+    "upstreamLintWorkflowRun": 32836541308,
+    "upstreamRuntimeWorkflowRun": 32837227578,
+    "upstreamRuntimeLayouts": [
+      "table",
+      "cards"
+    ]
+  },
+  "developmentBranch": "feat/upstream-message-list-action-draft",
   "testing": {
     "contract": [
       "tests/test_organic_workspace_ui.py",
       "tests/test_thunderbird_compatibility_boundary.py",
-      "tests/thunderbird_compatibility_contract.mjs"
+      "tests/thunderbird_compatibility_contract.mjs",
+      "scripts/check_upstream_experiment.py"
     ],
-    "runtimeWorkflow": ".github/workflows/thunderbird-smoke.yml",
-    "runtimeScript": "tests/thunderbird/real_smoke.py",
-    "browserStatus": "1.7.6 publishes the cold-start initialization correction merged by PR #64; no UI redesign is included.",
-    "runtimeStatus": "Exact versioned 1.7.6 candidate c502175041c85e3cb6e37666a0784f7df0a9e367 passed QA 32640198347 and real Thunderbird 154.0 smoke 32640198339. GitHub release v1.7.6 targets 522042df08c2eb7a18a13cbb83631943e54abf2c."
+    "runtimeWorkflow": ".github/workflows/upstream-experiment-runtime.yml",
+    "runtimeScript": "tests/thunderbird/upstream_experiment_smoke.py",
+    "browserStatus": "MailPin 1.7.6 remains unchanged. MessageListAction source contracts, official upstream lint, and dedicated Thunderbird 154 runtime smoke are green in both table and cards layouts. Upstream design issue #72 is open and awaiting maintainer feedback before any upstream PR is opened.",
+    "runtimeStatus": "MessageListAction runtime matrix 32837227578 passed on official Thunderbird 154.0 in table and cards layouts, including one-action injection, onClicked message/tab conversion, unchanged native flags/counters, and uninstall cleanup. Branch QA 32837227261 passed on Linux and Windows."
   },
   "latestPublicVersion": "1.7.6",
   "releaseStatus": "published"
