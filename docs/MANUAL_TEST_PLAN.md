@@ -1,4 +1,4 @@
-# Plan de test manuel MailPin — 1.7.6
+# Plan de test manuel MailPin — 1.7.7
 
 Utiliser de préférence un profil Thunderbird jetable pour les scénarios destructifs. Le présent plan complète les validations automatisées de la source 1.7.6 ; la dernière release publique est 1.7.6. Aucun contrôle non exécuté ne doit être présenté comme PASS.
 

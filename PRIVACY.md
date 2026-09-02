@@ -1,6 +1,6 @@
 # Confidentialité / Privacy
 
-Dernière mise à jour / Last updated: 23 août 2026 / August 23, 2026
+Dernière mise à jour / Last updated: 2 septembre 2026 / September 2, 2026
 
 ## Français
 
@@ -16,7 +16,7 @@ L’extension ne copie pas dans sa base :
 
 ### Transmission
 
-MailPin 1.7.6 ne contient aucun appel réseau, télémétrie, publicité, service de licence ni chargement de code distant. Les données restent dans le profil Thunderbird ou dans un fichier de sauvegarde choisi explicitement par l’utilisateur.
+MailPin 1.7.7 ne contient aucun appel réseau, télémétrie, publicité, service de licence ni chargement de code distant. Les données restent dans le profil Thunderbird ou dans un fichier de sauvegarde choisi explicitement par l’utilisateur.
 
 ### Sauvegardes et diagnostics
 
@@ -48,7 +48,7 @@ The extension does not copy into its database:
 
 ### Transmission
 
-MailPin 1.7.6 contains no network call, telemetry, advertising, license service, or remotely loaded code. Data remains in the Thunderbird profile or in a backup file explicitly selected by the user.
+MailPin 1.7.7 contains no network call, telemetry, advertising, license service, or remotely loaded code. Data remains in the Thunderbird profile or in a backup file explicitly selected by the user.
 
 ### Backups and diagnostics
 

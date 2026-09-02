@@ -3,7 +3,7 @@
 ## État
 
 - branche : `release/finalize-1.7.6` ;
-- version source : **1.7.6** ;
+- version source : **1.7.7** ;
 - dernière release publique : **1.7.6** ;
 - Thunderbird : 153.0 à 154.* ;
 - ID : `ussmarines.mailpin@addons.thunderbird.net` ;

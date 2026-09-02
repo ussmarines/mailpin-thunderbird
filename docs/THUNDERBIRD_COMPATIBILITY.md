@@ -127,6 +127,14 @@ Depuis 1.5.1, la branche 153 était la seule plage revendiquée après essais r�
 
 Toute future adaptation de version doit rester localisée autant que possible dans ces adaptateurs et être documentée dans `docs/KNOWN_LIMITATIONS.md` et `docs/BUG_TRACKER.md` si elle corrige une régression observée. Une nouvelle version majeure Thunderbird ne doit pas être ajoutée à `strict_max_version` sans smoke réel frais lorsque l’Experiment ou le DOM interne sont concernés.
 
+### Thunderbird 155.0 — 2 septembre 2026
+
+Thunderbird 155.0 refuse désormais par défaut les sous-scripts `jar:`, `file:` et `moz-extension:` chargés par `loadSubScript()`. MailPin charge ses modules Experiment depuis l’XPI (`jar:file:`) ; le démarrage échouait donc avant l’injection du panneau avec `Trying to load untrusted URI`.
+
+Le chargeur MailPin utilise maintenant `loadSubScriptWithOptions(..., {target: PIN_MODULES, allowUnsafeURL: true})`. L’opt-in est borné à `MODULE_PATHS`, liste fixe de fichiers locaux résolus sous `context.extension.rootURI`; aucune URL utilisateur ou distante n’est acceptée.
+
+Le head pré-versionnement `2dc4fd24e303d5d9e3d5fc0275ed150b54893741` a passé QA `33687513879` et le smoke réel `33687513777` sur le binaire officiel Thunderbird 155.0. La candidate versionnée 1.7.7 doit repasser le smoke sur son head exact avant publication. La plage candidate est `153.0` à `155.*`.
+
 ### Preuve runtime actuelle
 
 Le 19 août 2026, le head pré-versionnement `3e1943f2be7a18ebcceef5952810675442e91a33` de la PR #52 a validé le binaire officiel **Thunderbird 154.0** sous Linux, geckodriver 0.37.1 : QA `32299537328` PASS et smoke réel `32299537485` PASS. Le smoke a confirmé vue `about:3pane` prête, Experiment/background à `Startup: Complete`, panneau et bouton injectés une seule fois, ouverture unique du Dashboard, nettoyage après désinstallation puis réinstallation sans duplication.

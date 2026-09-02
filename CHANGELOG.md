@@ -1,5 +1,12 @@
 # Journal des modifications
 
+## 1.7.7 — compatibilité Thunderbird 155
+
+- étend la compatibilité déclarée à Thunderbird `155.*` après smoke réel sur le binaire officiel 155.0 ;
+- adapte le chargeur de modules locaux de l’Experiment au durcissement Thunderbird 155 : `loadSubScriptWithOptions` avec `allowUnsafeURL: true` uniquement pour les chemins fixes de `MODULE_PATHS` sous la racine de l’extension ;
+- conserve l’ID public, les permissions, `PinCompatibility`, les schémas, le stockage local-first, l’état lu/non-lu et l’absence de réseau runtime inchangés ;
+- actualise le smoke runtime pour cibler Thunderbird 155.0 et ajoute des gardes anti-régression sur le chargeur privilégié borné.
+
 ## 1.7.6 — chargement des épingles au démarrage
 
 - initialise automatiquement les onglets mail existants via `runtime.onStartup` lors d’un démarrage complet de Thunderbird ;
