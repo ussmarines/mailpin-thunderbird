@@ -1,0 +1,93 @@
+name: Sync Thunderbird 155 bench docs
+
+on:
+  push:
+    branches:
+      - docs/thunderbird-155-bench-sync
+    paths:
+      - ".github/workflows/sync-thunderbird-155-bench-docs.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: docs/thunderbird-155-bench-sync
+          persist-credentials: true
+          fetch-depth: 2
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v6.0.0
+        with:
+          node-version: "24"
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v6.0.0
+        with:
+          python-version: "3.12"
+
+      - name: Align current published documentation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import json
+
+          def replace_required(path: str, old: str, new: str) -> None:
+              file = Path(path)
+              text = file.read_text(encoding="utf-8")
+              if old not in text:
+                  raise SystemExit(f"{path}: expected token missing: {old!r}")
+              file.write_text(text.replace(old, new), encoding="utf-8")
+
+          bench = Path("docs/THUNDERBIRD_TEST_BENCH.md")
+          text = bench.read_text(encoding="utf-8")
+          required = {
+              "télécharge Thunderbird `154.0` depuis l’archive officielle Mozilla": "télécharge Thunderbird `155.0` depuis l’archive officielle Mozilla",
+              "toute extension future de la plage Thunderbird au-delà de 154": "toute extension future de la plage Thunderbird au-delà de 155",
+              "dist/MailPin_v1.7.4.xpi": "dist/MailPin_v1.7.7.xpi",
+              "Cette cible a démontré le correctif du chargeur Experiment de la candidate 1.7.7 ;": "Cette cible a démontré le correctif du chargeur Experiment de la release 1.7.7 ;",
+          }
+          for old, new in required.items():
+              if old not in text:
+                  raise SystemExit(f"docs/THUNDERBIRD_TEST_BENCH.md: expected token missing: {old!r}")
+              text = text.replace(old, new)
+          final_old = "Le smoke PR/main télécharge et vérifie le binaire officiel Thunderbird 155.0. Cette cible a démontré le correctif du chargeur Experiment de la release 1.7.7 ; le banc fonctionnel volumétrique ESR reste un contrôle distinct et n’est pas modifié sans besoin."
+          final_new = "Le smoke PR/main télécharge et vérifie le binaire officiel Thunderbird 155.0. Cette cible a démontré le correctif du chargeur Experiment de la release 1.7.7. La candidate exacte `94ce4d2656df8eb9694ce794743b82c00d83e8a9` a passé le smoke `33688296968`, puis `main` `f5d5c07a0f8d375ed7347b3a42fbc57f4bafb7fb` a passé le smoke post-merge `33689155048`. Le banc fonctionnel volumétrique ESR reste un contrôle distinct et n’est pas modifié sans besoin."
+          if final_old not in text:
+              raise SystemExit("docs/THUNDERBIRD_TEST_BENCH.md: final current-target paragraph missing")
+          bench.write_text(text.replace(final_old, final_new, 1), encoding="utf-8")
+
+          replace_required(
+              "PROJECT_MEMORY.md",
+              "> Branche courante : `release/finalize-1.7.7` ; finalisation documentaire post-publication",
+              "> Branche courante : `main` ; 1.7.7 publiée et documentation finalisée",
+          )
+          replace_required(
+              "docs/CODEX_HANDOFF.md",
+              "- branche de finalisation : `release/finalize-1.7.7` ;",
+              "- branche courante : `main` ;",
+          )
+
+          state_path = Path("docs/PROJECT_STATE.json")
+          state = json.loads(state_path.read_text(encoding="utf-8"))
+          if state.get("releaseStatus") != "published" or state.get("latestPublicVersion") != "1.7.7":
+              raise SystemExit("PROJECT_STATE is not the published 1.7.7 state")
+          state["developmentBranch"] = "main"
+          state_path.write_text(json.dumps(state, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+          PY
+
+          rm .github/workflows/sync-thunderbird-155-bench-docs.yml
+          git add -A
+          git diff --cached --check
+          python tests/test_thunderbird_test_bench.py
+          npm run check
+
+          git config user.name "ussmarines"
+          git config user.email "ussmarines@users.noreply.github.com"
+          git commit -m "docs: sync published Thunderbird 155 bench state"
+          git push origin HEAD:docs/thunderbird-155-bench-sync
