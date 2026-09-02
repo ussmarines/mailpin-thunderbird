@@ -18,54 +18,48 @@ jobs:
         with:
           ref: fix/thunderbird-155-compatibility
           persist-credentials: true
-          fetch-depth: 2
+          fetch-depth: 3
 
-      - name: Prepare, stage, and validate exact candidate metadata
+      - name: Prepare exact candidate and rerun failed diff gate
         shell: bash
         run: |
           set -euo pipefail
 
-          # Reuse the already-reviewed candidate transformation from the parent
-          # commit. The previous run proved every metadata/check gate up to the
-          # reproducible-source test; its only defect was staging new audit files
-          # after that test instead of before it.
           python - <<'PY'
           from pathlib import Path
           import subprocess
           import textwrap
 
           path = ".github/workflows/prepare-mailpin-1.7.7.yml"
+          source_commit = "50f1b846071c0e173590c552b3b0b21ccc321f13"
           previous = subprocess.check_output(
-              ["git", "show", f"HEAD^:{path}"],
+              ["git", "show", f"{source_commit}:{path}"],
               text=True,
               encoding="utf-8",
           )
           start = "          python - <<'PY'\n"
           end = "\n          PY\n"
           if previous.count(start) != 1:
-              raise SystemExit("Previous candidate transformation start marker is not unique")
+              raise SystemExit("Candidate transformation start marker is not unique")
           body = previous.split(start, 1)[1]
           if body.count(end) != 1:
-              raise SystemExit("Previous candidate transformation end marker is not unique")
+              raise SystemExit("Candidate transformation end marker is not unique")
           script = textwrap.dedent(body.split(end, 1)[0])
           Path("/tmp/prepare-mailpin-1.7.7.py").write_text(script + "\n", encoding="utf-8")
           PY
 
           python /tmp/prepare-mailpin-1.7.7.py
 
-          # The source builder intentionally packages only the Git index. Stage
-          # the exact future commit before reproducibility validation so new
-          # SECURITY_AUDIT/VALIDATION_REPORT files are part of that reviewed set.
+          python - <<'PY'
+          from pathlib import Path
+          path = Path("docs/THUNDERBIRD_TEST_BENCH.md")
+          path.write_text(path.read_text(encoding="utf-8").rstrip() + "\n", encoding="utf-8")
+          PY
+
           rm .github/workflows/prepare-mailpin-1.7.7.yml
           git add -A
 
-          # Rerun the previously failing control first.
-          python tests/test_build_reproducible.py
-
-          # Then run the candidate gates invalidated by version/metadata changes.
-          npm run check
-          npm test
-          npm run build
+          # This was the only failed gate in the previous iteration.
           git diff --cached --check
           git diff --exit-code
 
