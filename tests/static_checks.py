@@ -13,7 +13,7 @@ assert manifest["manifest_version"] == 3
 assert manifest["permissions"] == ["menus"]
 assert manifest["browser_specific_settings"]["gecko"]["id"] == "ussmarines.mailpin@addons.thunderbird.net"
 assert manifest["browser_specific_settings"]["gecko"]["strict_min_version"] == "153.0"
-assert manifest["browser_specific_settings"]["gecko"]["strict_max_version"] == "154.*"
+assert manifest["browser_specific_settings"]["gecko"]["strict_max_version"] == "155.*"
 assert manifest["default_locale"] == "fr"
 package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
 assert package["version"] == version
@@ -112,6 +112,10 @@ assert 'this._extensionVersion = String(context.extension.manifest?.version || "
 assert 'extension: {version: this._extensionVersion || "0.0.0"' in impl
 assert 'let popupSet = document.querySelector("popupset") || document.getElementById("mainPopupSet")' in impl
 assert 'contextMenu?.remove()' in impl
+assert "Services.scriptloader.loadSubScriptWithOptions(" in impl
+assert "target: PIN_MODULES" in impl
+assert "allowUnsafeURL: true" in impl
+assert 'Services.scriptloader.loadSubScript(context.extension.rootURI.resolve(' not in impl
 
 css = (EXT / "styles/pin.css").read_text(encoding="utf-8")
 for needle in [

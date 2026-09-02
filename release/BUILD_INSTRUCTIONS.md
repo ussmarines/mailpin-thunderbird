@@ -1,4 +1,6 @@
-# Instructions de build pour les reviewers — MailPin 1.7.6
+# Instructions de build pour les reviewers — MailPin 1.7.7
+
+Artefact XPI candidat attendu : `MailPin_v1.7.7.xpi`. La release GitHub **1.7.6** est publiée et reste la référence publique jusqu’à la publication de 1.7.7.
 
 ## État
 

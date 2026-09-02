@@ -1623,7 +1623,15 @@ var pinInbox = class extends ExtensionCommon.ExtensionAPI {
     this._locale = String(context.extension.localeData?.selectedLocale || Services.locale?.appLocaleAsBCP47 || "fr");
     if (!this._modulesLoaded) {
       for (const name of MODULE_PATHS) {
-        Services.scriptloader.loadSubScript(context.extension.rootURI.resolve(`api/pinInbox/modules/${name}`), PIN_MODULES, "UTF-8");
+        Services.scriptloader.loadSubScriptWithOptions(
+        context.extension.rootURI.resolve(`api/pinInbox/modules/${name}`),
+        {
+          target: PIN_MODULES,
+          // Thunderbird 155 blocks jar:/file:/moz-extension: subscripts by default.
+          // This opt-in is bounded to the fixed local MODULE_PATHS under the extension root.
+          allowUnsafeURL: true
+        }
+      );
       }
       if (!PIN_MODULES.PinSettings?.DEFAULTS) {
         throw new Error("Le registre de recommandations MailPin est indisponible.");

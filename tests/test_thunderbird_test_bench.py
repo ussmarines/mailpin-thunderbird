@@ -53,11 +53,12 @@ assert "runtime-cleanup-after-uninstall" in HARNESS
 assert "clean-reinstall" in HARNESS
 
 # Runtime-sensitive changes are checked on PRs and again after integration on main;
-# manual dispatch remains available for explicit reruns.
+# manual dispatch remains available for explicit reruns. Thunderbird 155.0 is
+# the release-candidate runtime gate for MailPin 1.7.7.
 assert "workflow_dispatch:" in WORKFLOW
 assert re.search(r"branches:\s*\n\s*- main", WORKFLOW)
 assert "pull_request:" in WORKFLOW
-assert 'THUNDERBIRD_VERSION: "154.0"' in WORKFLOW
+assert 'THUNDERBIRD_VERSION: "155.0"' in WORKFLOW
 assert 'GECKODRIVER_VERSION: "0.37.1"' in WORKFLOW
 assert "archive.mozilla.org/pub/thunderbird/releases" in WORKFLOW
 assert "SHA256SUMS" in WORKFLOW

@@ -1,8 +1,8 @@
 # Mémoire opérationnelle — MailPin
 
-> Version source : **1.7.6**
+> Version source : **1.7.7**
 > Dernière release publique : **1.7.6**
-> Branche courante : `release/finalize-1.7.6` ; finalisation documentaire post-publication
+> Branche courante : `fix/thunderbird-155-compatibility` ; candidate compatibilité Thunderbird 155
 > Extension ID : `ussmarines.mailpin@addons.thunderbird.net`
 
 ## Résumé
@@ -10,6 +10,8 @@
 MailPin est une extension Thunderbird Manifest V3 locale. La release 1.7.6 corrige le chargement des épingles persistées après un démarrage complet de Thunderbird : le background MV3 s’enregistre sur `runtime.onStartup` et initialise les onglets mail existants sans dépendre de l’ouverture du Dashboard. Le banc persistant ne réactive plus artificiellement l’onglet mail. La logique reste idempotente et ne change ni `PinCompatibility`, ni les schémas, le stockage, les permissions, la plage Thunderbird 153.0–154.* ou la politique réseau local-first.
 
 La candidate versionnée `c502175041c85e3cb6e37666a0784f7df0a9e367` a passé la QA `32640198347` et le smoke réel Thunderbird 154.0 `32640198339`. La release `v1.7.6` cible `522042df08c2eb7a18a13cbb83631943e54abf2c`. Le téléchargement indépendant des assets publics n’est pas exposé par le connecteur utilisé ici ; aucune empreinte d’asset non observée n’est donc inventée dans cet état final.
+
+Le head de compatibilité Thunderbird 155 pré-versionnement `2dc4fd24e303d5d9e3d5fc0275ed150b54893741` a passé QA `33687513879` et le smoke réel Thunderbird 155.0 `33687513777`. Le correctif remplace uniquement le chargement local des modules Experiment par `loadSubScriptWithOptions` avec `allowUnsafeURL: true`, borné à la liste fixe `MODULE_PATHS` sous la racine de l’extension. La candidate 1.7.7 doit repasser les gates exacts après versionnement.
 
 ## Invariants non négociables
 
@@ -55,11 +57,11 @@ La candidate versionnée `c502175041c85e3cb6e37666a0784f7df0a9e367` a passé la 
 
 ## État technique courant
 
-- source : 1.7.6 publiée ; dernière release publique : 1.7.6 ;
-- Thunderbird : 153.0 à 154.* ;
+- source : 1.7.7 candidate ; dernière release publique : 1.7.6 ;
+- Thunderbird : 153.0 à 155.* ;
 - permission WebExtension : `menus` uniquement ;
 - schémas : SQLite 5, settings 8, data 7 ;
-- aucune migration, permission, dépendance runtime ou connexion réseau introduite par 1.7.6 ;
+- aucune migration, permission, dépendance runtime ou connexion réseau introduite par 1.7.7 ;
 - candidate exacte 1.7.6 `c502175041c85e3cb6e37666a0784f7df0a9e367` : QA `32640198347` — PASS ; smoke Thunderbird 154.0 `32640198339` — PASS ;
 - release `v1.7.6` : tag ciblant `522042df08c2eb7a18a13cbb83631943e54abf2c`.
 
@@ -76,7 +78,7 @@ npm run ci
 
 - version source et dernière release publique déclarées sans ambiguïté ;
 - tests et build verts sur le diff applicable ;
-- smoke Thunderbird 154 réel frais sur le head versionné ;
+- smoke Thunderbird 155 réel frais sur le head versionné ;
 - cold start avec épingles persistées sans Dashboard validé ;
 - aucune permission, schéma, réseau ou dépendance runtime injustifiée ;
 - documentation active alignée avec les preuves exactes ;
