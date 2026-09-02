@@ -1,6 +1,6 @@
 # Registre des bugs MailPin
 
-Version source : **1.7.7**
+Version source : **1.7.8**
 
 Dernière release publique : **1.7.7**
 

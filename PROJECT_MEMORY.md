@@ -1,8 +1,8 @@
 # Mémoire opérationnelle — MailPin
 
-> Version source : **1.7.7**
+> Version source : **1.7.8**
 > Dernière release publique : **1.7.7**
-> Branche courante : `main` ; 1.7.7 publiée et documentation finalisée
+> Branche courante : `release/1.7.8-candidate` ; maintenance de publication 1.7.8
 > Extension ID : `ussmarines.mailpin@addons.thunderbird.net`
 
 ## Résumé
@@ -59,7 +59,7 @@ Les métadonnées de release exposent les empreintes suivantes : XPI `ec80836aeb
 
 ## État technique courant
 
-- source : 1.7.7 publiée ; dernière release publique : 1.7.7 ;
+- source : 1.7.8 candidate ; dernière release publique : 1.7.7 ;
 - Thunderbird : 153.0 à 155.* ;
 - permission WebExtension : `menus` uniquement ;
 - schémas : SQLite 5, settings 8, data 7 ;
