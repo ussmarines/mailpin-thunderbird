@@ -14,7 +14,7 @@
     "gecko": {
       "id": "ussmarines.mailpin@addons.thunderbird.net",
       "strict_min_version": "153.0",
-      "strict_max_version": "154.*"
+      "strict_max_version": "155.*"
     }
   },
   "permissions": [
