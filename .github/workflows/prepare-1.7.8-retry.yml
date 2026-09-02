@@ -1,0 +1,52 @@
+name: Retry MailPin 1.7.8 candidate preparation
+
+on:
+  push:
+    branches:
+      - release/1.7.8-candidate
+    paths:
+      - ".github/workflows/prepare-1.7.8-retry.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: "3.12"
+      - name: Reuse preparation transform with staged source manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import textwrap
+          source = Path('.github/workflows/prepare-1.7.8.yml').read_text(encoding='utf-8')
+          start_marker = "          python - <<'PY'\n"
+          end_marker = "\n          PY\n"
+          start = source.index(start_marker) + len(start_marker)
+          end = source.index(end_marker, start)
+          script = textwrap.dedent(source[start:end])
+          exec(compile(script, 'prepare-1.7.8-inline.py', 'exec'), {'__name__': '__main__'})
+          PY
+
+          git rm .github/workflows/prepare-1.7.8.yml .github/workflows/prepare-1.7.8-retry.yml
+          git add -A
+          npm run ci
+          git diff --cached --check
+
+          git config user.name "ussmarines"
+          git config user.email "ussmarines@users.noreply.github.com"
+          git commit -m "release: prepare MailPin 1.7.8 candidate"
+          git push origin HEAD:release/1.7.8-candidate
