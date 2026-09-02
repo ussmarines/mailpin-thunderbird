@@ -2,7 +2,7 @@
 
 ## État
 
-- branche de finalisation : `release/finalize-1.7.7` ;
+- branche courante : `main` ;
 - version source : **1.7.7** ;
 - dernière release publique : **1.7.7** ;
 - Thunderbird : 153.0 à 155.* ;
