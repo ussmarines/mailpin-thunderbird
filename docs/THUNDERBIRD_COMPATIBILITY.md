@@ -123,7 +123,7 @@ Avant d’ajouter une nouvelle capacité Thunderbird :
 
 ## Compatibilité de versions
 
-Depuis 1.5.1, la branche 153 était la seule plage revendiquée après essais réels. MailPin 1.7.4 étend cette plage à Thunderbird `154.*` après validation directe du runtime 154.0. Le minimum reste `153.0` : les essais antérieurs sur 128/140 injectaient le panneau mais ne garantissaient pas l’ouverture fiable du Dashboard via le pont MV3 Experiment → background.
+Depuis 1.5.1, la branche 153 était la seule plage revendiquée après essais réels. MailPin 1.7.4 a étendu cette plage à Thunderbird `154.*` après validation directe du runtime 154.0. MailPin 1.7.7 l’étend à `155.*` après correction et validation réelle du runtime 155.0. Le minimum reste `153.0` : les essais antérieurs sur 128/140 injectaient le panneau mais ne garantissaient pas l’ouverture fiable du Dashboard via le pont MV3 Experiment → background.
 
 Toute future adaptation de version doit rester localisée autant que possible dans ces adaptateurs et être documentée dans `docs/KNOWN_LIMITATIONS.md` et `docs/BUG_TRACKER.md` si elle corrige une régression observée. Une nouvelle version majeure Thunderbird ne doit pas être ajoutée à `strict_max_version` sans smoke réel frais lorsque l’Experiment ou le DOM interne sont concernés.
 
@@ -133,10 +133,10 @@ Thunderbird 155.0 refuse désormais par défaut les sous-scripts `jar:`, `file:`
 
 Le chargeur MailPin utilise maintenant `loadSubScriptWithOptions(..., {target: PIN_MODULES, allowUnsafeURL: true})`. L’opt-in est borné à `MODULE_PATHS`, liste fixe de fichiers locaux résolus sous `context.extension.rootURI`; aucune URL utilisateur ou distante n’est acceptée.
 
-Le head pré-versionnement `2dc4fd24e303d5d9e3d5fc0275ed150b54893741` a passé QA `33687513879` et le smoke réel `33687513777` sur le binaire officiel Thunderbird 155.0. La candidate versionnée 1.7.7 doit repasser le smoke sur son head exact avant publication. La plage candidate est `153.0` à `155.*`.
+Le head pré-versionnement `2dc4fd24e303d5d9e3d5fc0275ed150b54893741` a passé QA `33687513879` et le smoke réel `33687513777` sur le binaire officiel Thunderbird 155.0. La candidate exacte `94ce4d2656df8eb9694ce794743b82c00d83e8a9` a ensuite passé QA `33688297275` et smoke réel `33688296968`. Après squash, `main` `f5d5c07a0f8d375ed7347b3a42fbc57f4bafb7fb` a repassé QA `33689155033` et smoke réel `33689155048`. Le workflow Release `33689378381` a publié `v1.7.7` depuis ce même commit. La plage publiée est `153.0` à `155.*`.
 
 ### Preuve runtime actuelle
 
-Le 19 août 2026, le head pré-versionnement `3e1943f2be7a18ebcceef5952810675442e91a33` de la PR #52 a validé le binaire officiel **Thunderbird 154.0** sous Linux, geckodriver 0.37.1 : QA `32299537328` PASS et smoke réel `32299537485` PASS. Le smoke a confirmé vue `about:3pane` prête, Experiment/background à `Startup: Complete`, panneau et bouton injectés une seule fois, ouverture unique du Dashboard, nettoyage après désinstallation puis réinstallation sans duplication.
+La preuve runtime courante pour la limite supérieure est Thunderbird 155.0 : candidate exacte `94ce4d2656df8eb9694ce794743b82c00d83e8a9`, smoke `33688296968` PASS, puis `main` `f5d5c07a0f8d375ed7347b3a42fbc57f4bafb7fb`, smoke post-merge `33689155048` PASS. Les deux jobs utilisent le binaire officiel Thunderbird 155.0 et geckodriver 0.37.1 vérifiés avant exécution.
 
-La candidate versionnée exacte `c2527b57de4775f4fd228af22b9792937e7ce6ea` a ensuite passé QA `32300356172` et smoke réel Thunderbird 154.0 `32300356085`. Le tag publié `v1.7.4` est identique au commit `b74c0c7f264cf387269be0aaf18e47e99cf07600`. Les fournisseurs réseau, calendriers distants et la matrice multi-OS restent des validations distinctes.
+Les preuves Thunderbird 154 restent historiques : la candidate versionnée `c2527b57de4775f4fd228af22b9792937e7ce6ea` avait passé QA `32300356172` et smoke réel Thunderbird 154.0 `32300356085`, puis `v1.7.4` avait été publiée sur `b74c0c7f264cf387269be0aaf18e47e99cf07600`. Les fournisseurs réseau, calendriers distants et la matrice multi-OS restent des validations distinctes.
