@@ -1,0 +1,67 @@
+name: Apply Thunderbird 155 compatibility fix
+
+on:
+  push:
+    branches:
+      - fix/thunderbird-155-compatibility
+    paths:
+      - ".github/workflows/apply-thunderbird-155-fix.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: fix/thunderbird-155-compatibility
+          persist-credentials: true
+          fetch-depth: 1
+
+      - name: Apply exact bounded loader migration
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          impl_path = Path("extension/api/pinInbox/implementation.js")
+          impl = impl_path.read_text(encoding="utf-8")
+          old = '        Services.scriptloader.loadSubScript(context.extension.rootURI.resolve(`api/pinInbox/modules/${name}`), PIN_MODULES, "UTF-8");'
+          new = '''        Services.scriptloader.loadSubScriptWithOptions(
+                  context.extension.rootURI.resolve(`api/pinInbox/modules/${name}`),
+                  {
+                    target: PIN_MODULES,
+                    // Thunderbird 155 blocks jar:/file:/moz-extension: subscripts by default.
+                    // This opt-in is bounded to the fixed local MODULE_PATHS under the extension root.
+                    allowUnsafeURL: true
+                  }
+                );'''
+          if impl.count(old) != 1:
+              raise SystemExit(f"Expected exactly one legacy module loader, found {impl.count(old)}")
+          impl_path.write_text(impl.replace(old, new), encoding="utf-8")
+
+          checks_path = Path("tests/static_checks.py")
+          checks = checks_path.read_text(encoding="utf-8")
+          anchor = "assert 'contextMenu?.remove()' in impl\n"
+          guard = '''assert 'contextMenu?.remove()' in impl
+          assert "Services.scriptloader.loadSubScriptWithOptions(" in impl
+          assert "allowUnsafeURL: true" in impl
+          assert 'Services.scriptloader.loadSubScript(context.extension.rootURI.resolve(' not in impl
+          '''
+          if checks.count(anchor) != 1:
+              raise SystemExit(f"Expected exactly one static-check anchor, found {checks.count(anchor)}")
+          checks_path.write_text(checks.replace(anchor, guard), encoding="utf-8")
+          PY
+
+          rm .github/workflows/apply-thunderbird-155-fix.yml
+
+          git diff --check
+          git diff -- extension/api/pinInbox/implementation.js tests/static_checks.py
+          git config user.name "ussmarines"
+          git config user.email "ussmarines@users.noreply.github.com"
+          git add extension/api/pinInbox/implementation.js tests/static_checks.py .github/workflows/apply-thunderbird-155-fix.yml
+          git commit -m "fix(runtime): load packaged modules on Thunderbird 155"
+          git push origin HEAD:fix/thunderbird-155-compatibility
