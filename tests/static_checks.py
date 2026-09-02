@@ -113,6 +113,7 @@ assert 'extension: {version: this._extensionVersion || "0.0.0"' in impl
 assert 'let popupSet = document.querySelector("popupset") || document.getElementById("mainPopupSet")' in impl
 assert 'contextMenu?.remove()' in impl
 assert "Services.scriptloader.loadSubScriptWithOptions(" in impl
+assert "target: PIN_MODULES" in impl
 assert "allowUnsafeURL: true" in impl
 assert 'Services.scriptloader.loadSubScript(context.extension.rootURI.resolve(' not in impl
 
