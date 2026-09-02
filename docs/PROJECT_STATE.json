@@ -2,11 +2,11 @@
   "format": "mailperch-project-state",
   "version": 1,
   "project": "MailPin — Email Follow-up & Productivity",
-  "extensionVersion": "1.7.7",
+  "extensionVersion": "1.7.8",
   "baseGitHub": {
     "branch": "main",
-    "commit": "f5d5c07a0f8d375ed7347b3a42fbc57f4bafb7fb",
-    "role": "GitHub release v1.7.7 tag target after validated candidate, post-merge Thunderbird 155 smoke and canonical publisher"
+    "commit": "81ff1f56e0a58b203ff755be6ed522e0fbc62559",
+    "role": "published 1.7.7 repository state used as the base for the MailPin 1.7.8 maintenance candidate"
   },
   "extensionId": "ussmarines.mailpin@addons.thunderbird.net",
   "thunderbird": {
@@ -91,7 +91,7 @@
     "uiDependencyPolicy": "native HTML plus local Organic Workspace CSS tokens; canonical workspace stylesheet; no runtime patch stylesheet, npm runtime dependency, bundler, CDN or remote asset",
     "runtimeTestSupplyChain": "test-only Thunderbird/geckodriver downloads are checksum-verified and are not runtime dependencies"
   },
-  "developmentBranch": "main",
+  "developmentBranch": "release/1.7.8-candidate",
   "testing": {
     "contract": [
       "tests/test_organic_workspace_ui.py",
@@ -100,9 +100,9 @@
     ],
     "runtimeWorkflow": ".github/workflows/thunderbird-smoke.yml",
     "runtimeScript": "tests/thunderbird/real_smoke.py",
-    "browserStatus": "MailPin 1.7.7 is published for Thunderbird 153.0 through 155.*. Thunderbird 155 compatibility is restored by loading only the fixed local Experiment module list through loadSubScriptWithOptions with a bounded allowUnsafeURL opt-in.",
-    "runtimeStatus": "Exact candidate 94ce4d2656df8eb9694ce794743b82c00d83e8a9 passed QA run 33688297275 and real Thunderbird 155.0 smoke run 33688296968. Integrated main f5d5c07a0f8d375ed7347b3a42fbc57f4bafb7fb passed post-merge QA run 33689155033 and real Thunderbird 155.0 smoke run 33689155048. Canonical release workflow 33689378381 published v1.7.7 from that exact main commit."
+    "browserStatus": "MailPin 1.7.8 is a maintenance candidate for Thunderbird 153.0 through 155.*. Runtime behavior remains the validated 1.7.7 Thunderbird 155 implementation; the manifest/version bump must pass fresh exact-candidate gates before publication.",
+    "runtimeStatus": "Published 1.7.7 runtime proof remains candidate 94ce4d2656df8eb9694ce794743b82c00d83e8a9 QA 33688297275 / smoke 33688296968 and integrated main f5d5c07a0f8d375ed7347b3a42fbc57f4bafb7fb QA 33689155033 / smoke 33689155048. MailPin 1.7.8 changes only release/version metadata from the final synchronized repository state; fresh QA, reproducibility/build and Thunderbird 155.0 smoke are required on the exact 1.7.8 candidate before release."
   },
   "latestPublicVersion": "1.7.7",
-  "releaseStatus": "published"
+  "releaseStatus": "candidate"
 }

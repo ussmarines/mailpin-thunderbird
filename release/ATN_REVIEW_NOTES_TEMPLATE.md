@@ -1,10 +1,10 @@
-# Notes pour les reviewers ATN — MailPin 1.7.7
+# Notes pour les reviewers ATN — MailPin 1.7.8
 
 ## Statut
 
 - **Dernière release GitHub publique :** 1.7.7
-- **Source publiée :** 1.7.7
-- **Version :** 1.7.7
+- **Source candidate :** 1.7.8
+- **Version :** 1.7.8
 - **Soumission ATN :** à préparer séparément de la release GitHub si souhaitée
 
 ## Identité

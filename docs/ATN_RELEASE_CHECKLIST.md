@@ -1,6 +1,6 @@
-# Checklist Add-ons for Thunderbird — MailPin 1.7.7
+# Checklist Add-ons for Thunderbird — MailPin 1.7.8
 
-Dernière release GitHub publique : **1.7.7**. La **version source 1.7.7** est publiée. Le cycle de soumission et de revue Add-ons for Thunderbird reste distinct de la release GitHub ; ce document ne prétend pas qu’une soumission ATN 1.7.7 a été effectuée.
+Dernière release GitHub publique : **1.7.7**. La **version source 1.7.8** est candidate ; la release GitHub publique reste **1.7.7** jusqu’aux gates et à la publication. Le cycle de soumission et de revue Add-ons for Thunderbird reste distinct de la release GitHub ; ce document ne prétend pas qu’une soumission ATN 1.7.7 a été effectuée.
 
 Fiche ATN : https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/
 

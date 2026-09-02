@@ -1,5 +1,12 @@
 # Journal des modifications
 
+## 1.7.8 — maintenance de publication
+
+- republie l’état Git final synchronisé après 1.7.7 sous un nouveau numéro de version ;
+- conserve strictement le runtime Thunderbird 155 de 1.7.7 : chargeur Experiment borné, `PinCompatibility`, permissions, schémas, stockage et politique local-first inchangés ;
+- met à jour les métadonnées et documents de release/reviewer pour correspondre à l’état final du dépôt ;
+- n’ajoute aucune fonction, permission, migration, dépendance runtime, connexion réseau, télémétrie, publicité, CDN ou code distant.
+
 ## 1.7.7 — compatibilité Thunderbird 155
 
 - étend la compatibilité déclarée à Thunderbird `155.*` après smoke réel sur le binaire officiel 155.0 ;

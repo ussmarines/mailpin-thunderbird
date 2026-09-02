@@ -1,6 +1,6 @@
-# Instructions de build pour les reviewers — MailPin 1.7.7
+# Instructions de build pour les reviewers — MailPin 1.7.8
 
-Artefact XPI publié attendu : `MailPin_v1.7.7.xpi`. La release GitHub **1.7.7** est publiée et correspond à la source **1.7.7**.
+Artefact XPI candidat attendu : `MailPin_v1.7.8.xpi`. La release GitHub **1.7.7** reste la référence publique jusqu’à la publication de 1.7.8.
 
 ## État
 
@@ -17,7 +17,7 @@ La release GitHub **1.7.7** est publiée. Elle restaure la compatibilité Thunde
 
 ## Reproduction
 
-Dans un checkout de la source MailPin 1.7.7 ou dans l’archive reviewer extraite sans `.git` :
+Dans un checkout de la source MailPin 1.7.8 ou dans l’archive reviewer extraite sans `.git` :
 
 ```bash
 npm run ci
@@ -26,8 +26,8 @@ npm run ci
 Livrables :
 
 ```text
-dist/MailPin_v1.7.7.xpi
-dist/MailPin_GitHub_Repository_v1.7.7.zip
+dist/MailPin_v1.7.8.xpi
+dist/MailPin_GitHub_Repository_v1.7.8.zip
 dist/SHA256SUMS.txt
 ```
 
