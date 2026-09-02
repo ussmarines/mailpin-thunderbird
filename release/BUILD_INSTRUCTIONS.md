@@ -1,10 +1,6 @@
 # Instructions de build pour les reviewers — MailPin 1.7.8
 
-Artefact XPI candidat attendu : `MailPin_v1.7.8.xpi`. La release GitHub **1.7.7** reste la référence publique jusqu’à la publication de 1.7.8.
-
-## État
-
-La release GitHub **1.7.7** est publiée. Elle restaure la compatibilité Thunderbird 155.0 après le durcissement du chargement des sous-scripts privilégiés. La plage revendiquée est Thunderbird 153.0–155.*.
+Artefact XPI attendu : `MailPin_v1.7.8.xpi`. La release GitHub **1.7.8** est publiée.
 
 ## Environnement
 
@@ -33,19 +29,8 @@ dist/SHA256SUMS.txt
 
 Le contenu de `extension/` est placé directement à la racine du XPI. Aucun JavaScript/CSS n’est minifié, transpilé, concaténé, généré ou obfusqué.
 
-## Portée 1.7.7
+## Portée et preuves
 
-Thunderbird 155.0 refuse par défaut les sous-scripts `jar:`, `file:` et `moz-extension:` chargés par `loadSubScript()`. MailPin charge ses modules Experiment depuis l’XPI ; le chargeur utilise donc `loadSubScriptWithOptions` avec `allowUnsafeURL: true`, limité aux noms de fichiers fixés dans `MODULE_PATHS` et résolus sous `context.extension.rootURI`.
+La 1.7.8 ne modifie pas le runtime Thunderbird 155 validé. Candidate `e48a12239c674e1f8a909b22a04c0c3266eca70e` : QA `33691697322` PASS, smoke `33691697345` PASS. Tag `v1.7.8` : cible `800c07315ee7f8611f2d2fc6e12a4f2c2d74b849`, après QA `33691785442` et smoke `33691785284` PASS. Workflow Release `33691919194` PASS.
 
-La version n’ajoute aucune permission, dépendance runtime, migration, schéma, réseau, télémétrie, publicité ou code distant. `PinCompatibility`, le stockage et le correctif cold-start de 1.7.6 restent inchangés.
-
-## Preuves
-
-- candidate versionnée `94ce4d2656df8eb9694ce794743b82c00d83e8a9` : QA `33688297275` — PASS ;
-- smoke réel Thunderbird 155.0 sur la candidate : `33688296968` — PASS ;
-- `main` `f5d5c07a0f8d375ed7347b3a42fbc57f4bafb7fb` : QA post-merge `33689155033` — PASS ;
-- smoke réel Thunderbird 155.0 post-merge : `33689155048` — PASS ;
-- workflow canonique Release `33689378381` : `npm run ci`, métadonnées et publication — PASS ;
-- tag `v1.7.7` : cible `f5d5c07a0f8d375ed7347b3a42fbc57f4bafb7fb` ;
-- XPI public SHA-256 : `ec80836aebcb972d8148063cd4035df836e5e66a663003e7785146a7d798ce4e` ;
-- archive source publique SHA-256 : `c921436872c10db42b370947f1caa701a20fac69f2f5f0a7c1fecdfd277d5d49`.
+SHA-256 public du XPI : `b007f9ad0213bb5672e5273c27b4f0d3935897fc2696922acd2e2dd673b5048e`.

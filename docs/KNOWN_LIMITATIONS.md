@@ -1,6 +1,6 @@
 # Limites connues — MailPin
 
-## Source 1.7.8 / release publique 1.7.7
+## Source 1.7.8 / release publique 1.7.8
 
 La source **1.7.7** et la release publique **1.7.7** sont alignées. Cette maintenance restaure le chargement de l’Experiment sur Thunderbird 155.0 après le durcissement des sous-scripts privilégiés.
 
