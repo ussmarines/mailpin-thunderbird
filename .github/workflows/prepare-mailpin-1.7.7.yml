@@ -1,0 +1,248 @@
+name: Prepare MailPin 1.7.7 candidate
+
+on:
+  push:
+    branches:
+      - fix/thunderbird-155-compatibility
+    paths:
+      - ".github/workflows/prepare-mailpin-1.7.7.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: fix/thunderbird-155-compatibility
+          persist-credentials: true
+          fetch-depth: 1
+
+      - name: Prepare exact candidate metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          import re
+
+          VERSION = "1.7.7"
+          PUBLIC = "1.7.6"
+          ROOT = Path(".")
+
+          def read(path):
+              return (ROOT / path).read_text(encoding="utf-8")
+
+          def write(path, text):
+              (ROOT / path).write_text(text, encoding="utf-8")
+
+          def replace_once(path, old, new):
+              text = read(path)
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{path}: expected one occurrence of {old!r}, found {count}")
+              write(path, text.replace(old, new, 1))
+
+          def regex_once(path, pattern, replacement, flags=0):
+              text = read(path)
+              updated, count = re.subn(pattern, replacement, text, count=1, flags=flags)
+              if count != 1:
+                  raise SystemExit(f"{path}: pattern did not match exactly once: {pattern!r} (count={count})")
+              write(path, updated)
+
+          # Canonical machine-readable version state.
+          package_path = ROOT / "package.json"
+          package = json.loads(package_path.read_text(encoding="utf-8"))
+          if package.get("version") != PUBLIC:
+              raise SystemExit(f"package.json unexpected base version: {package.get('version')}")
+          package["version"] = VERSION
+          package_path.write_text(json.dumps(package, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+          manifest_path = ROOT / "extension/manifest.json"
+          manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+          if manifest.get("version") != PUBLIC:
+              raise SystemExit(f"manifest unexpected base version: {manifest.get('version')}")
+          if manifest.get("browser_specific_settings", {}).get("gecko", {}).get("strict_max_version") != "155.*":
+              raise SystemExit("manifest Thunderbird max is not the validated 155.* range")
+          manifest["version"] = VERSION
+          manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+          state_path = ROOT / "docs/PROJECT_STATE.json"
+          state = json.loads(state_path.read_text(encoding="utf-8"))
+          if state.get("latestPublicVersion") != PUBLIC:
+              raise SystemExit("PROJECT_STATE latest public version changed unexpectedly")
+          state["extensionVersion"] = VERSION
+          state["thunderbird"]["max"] = "155.*"
+          state["developmentBranch"] = "fix/thunderbird-155-compatibility"
+          state["testing"]["browserStatus"] = (
+              "Candidate 1.7.7 restores Thunderbird 155 compatibility by migrating the fixed local Experiment module loader "
+              "to loadSubScriptWithOptions with a bounded allowUnsafeURL opt-in. No UI redesign is included."
+          )
+          state["testing"]["runtimeStatus"] = (
+              "Pre-versioned compatibility head 2dc4fd24e303d5d9e3d5fc0275ed150b54893741 passed QA run 33687513879 "
+              "and real Thunderbird 155.0 smoke run 33687513777. The exact versioned 1.7.7 candidate must rerun applicable gates before publication."
+          )
+          state["releaseStatus"] = "candidate"
+          state_path.write_text(json.dumps(state, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+          # Changelog and active top-level documentation.
+          changelog = read("CHANGELOG.md")
+          anchor = "# Journal des modifications\n\n"
+          if anchor not in changelog or "## 1.7.7" in changelog:
+              raise SystemExit("CHANGELOG.md unexpected candidate state")
+          section = (
+              "## 1.7.7 — compatibilité Thunderbird 155\n\n"
+              "- étend la compatibilité déclarée à Thunderbird `155.*` après smoke réel sur le binaire officiel 155.0 ;\n"
+              "- adapte le chargeur de modules locaux de l’Experiment au durcissement Thunderbird 155 : `loadSubScriptWithOptions` avec `allowUnsafeURL: true` uniquement pour les chemins fixes de `MODULE_PATHS` sous la racine de l’extension ;\n"
+              "- conserve l’ID public, les permissions, `PinCompatibility`, les schémas, le stockage local-first, l’état lu/non-lu et l’absence de réseau runtime inchangés ;\n"
+              "- actualise le smoke runtime pour cibler Thunderbird 155.0 et ajoute des gardes anti-régression sur le chargeur privilégié borné.\n\n"
+          )
+          write("CHANGELOG.md", changelog.replace(anchor, anchor + section, 1))
+
+          replace_once("THIRD_PARTY_NOTICES.md", "MailPin 1.7.6 source", "MailPin 1.7.7 source")
+          regex_once("PRIVACY.md", r"Dernière mise à jour / Last updated:.*", "Dernière mise à jour / Last updated: 2 septembre 2026 / September 2, 2026")
+          replace_once("PRIVACY.md", "MailPin 1.7.6 ne contient", "MailPin 1.7.7 ne contient")
+          replace_once("PRIVACY.md", "MailPin 1.7.6 contains", "MailPin 1.7.7 contains")
+
+          # README FR: candidate/source changes only; public release 1.7.6 remains the install reference until publication.
+          replace_once("README.md", "![Source](https://img.shields.io/badge/source-v1.7.6-3D536B)", "![Source](https://img.shields.io/badge/candidate-v1.7.7-3D536B)")
+          replace_once("README.md", "![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x--154.x-3D536B)", "![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x--155.x-3D536B)")
+          replace_once("README.md", "La release **1.7.6** corrige le chargement à froid des épingles persistées : le background Manifest V3 initialise désormais les onglets mail existants via `runtime.onStartup`, sans exiger l’ouverture préalable du Dashboard. Aucun redesign UI n’est inclus.", "La candidate **1.7.7** restaure la compatibilité Thunderbird 155 en adaptant le chargeur local de l’Experiment au durcissement des sous-scripts privilégiés. Aucun redesign UI, permission, migration ou réseau runtime n’est ajouté.")
+          replace_once("README.md", "- **Version source :** `1.7.6` — publiée", "- **Version source :** `1.7.7` — candidate")
+          replace_once("README.md", "- **Thunderbird :** `153.0` à `154.*`", "- **Thunderbird :** `153.0` à `155.*`")
+          replace_once("README.md", "La candidate versionnée 1.7.6 a passé la QA et un smoke réel sur Thunderbird 154.0 avant publication.", "Le head de compatibilité pré-versionnement a passé la QA et un smoke réel sur Thunderbird 155.0. La candidate versionnée 1.7.7 doit repasser ces gates sur son head exact avant publication.")
+          replace_once("README.md", "Livrables reproductibles de la source publiée :", "Livrables reproductibles de la source candidate :")
+          replace_once("README.md", "- `dist/MailPin_v1.7.6.xpi`", "- `dist/MailPin_v1.7.7.xpi`")
+          replace_once("README.md", "- `dist/MailPin_GitHub_Repository_v1.7.6.zip`", "- `dist/MailPin_GitHub_Repository_v1.7.7.zip`")
+          replace_once("README.md", "- [Audit sécurité source 1.7.6](SECURITY_AUDIT_1.7.6.md)", "- [Audit sécurité source 1.7.7](SECURITY_AUDIT_1.7.7.md)")
+          replace_once("README.md", "- [Rapport de validation source 1.7.6](VALIDATION_REPORT_1.7.6.md)", "- [Rapport de validation source 1.7.7](VALIDATION_REPORT_1.7.7.md)")
+
+          # README EN.
+          replace_once("README.en.md", "![Source](https://img.shields.io/badge/source-v1.7.6-3D536B)", "![Source](https://img.shields.io/badge/candidate-v1.7.7-3D536B)")
+          replace_once("README.en.md", "![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x--154.x-3D536B)", "![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x--155.x-3D536B)")
+          replace_once("README.en.md", "Release **1.7.6** fixes persisted-pin cold-start loading: the Manifest V3 background now initializes existing mail tabs through `runtime.onStartup`, without requiring the Dashboard to be opened first. No UI redesign is included.", "Candidate **1.7.7** restores Thunderbird 155 compatibility by adapting the local Experiment module loader to Thunderbird’s hardened privileged-subscript policy. No UI redesign, permission, migration or runtime network access is added.")
+          replace_once("README.en.md", "- **Source version:** `1.7.6` — published", "- **Source version:** `1.7.7` — candidate")
+          replace_once("README.en.md", "- **Thunderbird:** `153.0` to `154.*`", "- **Thunderbird:** `153.0` to `155.*`")
+          replace_once("README.en.md", "The exact versioned 1.7.6 candidate passed QA and a real Thunderbird 154.0 smoke before publication.", "The pre-versioned compatibility head passed QA and a real Thunderbird 155.0 smoke. The exact versioned 1.7.7 candidate must rerun those gates before publication.")
+          replace_once("README.en.md", "Reproducible outputs from the published source:", "Reproducible outputs from the candidate source:")
+          replace_once("README.en.md", "- `dist/MailPin_v1.7.6.xpi`", "- `dist/MailPin_v1.7.7.xpi`")
+          replace_once("README.en.md", "- `dist/MailPin_GitHub_Repository_v1.7.6.zip`", "- `dist/MailPin_GitHub_Repository_v1.7.7.zip`")
+          replace_once("README.en.md", "- [Source security audit 1.7.6](SECURITY_AUDIT_1.7.6.md)", "- [Source security audit 1.7.7](SECURITY_AUDIT_1.7.7.md)")
+          replace_once("README.en.md", "- [Source validation report 1.7.6](VALIDATION_REPORT_1.7.6.md)", "- [Source validation report 1.7.7](VALIDATION_REPORT_1.7.7.md)")
+
+          # Operational memory: keep the published 1.7.6 evidence and add the current candidate proof separately.
+          replace_once("PROJECT_MEMORY.md", "> Version source : **1.7.6**", "> Version source : **1.7.7**")
+          replace_once("PROJECT_MEMORY.md", "> Branche courante : `release/finalize-1.7.6` ; finalisation documentaire post-publication", "> Branche courante : `fix/thunderbird-155-compatibility` ; candidate compatibilité Thunderbird 155")
+          replace_once("PROJECT_MEMORY.md", "- source : 1.7.6 publiée ; dernière release publique : 1.7.6 ;", "- source : 1.7.7 candidate ; dernière release publique : 1.7.6 ;")
+          replace_once("PROJECT_MEMORY.md", "- Thunderbird : 153.0 à 154.* ;", "- Thunderbird : 153.0 à 155.* ;")
+          replace_once("PROJECT_MEMORY.md", "- aucune migration, permission, dépendance runtime ou connexion réseau introduite par 1.7.6 ;", "- aucune migration, permission, dépendance runtime ou connexion réseau introduite par 1.7.7 ;")
+          marker = "La candidate versionnée `c502175041c85e3cb6e37666a0784f7df0a9e367` a passé la QA `32640198347` et le smoke réel Thunderbird 154.0 `32640198339`. La release `v1.7.6` cible `522042df08c2eb7a18a13cbb83631943e54abf2c`. Le téléchargement indépendant des assets publics n’est pas exposé par le connecteur utilisé ici ; aucune empreinte d’asset non observée n’est donc inventée dans cet état final."
+          added = marker + "\n\nLe head de compatibilité Thunderbird 155 pré-versionnement `2dc4fd24e303d5d9e3d5fc0275ed150b54893741` a passé QA `33687513879` et le smoke réel Thunderbird 155.0 `33687513777`. Le correctif remplace uniquement le chargement local des modules Experiment par `loadSubScriptWithOptions` avec `allowUnsafeURL: true`, borné à la liste fixe `MODULE_PATHS` sous la racine de l’extension. La candidate 1.7.7 doit repasser les gates exacts après versionnement."
+          replace_once("PROJECT_MEMORY.md", marker, added)
+          replace_once("PROJECT_MEMORY.md", "- smoke Thunderbird 154 réel frais sur le head versionné ;", "- smoke Thunderbird 155 réel frais sur le head versionné ;")
+
+          # Release/status docs: preserve 1.7.6 publication evidence, add candidate facts.
+          regex_once("STORE_RELEASE.md", r"^# Publication MailPin 1\.7\.6$", "# Préparation MailPin 1.7.7", re.M)
+          replace_once("STORE_RELEASE.md", "- **Version source :** 1.7.6 — publiée", "- **Version source :** 1.7.7 — candidate")
+          replace_once("STORE_RELEASE.md", "- **Compatibilité publiée :** Thunderbird 153.0 à 154.*", "- **Compatibilité candidate :** Thunderbird 153.0 à 155.*")
+          state_anchor = "- **Compatibilité candidate :** Thunderbird 153.0 à 155.*\n"
+          store = read("STORE_RELEASE.md")
+          if state_anchor not in store:
+              raise SystemExit("STORE_RELEASE candidate compatibility anchor missing")
+          store = store.replace(state_anchor, state_anchor + "- **Artefact candidat :** `MailPin_v1.7.7.xpi`\n", 1)
+          scope_anchor = "## Portée 1.7.6\n"
+          candidate_scope = (
+              "## Portée 1.7.7\n\n"
+              "La 1.7.7 restaure le démarrage de MailPin sur Thunderbird 155.0 après le durcissement de `loadSubScript()`. Le chargeur de modules de l’Experiment utilise désormais `loadSubScriptWithOptions` avec `allowUnsafeURL: true` uniquement pour les fichiers locaux fixés par `MODULE_PATHS` sous la racine de l’extension.\n\n"
+              "Le head pré-versionnement `2dc4fd24e303d5d9e3d5fc0275ed150b54893741` a passé QA `33687513879` et smoke réel Thunderbird 155.0 `33687513777`. La candidate versionnée doit repasser ces gates avant publication.\n\n"
+              "Aucune permission, migration, schéma, dépendance runtime, connexion réseau, télémétrie, publicité, CDN ou code distant n’est ajouté.\n\n"
+          )
+          if scope_anchor not in store:
+              raise SystemExit("STORE_RELEASE 1.7.6 scope anchor missing")
+          write("STORE_RELEASE.md", store.replace(scope_anchor, candidate_scope + scope_anchor, 1))
+
+          # Required source-version tokens in active release documentation.
+          regex_once("docs/ATN_RELEASE_CHECKLIST.md", r"^# Checklist Add-ons for Thunderbird — MailPin 1\.7\.6$", "# Checklist Add-ons for Thunderbird — MailPin 1.7.7", re.M)
+          regex_once("docs/ATN_RELEASE_CHECKLIST.md", r"version source 1\.7\.6", "version source 1.7.7")
+          replace_once("docs/KNOWN_LIMITATIONS.md", "## Source 1.7.6 / release publique 1.7.6", "## Source 1.7.7 / release publique 1.7.6")
+          replace_once("docs/KNOWN_LIMITATIONS.md", "La source **1.7.6** et la release publique **1.7.6** sont alignées. Cette maintenance corrige le chargement des épingles persistées au cold start via `runtime.onStartup`.", "La source **1.7.7** est candidate et la release publique **1.7.6** reste la référence publiée. La candidate restaure le chargement de l’Experiment sur Thunderbird 155.0 après le durcissement des sous-scripts privilégiés.")
+          replace_once("docs/KNOWN_LIMITATIONS.md", "- compatibilité revendiquée : Thunderbird 153.0 à 154.* ;", "- compatibilité candidate : Thunderbird 153.0 à 155.* ;")
+          replace_once("docs/KNOWN_LIMITATIONS.md", "- candidate versionnée 1.7.6 : QA et smoke réel Thunderbird 154.0 PASS avant publication ;", "- head pré-versionnement 1.7.7 : QA et smoke réel Thunderbird 155.0 PASS ; candidate versionnée exacte à revalider avant publication ;")
+          regex_once("docs/MANUAL_TEST_PLAN.md", r"^# Plan de test manuel MailPin — 1\.7\.6$", "# Plan de test manuel MailPin — 1.7.7", re.M)
+          replace_once("docs/BUG_TRACKER.md", "Version source : **1.7.6**", "Version source : **1.7.7**")
+          replace_once("docs/CODEX_HANDOFF.md", "version source : **1.7.6**", "version source : **1.7.7**")
+          regex_once("release/ATN_REVIEW_NOTES_TEMPLATE.md", r"^# Notes pour les reviewers ATN — MailPin 1\.7\.6$", "# Notes pour les reviewers ATN — MailPin 1.7.7", re.M)
+          replace_once("release/ATN_REVIEW_NOTES_TEMPLATE.md", "**Version :** 1.7.6", "**Version :** 1.7.7")
+          regex_once("release/BUILD_INSTRUCTIONS.md", r"^# Instructions de build pour les reviewers — MailPin 1\.7\.6$", "# Instructions de build pour les reviewers — MailPin 1.7.7", re.M)
+          build = read("release/BUILD_INSTRUCTIONS.md")
+          build_anchor = "# Instructions de build pour les reviewers — MailPin 1.7.7\n"
+          if build_anchor not in build:
+              raise SystemExit("BUILD_INSTRUCTIONS title missing after update")
+          write("release/BUILD_INSTRUCTIONS.md", build.replace(build_anchor, build_anchor + "\nArtefact XPI candidat attendu : `MailPin_v1.7.7.xpi`. La release GitHub **1.7.6** est publiée et reste la référence publique jusqu’à la publication de 1.7.7.\n", 1))
+
+          manifest_template_path = ROOT / "release/manifest-store-template.json"
+          store_manifest = json.loads(manifest_template_path.read_text(encoding="utf-8"))
+          store_manifest["note"] = "Référence de métadonnées pour MailPin 1.7.7 candidat. MailPin 1.7.6 publié reste la dernière release publique jusqu’aux gates et à la publication 1.7.7."
+          manifest_template_path.write_text(json.dumps(store_manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+          # Compatibility evidence: append current 155 proof without rewriting historical 154 evidence.
+          compat_path = "docs/THUNDERBIRD_COMPATIBILITY.md"
+          compat = read(compat_path)
+          proof_anchor = "### Preuve runtime actuelle\n"
+          if proof_anchor not in compat or "### Thunderbird 155.0 — 2 septembre 2026" in compat:
+              raise SystemExit("THUNDERBIRD_COMPATIBILITY unexpected state")
+          proof = (
+              "### Thunderbird 155.0 — 2 septembre 2026\n\n"
+              "Thunderbird 155.0 refuse désormais par défaut les sous-scripts `jar:`, `file:` et `moz-extension:` chargés par `loadSubScript()`. MailPin charge ses modules Experiment depuis l’XPI (`jar:file:`) ; le démarrage échouait donc avant l’injection du panneau avec `Trying to load untrusted URI`.\n\n"
+              "Le chargeur MailPin utilise maintenant `loadSubScriptWithOptions(..., {target: PIN_MODULES, allowUnsafeURL: true})`. L’opt-in est borné à `MODULE_PATHS`, liste fixe de fichiers locaux résolus sous `context.extension.rootURI`; aucune URL utilisateur ou distante n’est acceptée.\n\n"
+              "Le head pré-versionnement `2dc4fd24e303d5d9e3d5fc0275ed150b54893741` a passé QA `33687513879` et le smoke réel `33687513777` sur le binaire officiel Thunderbird 155.0. La candidate versionnée 1.7.7 doit repasser le smoke sur son head exact avant publication. La plage candidate est `153.0` à `155.*`.\n\n"
+          )
+          write(compat_path, compat.replace(proof_anchor, proof + proof_anchor, 1))
+
+          bench_path = "docs/THUNDERBIRD_TEST_BENCH.md"
+          bench = read(bench_path)
+          bench_note = "\n## Cible runtime actuelle — Thunderbird 155.0\n\nLe smoke PR/main télécharge et vérifie le binaire officiel Thunderbird 155.0. Cette cible a démontré le correctif du chargeur Experiment de la candidate 1.7.7 ; le banc fonctionnel volumétrique ESR reste un contrôle distinct et n’est pas modifié sans besoin.\n"
+          if "## Cible runtime actuelle — Thunderbird 155.0" not in bench:
+              write(bench_path, bench.rstrip() + bench_note + "\n")
+
+          # Candidate-only audit/report. They deliberately distinguish pre-version proof from exact candidate gates.
+          (ROOT / f"SECURITY_AUDIT_{VERSION}.md").write_text(
+              "# Audit de sécurité — MailPin 1.7.7\n\n"
+              "## Portée\n\n"
+              "Maintenance de compatibilité Thunderbird 155 : borne manifeste, smoke runtime et migration du chargeur local de modules de l’Experiment. Aucun changement de permission, schéma, stockage, `PinCompatibility`, réseau runtime ou dépendance runtime.\n\n"
+              "## Point sensible Thunderbird 155\n\n"
+              "Thunderbird 155 bloque les sous-scripts `jar:` avec `loadSubScript()` par défaut. MailPin utilise `loadSubScriptWithOptions` avec `allowUnsafeURL: true` uniquement pour les noms de fichiers fixés dans `MODULE_PATHS` et résolus sous `context.extension.rootURI`. Aucune entrée API, donnée mail ou URL utilisateur ne construit ce chemin. Le réseau runtime reste absent.\n\n"
+              "## Preuve disponible\n\n"
+              "Le head pré-versionnement `2dc4fd24e303d5d9e3d5fc0275ed150b54893741` a passé QA `33687513879` et le smoke réel Thunderbird 155.0 `33687513777`. Les gates du head versionné exact 1.7.7 restent à exécuter avant publication.\n\n"
+              "Codex Security n’est pas utilisé.\n",
+              encoding="utf-8",
+          )
+          (ROOT / f"VALIDATION_REPORT_{VERSION}.md").write_text(
+              "# Rapport de validation — MailPin 1.7.7\n\n"
+              "## Objectif\n\n"
+              "Démontrer que MailPin démarre et conserve son intégration principale sur Thunderbird 155.0 après le durcissement du chargeur de sous-scripts privilégiés.\n\n"
+              "## Preuve pré-versionnement\n\n"
+              "- head : `2dc4fd24e303d5d9e3d5fc0275ed150b54893741` ;\n"
+              "- QA : `33687513879` — PASS ;\n"
+              "- smoke réel Thunderbird 155.0 : `33687513777` — PASS ;\n"
+              "- binaire Thunderbird officiel et geckodriver épinglé vérifiés par SHA avant exécution.\n\n"
+              "## Gate candidate 1.7.7\n\n"
+              "**CANDIDATE — gates exacts à exécuter.** Le bump de version modifie le manifeste et impose une QA/build ainsi qu’un smoke Thunderbird 155.0 frais sur le head versionné exact. Aucun résultat futur n’est présenté comme PASS avant son exécution.\n",
+              encoding="utf-8",
+          )
+          PY
+
+          npm run check
+          npm test
+          npm run build
+          git diff --check
+
+          rm .github/workflows/prepare-mailpin-1.7.7.yml
+          git config user.name "ussmarines"
+          git config user.email "ussmarines@users.noreply.github.com"
+          git add -A
+          git commit -m "release: prepare MailPin 1.7.7 for Thunderbird 155"
+          git push origin HEAD:fix/thunderbird-155-compatibility
