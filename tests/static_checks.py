@@ -112,6 +112,9 @@ assert 'this._extensionVersion = String(context.extension.manifest?.version || "
 assert 'extension: {version: this._extensionVersion || "0.0.0"' in impl
 assert 'let popupSet = document.querySelector("popupset") || document.getElementById("mainPopupSet")' in impl
 assert 'contextMenu?.remove()' in impl
+assert "Services.scriptloader.loadSubScriptWithOptions(" in impl
+assert "allowUnsafeURL: true" in impl
+assert 'Services.scriptloader.loadSubScript(context.extension.rootURI.resolve(' not in impl
 
 css = (EXT / "styles/pin.css").read_text(encoding="utf-8")
 for needle in [
