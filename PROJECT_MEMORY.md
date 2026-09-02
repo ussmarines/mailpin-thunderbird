@@ -2,7 +2,7 @@
 
 > Version source : **1.7.7**
 > Dernière release publique : **1.7.7**
-> Branche courante : `release/finalize-1.7.7` ; finalisation documentaire post-publication
+> Branche courante : `main` ; 1.7.7 publiée et documentation finalisée
 > Extension ID : `ussmarines.mailpin@addons.thunderbird.net`
 
 ## Résumé
