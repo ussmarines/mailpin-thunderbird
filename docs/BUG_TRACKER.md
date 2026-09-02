@@ -2,7 +2,7 @@
 
 Version source : **1.7.8**
 
-Dernière release publique : **1.7.7**
+Dernière release publique : **1.7.8**
 
 Les détails historiques complets restent dans Git et les audits archivés. Le registre courant conserve les entrées encore actionnables, les dernières corrections et les IDs historiques utilisés comme preuves permanentes par les gardes de régression.
 

@@ -2,14 +2,16 @@
 
 ## Portée
 
-Maintenance de publication basée sur l’état Git final de 1.7.7. Le runtime Thunderbird 155, le chargeur Experiment borné, les permissions, schémas, stockage et `PinCompatibility` sont inchangés.
+Maintenance de publication basée sur l’état Git final après 1.7.7. Le runtime Thunderbird 155, le chargeur Experiment borné, les permissions, schémas, stockage et `PinCompatibility` sont inchangés.
 
 ## Frontière privilégiée
 
 Le correctif Thunderbird 155 reste `loadSubScriptWithOptions(..., {target: PIN_MODULES, allowUnsafeURL: true})`, limité aux noms fixes de `MODULE_PATHS` résolus sous `context.extension.rootURI`. Aucune entrée utilisateur, donnée mail ou URL distante ne construit ces chemins. Le réseau runtime reste absent.
 
-## Gate 1.7.8
+## Preuves
 
-La release publique 1.7.7 a déjà démontré ce runtime sur Thunderbird 155.0. Le bump de manifeste 1.7.8 impose néanmoins une QA, un build reproductible et un smoke Thunderbird 155.0 frais sur le head candidat exact avant publication. Aucun résultat futur n’est présenté comme PASS avant exécution.
+- candidate `e48a12239c674e1f8a909b22a04c0c3266eca70e` : QA `33691697322` PASS, smoke Thunderbird 155.0 `33691697345` PASS ;
+- main/tag target `800c07315ee7f8611f2d2fc6e12a4f2c2d74b849` : QA `33691785442` PASS, smoke `33691785284` PASS ;
+- Release `33691919194` : build et publication PASS.
 
-Codex Security n’est pas utilisé.
+Aucune nouvelle permission, migration, dépendance runtime ou surface réseau n’est introduite par 1.7.8. Codex Security n’est pas utilisé.

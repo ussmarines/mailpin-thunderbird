@@ -4,12 +4,24 @@
 
 Publier l’état Git final synchronisé après 1.7.7 sous une version de maintenance distincte sans modifier le runtime Thunderbird 155 validé.
 
-## Baseline réutilisée
+## Candidate exacte
 
-- release publique 1.7.7 : runtime Thunderbird 155.0 validé ;
-- candidate 1.7.7 `94ce4d2656df8eb9694ce794743b82c00d83e8a9` : QA `33688297275` PASS, smoke `33688296968` PASS ;
-- main 1.7.7 `f5d5c07a0f8d375ed7347b3a42fbc57f4bafb7fb` : QA `33689155033` PASS, smoke `33689155048` PASS.
+- head : `e48a12239c674e1f8a909b22a04c0c3266eca70e` ;
+- QA : `33691697322` — PASS ;
+- smoke réel Thunderbird 155.0 : `33691697345` — PASS.
 
-## Gate candidate 1.7.8
+## Main / publication
 
-**CANDIDATE — gates exacts à exécuter.** Le runtime ne change pas, mais le numéro de version modifie le manifeste. Le head exact 1.7.8 doit passer QA Linux/Windows, garde sécurité/identité, build/reproductibilité et smoke réel Thunderbird 155.0 avant merge/publication.
+- squash/tag target : `800c07315ee7f8611f2d2fc6e12a4f2c2d74b849` ;
+- QA post-merge : `33691785442` — PASS ;
+- smoke réel Thunderbird 155.0 post-merge : `33691785284` — PASS ;
+- workflow canonique Release : `33691919194` — PASS ;
+- release publique : `v1.7.8` sur le même commit.
+
+## Artefacts publics
+
+- XPI : `b007f9ad0213bb5672e5273c27b4f0d3935897fc2696922acd2e2dd673b5048e` ;
+- archive source : `509076b18aef693c060983037c4277a97c65d98e13738ead351da7ef13537b9d` ;
+- `SHA256SUMS.txt` asset : `c20e8f706bad9d688486d8143a375a5377289ccf40c3aeeb023491ed7cccc1b7`.
+
+**PASS** — les gates applicables à la maintenance 1.7.8 sont démontrés. La soumission ATN reste un cycle distinct.
