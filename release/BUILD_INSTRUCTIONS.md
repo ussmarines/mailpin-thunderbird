@@ -1,4 +1,4 @@
-# Instructions de build pour les reviewers — MailPin 1.7.8
+# Instructions de build pour les reviewers — MailPin 1.7.9
 
 Artefact XPI attendu : `MailPin_v1.7.8.xpi`. La release GitHub **1.7.8** est publiée.
 
@@ -13,7 +13,7 @@ Artefact XPI attendu : `MailPin_v1.7.8.xpi`. La release GitHub **1.7.8** est pub
 
 ## Reproduction
 
-Dans un checkout de la source MailPin 1.7.8 ou dans l’archive reviewer extraite sans `.git` :
+Dans un checkout de la source MailPin 1.7.9 ou dans l’archive reviewer extraite sans `.git` :
 
 ```bash
 npm run ci
@@ -22,8 +22,8 @@ npm run ci
 Livrables :
 
 ```text
-dist/MailPin_v1.7.8.xpi
-dist/MailPin_GitHub_Repository_v1.7.8.zip
+dist/MailPin_v1.7.9.xpi
+dist/MailPin_GitHub_Repository_v1.7.9.zip
 dist/SHA256SUMS.txt
 ```
 

@@ -1,10 +1,10 @@
 {
-  "note": "MailPin 1.7.8 publié. Référence de métadonnées alignée sur la release GitHub v1.7.8 et la compatibilité Thunderbird 153.0 à 155.*.",
+  "note": "MailPin 1.7.9 candidat. Référence de métadonnées pour la compatibilité Thunderbird 153.0 à 156.* ; MailPin 1.7.8 publié reste la dernière release publique jusqu’aux gates et à la publication 1.7.9.",
   "browser_specific_settings": {
     "gecko": {
       "id": "ussmarines.mailpin@addons.thunderbird.net",
       "strict_min_version": "153.0",
-      "strict_max_version": "155.*"
+      "strict_max_version": "156.*"
     }
   },
   "homepage_url": "https://github.com/ussmarines/mailpin-thunderbird",

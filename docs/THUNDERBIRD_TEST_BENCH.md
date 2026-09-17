@@ -56,7 +56,7 @@ Thunderbird documente officiellement `mach`/xpcshell/Mochitest pour ses propres 
 Le job :
 
 1. construit l’XPI depuis le checkout ;
-2. télécharge Thunderbird `155.0` depuis l’archive officielle Mozilla ;
+2. télécharge Thunderbird `156.0` depuis l’archive officielle Mozilla ;
 3. vérifie l’archive avec le `SHA256SUMS` officiel Mozilla ;
 4. télécharge geckodriver `0.37.1` depuis la release Mozilla officielle ;
 5. vérifie le SHA-256 de l’asset fourni par GitHub ;
@@ -91,7 +91,7 @@ Lorsque le job réussit réellement, il démontre au minimum sur la version épi
 
 Il ne prouve pas à lui seul :
 
-- toute extension future de la plage Thunderbird au-delà de 155 ;
+- toute extension future de la plage Thunderbird au-delà de 156 ;
 - Windows ou macOS ;
 - IMAP/POP/Gmail/Microsoft réels ;
 - les dossiers virtuels réels ;
@@ -118,7 +118,7 @@ Après publication de la branche, lancer **Thunderbird functional and scale benc
 ```bash
 python tests/thunderbird/functional_bench.py \
   --binary /chemin/vers/thunderbird \
-  --xpi dist/MailPin_v1.7.7.xpi \
+  --xpi dist/MailPin_v1.7.9.xpi \
   --geckodriver /chemin/vers/geckodriver \
   --output-dir artifacts/thunderbird-bench \
   --volumes 50,100,500,1000,2000 \
@@ -136,7 +136,7 @@ Pour préparer cette validation manuelle sans automatiser l’onglet Options, ut
 ```bash
 python tests/thunderbird/functional_bench.py \
   --binary /chemin/vers/thunderbird \
-  --xpi dist/MailPin_v1.7.7.xpi \
+  --xpi dist/MailPin_v1.7.9.xpi \
   --geckodriver /chemin/vers/geckodriver \
   --output-dir artifacts/thunderbird-manual-scope \
   --prepare-manual-scope-validation \
@@ -146,7 +146,7 @@ python tests/thunderbird/functional_bench.py \
 ```bash
 python tests/thunderbird/functional_bench.py \
   --binary /chemin/vers/thunderbird \
-  --xpi dist/MailPin_v1.7.7.xpi \
+  --xpi dist/MailPin_v1.7.9.xpi \
   --geckodriver /chemin/vers/geckodriver \
   --output-dir artifacts/thunderbird-multi-account \
   --scope-validation-only \
@@ -182,7 +182,7 @@ Sous Windows x64, l’installation utilisateur validée est `C:\Users\ussma\AppD
 ```bash
 python tests/thunderbird/real_smoke.py \
   --binary /chemin/vers/thunderbird \
-  --xpi dist/MailPin_v1.7.7.xpi \
+  --xpi dist/MailPin_v1.7.9.xpi \
   --geckodriver /chemin/vers/geckodriver \
   --output-dir artifacts/thunderbird-smoke \
   --timeout 45

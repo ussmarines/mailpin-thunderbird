@@ -1,9 +1,9 @@
-# Passage de relais — MailPin 1.7.8 publiée
+# Passage de relais — MailPin 1.7.9 candidate
 
 ## État
 
-- branche : `main` ;
-- version source : **1.7.8** ;
+- branche : `fix/thunderbird-156-compatibility` ;
+- version source : **1.7.9** ;
 - dernière release publique : **1.7.8** ;
 - Thunderbird : 153.0 à 155.* ;
 - ID : `ussmarines.mailpin@addons.thunderbird.net` ;
