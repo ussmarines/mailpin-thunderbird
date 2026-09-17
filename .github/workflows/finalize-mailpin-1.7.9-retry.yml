@@ -1,0 +1,63 @@
+name: Retry MailPin 1.7.9 publication finalization
+
+on:
+  push:
+    branches:
+      - release/finalize-1.7.9
+    paths:
+      - ".github/workflows/finalize-mailpin-1.7.9-retry.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: "3.12"
+      - name: Finalize with canonical public-version token
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          source = Path('.github/workflows/finalize-mailpin-1.7.9.yml').read_text(encoding='utf-8')
+          marker = "          python - <<'PY'\n"
+          start = source.index(marker) + len(marker)
+          end = source.index("\n          PY\n", start)
+          block = source[start:end]
+          code = '\n'.join(line[10:] if line.startswith('          ') else line for line in block.splitlines()) + '\n'
+          code = code.replace("repl('docs/ATN_RELEASE_CHECKLIST.md', 'publique reste **1.7.8**', 'publique est **1.7.9**', required=False)", "repl('docs/ATN_RELEASE_CHECKLIST.md', 'publique reste **1.7.8**', 'publique : **1.7.9**', required=False)")
+          Path('/tmp/finalize_179.py').write_text(code, encoding='utf-8')
+          PY
+          python /tmp/finalize_179.py
+
+          git add \
+            README.md README.en.md PROJECT_MEMORY.md STORE_RELEASE.md \
+            SECURITY_AUDIT_1.7.9.md VALIDATION_REPORT_1.7.9.md \
+            docs/PROJECT_STATE.json docs/KNOWN_LIMITATIONS.md docs/BUG_TRACKER.md docs/MANUAL_TEST_PLAN.md \
+            docs/ATN_RELEASE_CHECKLIST.md docs/CODEX_HANDOFF.md docs/THUNDERBIRD_COMPATIBILITY.md \
+            release/BUILD_INSTRUCTIONS.md release/ATN_REVIEW_NOTES_TEMPLATE.md release/manifest-store-template.json
+          git diff --cached --check
+
+          # Rerun the failed contract first, then the invalidated documentation gates.
+          python scripts/check_versions.py
+          npm run check
+          python tests/test_project_metadata.py
+          python tests/test_build_reproducible.py
+          git diff --cached --check
+
+          git config user.name "ussmarines"
+          git config user.email "ussmarines@users.noreply.github.com"
+          git commit -m "docs(release): finalize MailPin 1.7.9 publication"
+          git push origin HEAD:release/finalize-1.7.9
