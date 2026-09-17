@@ -2,9 +2,9 @@
 
 ## État
 
-- branche : `fix/thunderbird-156-compatibility` ;
+- branche : `main` ;
 - version source : **1.7.9** ;
-- dernière release publique : **1.7.8** ;
+- dernière release publique : **1.7.9** ;
 - Thunderbird : 153.0 à 155.* ;
 - ID : `ussmarines.mailpin@addons.thunderbird.net` ;
 - tag/release : `v1.7.8` → `800c07315ee7f8611f2d2fc6e12a4f2c2d74b849`.

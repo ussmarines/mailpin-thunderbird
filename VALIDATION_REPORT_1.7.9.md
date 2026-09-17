@@ -1,14 +1,16 @@
 # Rapport de validation — MailPin 1.7.9
 
-## Objectif
+## Résultat
 
-Étendre MailPin de Thunderbird 153.0–155.* à Thunderbird 153.0–156.* après la sortie de Thunderbird 156.0 le 15 septembre 2026.
+**PASS — publiée.** MailPin 1.7.9 est validé pour Thunderbird 153.0 à 156.*.
 
-## Baseline réutilisée
+## Preuves
 
-- MailPin 1.7.8 / Thunderbird 155 : candidate `e48a12239c674e1f8a909b22a04c0c3266eca70e`, QA `33691697322` PASS, smoke `33691697345` PASS ;
-- release target 1.7.8 `800c07315ee7f8611f2d2fc6e12a4f2c2d74b849`, QA `33691785442` PASS, smoke `33691785284` PASS.
+- candidate exacte `da9d97a874f5043b43a212d09b9090ad0f77d681` : QA `35224045803` PASS ; smoke réel Thunderbird 156.0 `35224046106` PASS ;
+- `main` / cible du tag `46bb9fc27256cc143743e74e4a04fb48d48f6e85` : QA `35224161719` PASS ; smoke réel Thunderbird 156.0 `35224161877` PASS ;
+- workflow canonique Release `35224299551` : build/vérification/publication PASS ;
+- XPI public SHA-256 `41248fb7f68dde8a7858e5500e008a09248f7c3a4968b045e1f8c2d6d5839fb2` ;
+- archive source SHA-256 `b3aef29587f653433dd211dfeb7d077f44832d1b83331de26151c40c334e9397` ;
+- `SHA256SUMS.txt` asset SHA-256 `ea5f9801b5d952368290ca2754e8dbc0df3a01133759b594b59c2d812609bcb0`.
 
-## Gate candidate 1.7.9
-
-**CANDIDATE — gates exacts à exécuter.** QA Linux/Windows, garde sécurité/identité, build reproductible et smoke réel Thunderbird 156.0 sont requis avant merge/publication. Aucun résultat futur n’est présenté comme PASS avant exécution.
+Aucun changement métier `pinInbox`, permission, schéma, stockage, dépendance runtime ou réseau n’a été nécessaire pour Thunderbird 156.

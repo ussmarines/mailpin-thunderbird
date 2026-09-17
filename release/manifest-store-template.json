@@ -1,5 +1,5 @@
 {
-  "note": "MailPin 1.7.9 candidat. Référence de métadonnées pour la compatibilité Thunderbird 153.0 à 156.* ; MailPin 1.7.8 publié reste la dernière release publique jusqu’aux gates et à la publication 1.7.9.",
+  "note": "MailPin 1.7.9 publié. Référence de métadonnées pour la compatibilité Thunderbird 153.0 à 156.* ; la release GitHub v1.7.9 a passé QA et smoke réel Thunderbird 156.0.",
   "browser_specific_settings": {
     "gecko": {
       "id": "ussmarines.mailpin@addons.thunderbird.net",
