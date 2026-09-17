@@ -1,0 +1,82 @@
+name: Persist Thunderbird 156 candidate
+
+on:
+  push:
+    branches:
+      - fix/thunderbird-156-compatibility
+    paths:
+      - ".github/workflows/persist-thunderbird-156-candidate.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  persist:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: "3.12"
+      - name: Build and persist non-workflow candidate diff
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          source = Path('.github/workflows/prepare-thunderbird-156.yml').read_text(encoding='utf-8')
+          marker = "          python - <<'PY'\n"
+          start = source.index(marker) + len(marker)
+          end = source.index("\n          PY\n", start)
+          block = source[start:end]
+          code = '\n'.join(line[10:] if line.startswith('          ') else line for line in block.splitlines()) + '\n'
+          # The canonical smoke workflow was already changed through the authorized
+          # GitHub connector; do not modify any workflow from the Actions token.
+          code = code.replace("replace('.github/workflows/thunderbird-smoke.yml', 'THUNDERBIRD_VERSION: \"155.0\"', 'THUNDERBIRD_VERSION: \"156.0\"')", "pass")
+          code = code.replace("replace('.github/workflows/thunderbird-smoke.yml', 'name: Real Thunderbird 155 runtime smoke', 'name: Real Thunderbird 156 runtime smoke')", "pass")
+          Path('/tmp/prepare_tb156.py').write_text(code, encoding='utf-8')
+          PY
+          python /tmp/prepare_tb156.py
+          python - <<'PY'
+          from pathlib import Path
+          import json
+
+          path = Path('release/manifest-store-template.json')
+          data = json.loads(path.read_text(encoding='utf-8'))
+          data['note'] = 'MailPin 1.7.9 candidat. Référence de métadonnées pour la compatibilité Thunderbird 153.0 à 156.* ; MailPin 1.7.8 publié reste la dernière release publique jusqu’aux gates et à la publication 1.7.9.'
+          path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+          static = Path('tests/static_checks.py')
+          text = static.read_text(encoding='utf-8')
+          old = 'assert manifest["browser_specific_settings"]["gecko"]["strict_max_version"] == "155.*"'
+          new = 'assert manifest["browser_specific_settings"]["gecko"]["strict_max_version"] == "156.*"'
+          if old not in text:
+              raise SystemExit('tests/static_checks.py: expected Thunderbird 155 ceiling guard missing')
+          static.write_text(text.replace(old, new, 1), encoding='utf-8')
+          PY
+
+          # Do not stage workflow files; GitHub Actions is intentionally not granted workflows:write.
+          git add \
+            package.json extension/manifest.json tests/static_checks.py tests/test_thunderbird_test_bench.py \
+            README.md README.en.md CHANGELOG.md THIRD_PARTY_NOTICES.md PRIVACY.md PROJECT_MEMORY.md STORE_RELEASE.md \
+            SECURITY_AUDIT_1.7.9.md VALIDATION_REPORT_1.7.9.md \
+            docs/PROJECT_STATE.json docs/KNOWN_LIMITATIONS.md docs/MANUAL_TEST_PLAN.md docs/BUG_TRACKER.md \
+            docs/CODEX_HANDOFF.md docs/ATN_RELEASE_CHECKLIST.md docs/THUNDERBIRD_COMPATIBILITY.md docs/THUNDERBIRD_TEST_BENCH.md \
+            release/BUILD_INSTRUCTIONS.md release/ATN_REVIEW_NOTES_TEMPLATE.md release/manifest-store-template.json
+          git diff --cached --check
+
+          python tests/static_checks.py
+          npm run ci
+          git diff --cached --check
+
+          git config user.name "ussmarines"
+          git config user.email "ussmarines@users.noreply.github.com"
+          git commit -m "release: prepare MailPin 1.7.9 for Thunderbird 156"
+          git push origin HEAD:fix/thunderbird-156-compatibility
