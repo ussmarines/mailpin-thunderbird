@@ -123,7 +123,7 @@ Avant d’ajouter une nouvelle capacité Thunderbird :
 
 ## Compatibilité de versions
 
-Depuis 1.5.1, la branche 153 était la seule plage revendiquée après essais réels. MailPin 1.7.4 a étendu cette plage à Thunderbird `154.*` après validation directe du runtime 154.0. MailPin 1.7.7 l’étend à `155.*` après correction et validation réelle du runtime 155.0. Le minimum reste `153.0` : les essais antérieurs sur 128/140 injectaient le panneau mais ne garantissaient pas l’ouverture fiable du Dashboard via le pont MV3 Experiment → background.
+Depuis 1.5.1, la branche 153 était la seule plage revendiquée après essais réels. MailPin 1.7.4 a étendu cette plage à Thunderbird `154.*` après validation directe du runtime 154.0. MailPin 1.7.7 l’étend à `155.*` après correction et validation réelle du runtime 155.0. La candidate 1.7.9 porte la limite supérieure à `156.*` et exige un smoke réel frais sur Thunderbird 156.0 avant publication. Le minimum reste `153.0` : les essais antérieurs sur 128/140 injectaient le panneau mais ne garantissaient pas l’ouverture fiable du Dashboard via le pont MV3 Experiment → background.
 
 Toute future adaptation de version doit rester localisée autant que possible dans ces adaptateurs et être documentée dans `docs/KNOWN_LIMITATIONS.md` et `docs/BUG_TRACKER.md` si elle corrige une régression observée. Une nouvelle version majeure Thunderbird ne doit pas être ajoutée à `strict_max_version` sans smoke réel frais lorsque l’Experiment ou le DOM interne sont concernés.
 
@@ -135,8 +135,12 @@ Le chargeur MailPin utilise maintenant `loadSubScriptWithOptions(..., {target: P
 
 Le head pré-versionnement `2dc4fd24e303d5d9e3d5fc0275ed150b54893741` a passé QA `33687513879` et le smoke réel `33687513777` sur le binaire officiel Thunderbird 155.0. La candidate exacte `94ce4d2656df8eb9694ce794743b82c00d83e8a9` a ensuite passé QA `33688297275` et smoke réel `33688296968`. Après squash, `main` `f5d5c07a0f8d375ed7347b3a42fbc57f4bafb7fb` a repassé QA `33689155033` et smoke réel `33689155048`. Le workflow Release `33689378381` a publié `v1.7.7` depuis ce même commit. La plage publiée est `153.0` à `155.*`.
 
+### Thunderbird 156.0 — 17 septembre 2026
+
+Thunderbird 156.0 est sorti le 15 septembre 2026. Les notes officielles ne signalent pas de rupture WebExtension/Experiment équivalente à celle de 155, mais MailPin dépend du DOM `about:3pane` et d’une API Experiment privilégiée : la compatibilité n’est donc pas inférée. La candidate 1.7.9 relève `strict_max_version` à `156.*`, déplace le smoke sur le binaire officiel 156.0 et conserve le runtime métier inchangé. Les preuves exactes seront consignées après exécution des gates.
+
 ### Preuve runtime actuelle
 
-La preuve runtime courante pour la limite supérieure est Thunderbird 155.0 : candidate exacte `94ce4d2656df8eb9694ce794743b82c00d83e8a9`, smoke `33688296968` PASS, puis `main` `f5d5c07a0f8d375ed7347b3a42fbc57f4bafb7fb`, smoke post-merge `33689155048` PASS. Les deux jobs utilisent le binaire officiel Thunderbird 155.0 et geckodriver 0.37.1 vérifiés avant exécution.
+Jusqu’au PASS de la candidate 1.7.9, la dernière preuve runtime publiée pour la limite supérieure reste Thunderbird 155.0 : candidate exacte `94ce4d2656df8eb9694ce794743b82c00d83e8a9`, smoke `33688296968` PASS, puis `main` `f5d5c07a0f8d375ed7347b3a42fbc57f4bafb7fb`, smoke post-merge `33689155048` PASS. Les deux jobs utilisent le binaire officiel Thunderbird 155.0 et geckodriver 0.37.1 vérifiés avant exécution.
 
 Les preuves Thunderbird 154 restent historiques : la candidate versionnée `c2527b57de4775f4fd228af22b9792937e7ce6ea` avait passé QA `32300356172` et smoke réel Thunderbird 154.0 `32300356085`, puis `v1.7.4` avait été publiée sur `b74c0c7f264cf387269be0aaf18e47e99cf07600`. Les fournisseurs réseau, calendriers distants et la matrice multi-OS restent des validations distinctes.

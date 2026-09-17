@@ -1,5 +1,12 @@
 # Journal des modifications
 
+## 1.7.9 — compatibilité Thunderbird 156
+
+- étend la compatibilité déclarée de Thunderbird `153.0` à `156.*` ;
+- déplace le smoke runtime automatisé sur le binaire officiel Thunderbird 156.0 avec vérification SHA-256 ;
+- conserve le chargeur Experiment borné introduit pour Thunderbird 155, `PinCompatibility`, les permissions, schémas, stockage local-first et l’état lu/non-lu inchangés ;
+- n’ajoute aucune dépendance runtime, connexion réseau, télémétrie, publicité, CDN ou code distant.
+
 ## 1.7.8 — maintenance de publication
 
 - republie l’état Git final synchronisé après 1.7.7 sous un nouveau numéro de version ;
