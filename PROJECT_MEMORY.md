@@ -1,8 +1,8 @@
 # Mémoire opérationnelle — MailPin
 
 > Version source : **1.7.9**
-> Dernière release publique : **1.7.8**
-> Branche courante : `fix/thunderbird-156-compatibility` ; candidate MailPin 1.7.9 / Thunderbird 156
+> Dernière release publique : **1.7.9**
+> Branche courante : `main` ; MailPin 1.7.9 publiée
 > Extension ID : `ussmarines.mailpin@addons.thunderbird.net`
 
 ## Résumé
@@ -19,6 +19,8 @@ La maintenance 1.7.8 a été validée sur la candidate exacte `e48a12239c674e1f8
 
 Thunderbird 156.0 est sorti le 15 septembre 2026. La source 1.7.9 relève `strict_max_version` à `156.*` et cible le binaire officiel 156.0 dans le smoke runtime ; aucune compatibilité 156 n’est considérée prouvée avant le PASS du smoke exact de la candidate.
 
+
+La compatibilité Thunderbird 156 a été démontrée sur la candidate `da9d97a874f5043b43a212d09b9090ad0f77d681` (QA `35224045803`, smoke réel 156.0 `35224046106`) puis sur le target publié `46bb9fc27256cc143743e74e4a04fb48d48f6e85` (QA `35224161719`, smoke `35224161877`). Le workflow canonique Release `35224299551` a publié `v1.7.9`. Empreintes GitHub : XPI `41248fb7f68dde8a7858e5500e008a09248f7c3a4968b045e1f8c2d6d5839fb2`, source `b3aef29587f653433dd211dfeb7d077f44832d1b83331de26151c40c334e9397`, `SHA256SUMS.txt` `ea5f9801b5d952368290ca2754e8dbc0df3a01133759b594b59c2d812609bcb0`.
 
 ## Invariants non négociables
 
@@ -64,7 +66,7 @@ Thunderbird 156.0 est sorti le 15 septembre 2026. La source 1.7.9 relève `stric
 
 ## État technique courant
 
-- source : 1.7.9 candidate ; dernière release publique : 1.7.8 ;
+- source : 1.7.9 publiée ; dernière release publique : 1.7.9 ;
 - Thunderbird : 153.0 à 155.* ;
 - permission WebExtension : `menus` uniquement ;
 - schémas : SQLite 5, settings 8, data 7 ;

@@ -3,7 +3,7 @@
 ## Statut
 
 - **Dernière release GitHub publique :** 1.7.8
-- **Source candidate :** 1.7.9
+- **Source publiée :** 1.7.9
 - **Version :** 1.7.9
 - **Soumission ATN :** à préparer séparément de la release GitHub
 

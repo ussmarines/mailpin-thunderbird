@@ -1,6 +1,6 @@
 # Instructions de build pour les reviewers — MailPin 1.7.9
 
-Artefact XPI attendu : `MailPin_v1.7.8.xpi`. La release GitHub **1.7.8** est publiée.
+Artefact XPI attendu : `MailPin_v1.7.8.xpi`. La release GitHub **1.7.9** est publiée.
 
 ## Environnement
 
