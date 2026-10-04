@@ -6,8 +6,8 @@
 **Email Follow-up & Productivity for Thunderbird**
 
 [![QA](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml)
-![Release](https://img.shields.io/badge/release-v1.7.9-4F7F75)
-![Source](https://img.shields.io/badge/candidate-v1.7.10-3D536B)
+![Release](https://img.shields.io/badge/release-v1.7.10-4F7F75)
+![Source](https://img.shields.io/badge/release-v1.7.10-3D536B)
 ![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x--157.x-3D536B)
 ![License](https://img.shields.io/badge/license-MailPin%20Source--Available%201.1-1A1D21)
 </div>
@@ -25,29 +25,29 @@ MailPin turns important email into actionable follow-up **without replacing Thun
 
 ## Brand & interface
 
-Candidate **1.7.10** extends declared compatibility to Thunderbird 157 and moves the real-runtime smoke to the official 157.0.1 binary. No permission, schema, storage, runtime dependency or network behavior changes; publication remains blocked until the exact gates pass.
+Release **1.7.10** extends compatibility to Thunderbird 157 after real-runtime validation on the official 157.0.1 binary. No permission, schema, storage, runtime dependency or network behavior changes.
 
 ## Compatibility
 
-- **Source version:** `1.7.10` — candidate
-- **Latest public release:** `1.7.9`
+- **Source version:** `1.7.10` — published
+- **Latest public release:** `1.7.10`
 - **Thunderbird:** `153.0` to `157.*`
 - **Format:** MailExtension Manifest V3
 - **Locales:** French and English
 - **Public ID:** `ussmarines.mailpin@addons.thunderbird.net`
 - **Add-ons for Thunderbird listing:** [MailPin](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/) — the ATN submission/review cycle remains separate from the GitHub release
 
-MailPin uses a privileged Thunderbird Experiment for `about:3pane`, local SQLite storage, and selected Messages/Tags/Calendar integration. Messages, Tags and Calendar internals remain isolated behind `PinCompatibility`. Public release 1.7.9 remains the validated Thunderbird 156.0 baseline; candidate 1.7.10 claims Thunderbird 157 only after QA, reproducible build and a real 157.0.1 runtime smoke on its exact head.
+MailPin uses a privileged Thunderbird Experiment for `about:3pane`, local SQLite storage, and selected Messages/Tags/Calendar integration. Messages, Tags and Calendar internals remain isolated behind `PinCompatibility`. Exact candidate `565f565710da6262d7a91bfbe280a943047cdc6c` passed QA `37213680870` and real Thunderbird 157.0.1 smoke `37213680824`; published target `704b3d5c2b35a2eceb4fbe1136b50a86dfadd6f0` reran QA `37213779632`, smoke `37213779633` and CodeQL `37213779727` before canonical Release run `37214354533` published v1.7.10.
 
 ## Install
 
 ### Add-ons for Thunderbird
 
-The [MailPin listing on Add-ons for Thunderbird](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/) exists. GitHub release 1.7.9 is separate from the Add-ons for Thunderbird review cycle.
+The [MailPin listing on Add-ons for Thunderbird](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/) exists. GitHub release 1.7.10 is separate from the Add-ons for Thunderbird review cycle.
 
 ### GitHub release
 
-1. Download `MailPin_v1.7.9.xpi` from release `v1.7.9`.
+1. Download `MailPin_v1.7.10.xpi` from release `v1.7.10`.
 2. Thunderbird → **Add-ons and Themes** → gear menu → **Install Add-on From File**.
 3. Select the XPI.
 

@@ -1,6 +1,6 @@
 # Plan de test manuel MailPin — 1.7.10
 
-Utiliser de préférence un profil Thunderbird jetable pour les scénarios destructifs. Le présent plan complète les validations automatisées de la source 1.7.10 ; la dernière release publique est 1.7.9. Aucun contrôle non exécuté ne doit être présenté comme PASS.
+Utiliser de préférence un profil Thunderbird jetable pour les scénarios destructifs. Le présent plan complète les validations automatisées de la source 1.7.10 ; la dernière release publique est 1.7.10. Aucun contrôle non exécuté ne doit être présenté comme PASS.
 
 ## Recette 1.7.10 — Thunderbird 157.0.1
 
@@ -16,6 +16,6 @@ Utiliser de préférence un profil Thunderbird jetable pour les scénarios destr
 
 ## Preuves automatisées disponibles
 
-La release publique 1.7.9 reste validée sur Thunderbird 156.0 : candidate `da9d97a874f5043b43a212d09b9090ad0f77d681` — QA `35224045803`, smoke `35224046106` PASS ; target `46bb9fc27256cc143743e74e4a04fb48d48f6e85` — QA `35224161719`, smoke `35224161877` PASS.
+La release publique 1.7.10 est validée sur Thunderbird 157.0.1 : candidate `565f565710da6262d7a91bfbe280a943047cdc6c` — QA `37213680870`, smoke `37213680824` PASS ; target `704b3d5c2b35a2eceb4fbe1136b50a86dfadd6f0` — QA `37213779632`, smoke `37213779633` et CodeQL `37213779727` PASS ; workflow Release `37214354533` PASS.
 
-La preuve Thunderbird 157.0.1 de 1.7.10 est en attente tant que les workflows du head exact n’ont pas terminé avec succès. Une recette humaine supplémentaire ne doit être déclarée PASS que si elle est réellement exécutée sur le XPI correspondant.
+Une recette humaine supplémentaire ne doit être déclarée PASS que si elle est réellement exécutée sur le XPI public correspondant.

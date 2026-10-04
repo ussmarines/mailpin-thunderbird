@@ -1,8 +1,8 @@
 # Mémoire opérationnelle — MailPin
 
 > Version source : **1.7.10**
-> Dernière release publique : **1.7.9**
-> Branche courante : `fix/thunderbird-157-compatibility` ; candidate MailPin 1.7.10 / Thunderbird 157
+> Dernière release publique : **1.7.10**
+> Branche courante : `main` ; MailPin 1.7.10 publiée
 > Extension ID : `ussmarines.mailpin@addons.thunderbird.net`
 
 ## Résumé
@@ -23,6 +23,8 @@ Thunderbird 156.0 est sorti le 15 septembre 2026. La source 1.7.9 relève `stric
 La compatibilité Thunderbird 156 a été démontrée sur la candidate `da9d97a874f5043b43a212d09b9090ad0f77d681` (QA `35224045803`, smoke réel 156.0 `35224046106`) puis sur le target publié `46bb9fc27256cc143743e74e4a04fb48d48f6e85` (QA `35224161719`, smoke `35224161877`). Le workflow canonique Release `35224299551` a publié `v1.7.9`. Empreintes GitHub : XPI `41248fb7f68dde8a7858e5500e008a09248f7c3a4968b045e1f8c2d6d5839fb2`, source `b3aef29587f653433dd211dfeb7d077f44832d1b83331de26151c40c334e9397`, `SHA256SUMS.txt` `ea5f9801b5d952368290ca2754e8dbc0df3a01133759b594b59c2d812609bcb0`.
 
 Thunderbird 157.0 est sorti le 30 septembre 2026 et 157.0.1 le 1er octobre 2026. La candidate 1.7.10 relève `strict_max_version` à `157.*` et déplace le smoke runtime sur le binaire officiel 157.0.1. Le runtime métier, les permissions, schémas, stockage et frontières privilégiées restent inchangés ; aucune compatibilité 157 n’est considérée prouvée avant le PASS du smoke exact de la candidate.
+
+La compatibilité Thunderbird 157 a été démontrée sur la candidate `565f565710da6262d7a91bfbe280a943047cdc6c` (QA `37213680870`, smoke réel 157.0.1 `37213680824`) puis sur le target publié `704b3d5c2b35a2eceb4fbe1136b50a86dfadd6f0` (QA `37213779632`, smoke `37213779633`, CodeQL `37213779727`). Le workflow canonique Release `37214354533` a publié `v1.7.10`. Empreintes GitHub : XPI `fc0cc2ada46cce977de9ba8594b79d8f9ba065dc810be329455f998e3c729b62`, source `ecb990f72cf44c880fb4e6f819f185cd6f477dd55525bed907332627fa266e94`, `SHA256SUMS.txt` `b213b5dc7f6fa8dc89812ccb838db7889ca143915df5523689e6eb011d7f8744`.
 
 ## Invariants non négociables
 
@@ -68,14 +70,14 @@ Thunderbird 157.0 est sorti le 30 septembre 2026 et 157.0.1 le 1er octobre 2026.
 
 ## État technique courant
 
-- source : 1.7.10 candidate ; dernière release publique : 1.7.9 ;
-- Thunderbird candidat : 153.0 à 157.* ; baseline publiée validée : 153.0 à 156.* ;
+- source : 1.7.10 publiée ; dernière release publique : 1.7.10 ;
+- Thunderbird : 153.0 à 157.* ;
 - permission WebExtension : `menus` uniquement ;
 - schémas : SQLite 5, settings 8, data 7 ;
-- aucun changement métier, migration, permission, dépendance runtime ou réseau prévu pour 1.7.10 ;
-- preuve publiée 1.7.9 : candidate `da9d97a874f5043b43a212d09b9090ad0f77d681` — QA `35224045803` / smoke Thunderbird 156.0 `35224046106` PASS ;
-- target publié 1.7.9 `46bb9fc27256cc143743e74e4a04fb48d48f6e85` — QA `35224161719` / smoke `35224161877` PASS ;
-- preuve Thunderbird 157.0.1 : en attente sur le head exact 1.7.10.
+- aucun changement métier, migration, permission, dépendance runtime ou réseau introduit par 1.7.10 ;
+- candidate 1.7.10 `565f565710da6262d7a91bfbe280a943047cdc6c` : QA `37213680870` / smoke Thunderbird 157.0.1 `37213680824` PASS ;
+- `main`/target publié `704b3d5c2b35a2eceb4fbe1136b50a86dfadd6f0` : QA `37213779632` / smoke `37213779633` / CodeQL `37213779727` PASS ;
+- release `v1.7.10` : workflow Release `37214354533` PASS.
 
 ## Commandes obligatoires
 
