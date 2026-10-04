@@ -2,16 +2,16 @@
   "format": "mailperch-project-state",
   "version": 1,
   "project": "MailPin — Email Follow-up & Productivity",
-  "extensionVersion": "1.7.9",
+  "extensionVersion": "1.7.10",
   "baseGitHub": {
-    "branch": "main",
-    "commit": "46bb9fc27256cc143743e74e4a04fb48d48f6e85",
-    "role": "MailPin 1.7.9 release/tag target validated on Thunderbird 156.0 before publication"
+    "branch": "fix/thunderbird-157-compatibility",
+    "commit": "aef40057221ae44c598f1769f6ab7d718637cd47",
+    "role": "MailPin 1.7.9 published baseline used for the Thunderbird 157 / MailPin 1.7.10 compatibility candidate"
   },
   "extensionId": "ussmarines.mailpin@addons.thunderbird.net",
   "thunderbird": {
     "min": "153.0",
-    "max": "156.*"
+    "max": "157.*"
   },
   "schemas": {
     "sqlite": 5,
@@ -91,7 +91,7 @@
     "uiDependencyPolicy": "native HTML plus local Organic Workspace CSS tokens; canonical workspace stylesheet; no runtime patch stylesheet, npm runtime dependency, bundler, CDN or remote asset",
     "runtimeTestSupplyChain": "test-only Thunderbird/geckodriver downloads are checksum-verified and are not runtime dependencies"
   },
-  "developmentBranch": "main",
+  "developmentBranch": "fix/thunderbird-157-compatibility",
   "testing": {
     "contract": [
       "tests/test_organic_workspace_ui.py",
@@ -100,9 +100,9 @@
     ],
     "runtimeWorkflow": ".github/workflows/thunderbird-smoke.yml",
     "runtimeScript": "tests/thunderbird/real_smoke.py",
-    "browserStatus": "MailPin 1.7.9 is published for Thunderbird 153.0 through 156.*. Thunderbird 156.0 compatibility was validated on both the exact candidate and the merged release target.",
-    "runtimeStatus": "Exact candidate da9d97a874f5043b43a212d09b9090ad0f77d681: QA 35224045803 PASS and real Thunderbird 156.0 smoke 35224046106 PASS. Merged main/tag target 46bb9fc27256cc143743e74e4a04fb48d48f6e85: QA 35224161719 PASS and real Thunderbird 156.0 smoke 35224161877 PASS. Canonical Release workflow 35224299551 rebuilt and published v1.7.9 from the same target commit."
+    "browserStatus": "MailPin 1.7.10 is a compatibility candidate for Thunderbird 153.0 through 157.*. Published 1.7.9 remains the validated Thunderbird 156.0 baseline until the exact candidate passes a fresh real Thunderbird 157.0.1 smoke.",
+    "runtimeStatus": "Pending on exact 1.7.10 candidate: QA/security/Windows and real Thunderbird 157.0.1 smoke. Published proof remains MailPin 1.7.9: candidate da9d97a874f5043b43a212d09b9090ad0f77d681 QA 35224045803 / smoke 35224046106 and target 46bb9fc27256cc143743e74e4a04fb48d48f6e85 QA 35224161719 / smoke 35224161877."
   },
   "latestPublicVersion": "1.7.9",
-  "releaseStatus": "published"
+  "releaseStatus": "candidate"
 }

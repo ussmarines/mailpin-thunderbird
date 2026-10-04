@@ -1,6 +1,6 @@
-# Instructions de build pour les reviewers — MailPin 1.7.9
+# Instructions de build pour les reviewers — MailPin 1.7.10
 
-Artefact XPI attendu : `MailPin_v1.7.8.xpi`. La release GitHub **1.7.9** est publiée.
+Artefact XPI attendu : `MailPin_v1.7.10.xpi`. La release GitHub **1.7.9** est publiée ; 1.7.10 est candidate.
 
 ## Environnement
 
@@ -13,7 +13,7 @@ Artefact XPI attendu : `MailPin_v1.7.8.xpi`. La release GitHub **1.7.9** est pub
 
 ## Reproduction
 
-Dans un checkout de la source MailPin 1.7.9 ou dans l’archive reviewer extraite sans `.git` :
+Dans un checkout de la source MailPin 1.7.10 ou dans l’archive reviewer extraite sans `.git` :
 
 ```bash
 npm run ci
@@ -22,8 +22,8 @@ npm run ci
 Livrables :
 
 ```text
-dist/MailPin_v1.7.9.xpi
-dist/MailPin_GitHub_Repository_v1.7.9.zip
+dist/MailPin_v1.7.10.xpi
+dist/MailPin_GitHub_Repository_v1.7.10.zip
 dist/SHA256SUMS.txt
 ```
 
@@ -31,6 +31,4 @@ Le contenu de `extension/` est placé directement à la racine du XPI. Aucun Jav
 
 ## Portée et preuves
 
-La 1.7.8 ne modifie pas le runtime Thunderbird 155 validé. Candidate `e48a12239c674e1f8a909b22a04c0c3266eca70e` : QA `33691697322` PASS, smoke `33691697345` PASS. Tag `v1.7.8` : cible `800c07315ee7f8611f2d2fc6e12a4f2c2d74b849`, après QA `33691785442` et smoke `33691785284` PASS. Workflow Release `33691919194` PASS.
-
-SHA-256 public du XPI : `b007f9ad0213bb5672e5273c27b4f0d3935897fc2696922acd2e2dd673b5048e`.
+La 1.7.10 conserve le runtime métier validé en 1.7.9 et ne modifie que la version source, la borne de compatibilité et le binaire de smoke. La compatibilité Thunderbird 157.0.1 reste en attente jusqu’aux PASS exacts de la candidate puis du target `main`. Aucun résultat futur n’est présenté comme acquis.
