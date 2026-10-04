@@ -1,3 +1,8 @@
+> Source 2.2.0 — candidate native uniquement. Version source : **2.2.0**. Dernière release publique : **1.7.10** ; release publique 1.7.10 inchangée.
+> Contrat courant et différences : docs/NATIVE_2.2.0_HANDOFF.md. Les sections 1.7.x ci-dessous restent historiques et ne prouvent pas le natif.
+
+MailPin 2.2.0 — **Version :** 2.2.0. MV3 natif sans Experiment, migration JSON manuelle, limites Agenda/inline explicites. Aucun envoi autorisé.
+
 # Notes pour les reviewers ATN — MailPin 1.7.10
 
 ## Statut

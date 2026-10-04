@@ -107,18 +107,18 @@ function withTimeout(operation, timeoutMs, operationName) {
   });
 }
 
-function pinInboxMethod(name) {
-  const method = globalThis.messenger?.pinInbox?.[name];
+function nativeMethod(name) {
+  const method = globalThis.MailPinNative?.[name];
   if (typeof method !== "function") {
     throw new Error(`L’API MailPin « ${name} » n’est pas disponible.`);
   }
-  return method.bind(globalThis.messenger.pinInbox);
+  return method.bind(globalThis.MailPinNative);
 }
 
-async function waitForPinInbox() {
+async function waitForNative() {
   const startedAt = Date.now();
   while (Date.now() - startedAt < INITIALIZATION_TIMEOUTS.apiNamespace) {
-    if (typeof globalThis.messenger?.pinInbox?.getConfiguration === "function") {
+    if (typeof globalThis.MailPinNative?.getConfiguration === "function") {
       startup?.mark("api:namespace-present");
       return;
     }
@@ -196,13 +196,13 @@ function setConfigurationReady(ready) {
 }
 
 async function fetchConfigurationWithRetry(attempts = 1) {
-  await waitForPinInbox();
+  await waitForNative();
   let lastError = null;
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     try {
       startup?.mark("api:getConfiguration:start");
       const value = await withTimeout(
-        () => pinInboxMethod("getConfiguration")(),
+        () => nativeMethod("getConfiguration")(),
         INITIALIZATION_TIMEOUTS.configuration,
         "configuration"
       );
@@ -1001,8 +1001,8 @@ function renderCases(){
             : msg(type.value === "event" ? "dynamicNoEventCalendar" : "dynamicNoTaskCalendar"));
         }
         const result = await withBusy(event.currentTarget, msg("dynamicCalendarBusy"), async () => {
-          await messenger.pinInbox.updateCase(item.id, item);
-          return messenger.pinInbox.createCaseCalendarItem(item.id,type.value,calendar.value);
+          await globalThis.MailPinNative.updateCase(item.id, item);
+          return globalThis.MailPinNative.createCaseCalendarItem(item.id,type.value,calendar.value);
         });
         item.calendarItemId = result.itemId || item.calendarItemId || "";
         item.calendarId = result.calendarId || item.calendarId || "";
@@ -1242,7 +1242,7 @@ async function renderCalendars(selected) {
   el.append(ask);
   try {
     const calendars = await withTimeout(
-      () => pinInboxMethod("getCalendars")(),
+      () => nativeMethod("getCalendars")(),
       INITIALIZATION_TIMEOUTS.calendar,
       "calendars"
     );
@@ -1411,7 +1411,7 @@ function renderImportPreview(preview, configurationData) {
     if (strategy === "replace" && !confirm(msg("restoreReplaceConfirm"))) return;
     try {
       await withBusy(control, msg("restoreBusy"), async () => {
-        await messenger.pinInbox.restoreConfiguration(configurationData, strategy);
+        await globalThis.MailPinNative.restoreConfiguration(configurationData, strategy);
         const restoredShortcuts = configurationData.shortcuts && typeof configurationData.shortcuts === "object"
           ? configurationData.shortcuts
           : (typeof configurationData.shortcut === "string" ? {"toggle-pin-selected": configurationData.shortcut} : {});
@@ -1533,8 +1533,8 @@ function collectSettings() {
 async function refreshOptionalConfiguration(config) {
   const configurationAtStart = configuration;
   const [backup, health] = await Promise.all([
-    withTimeout(() => pinInboxMethod("getBackupStatus")(), INITIALIZATION_TIMEOUTS.auxiliary, "backup-status").catch(() => null),
-    withTimeout(() => pinInboxMethod("getHealthReport")(), INITIALIZATION_TIMEOUTS.auxiliary, "health-report").catch(() => null)
+    withTimeout(() => nativeMethod("getBackupStatus")(), INITIALIZATION_TIMEOUTS.auxiliary, "backup-status").catch(() => null),
+    withTimeout(() => nativeMethod("getHealthReport")(), INITIALIZATION_TIMEOUTS.auxiliary, "health-report").catch(() => null)
   ]);
   if (!configurationReady || configuration !== configurationAtStart) return;
   updateRuntimeSummary(configurationAtStart || config, backup);
@@ -1628,7 +1628,7 @@ async function saveAll(event = null) {
         cases,
         templates
       };
-      const saved = await messenger.pinInbox.setConfiguration(requested);
+      const saved = await globalThis.MailPinNative.setConfiguration(requested);
       if (!saved?.settings || typeof saved.settings !== "object") {
         throw new Error("MailPin n’a pas confirmé l’enregistrement des paramètres.");
       }
@@ -1639,7 +1639,7 @@ async function saveAll(event = null) {
       // Read back through the public API. This verifies the complete path from
       // the form to the privileged preference/SQLite stores before showing a
       // success message.
-      const persisted = await messenger.pinInbox.getConfiguration();
+      const persisted = await globalThis.MailPinNative.getConfiguration();
       if (!persisted?.settings || typeof persisted.settings !== "object") {
         throw new Error("La relecture des paramètres enregistrés a échoué.");
       }
@@ -1748,7 +1748,7 @@ async function importFile(event) {
   }
   try {
     const parsed = JSON.parse(await file.text());
-    const preview = await withBusy(null, msg("importAnalyzeBusy"), () => messenger.pinInbox.previewImport(parsed));
+    const preview = await withBusy(null, msg("importAnalyzeBusy"), () => globalThis.MailPinNative.previewImport(parsed));
     if (!preview?.valid) throw new TypeError("backup-format-invalid");
     renderImportPreview(preview, parsed);
     setStatus(msg("importAnalyzed"), "success", {control: $("import-preview")});
@@ -1931,7 +1931,7 @@ async function startOptions() {
 
   $("simulate-rules").addEventListener("click", async event => {
     const result = await run(
-      () => messenger.pinInbox.simulateRules({trigger: "messageAdded", limit: 1000, rules}),
+      () => globalThis.MailPinNative.simulateRules({trigger: "messageAdded", limit: 1000, rules}),
       value => msg("dynamicSimulationSummary", [value.matches.length, value.scanned]),
       {
         control: event.currentTarget,
@@ -1968,7 +1968,7 @@ async function startOptions() {
 
   $("provider-check").addEventListener("click", async event => {
     const matrix = await run(
-      () => messenger.pinInbox.runProviderCompatibilityCheck(),
+      () => globalThis.MailPinNative.runProviderCompatibilityCheck(),
       value => msg("providerAnalysisResult", [value.accounts?.length || 0, value.calendars?.length || 0]),
       {control: event.currentTarget, busyMessage: msg("providerCheckBusy"), reloadAfter: false}
     );
@@ -1980,7 +1980,7 @@ async function startOptions() {
 
   $("health-check").addEventListener("click", async event => {
     try {
-      const health = await withBusy(event.currentTarget, msg("healthCheckBusy"), () => messenger.pinInbox.getHealthReport());
+      const health = await withBusy(event.currentTarget, msg("healthCheckBusy"), () => globalThis.MailPinNative.getHealthReport());
       renderHealth(health);
       setStatus(msg("healthCheckComplete").replace("$1", health.score), health.status === "critical" ? "error" : "success", {control: event.currentTarget});
     } catch (error) {
@@ -1991,7 +1991,7 @@ async function startOptions() {
   $("health-repair").addEventListener("click", async event => {
     if (!confirm(msg("healthRepairConfirmWithBackup"))) return;
     try {
-      const result = await withBusy(event.currentTarget, msg("healthRepairBusy"), () => messenger.pinInbox.repairHealthIssues({actions: ["orphan-links", "repair-references"]}));
+      const result = await withBusy(event.currentTarget, msg("healthRepairBusy"), () => globalThis.MailPinNative.repairHealthIssues({actions: ["orphan-links", "repair-references"]}));
       renderHealth(result.health);
       await reload({preserveEdits: dirty});
       setStatus(msg("healthRepairComplete").replace("$1", result.repaired || 0), "success", {control: event.currentTarget});
@@ -2002,68 +2002,68 @@ async function startOptions() {
 
   $("clear-diagnostics").addEventListener("click", async event => {
     const result = await run(
-      () => messenger.pinInbox.clearDiagnostics(),
+      () => globalThis.MailPinNative.clearDiagnostics(),
       value => msg("diagnosticsClearedCount", [value.cleared || 0]),
       {control: event.currentTarget, busyMessage: msg("diagnosticsClearBusy"), reloadAfter: false}
     );
-    if (result) renderHealth(await messenger.pinInbox.getHealthReport().catch(() => null));
+    if (result) renderHealth(await globalThis.MailPinNative.getHealthReport().catch(() => null));
   });
 
   bindRun(
     "clear-rule-log",
-    () => messenger.pinInbox.clearRuleLog(),
+    () => globalThis.MailPinNative.clearRuleLog(),
     result => msg("ruleLogCleared", [result.cleared]),
     msg("ruleLogClearBusy")
   );
   bindRun(
     "import-stars",
-    () => messenger.pinInbox.importNativeStars($("clear-stars-after-import").checked),
+    () => globalThis.MailPinNative.importNativeStars($("clear-stars-after-import").checked),
     result => msg("starsImported", [result.imported]),
     msg("starsImportBusy")
   );
-  bindRun("undo", () => messenger.pinInbox.undoLast(), msg("undoComplete"), msg("undoBusy"));
+  bindRun("undo", () => globalThis.MailPinNative.undoLast(), msg("undoComplete"), msg("undoBusy"));
   bindRun(
     "repair",
-    () => messenger.pinInbox.repairReferences(),
+    () => globalThis.MailPinNative.repairReferences(),
     result => msg("referencesRepaired", [result.repaired, result.missing]),
     msg("referencesRepairBusy")
   );
-  bindRun("rescan", () => messenger.pinInbox.rescanPinned(), msg("rescanComplete"), msg("rescanBusy"));
-  bindRun("cleanup", () => messenger.pinInbox.cleanupBroken(), msg("cleanupComplete"), msg("cleanupBusy"));
+  bindRun("rescan", () => globalThis.MailPinNative.rescanPinned(), msg("rescanComplete"), msg("rescanBusy"));
+  bindRun("cleanup", () => globalThis.MailPinNative.cleanupBroken(), msg("cleanupComplete"), msg("cleanupBusy"));
   bindRun(
     "reset-interface",
-    () => messenger.pinInbox.resetInterface(),
+    () => globalThis.MailPinNative.resetInterface(),
     msg("interfaceReset"),
     msg("interfaceResetBusy")
   );
   bindRun(
     "compat-check",
-    () => messenger.pinInbox.runCompatibilityCheck(),
+    () => globalThis.MailPinNative.runCompatibilityCheck(),
     msg("compatibilityCheckComplete"),
     msg("compatibilityCheckBusy")
   );
   bindRun(
     "sync-calendar",
-    () => messenger.pinInbox.syncCalendarLinks(),
+    () => globalThis.MailPinNative.syncCalendarLinks(),
     result => msg("calendarSyncComplete", [result.synced || 0]),
     msg("calendarSyncBusy")
   );
   bindRun(
     "sync-tags",
-    () => messenger.pinInbox.syncTags([]),
+    () => globalThis.MailPinNative.syncTags([]),
     result => msg("tagSyncComplete", [result.synced || 0, result.errors || 0]),
     msg("tagSyncBusy")
   );
   bindRun(
     "run-backup",
-    () => messenger.pinInbox.runBackup("manual"),
+    () => globalThis.MailPinNative.runBackup("manual"),
     result => msg("backupCreated", [result.path]),
     msg("backupCreateBusy")
   );
 
   $("integrity-check").addEventListener("click", async event => {
     const result = await run(
-      () => messenger.pinInbox.checkStorageIntegrity(),
+      () => globalThis.MailPinNative.checkStorageIntegrity(),
       value => msg(value.ok ? "sqliteHealthy" : "sqliteIssue"),
       {
         control: event.currentTarget,
@@ -2078,7 +2078,7 @@ async function startOptions() {
       const result = await withBusy(
         event.currentTarget,
         msg("backupFolderBusy"),
-        () => messenger.pinInbox.chooseBackupDirectory()
+        () => globalThis.MailPinNative.chooseBackupDirectory()
       );
       if (!result.selected) {
         setStatus(msg("backupFolderCancelled"), "success");
@@ -2087,7 +2087,7 @@ async function startOptions() {
       $("backupDirectory").value = result.path;
       if (!configuration?.settings) await reload();
       requireConfiguration().settings.backupDirectory = result.path;
-      const backup = await messenger.pinInbox.getBackupStatus().catch(() => null);
+      const backup = await globalThis.MailPinNative.getBackupStatus().catch(() => null);
       updateRuntimeSummary(configuration, backup);
       setStatus(msg("backupFolderSaved"), "success");
     } catch (error) {
@@ -2098,7 +2098,7 @@ async function startOptions() {
   $("dashboard").addEventListener("click", async event => {
     try {
       await withBusy(event.currentTarget, msg("dashboardOpenBusy"), () =>
-        messenger.tabs.create({url: messenger.runtime.getURL("dashboard/dashboard.html")})
+        globalThis.MailPinNative.openDashboard()
       );
       setStatus(msg("dashboardOpened"), "success");
     } catch (error) {
@@ -2112,7 +2112,7 @@ async function startOptions() {
       const report = await withBusy(
         event.currentTarget,
         msg("diagnosticExportBusy"),
-        () => messenger.pinInbox.exportDiagnosticBundle()
+        () => globalThis.MailPinNative.exportDiagnosticBundle()
       );
       downloadJson(
         `mailpin-diagnostic-${new Date().toISOString().slice(0, 10)}.json`,
@@ -2127,7 +2127,7 @@ async function startOptions() {
   $("export").addEventListener("click", async event => {
     try {
       const data = await withBusy(event.currentTarget, msg("backupExportBusy"), async () => {
-        const value = await messenger.pinInbox.exportConfiguration();
+        const value = await globalThis.MailPinNative.exportConfiguration();
         value.shortcuts = await getShortcuts();
         value.shortcut = value.shortcuts["toggle-pin-selected"] || "";
         return value;
@@ -2146,7 +2146,7 @@ async function startOptions() {
       return;
     }
     const result = await run(
-      () => messenger.pinInbox.resetConfiguration(),
+      () => globalThis.MailPinNative.resetConfiguration(),
       msg("settingsReset"),
       {
         control: event.currentTarget,

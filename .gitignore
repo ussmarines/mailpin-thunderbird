@@ -46,6 +46,10 @@ ROUNDTRIP_CI_LOG_*.txt
 # Local Thunderbird test runtime and generated evidence
 /.runtime/
 /artifacts/
+/.schema-cache/
+/.experiments-cache/
+/.lib-cdn-lookup-cache/
+/.lib-mozilla-hash-db-cache/
 
 # BEGIN managed secret hardening
 auth.json

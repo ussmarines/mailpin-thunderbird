@@ -539,6 +539,12 @@ def _write_json(path: pathlib.Path, value: Any) -> None:
 
 
 def run(args: argparse.Namespace) -> int:
+    import zipfile
+    with zipfile.ZipFile(args.xpi) as archive:
+        manifest = json.loads(archive.read("manifest.json"))
+    if "experiment_apis" not in manifest:
+        from native_smoke import run as run_native
+        return run_native(args)
     binary = _validate_path(args.binary, "Thunderbird binary", executable=True)
     xpi = _validate_path(args.xpi, "MailPin XPI")
     geckodriver = _validate_path(args.geckodriver, "geckodriver", executable=True)

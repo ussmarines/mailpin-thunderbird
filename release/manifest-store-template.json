@@ -1,9 +1,9 @@
 {
-  "note": "MailPin 1.7.10 publié. Référence de métadonnées pour la compatibilité Thunderbird 153.0 à 157.* ; la release GitHub v1.7.10 a passé QA, CodeQL et smoke réel Thunderbird 157.0.1.",
+  "note": "MailPin 2.2.0 candidate native zéro-Experiment, min 157.0/max 157.* ; MailPin 1.7.10 publié demeure la dernière release. Aucun envoi ATN/release autorisé.",
   "browser_specific_settings": {
     "gecko": {
       "id": "ussmarines.mailpin@addons.thunderbird.net",
-      "strict_min_version": "153.0",
+      "strict_min_version": "157.0",
       "strict_max_version": "157.*"
     }
   },

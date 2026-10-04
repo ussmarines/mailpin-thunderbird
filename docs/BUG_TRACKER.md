@@ -1,3 +1,6 @@
+> Source 2.2.0 — candidate native uniquement. Version source : **2.2.0**. Dernière release publique : **1.7.10** ; release publique 1.7.10 inchangée.
+> Contrat courant et différences : docs/NATIVE_2.2.0_HANDOFF.md. Les sections 1.7.x ci-dessous restent historiques et ne prouvent pas le natif.
+
 # Registre des bugs MailPin
 
 Version source : **1.7.10**
@@ -7,6 +10,8 @@ Dernière release publique : **1.7.10**
 Les détails historiques complets restent dans Git et les audits archivés. Le registre courant conserve les entrées encore actionnables, les dernières corrections et les IDs historiques utilisés comme preuves permanentes par les gardes de régression.
 
 ## Bugs ouverts
+
+Candidate native 2.2.0 : les six régressions de la revue (fusion au plafond, lien Agenda affaire, identité Gmail, union des tags conversation/message, rollback après commit, racine de capture sans réponse) sont corrigées et testées dans `tests/native_core_contract.mjs`. Gate UX/profil/fournisseurs réel : `MANUAL_OWNER_TEST_REQUIRED` selon `docs/NATIVE_2.2.0_HANDOFF.md`. Aucun PASS privilégié historique ne prouve la nouvelle architecture.
 
 | ID | Introduit | Symptôme | Cause | Fichiers | Test | Statut | Correction | Validation |
 |---|---|---|---|---|---|---|---|---|

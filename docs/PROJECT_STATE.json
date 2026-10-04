@@ -2,39 +2,40 @@
   "format": "mailperch-project-state",
   "version": 1,
   "project": "MailPin — Email Follow-up & Productivity",
-  "extensionVersion": "1.7.10",
+  "extensionVersion": "2.2.0",
   "baseGitHub": {
-    "branch": "main",
-    "commit": "704b3d5c2b35a2eceb4fbe1136b50a86dfadd6f0",
-    "role": "MailPin 1.7.10 release/tag target validated on Thunderbird 157.0.1 before publication"
+    "branch": "origin/main",
+    "commit": "4d38862c55ea4c7fc3e4c440fbfed80e3aa197e3",
+    "role": "Observed 1.7.10 main baseline; not mutated by this candidate"
   },
   "extensionId": "ussmarines.mailpin@addons.thunderbird.net",
   "thunderbird": {
-    "min": "153.0",
+    "min": "157.0",
     "max": "157.*"
   },
   "schemas": {
-    "sqlite": 5,
+    "nativeEnvelope": 1,
     "settings": 8,
-    "data": 7
+    "data": 7,
+    "historicalSQLite": 5
   },
   "entrypoints": {
     "manifest": "extension/manifest.json",
     "background": "extension/background.js",
-    "experimentSchema": "extension/api/pinInbox/schema.json",
-    "experiment": "extension/api/pinInbox/implementation.js",
     "options": "extension/options/options.html",
     "dashboard": "extension/dashboard/dashboard.html",
     "projectMemory": "PROJECT_MEMORY.md",
     "securityBoundary": "docs/SECURITY_BOUNDARY.md",
     "bugTracker": "docs/BUG_TRACKER.md",
-    "compatibilityFacade": "extension/api/pinInbox/modules/compatibility.js",
-    "thunderbirdMessages": "extension/api/pinInbox/modules/thunderbird-messages.js",
-    "thunderbirdTags": "extension/api/pinInbox/modules/thunderbird-tags.js",
-    "thunderbirdCalendar": "extension/api/pinInbox/modules/thunderbird-calendar.js",
     "thunderbirdCompatibilityDoc": "docs/THUNDERBIRD_COMPATIBILITY.md",
     "thunderbirdTestBench": "docs/THUNDERBIRD_TEST_BENCH.md",
-    "codexHandoff": "docs/CODEX_HANDOFF.md"
+    "codexHandoff": "docs/CODEX_HANDOFF.md",
+    "nativeCore": "extension/native/core.js",
+    "nativeTags": "extension/native/tags.js",
+    "nativeClient": "extension/native/client.js",
+    "workbench": "extension/workbench/workbench.html",
+    "nativeMatrix": "docs/NATIVE_2.2.0_MATRIX.md",
+    "nativeHandoff": "docs/NATIVE_2.2.0_HANDOFF.md"
   },
   "commands": [
     "npm run check",
@@ -48,16 +49,16 @@
     "No network, telemetry, ads, CDN or remote code",
     "No message bodies or attachment contents stored",
     "No eval/new Function/innerHTML/outerHTML",
-    "SQLite writes remain incremental, transactional and serialized",
-    "All injected resources are cleaned up",
     "No remote publication without explicit approval",
     "Privileged API inputs are bounded and normalized",
     "Only exact MailPin-owned Thunderbird tags may be managed or removed",
     "Optional Thunderbird capabilities fail locally instead of disabling the full extension",
-    "Business modules do not call Thunderbird core services directly outside compatibility adapters",
     "Recommended mode never auto-saves and preserves profile-specific settings",
     "Organic Workspace uses one canonical workspace stylesheet rather than stacked runtime patch stylesheets",
-    "Selected-account scope uses Thunderbird account.key consistently from Options through runtime filtering"
+    "Serialized atomic storage.local envelope writes; fail closed on corruption",
+    "No private Experiment or internal DOM code in the XPI",
+    "Imported automation disabled; manual bounded preview and pre-write safety snapshot",
+    "Selected-account scope uses public Thunderbird account.id"
   ],
   "ui": {
     "settingsSpacingAffects": [
@@ -72,37 +73,30 @@
     ]
   },
   "highRisk": [
-    "_setupAbout3Pane",
-    "PinCompatibility adapters",
-    "PinStructuredStore",
-    "_resolveReference",
-    "calendar observers",
-    "folder observers",
-    "automatic rules",
-    "imports and restores",
-    "uninstall lifecycle",
-    "privileged API input validation",
-    "settings save/cancel lifecycle",
-    "selected-account filtering",
+    "native message identity and conversations",
+    "imports/merges and storage.local quota",
+    "tag ownership and overlapping pins",
+    "native RPC sender and input validation",
+    "native lifecycle/reminders",
     "Thunderbird runtime smoke harness"
   ],
   "security": {
-    "thunderbirdBoundary": "Messages/Tags/Calendar internals remain isolated behind dedicated compatibility adapters",
+    "thunderbirdBoundary": "Only official messenger.* APIs in native/core.js, native/tags.js and background.js; historical Experiment excluded from XPI",
     "uiDependencyPolicy": "native HTML plus local Organic Workspace CSS tokens; canonical workspace stylesheet; no runtime patch stylesheet, npm runtime dependency, bundler, CDN or remote asset",
     "runtimeTestSupplyChain": "test-only Thunderbird/geckodriver downloads are checksum-verified and are not runtime dependencies"
   },
-  "developmentBranch": "main",
+  "developmentBranch": "codex/native-2.2.0-zero-experiment",
   "testing": {
     "contract": [
-      "tests/test_organic_workspace_ui.py",
-      "tests/test_thunderbird_compatibility_boundary.py",
-      "tests/thunderbird_compatibility_contract.mjs"
+      "tests/native_core_contract.mjs",
+      "tests/native_build_contract.py",
+      "scripts/check_native.py"
     ],
     "runtimeWorkflow": ".github/workflows/thunderbird-smoke.yml",
     "runtimeScript": "tests/thunderbird/real_smoke.py",
-    "browserStatus": "MailPin 1.7.10 is published for Thunderbird 153.0 through 157.*. Thunderbird 157.0.1 compatibility was validated on both the exact candidate and the merged release target.",
-    "runtimeStatus": "Exact candidate 565f565710da6262d7a91bfbe280a943047cdc6c: QA 37213680870 PASS and real Thunderbird 157.0.1 smoke 37213680824 PASS. Merged main/tag target 704b3d5c2b35a2eceb4fbe1136b50a86dfadd6f0: QA 37213779632 PASS, real Thunderbird 157.0.1 smoke 37213779633 PASS and CodeQL 37213779727 PASS. Canonical Release workflow 37214354533 rebuilt and published v1.7.10 from the same target commit."
+    "browserStatus": "2.2.0 native candidate, owner UX/provider validation pending; see NATIVE_2.2.0_HANDOFF.md",
+    "runtimeStatus": "See VALIDATION_REPORT_2.2.0.md for executed candidate evidence; 1.7.10 evidence is not proof of native runtime"
   },
   "latestPublicVersion": "1.7.10",
-  "releaseStatus": "published"
+  "releaseStatus": "candidate"
 }

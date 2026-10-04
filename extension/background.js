@@ -1,4 +1,6 @@
-"use strict";
+import {NativeCore, METHODS} from "./native/core.js";
+const core = new NativeCore(messenger);
+const Native = Object.fromEntries([...METHODS].map(method => [method, (...args) => core.dispatch(method, args)]));
 
 const MENU_IDS = Object.freeze({
   toggle: "pin-mails-toggle-selection",
@@ -27,7 +29,7 @@ function logError(context, error) {
 async function setupTab(tabId) {
   if (!Number.isInteger(tabId)) return;
   try {
-    await messenger.pinInbox.setup(tabId);
+    await Native.setup(tabId);
   } catch (error) {
     console.debug("MailPin : onglet non initialisé", errorName(error));
   }
@@ -45,7 +47,7 @@ async function setupExistingMailTabs() {
 async function toggleSelected(tabId, state) {
   try {
     const args = typeof state === "boolean" ? [state] : [];
-    return await messenger.pinInbox.toggleSelected(tabId, ...args);
+    return await Native.toggleSelected(tabId, ...args);
   } catch (error) {
     logError("action sur la sélection impossible", error);
     return undefined;
@@ -55,7 +57,7 @@ async function toggleSelected(tabId, state) {
 async function toggleConversation(tabId, state) {
   try {
     const args = typeof state === "boolean" ? [state] : [];
-    return await messenger.pinInbox.toggleConversationSelected(tabId, ...args);
+    return await Native.toggleConversationSelected(tabId, ...args);
   } catch (error) {
     logError("action sur la conversation impossible", error);
     return undefined;
@@ -65,7 +67,7 @@ async function toggleConversation(tabId, state) {
 async function toggleDisplayed(tabId, state) {
   try {
     const args = typeof state === "boolean" ? [state] : [];
-    return await messenger.pinInbox.toggleDisplayed(tabId, ...args);
+    return await Native.toggleDisplayed(tabId, ...args);
   } catch (error) {
     logError("message affiché indisponible", error);
     return undefined;
@@ -76,9 +78,11 @@ async function openDashboard(options = {}) {
   try {
     const palette = options?.palette === true;
     const page = palette ? "dashboard/dashboard.html?palette=1" : "dashboard/dashboard.html";
-    return await messenger.tabs.create({
-      url: messenger.runtime.getURL(page)
-    });
+    if (!palette && messenger.spaces) {
+      const space = await ensureSpace();
+      return messenger.spaces.open(space.id);
+    }
+    return messenger.tabs.create({url: messenger.runtime.getURL(page)});
   } catch (error) {
     logError("ouverture du tableau de bord impossible", error);
     return undefined;
@@ -145,7 +149,7 @@ function createMenus() {
 messenger.menus.onShown.addListener(async (_info, tab) => {
   if (!tab?.id) return;
   try {
-    const state = await messenger.pinInbox.getSelectionState(tab.id);
+    const state = await Native.getSelectionState(tab.id);
     const usable = Boolean(state?.count);
     await Promise.all([
       messenger.menus.update(MENU_IDS.toggle, {
@@ -172,7 +176,7 @@ messenger.menus.onClicked.addListener(async (info, tab) => {
       case MENU_IDS.dashboard:
         return await openDashboard();
       case MENU_IDS.undo:
-        return await messenger.pinInbox.undoLast();
+        return await Native.undoLast();
       default:
         break;
     }
@@ -184,15 +188,15 @@ messenger.menus.onClicked.addListener(async (info, tab) => {
       case MENU_IDS.conversation:
         return await toggleConversation(tab.id);
       case MENU_IDS.quickSimple:
-        return await messenger.pinInbox.quickCaptureSelected(tab.id, "simple");
+        return await Native.quickCaptureSelected(tab.id, "simple");
       case MENU_IDS.quickToday:
-        return await messenger.pinInbox.quickCaptureSelected(tab.id, "today");
+        return await Native.quickCaptureSelected(tab.id, "today");
       case MENU_IDS.quickTomorrow:
-        return await messenger.pinInbox.quickCaptureSelected(tab.id, "tomorrow");
+        return await Native.quickCaptureSelected(tab.id, "tomorrow");
       case MENU_IDS.quickWaiting:
-        return await messenger.pinInbox.quickCaptureSelected(tab.id, "waiting");
+        return await Native.quickCaptureSelected(tab.id, "waiting");
       case MENU_IDS.quickNoReply:
-        return await messenger.pinInbox.quickCaptureSelected(tab.id, "noReply");
+        return await Native.quickCaptureSelected(tab.id, "noReply");
       default:
         return undefined;
     }
@@ -214,19 +218,19 @@ messenger.commands.onCommand.addListener(async (command, tab) => {
       case "toggle-conversation-selected":
         return await toggleConversation(tab.id);
       case "complete-selected-pin":
-        return await messenger.pinInbox.performSelected(tab.id, "complete");
+        return await Native.performSelected(tab.id, "complete");
       case "wait-selected-pin":
-        return await messenger.pinInbox.performSelected(tab.id, "waiting");
+        return await Native.performSelected(tab.id, "waiting");
       case "plan-selected-pin":
-        return await messenger.pinInbox.performSelected(tab.id, "planned");
+        return await Native.performSelected(tab.id, "planned");
       case "activate-selected-pin":
-        return await messenger.pinInbox.performSelected(tab.id, "active");
+        return await Native.performSelected(tab.id, "active");
       case "snooze-selected-pin":
-        return await messenger.pinInbox.performSelected(tab.id, "snooze");
+        return await Native.performSelected(tab.id, "snooze");
       case "track-no-reply-selected":
-        return await messenger.pinInbox.quickCaptureSelected(tab.id, "noReply");
+        return await Native.quickCaptureSelected(tab.id, "noReply");
       case "quick-today-selected":
-        return await messenger.pinInbox.quickCaptureSelected(tab.id, "today");
+        return await Native.quickCaptureSelected(tab.id, "today");
       default:
         return undefined;
     }
@@ -238,7 +242,7 @@ messenger.commands.onCommand.addListener(async (command, tab) => {
 
 messenger.messageDisplayAction?.onClicked.addListener(tab => toggleDisplayed(tab.id));
 messenger.action?.onClicked.addListener(openDashboard);
-messenger.pinInbox?.onDashboardRequested.addListener(openDashboard);
+
 messenger.runtime.onStartup.addListener(setupExistingMailTabs);
 messenger.tabs.onCreated.addListener(tab => {
   if (tab.type === "mail") setupTab(tab.id);
@@ -252,3 +256,58 @@ async function initializeMenus() {
 
 initializeMenus().catch(error => logError("initialisation des menus impossible", error));
 setupExistingMailTabs();
+
+let spaceQueue = Promise.resolve();
+function ensureSpace() {
+  const run = spaceQueue.then(async () => {
+    const spaces = await messenger.spaces.query({name: "MailPin", isSelfOwned: true});
+    return spaces[0] || messenger.spaces.create("MailPin", {url: messenger.runtime.getURL("dashboard/dashboard.html")},
+      {title: "MailPin", defaultIcons: "icons/mailpin-icon.svg"});
+  });
+  spaceQueue = run.catch(() => undefined);
+  return run;
+}
+
+const PAGE_PATHS = new Set(["/dashboard/dashboard.html", "/options/options.html", "/workbench/workbench.html"]);
+messenger.runtime.onMessage.addListener((request, sender) => {
+  if (request?.type !== "mailpin:native") return undefined;
+  try {
+    const url = new URL(sender.url || "");
+    if (sender.id !== messenger.runtime.id || url.origin !== new URL(messenger.runtime.getURL("dashboard/dashboard.html")).origin ||
+        !PAGE_PATHS.has(url.pathname) || ["onMessages", "onAlarm", "setup", "toggleSelected", "toggleDisplayed", "toggleConversationSelected"].includes(request.method)) {
+      return Promise.resolve({ok: false, error: "Unauthorized MailPin request"});
+    }
+  } catch { return Promise.resolve({ok: false, error: "Unauthorized MailPin request"}); }
+  if (request.method === "openDashboard") {
+    return ensureSpace().then(space => messenger.spaces.open(space.id)).then(
+      tab => ({ok: true, result: {tabId: tab.id}}),
+      () => ({ok: false, error: "MailPin Space unavailable"}));
+  }
+  return core.dispatch(request.method, request.args || []).then(result => ({ok: true, result}),
+    error => ({ok: false, error: String(error.message || "MailPin operation failed").slice(0, 300)}));
+});
+
+messenger.alarms.onAlarm.addListener(alarm => {
+  if (alarm.name === "mailpin-reminders") Native.onAlarm().catch(error => logError("rappel", error));
+});
+messenger.notifications.onClicked.addListener(id => {
+  if (id.startsWith("mailpin:")) Native.openReference(id.slice(8)).catch(() => openDashboard());
+});
+messenger.messages.onNewMailReceived.addListener(async (_folder, list) => {
+  try {
+    const messages = await core.collect(list);
+    await Native.onMessages(JSON.parse(JSON.stringify(messages)), "messageAdded");
+  } catch (error) { logError("messages reçus", error); }
+});
+messenger.messages.onUpdated.addListener(async (message, changed) => {
+  if (!Object.prototype.hasOwnProperty.call(changed, "read")) return;
+  await Native.onMessages(JSON.parse(JSON.stringify([message])), "read").catch(error => logError("message actualisé", error));
+});
+messenger.messages.onMoved.addListener(async (_old, list) => {
+  try { await Native.onMessages(JSON.parse(JSON.stringify(await core.collect(list))), "move"); }
+  catch (error) { logError("message déplacé", error); }
+});
+messenger.messageDisplay.onMessagesDisplayed.addListener(tab => setupTab(tab.id));
+messenger.runtime.onInstalled.addListener(() => setupExistingMailTabs());
+messenger.runtime.onStartup.addListener(() => ensureSpace().catch(error => logError("Space", error)));
+ensureSpace().catch(error => logError("Space", error));
