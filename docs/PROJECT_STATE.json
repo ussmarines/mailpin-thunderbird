@@ -5,8 +5,8 @@
   "extensionVersion": "1.7.10",
   "baseGitHub": {
     "branch": "main",
-    "commit": "aef40057221ae44c598f1769f6ab7d718637cd47",
-    "role": "MailPin 1.7.9 published baseline used for the Thunderbird 157 / MailPin 1.7.10 compatibility candidate"
+    "commit": "704b3d5c2b35a2eceb4fbe1136b50a86dfadd6f0",
+    "role": "MailPin 1.7.10 release/tag target validated on Thunderbird 157.0.1 before publication"
   },
   "extensionId": "ussmarines.mailpin@addons.thunderbird.net",
   "thunderbird": {
@@ -91,7 +91,7 @@
     "uiDependencyPolicy": "native HTML plus local Organic Workspace CSS tokens; canonical workspace stylesheet; no runtime patch stylesheet, npm runtime dependency, bundler, CDN or remote asset",
     "runtimeTestSupplyChain": "test-only Thunderbird/geckodriver downloads are checksum-verified and are not runtime dependencies"
   },
-  "developmentBranch": "fix/thunderbird-157-compatibility",
+  "developmentBranch": "main",
   "testing": {
     "contract": [
       "tests/test_organic_workspace_ui.py",
@@ -100,9 +100,9 @@
     ],
     "runtimeWorkflow": ".github/workflows/thunderbird-smoke.yml",
     "runtimeScript": "tests/thunderbird/real_smoke.py",
-    "browserStatus": "MailPin 1.7.10 is a compatibility candidate for Thunderbird 153.0 through 157.*. Published 1.7.9 remains the validated Thunderbird 156.0 baseline until the exact candidate passes a fresh real Thunderbird 157.0.1 smoke.",
-    "runtimeStatus": "Pending on exact 1.7.10 candidate: QA/security/Windows and real Thunderbird 157.0.1 smoke. Published proof remains MailPin 1.7.9: candidate da9d97a874f5043b43a212d09b9090ad0f77d681 QA 35224045803 / smoke 35224046106 and target 46bb9fc27256cc143743e74e4a04fb48d48f6e85 QA 35224161719 / smoke 35224161877."
+    "browserStatus": "MailPin 1.7.10 is published for Thunderbird 153.0 through 157.*. Thunderbird 157.0.1 compatibility was validated on both the exact candidate and the merged release target.",
+    "runtimeStatus": "Exact candidate 565f565710da6262d7a91bfbe280a943047cdc6c: QA 37213680870 PASS and real Thunderbird 157.0.1 smoke 37213680824 PASS. Merged main/tag target 704b3d5c2b35a2eceb4fbe1136b50a86dfadd6f0: QA 37213779632 PASS, real Thunderbird 157.0.1 smoke 37213779633 PASS and CodeQL 37213779727 PASS. Canonical Release workflow 37214354533 rebuilt and published v1.7.10 from the same target commit."
   },
-  "latestPublicVersion": "1.7.9",
-  "releaseStatus": "candidate"
+  "latestPublicVersion": "1.7.10",
+  "releaseStatus": "published"
 }

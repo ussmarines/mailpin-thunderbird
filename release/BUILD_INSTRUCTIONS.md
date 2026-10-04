@@ -1,6 +1,6 @@
 # Instructions de build pour les reviewers — MailPin 1.7.10
 
-Artefact XPI attendu : `MailPin_v1.7.10.xpi`. La release GitHub **1.7.9** est publiée ; 1.7.10 est candidate.
+Artefact XPI attendu : `MailPin_v1.7.10.xpi`. La release GitHub **1.7.10** est publiée.
 
 ## Environnement
 
@@ -31,4 +31,6 @@ Le contenu de `extension/` est placé directement à la racine du XPI. Aucun Jav
 
 ## Portée et preuves
 
-La 1.7.10 conserve le runtime métier validé en 1.7.9 et ne modifie que la version source, la borne de compatibilité et le binaire de smoke. La compatibilité Thunderbird 157.0.1 reste en attente jusqu’aux PASS exacts de la candidate puis du target `main`. Aucun résultat futur n’est présenté comme acquis.
+La 1.7.10 conserve le runtime métier 1.7.9 et étend uniquement la compatibilité à Thunderbird 157. Candidate `565f565710da6262d7a91bfbe280a943047cdc6c` : QA `37213680870`, smoke `37213680824` PASS. Tag `v1.7.10` : cible `704b3d5c2b35a2eceb4fbe1136b50a86dfadd6f0`, après QA `37213779632`, smoke `37213779633` et CodeQL `37213779727` PASS. Workflow Release `37214354533` PASS.
+
+SHA-256 public du XPI : `fc0cc2ada46cce977de9ba8594b79d8f9ba065dc810be329455f998e3c729b62`.

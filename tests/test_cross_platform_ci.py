@@ -19,6 +19,8 @@ for name in ("check", "test", "build"):
     assert "python " in command, (name, command)
 
 assert "runs-on: windows-latest" in ci
+assert re.search(r"push:\\s*\\n\\s*branches:\\s*\\n\\s*- main", ci)
+assert "pull_request:" in ci
 assert "npm run check && npm test" in ci
 assert "npm run ci" in release
 assert "gh release create" in release

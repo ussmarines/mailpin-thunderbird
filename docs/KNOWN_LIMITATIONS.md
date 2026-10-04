@@ -1,14 +1,13 @@
 # Limites connues — MailPin
 
-## Source 1.7.10 / release publique 1.7.9
+## Source 1.7.10 / release publique 1.7.10
 
-La source **1.7.10** est une candidate de compatibilité Thunderbird 157. La release publique **1.7.9** reste la baseline démontrée sur Thunderbird 156.0 tant que le smoke réel 157.0.1 de la candidate n’a pas passé.
+La source **1.7.10** et la release publique **1.7.10** sont alignées. La compatibilité publiée couvre Thunderbird 153.0 à 157.* après validation réelle sur Thunderbird 157.0.1.
 
-- compatibilité candidate : Thunderbird 153.0 à 157.* ;
-- compatibilité publiée : Thunderbird 153.0 à 156.* ;
-- aucune compatibilité 157 n’est revendiquée avant QA + smoke réel Thunderbird 157.0.1 sur le head exact ;
+- candidate exacte `565f565710da6262d7a91bfbe280a943047cdc6c` : QA `37213680870` et smoke réel Thunderbird 157.0.1 `37213680824` — PASS ;
+- `main` publié `704b3d5c2b35a2eceb4fbe1136b50a86dfadd6f0` : QA `37213779632`, smoke réel Thunderbird 157.0.1 `37213779633` et CodeQL `37213779727` — PASS ;
 - Agenda reste facultatif et dépend des capacités réelles du calendrier ;
 - fournisseurs réseau et calendriers distants restent des validations distinctes ;
 - le smoke Linux réel ne remplace pas une matrice complète Windows/macOS ;
-- aucune nouvelle permission, migration, dépendance runtime ou connexion réseau n’est introduite par cette candidate ;
-- les preuves publiques 1.7.9 restent : QA candidate `35224045803`, smoke 156.0 `35224046106`, QA target `35224161719`, smoke target `35224161877`, Release `35224299551`.
+- aucune nouvelle permission, migration, dépendance runtime ou connexion réseau n’est introduite ;
+- les trois assets publics de `v1.7.10` exposent des SHA-256 dans les métadonnées GitHub.

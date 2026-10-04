@@ -123,7 +123,7 @@ Avant d’ajouter une nouvelle capacité Thunderbird :
 
 ## Compatibilité de versions
 
-Depuis 1.5.1, la branche 153 était la seule plage revendiquée après essais réels. MailPin 1.7.4 a étendu cette plage à Thunderbird `154.*`, 1.7.7 à `155.*` et 1.7.9 à `156.*` après validations runtime réelles. La candidate 1.7.10 porte la limite supérieure à `157.*` et exige un smoke réel frais sur Thunderbird 157.0.1 avant publication. Le minimum reste `153.0` : les essais antérieurs sur 128/140 injectaient le panneau mais ne garantissaient pas l’ouverture fiable du Dashboard via le pont MV3 Experiment → background.
+Depuis 1.5.1, la branche 153 était la seule plage revendiquée après essais réels. MailPin 1.7.4 a étendu cette plage à Thunderbird `154.*`, 1.7.7 à `155.*` et 1.7.9 à `156.*` après validations runtime réelles. MailPin 1.7.10 porte la limite supérieure publiée à `157.*` après un smoke réel frais sur Thunderbird 157.0.1. Le minimum reste `153.0` : les essais antérieurs sur 128/140 injectaient le panneau mais ne garantissaient pas l’ouverture fiable du Dashboard via le pont MV3 Experiment → background.
 
 Toute future adaptation de version doit rester localisée autant que possible dans ces adaptateurs et être documentée dans `docs/KNOWN_LIMITATIONS.md` et `docs/BUG_TRACKER.md` si elle corrige une régression observée. Une nouvelle version majeure Thunderbird ne doit pas être ajoutée à `strict_max_version` sans smoke réel frais lorsque l’Experiment ou le DOM interne sont concernés.
 
@@ -141,10 +141,10 @@ Thunderbird 156.0 est sorti le 15 septembre 2026. Les notes officielles ne signa
 
 ### Thunderbird 157.0.1 — 4 octobre 2026
 
-Thunderbird 157.0 est sorti le 30 septembre 2026 et 157.0.1 le 1er octobre. Les notes officielles 157.0/157.0.1 ne décrivent pas de rupture WebExtension/Experiment équivalente au durcissement observé en 155, mais MailPin dépend du DOM interne `about:3pane` et d’une API Experiment privilégiée : la compatibilité n’est pas inférée. La candidate 1.7.10 relève `strict_max_version` à `157.*`, cible le binaire officiel 157.0.1 dans le smoke et conserve le runtime métier inchangé. La preuve reste en attente jusqu’au PASS du head exact.
+Thunderbird 157.0 est sorti le 30 septembre 2026 et 157.0.1 le 1er octobre. Les notes officielles 157.0/157.0.1 ne décrivent pas de rupture WebExtension/Experiment équivalente au durcissement observé en 155, mais MailPin dépend du DOM interne `about:3pane` et d’une API Experiment privilégiée : la compatibilité n’a pas été inférée. MailPin 1.7.10 relève `strict_max_version` à `157.*`, cible le binaire officiel 157.0.1 dans le smoke et conserve le runtime métier inchangé. Preuves : candidate `565f565710da6262d7a91bfbe280a943047cdc6c` — QA `37213680870` PASS, smoke réel 157.0.1 `37213680824` PASS ; target publié `704b3d5c2b35a2eceb4fbe1136b50a86dfadd6f0` — QA `37213779632`, smoke `37213779633` et CodeQL `37213779727` PASS ; Release `37214354533` PASS.
 
 ### Preuve runtime actuelle
 
-La preuve runtime publiée pour la limite supérieure reste Thunderbird 156.0 : candidate exacte `da9d97a874f5043b43a212d09b9090ad0f77d681`, smoke `35224046106` PASS, puis target publié `46bb9fc27256cc143743e74e4a04fb48d48f6e85`, smoke post-merge `35224161877` PASS. Les deux jobs utilisent le binaire officiel Thunderbird 156.0 et geckodriver 0.37.1 vérifiés avant exécution. La candidate 1.7.10 doit fournir une preuve séparée sur Thunderbird 157.0.1.
+La preuve runtime publiée pour la limite supérieure est désormais Thunderbird 157.0.1 : candidate exacte `565f565710da6262d7a91bfbe280a943047cdc6c`, smoke `37213680824` PASS, puis target publié `704b3d5c2b35a2eceb4fbe1136b50a86dfadd6f0`, smoke post-merge `37213779633` PASS. Les deux jobs utilisent le binaire officiel Thunderbird 157.0.1 et geckodriver 0.37.1 vérifiés avant exécution.
 
 Les preuves Thunderbird 154 restent historiques : la candidate versionnée `c2527b57de4775f4fd228af22b9792937e7ce6ea` avait passé QA `32300356172` et smoke réel Thunderbird 154.0 `32300356085`, puis `v1.7.4` avait été publiée sur `b74c0c7f264cf387269be0aaf18e47e99cf07600`. Les fournisseurs réseau, calendriers distants et la matrice multi-OS restent des validations distinctes.
