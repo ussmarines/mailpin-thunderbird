@@ -1,3 +1,12 @@
+# Changelog
+
+## 2.2.0 — candidate native, non publiée
+
+- API officielles MV3 uniquement ; zéro Experiment privé dans le XPI, tags possédés + Space/actions natives remplaçant le panneau inline.
+- Organic Workspace et modèles locaux 1.7.10 conservés ; Workbench migration JSON explicite, garde import/merge sans troncature, enveloppe atomique et fail-closed.
+- Agenda et accès SQLite/fichiers privilégiés neutralisés ; limitations fournisseurs/conversations/automatismes documentées.
+- Contrats natifs, reproductibilité reviewer, linter officiel courant et smoke 157.0.1 ; profil propriétaire requis avant toute décision de publication.
+
 # Journal des modifications
 
 ## 1.7.10 — compatibilité Thunderbird 157

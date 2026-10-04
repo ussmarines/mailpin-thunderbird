@@ -1,3 +1,8 @@
+> Source 2.2.0 — candidate native uniquement. Version source : **2.2.0**. Dernière release publique : **1.7.10** ; release publique 1.7.10 inchangée.
+> Contrat courant et différences : docs/NATIVE_2.2.0_HANDOFF.md. Les sections 1.7.x ci-dessous restent historiques et ne prouvent pas le natif.
+
+MailPin 2.2.0, version source 2.2.0 : aucun dépôt ATN autorisé ; dernière version publique : **1.7.10**.
+
 # Checklist Add-ons for Thunderbird — MailPin 1.7.10
 
 Dernière release GitHub publique : **1.7.10**. La **version source 1.7.10** est publiée et validée sur Thunderbird 157.0.1. La soumission Add-ons for Thunderbird reste une étape distincte.

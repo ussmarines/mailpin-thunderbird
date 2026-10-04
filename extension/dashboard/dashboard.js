@@ -149,7 +149,7 @@ function checklistElement(item) {
       const next = (item.checklist || []).map(candidate => candidate.id === entry.id ? {...candidate, completed: true, completedAt: Date.now()} : candidate);
       checkbox.disabled = true;
       try {
-        await api.pinInbox.updateReferenceDetails(item.stableKey, {checklist: next});
+        await globalThis.MailPinNative.updateReferenceDetails(item.stableKey, {checklist: next});
         if (!await loadAfterMutation()) checkbox.disabled = false;
       }
       catch (error) { checkbox.disabled = false; setStatus(failureMessage("actionFailed", "Action impossible", error), "error", {persistent: true}); }
@@ -466,7 +466,7 @@ function commandDefinitions() {
     {label: msg("viewReview", "Revue"), run: () => { current.view="review"; current.savedViewId=""; return load({silent:true}); }},
     {label: msg("searchPins", "Rechercher"), run: () => $("search").focus()},
     {label: msg("saveCurrentView", "Enregistrer la vue"), run: openSavedViewDialog},
-    configuration?.settings?.enableThunderbirdTagSync ? {label: msg("syncTags", "Synchroniser les tags"), run: async () => { const result=await api.pinInbox.syncTags([]); setStatus(msg("tagSyncComplete", "Tags synchronisés : $1 message(s), $2 erreur(s).", [displayCount(result.synced), displayCount(result.errors)]), result.errors ? "error" : "success"); }} : null,
+    configuration?.settings?.enableThunderbirdTagSync ? {label: msg("syncTags", "Synchroniser les tags"), run: async () => { const result=await globalThis.MailPinNative.syncTags([]); setStatus(msg("tagSyncComplete", "Tags synchronisés : $1 message(s), $2 erreur(s).", [displayCount(result.synced), displayCount(result.errors)]), result.errors ? "error" : "success"); }} : null,
     {label: msg("settings", "Paramètres"), run: () => api.runtime.openOptionsPage()}
   ].filter(Boolean);
 }
@@ -802,7 +802,7 @@ async function load({silent = false} = {}) {
   const generation = ++loadGeneration;
   if (!silent) setLoading(true);
   try {
-    if (!configuration) configuration = await api.pinInbox.getConfiguration();
+    if (!configuration) configuration = await globalThis.MailPinNative.getConfiguration();
     const options = {
       search: current ? $("search").value.trim() : undefined,
       smartView: current?.smartView || configuration.settings?.defaultSmartView || "today",
@@ -812,8 +812,8 @@ async function load({silent = false} = {}) {
       useSmartView: true
     };
     const [data, calendarList] = await Promise.all([
-      api.pinInbox.getDashboardData(options),
-      api.pinInbox.getCalendars().catch(() => [])
+      globalThis.MailPinNative.getDashboardData(options),
+      globalThis.MailPinNative.getCalendars().catch(() => [])
     ]);
     if (generation !== loadGeneration) return false;
     current = data;
@@ -872,7 +872,7 @@ async function perform(keys, action, options = {}, {reload = true, control = nul
   setButtonBusy(control, true);
   setStatus(msg("actionInProgress", "Action en cours…"), "busy", {persistent: true});
   try {
-    const result = await api.pinInbox.performReferenceAction(safeKeys, action, options);
+    const result = await globalThis.MailPinNative.performReferenceAction(safeKeys, action, options);
     if (reload && !await loadAfterMutation()) return result;
     if (action !== "open" && action !== "reply") {
       safeKeys.forEach(key => selected.delete(key));
@@ -1008,7 +1008,7 @@ async function refreshHealth(control = null) {
   setButtonBusy(control, true);
   setStatus(msg("healthCheckBusy", "Analyse de la santé MailPin…"), "busy", {persistent: true});
   try {
-    current.health = await api.pinInbox.getHealthReport();
+    current.health = await globalThis.MailPinNative.getHealthReport();
     renderHealth();
     setStatus(msg("healthCheckComplete", "Analyse terminée : score $1/100.", [displayCount(current.health.score)]), "success");
   } catch (error) { setStatus(failureMessage("healthCheckFailed", "Analyse impossible", error), "error", {persistent: true}); }
@@ -1036,7 +1036,7 @@ async function handleActionClick(event) {
     setButtonBusy(control, true);
     setStatus(msg("mergeRelatedBusy", "Fusion de la conversation…"), "busy", {persistent: true});
     try {
-      await api.pinInbox.mergeRelatedReferences(group.stableKeys);
+      await globalThis.MailPinNative.mergeRelatedReferences(group.stableKeys);
       if (!await loadAfterMutation()) return;
       setStatus(msg("mergeRelated", "Conversation fusionnée."), "success");
     } catch (error) { setStatus(failureMessage("mergeRelatedFailed", "Fusion impossible", error), "error", {persistent: true}); }
@@ -1082,7 +1082,7 @@ function bindEvents() {
   $("saved-views").addEventListener("click", async event => {
     const apply = eventElement(event)?.closest("[data-saved-view]");
     const remove = eventElement(event)?.closest("[data-delete-saved-view]");
-    if (remove) { await api.pinInbox.deleteSavedView(remove.dataset.deleteSavedView); if (current?.savedViewId === remove.dataset.deleteSavedView) current.savedViewId = ""; await load({silent:true}); return; }
+    if (remove) { await globalThis.MailPinNative.deleteSavedView(remove.dataset.deleteSavedView); if (current?.savedViewId === remove.dataset.deleteSavedView) current.savedViewId = ""; await load({silent:true}); return; }
     if (!apply || !current) return;
     const view = (current.savedViews || []).find(item => item.id === apply.dataset.savedView); if (!view) return;
     current.savedViewId = view.id; current.smartView = view.smartView || "all"; $("search").value = view.search || ""; await load({silent:true});
@@ -1090,7 +1090,7 @@ function bindEvents() {
   $("saved-view-dialog").addEventListener("close", async () => {
     if ($("saved-view-dialog").returnValue !== "default") return;
     const name = $("saved-view-name").value.trim(); if (!name) return;
-    const created = await api.pinInbox.createSavedView({name,smartView:$("saved-view-smart").value || "all",search:$("search").value.trim(),groupId:$("saved-view-group").value,caseId:$("saved-view-case").value,priority:$("saved-view-priority").value,responseState:$("saved-view-response").value,checklist:$("saved-view-checklist").value});
+    const created = await globalThis.MailPinNative.createSavedView({name,smartView:$("saved-view-smart").value || "all",search:$("search").value.trim(),groupId:$("saved-view-group").value,caseId:$("saved-view-case").value,priority:$("saved-view-priority").value,responseState:$("saved-view-response").value,checklist:$("saved-view-checklist").value});
     if (current) current.savedViewId = created.id; await load({silent:true});
   });
   $("search").addEventListener("input", () => {
@@ -1153,7 +1153,7 @@ function bindEvents() {
       setButtonBusy(control, true);
       setStatus(msg("healthRepairBusy", "Réparation en cours…"), "busy", {persistent: true});
       try {
-        const result = await api.pinInbox.repairHealthIssues({actions: ["orphan-links", "repair-references"]});
+        const result = await globalThis.MailPinNative.repairHealthIssues({actions: ["orphan-links", "repair-references"]});
         current.health = result.health;
         if (!await loadAfterMutation()) return;
         setStatus(msg("healthRepairComplete", "$1 élément(s) réparé(s).", [displayCount(result.repaired)]), "success");
@@ -1164,7 +1164,7 @@ function bindEvents() {
       setButtonBusy(control, true);
       setStatus(msg("diagnosticExportBusy", "Préparation du diagnostic…"), "busy", {persistent: true});
       try {
-        const bundle = await api.pinInbox.exportDiagnosticBundle();
+        const bundle = await globalThis.MailPinNative.exportDiagnosticBundle();
         const date = new Date().toISOString().slice(0, 10);
         downloadJson(`mailpin-diagnostic-${date}.json`, bundle);
         setStatus(msg("diagnosticExported", "Diagnostic local exporté."), "success");
@@ -1176,7 +1176,7 @@ function bindEvents() {
       if (!confirm(msg("diagnosticClearConfirm", "Vider le journal diagnostic local ?"))) return;
       setButtonBusy(control, true);
       try {
-        await api.pinInbox.clearDiagnostics();
+        await globalThis.MailPinNative.clearDiagnostics();
         if (!await loadAfterMutation()) return;
         setStatus(msg("diagnosticCleared", "Journal diagnostic vidé."), "success");
       } catch (error) { setStatus(failureMessage("diagnosticClearFailed", "Nettoyage impossible", error), "error", {persistent: true}); }
@@ -1186,7 +1186,7 @@ function bindEvents() {
     if (action === "provider-check") {
       setButtonBusy(control, true);
       setStatus(msg("providerCheckBusy", "Analyse des fournisseurs…"), "busy", {persistent: true});
-      try { current.providerMatrix = await api.pinInbox.runProviderCompatibilityCheck(); renderHealth(); setStatus(msg("providerCheckComplete", "Matrice de compatibilité actualisée."), "success"); }
+      try { current.providerMatrix = await globalThis.MailPinNative.runProviderCompatibilityCheck(); renderHealth(); setStatus(msg("providerCheckComplete", "Matrice de compatibilité actualisée."), "success"); }
       catch (error) { setStatus(failureMessage("providerCheckFailed", "Analyse impossible", error), "error", {persistent: true}); }
       finally { setButtonBusy(control, false); }
     }

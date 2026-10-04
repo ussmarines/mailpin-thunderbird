@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "purpose": "Cache machine-readable des dernières preuves de validation réutilisables. Ce fichier ne remplace ni AGENTS.md ni les règles de sécurité et ne doit jamais servir à inventer un test non exécuté.",
-  "recorded_at": "2026-08-23T14:55:33+02:00",
+  "recorded_at": "2026-10-04T17:25:51.585880+00:00",
   "baseline": {
     "repository": "ussmarines/mailpin-thunderbird",
-    "branch": "release/finalize-1.7.6",
-    "commit_sha": "8cf29c0d64fb0ea2b49c9568655be45514586747",
+    "branch": "codex/native-2.2.0-zero-experiment",
+    "commit_sha": "3a7030fc696546c26435217a18182e2b9efcbc89",
     "working_tree_patch_id": "",
     "untracked_candidate_files": []
   },
@@ -33,81 +33,94 @@
   },
   "repository_checks": [
     {
-      "id": "github-candidate-1-7-6-gate",
+      "id": "native-local-ci",
       "result": "success",
-      "validated_commit": "c502175041c85e3cb6e37666a0784f7df0a9e367",
-      "working_tree_patch_id": "",
-      "validated_at": "2026-08-23T14:43:13+02:00",
-      "command": "PR #65 QA 32640198347 + Thunderbird runtime smoke 32640198339",
-      "environment": {
-        "ci": "GitHub Actions",
-        "linux": "ubuntu-24.04",
-        "windows": "windows-latest",
-        "thunderbird": "154.0"
-      },
-      "invalidates_on": [
-        "extension/**",
-        "package.json",
-        "scripts/**",
-        "tests/**",
-        ".github/workflows/ci.yml",
-        ".github/workflows/thunderbird-smoke.yml"
-      ],
-      "evidence": {
-        "kind": "github-candidate-gate",
-        "summary": "MailPin 1.7.6 exact candidate passed Linux/Windows QA, identity/security guard, build/XPI checks and real Thunderbird 154 smoke before publication.",
-        "qa_run": 32640198347,
-        "thunderbird_smoke_run": 32640198339,
-        "release_tag": "v1.7.6",
-        "release_target": "522042df08c2eb7a18a13cbb83631943e54abf2c",
-        "public_asset_verification": "not independently downloaded in this session"
-      }
-    }
-  ],
-  "targeted_checks": [
-    {
-      "id": "startup-persisted-pins-thunderbird-154",
-      "result": "success",
-      "validated_commit": "26fc0ac9b4d35009f125f543eefc5de9338bef71",
-      "working_tree_patch_id": "",
-      "validated_at": "2026-08-23T14:27:33+02:00",
-      "command": "functional_bench._run_scope_case volume=50 scope=A-and-C on two Thunderbird processes without Dashboard or tab activation",
+      "validated_commit": "3a7030fc696546c26435217a18182e2b9efcbc89",
+      "validated_at": "2026-10-04T17:25:51.585880+00:00",
+      "command": "npm run ci",
       "environment": {
         "os": "Windows",
-        "thunderbird": "154.0",
-        "geckodriver": "0.37.1"
-      },
-      "invalidates_on": [
-        "extension/background.js",
-        "extension/api/pinInbox/**",
-        "tests/thunderbird/functional_bench.py",
-        "tests/thunderbird/real_smoke.py"
-      ],
-      "evidence": {
-        "kind": "real-thunderbird-cold-start",
-        "summary": "Baseline failed with the MV3 background stopped and no panel. The corrected worktree passed on the same persistent profile shape: APP_STARTUP background running, 50 SQLite refs preserved, 34 A+C cards rendered, one panel, one toggle, zero timeout and zero MailPin JavaScript exception."
-      }
-    },
-    {
-      "id": "startup-fix-github-runtime",
-      "result": "success",
-      "validated_commit": "c502175041c85e3cb6e37666a0784f7df0a9e367",
-      "working_tree_patch_id": "",
-      "validated_at": "2026-08-23T14:43:13+02:00",
-      "command": "GitHub Actions Thunderbird runtime smoke 32640198339 on exact 1.7.6 candidate",
-      "environment": {
-        "ci": "GitHub Actions",
-        "thunderbird": "154.0"
+        "node": "26.8.1",
+        "python": "3.14"
       },
       "invalidates_on": [
         "extension/**",
-        "tests/thunderbird/**",
-        ".github/workflows/thunderbird-smoke.yml"
+        "tests/**",
+        "scripts/**",
+        "package.json",
+        ".github/**"
       ],
-      "evidence": {
-        "kind": "real-thunderbird-smoke",
-        "summary": "Exact versioned 1.7.6 candidate passed the real Thunderbird 154 runtime smoke before GitHub publication."
-      }
+      "xpi_sha256": "25b6869e5c2bcdf112e531611477f6d23ea911436ae57a64730c771dc6f553c3"
+    },
+    {
+      "id": "native-runtime",
+      "result": "success",
+      "validated_commit": "3a7030fc696546c26435217a18182e2b9efcbc89",
+      "validated_at": "2026-10-04T17:25:51.585880+00:00",
+      "command": "python tests/thunderbird/real_smoke.py --binary <official installed 157.0.1> --xpi dist/MailPin_v2.2.0.xpi --geckodriver <0.37.1> --output-dir artifacts/native-smoke --timeout 40",
+      "environment": {
+        "os": "Windows",
+        "thunderbird": "157.0.1",
+        "buildID": "20261001134409",
+        "geckodriver": "0.37.1",
+        "profile": "disposable local synthetic; no owner data"
+      },
+      "invalidates_on": [
+        "extension/**",
+        "scripts/build.py",
+        "tests/thunderbird/**",
+        "extension/manifest.json"
+      ],
+      "xpi_sha256": "25b6869e5c2bcdf112e531611477f6d23ea911436ae57a64730c771dc6f553c3"
+    },
+    {
+      "id": "native-official-linter",
+      "result": "success",
+      "validated_commit": "3a7030fc696546c26435217a18182e2b9efcbc89",
+      "validated_at": "2026-10-04T17:25:51.585880+00:00",
+      "command": "node artifacts/webext-linter/verify.js dist/MailPin_v2.2.0.xpi --report-format json --report-out artifacts/native-linter.json",
+      "environment": {
+        "linter": "thunderbird/webext-linter 2.2.0",
+        "commit": "c56f6bdf3d3d0d1f3ec1091182570503f473ebaf",
+        "schema": "release-mv3 157.0",
+        "warnings": 1,
+        "acknowledged": "intentional prototype strict_max_version 157.*"
+      },
+      "invalidates_on": [
+        "extension/**",
+        "scripts/build.py",
+        ".github/workflows/ci.yml"
+      ],
+      "xpi_sha256": "25b6869e5c2bcdf112e531611477f6d23ea911436ae57a64730c771dc6f553c3"
     }
-  ]
+  ],
+  "targeted_checks": [],
+  "runtime_checks": [
+    "install-activate-native-MV3",
+    "one-native-space",
+    "dashboard-startup",
+    "native-Alt-P-pin",
+    "read-and-counters-unchanged",
+    "native-tag-feedback",
+    "options-opens-native-space-via-background",
+    "options-initialized",
+    "workbench-initialized",
+    "workbench-file-preview-merge-preserves-note",
+    "persistent-pin-after-real-process-restart",
+    "native-unpin-cleans-owned-tags-only",
+    "uninstall-removes-extension-runtime",
+    "clean-reinstall-with-no-duplicate-space",
+    "no-extension-runtime-script-errors"
+  ],
+  "manual_gates": [
+    {
+      "id": "native-owner-profile-ux",
+      "status": "MANUAL_OWNER_TEST_REQUIRED",
+      "contract": "docs/NATIVE_2.2.0_HANDOFF.md"
+    }
+  ],
+  "github_evidence": {
+    "status": "NOT EXECUTED at local recording; verify draft PR runs live, do not reuse 1.7.10 evidence"
+  },
+  "superseded_evidence": "1.7.6 cache removed; 1.7.10 docs retained as historical, not native runtime proof"
 }

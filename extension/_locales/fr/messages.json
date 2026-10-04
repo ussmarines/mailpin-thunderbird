@@ -6,7 +6,7 @@
     "message": "MailPin"
   },
   "extensionDescription": {
-    "message": "Épinglez, organisez et suivez vos e-mails importants dans Thunderbird avec notes, sous-tâches, rappels, vues, Agenda et tableau de bord local."
+    "message": "Suivi local des e-mails : tags natifs, notes, checklists et Space MailPin. Candidate sans Agenda ni panneau inline."
   },
   "brandSubtitle": {
     "message": "Suivi d’e-mails & productivité pour Thunderbird."
@@ -2647,5 +2647,62 @@
   },
   "ruleBuilderLimits": {
     "message": "Limites"
+  },
+  "nativeLimitations": {
+    "message": "Candidate native 2.2.0 : les tags et le Space remplacent le panneau dans la liste. Agenda et sauvegardes automatiques vers un dossier sont indisponibles. Exportez 1.7.10 avant la mise à niveau, puis importez dans le Workbench. Conversations : couverture locale bornée à 500 messages ; aucune recherche par sujet."
+  },
+  "nativeWorkbench": {
+    "message": "Migration et outils locaux"
+  },
+  "nativeMigrationGuide": {
+    "message": "Exportez une sauvegarde depuis 1.7.10 avant la mise à niveau. Conservez une copie du profil. Vérifiez la prévisualisation avant import. La candidate ne lit et ne supprime jamais les données SQLite originales."
+  },
+  "nativeMigration": {
+    "message": "Importer une sauvegarde"
+  },
+  "nativeBackupFile": {
+    "message": "Sauvegarde JSON (10 Mo maximum)"
+  },
+  "nativeMerge": {
+    "message": "Fusionner"
+  },
+  "nativeReplace": {
+    "message": "Remplacer après confirmation"
+  },
+  "nativeTools": {
+    "message": "Outils locaux"
+  },
+  "nativeExport": {
+    "message": "Télécharger la sauvegarde"
+  },
+  "nativeDiagnostics": {
+    "message": "Diagnostics"
+  },
+  "nativeRunRules": {
+    "message": "Appliquer les règles vérifiées aux messages suivis"
+  },
+  "nativeRollback": {
+    "message": "Avant de revenir à 1.7.10, désactivez les tags MailPin et exportez les données natives. 1.7.10 ne lit pas le stockage natif. Conservez les deux sauvegardes."
+  },
+  "nativeBusy": {
+    "message": "Opération en cours…"
+  },
+  "nativeDone": {
+    "message": "Terminé."
+  },
+  "nativeFailed": {
+    "message": "Échec de l’opération :"
+  },
+  "nativeInvalidFile": {
+    "message": "Choisissez une sauvegarde valide de moins de 10 Mo."
+  },
+  "nativeConfirmReplace": {
+    "message": "Remplacer les données natives ? Une sauvegarde de sécurité interne sera créée avant le remplacement."
+  },
+  "nativeConfirmRules": {
+    "message": "Appliquer les règles vérifiées aux messages suivis ? Vérifiez d’abord la simulation."
+  },
+  "nativeSkip": {
+    "message": "Aller aux outils locaux"
   }
 }

@@ -16,6 +16,7 @@ DIST = ROOT / "dist"
 FIXED_TIME = (2026, 1, 1, 0, 0, 0)
 SOURCE_EXCLUDED_GLOBS = ("CI_LOG_*.txt", "ROUNDTRIP_CI_LOG_*.txt")
 XPI_EXCLUDED_NAMES = {"AGENTS.md"}
+XPI_EXCLUDED_PREFIXES = ("api/",)
 SOURCE_FILE_MANIFEST = ".mailpin-source-files.json"
 
 
@@ -81,6 +82,9 @@ def create_xpi(output: Path) -> None:
     with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
         for source in tracked_repository_files():
             if not source.is_relative_to(EXTENSION) or source.name in XPI_EXCLUDED_NAMES:
+                continue
+            relative = source.relative_to(EXTENSION).as_posix()
+            if relative.startswith(XPI_EXCLUDED_PREFIXES) or relative == "styles/pin.css":
                 continue
             archive_file(archive, source, source.relative_to(EXTENSION).as_posix(), root=EXTENSION)
 

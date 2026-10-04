@@ -16,7 +16,7 @@ L’extension ne copie pas dans sa base :
 
 ### Transmission
 
-MailPin 1.7.10 ne contient aucun appel réseau, télémétrie, publicité, service de licence ni chargement de code distant. Les données restent dans le profil Thunderbird ou dans un fichier de sauvegarde choisi explicitement par l’utilisateur.
+MailPin 2.2.0 ne contient aucun appel réseau, télémétrie, publicité, service de licence ni chargement de code distant. Les données restent dans le profil Thunderbird ou dans un fichier de sauvegarde choisi explicitement par l’utilisateur.
 
 ### Sauvegardes et diagnostics
 
@@ -26,13 +26,9 @@ MailPin 1.7.10 ne contient aucun appel réseau, télémétrie, publicité, servi
 - l’utilisateur doit vérifier un fichier avant de le partager : une sauvegarde contient encore les métadonnées nécessaires aux épingles ;
 - aucune sauvegarde n’est téléversée automatiquement.
 
-### Suppression
+### Suppression (candidate native)
 
-La désinstallation ferme le stockage puis supprime la base, les fichiers de récupération, les préférences et les sauvegardes internes gérées par MailPin. Dans un dossier externe choisi avec le sélecteur natif, seules les enveloppes MailPin munies d’un checksum local vérifiable sont supprimées ; les autres fichiers et le dossier sont conservés.
-
-La désactivation de la synchronisation des tags ou la désinstallation retire uniquement les tags dont la clé et le libellé correspondent exactement aux définitions MailPin ; les tags personnels ne sont pas supprimés.
-
-Les exports téléchargés manuellement ne sont pas suivis par l’extension et restent sous le contrôle de l’utilisateur.
+Les tags personnels ne sont jamais adoptés/renommés/supprimés. Désactiver explicitement le sync avant désinstallation retire uniquement les définitions possédées selon clé, définition exacte et registre local. Le natif n'a pas de hook privilégié d'uninstall : les tags peuvent rester après désinstallation directe. Thunderbird gère les pages/listeners/Space et le cycle du stockage WebExtension. Aucun accès/purge du SQLite historique 1.7.10 ; exporter avant mise à niveau/désinstallation. Les exports téléchargés restent sous contrôle utilisateur.
 
 ## English
 
@@ -48,7 +44,7 @@ The extension does not copy into its database:
 
 ### Transmission
 
-MailPin 1.7.10 contains no network call, telemetry, advertising, license service, or remotely loaded code. Data remains in the Thunderbird profile or in a backup file explicitly selected by the user.
+MailPin 2.2.0 contains no network call, telemetry, advertising, license service, or remotely loaded code. Data remains in the Thunderbird profile or in a backup file explicitly selected by the user.
 
 ### Backups and diagnostics
 

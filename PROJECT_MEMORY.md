@@ -1,9 +1,46 @@
 # Mémoire opérationnelle — MailPin
 
-> Version source : **1.7.10**
+> Version source : **2.2.0**
 > Dernière release publique : **1.7.10**
-> Branche courante : `main` ; MailPin 1.7.10 publiée
+> Branche courante à vérifier : `codex/native-2.2.0-zero-experiment` ; candidate native
 > Extension ID : `ussmarines.mailpin@addons.thunderbird.net`
+
+## Architecture courante 2.2.0
+
+Source native zéro-Experiment. `docs/NATIVE_2.2.0_HANDOFF.md` est le contrat courant de migration, permissions et limitations ; `docs/NATIVE_2.2.0_MATRIX.md` contient l'audit différentiel. Les invariants lu/non-lu, compteurs, localité, bornes, ID et propriété des tags restent absolus. Le stockage courant est `storage.local` atomique/sérialisé ; l'ancien SQLite est conservé sans accès natif. Les anciennes sections Experiment/PinCompatibility ci-dessous sont historiques, jamais des instructions d'activer ces sources dans le XPI natif.
+
+## Carte complète des fichiers natifs
+
+- `extension/manifest.json`
+- `extension/background.js`
+- `extension/options/options.html`
+- `extension/dashboard/dashboard.html`
+- `PROJECT_MEMORY.md`
+- `docs/SECURITY_BOUNDARY.md`
+- `docs/BUG_TRACKER.md`
+- `docs/THUNDERBIRD_COMPATIBILITY.md`
+- `docs/THUNDERBIRD_TEST_BENCH.md`
+- `docs/CODEX_HANDOFF.md`
+- `extension/native/core.js`
+- `extension/native/tags.js`
+- `extension/native/client.js`
+- `extension/workbench/workbench.html`
+- `docs/NATIVE_2.2.0_MATRIX.md`
+- `docs/NATIVE_2.2.0_HANDOFF.md`
+
+## Où modifier quoi — natif
+
+Backend/RPC : native/core.js et client.js ; modèles purs : native/models/ et product.js ; tags : native/tags.js ; UI : dashboard/options/workbench ; manifeste/build/garde : manifest.json, scripts/build.py et scripts/check_native.py.
+
+## Commandes obligatoires — natif
+
+`npm run check`, `npm test`, `npm run build`, puis `npm run ci` au jalon final. Smoke canonique : tests/thunderbird/real_smoke.py sélectionne le banc natif depuis le XPI. Le linter officiel lit le XPI réellement livré. Voir le rapport candidat pour preuves exécutées et leur invalidation.
+
+## Définition de terminé — natif
+
+PASS statique/modèles/import/build/linter et smoke réel 157.0.1, PR draft, XPI propriétaire. Aucun merge/publication. Ne jamais attribuer les preuves historiques 1.7.10 à 2.2.0.
+
+## Historique 1.7.x conservé
 
 ## Résumé
 

@@ -1,3 +1,9 @@
+# Banc courante — candidate native 2.2.0
+
+Le contrat courant est `docs/NATIVE_2.2.0_HANDOFF.md` et sa matrice. Le XPI ne contient ni Experiment, ni injection about:3pane, ni accès SQLite/calendrier privé. La suite ci-dessous décrit la release historique 1.7.x ; ses assertions privilégiées ne s'appliquent pas au natif. Organic Workspace et ses tokens restent canoniques ; le panneau est remplacé par tags/Space. La frontière RPC vérifie ID, origine, chemin de page et données JSON bornées. Aucun contenu de courrier n'est interprété comme HTML. Les tags personnels et compteurs sont invariants. Le banc `real_smoke.py` route depuis le manifeste vers `native_smoke.py` pour 2.2.0.
+
+## Référence historique conservée
+
 # Banc de test Thunderbird
 
 ## But

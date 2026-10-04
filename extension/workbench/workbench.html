@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MailPin — Workbench</title><link rel="stylesheet" href="../styles/tokens.css"><link rel="stylesheet" href="../dashboard/dashboard.css"><link rel="stylesheet" href="../styles/workspace.css">
+<script src="../styles/theme.js"></script><script src="../native/client.js"></script><script src="workbench.js" defer></script></head>
+<body class="mp-organic-workspace native-workbench"><a class="skip-link" href="#workbench-main" data-i18n="nativeSkip">Skip to local tools</a><main id="workbench-main" tabindex="-1">
+<h1 data-i18n="nativeWorkbench">Migration and local tools</h1>
+<p data-i18n="nativeMigrationGuide">Export a backup from 1.7.10 before upgrading. Keep a profile copy. Import only after reviewing this preview. The original SQLite data is never read or deleted by this candidate.</p>
+<nav class="button-row"><a href="../dashboard/dashboard.html" data-i18n="menuDashboard">Dashboard</a><a href="../options/options.html" data-i18n="settings">Settings</a></nav>
+<section><h2 data-i18n="nativeMigration">Import a backup</h2>
+<label><span data-i18n="nativeBackupFile">Backup JSON (10 MB maximum)</span><input id="import-file" type="file" accept="application/json,.json"></label>
+<pre id="preview" aria-live="polite"></pre>
+<div class="button-row"><button class="button primary" id="merge" disabled data-i18n="nativeMerge">Merge</button><button class="button" id="replace" disabled data-i18n="nativeReplace">Replace after confirmation</button></div>
+</section>
+<section><h2 data-i18n="nativeTools">Local tools</h2><div class="button-row">
+<button id="export" data-i18n="nativeExport">Download backup</button><button id="diagnostics" data-i18n="nativeDiagnostics">Diagnostics</button>
+<button id="repair" data-i18n="repairReferences">Repair references</button><button id="simulate" data-i18n="simulate">Simulate rules</button>
+<button id="run-rules" data-i18n="nativeRunRules">Apply reviewed rules to followed messages</button>
+</div></section>
+<p id="status" role="status" aria-live="polite"></p><pre id="result"></pre>
+<aside class="info-box"><p data-i18n="nativeLimitations"></p><p data-i18n="nativeRollback">Before returning to 1.7.10, disable tag feedback and export your native data. 1.7.10 cannot read native storage. Restore its own backup explicitly if necessary.</p></aside>
+</main></body></html>

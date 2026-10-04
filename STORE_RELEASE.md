@@ -1,3 +1,8 @@
+> Source 2.2.0 — candidate native uniquement. Version source : **2.2.0**. Dernière release publique : **1.7.10** ; release publique 1.7.10 inchangée.
+> Contrat courant et différences : docs/NATIVE_2.2.0_HANDOFF.md. Les sections 1.7.x ci-dessous restent historiques et ne prouvent pas le natif.
+
+**Version source :** 2.2.0 — candidate ; **Dernière release publique :** 1.7.10. `MailPin_v2.2.0.xpi` réservé au test propriétaire.
+
 # Publication MailPin 1.7.10
 
 ## État

@@ -1,3 +1,14 @@
+# Candidate native MailPin 2.2.0
+
+**Version source :** `2.2.0` — candidate ; **Dernière release publique :** `1.7.10`.
+Les tags natifs, actions de message, menus, raccourcis et un Space MailPin remplacent le panneau privé. Organic Workspace conserve notes, checklists, workflows, recherche, vues, affaires et modèles locaux. Agenda et sauvegardes automatiques vers un dossier sont indisponibles. Le XPI ne contient aucun Experiment privé, réseau runtime, code distant, corps de courrier ou pièce jointe.
+
+Exporter depuis 1.7.10 avant mise à niveau ; garder le JSON et une copie du profil fermé. Import explicite dans Workbench avec preview puis merge/replace. Aucun accès/purge automatique SQLite. Automatisations importées désactivées. Limites, permissions, rollback et tests propriétaire : [handoff natif](docs/NATIVE_2.2.0_HANDOFF.md).
+
+Build : `npm run ci` ; candidate `dist/MailPin_v2.2.0.xpi`. Thunderbird 157.0–157.*, cible réelle 157.0.1. PR draft uniquement, aucune publication/release ATN. [Validation](VALIDATION_REPORT_2.2.0.md), [revue sécurité](SECURITY_AUDIT_2.2.0.md), [matrice](docs/NATIVE_2.2.0_MATRIX.md).
+
+## Documentation historique de la release publique 1.7.10
+
 <div align="center">
   <img src="assets/brand/mailpin-hero.svg" width="100%" alt="MailPin — Email Follow-up & Productivity">
 

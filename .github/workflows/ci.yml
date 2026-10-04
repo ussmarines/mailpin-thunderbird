@@ -56,10 +56,23 @@ jobs:
           xpi = next(pathlib.Path('dist').glob('*.xpi'))
           with zipfile.ZipFile(xpi) as z:
               assert 'manifest.json' in z.namelist()
-              json.loads(z.read('manifest.json'))
+              manifest = json.loads(z.read('manifest.json'))
+              assert manifest['manifest_version'] == 3 and 'experiment_apis' not in manifest
+              assert not any(name.startswith('api/') for name in z.namelist())
               assert all(not name.startswith('extension/') for name in z.namelist())
           print('XPI layout: OK')
           PY
+      - name: Official Thunderbird linter (pinned, test only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          linter_dir="$RUNNER_TEMP/mailpin-webext-linter"
+          git clone --no-checkout https://github.com/thunderbird/webext-linter.git "$linter_dir"
+          git -C "$linter_dir" checkout --detach c56f6bdf3d3d0d1f3ec1091182570503f473ebaf
+          npm --prefix "$linter_dir" ci --ignore-scripts
+          xpi="$(find dist -maxdepth 1 -type f -name 'MailPin_v*.xpi' -print -quit)"
+          mkdir -p artifacts
+          node "$linter_dir/verify.js" "$xpi" --report-format json --report-out artifacts/native-linter.json
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: development-build
@@ -70,6 +83,7 @@ jobs:
             dist/*.xpi
             dist/*Repository*.zip
             dist/SHA256SUMS.txt
+            artifacts/native-linter.json
 
   windows-smoke:
     name: Source and model checks (Windows)

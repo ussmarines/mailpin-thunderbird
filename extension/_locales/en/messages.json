@@ -6,7 +6,7 @@
     "message": "MailPin"
   },
   "extensionDescription": {
-    "message": "Pin, organize, and follow up on important email in Thunderbird with notes, subtasks, reminders, saved views, Calendar integration, and a local dashboard."
+    "message": "Local email follow-up: native tags, notes, checklists and MailPin Space. Candidate without Calendar or inline panel."
   },
   "brandSubtitle": {
     "message": "Email Follow-up & Productivity for Thunderbird"
@@ -2647,5 +2647,62 @@
   },
   "ruleBuilderLimits": {
     "message": "Limits"
+  },
+  "nativeLimitations": {
+    "message": "Native 2.2.0 candidate: tags and the Space replace the inline panel. Calendar and automatic folder backups are unavailable. Export 1.7.10 before upgrading, then import in the Workbench. Conversations: local coverage bounded to 500 messages; never matched by subject."
+  },
+  "nativeWorkbench": {
+    "message": "Migration and local tools"
+  },
+  "nativeMigrationGuide": {
+    "message": "Export a backup from 1.7.10 before upgrading. Keep a profile copy. Review the preview before importing. The candidate never reads or deletes the original SQLite data."
+  },
+  "nativeMigration": {
+    "message": "Import a backup"
+  },
+  "nativeBackupFile": {
+    "message": "Backup JSON (10 MB maximum)"
+  },
+  "nativeMerge": {
+    "message": "Merge"
+  },
+  "nativeReplace": {
+    "message": "Replace after confirmation"
+  },
+  "nativeTools": {
+    "message": "Local tools"
+  },
+  "nativeExport": {
+    "message": "Download backup"
+  },
+  "nativeDiagnostics": {
+    "message": "Diagnostics"
+  },
+  "nativeRunRules": {
+    "message": "Apply reviewed rules to followed messages"
+  },
+  "nativeRollback": {
+    "message": "Before returning to 1.7.10, disable tag feedback and export your native data. 1.7.10 cannot read native storage. Keep both backups."
+  },
+  "nativeBusy": {
+    "message": "Working…"
+  },
+  "nativeDone": {
+    "message": "Done."
+  },
+  "nativeFailed": {
+    "message": "Operation failed:"
+  },
+  "nativeInvalidFile": {
+    "message": "Choose a valid backup under 10 MB."
+  },
+  "nativeConfirmReplace": {
+    "message": "Replace the native data? An internal safety snapshot will be saved first."
+  },
+  "nativeConfirmRules": {
+    "message": "Apply reviewed rules to followed messages? Review the simulation first."
+  },
+  "nativeSkip": {
+    "message": "Skip to local tools"
   }
 }

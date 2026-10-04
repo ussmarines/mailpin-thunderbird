@@ -201,7 +201,7 @@
   void (async () => {
     try {
       mark("settings:requested");
-      await loadClassicScript("../api/pinInbox/modules/settings.js");
+      await loadClassicScript("../native/models/settings.js");
       if (!globalThis.PinSettings) {
         const error = new Error("Settings registry did not initialize.");
         error.name = "OptionsSettingsRegistryError";

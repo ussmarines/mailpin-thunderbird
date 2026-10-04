@@ -1,3 +1,7 @@
+# Contrat courant de la candidate native 2.2.0
+
+L'instruction explicite du chantier zéro-Experiment remplace l'ancienne architecture privilégiée : lire les canoniques ci-dessous dans leur ordre, puis docs/NATIVE_2.2.0_HANDOFF.md. Les fichiers API/Experiment restent historiques et sont exclus du XPI. Ne pas réactiver pinInbox/PinCompatibility/injection DOM/SQLite dans le runtime natif. Backend : extension/native/core.js ; frontière : API messenger officielles ; atomicité storage.local sérialisée. Dashboard via Space/tabs dans background ; aucune notification Experiment. Les invariants compteurs/read/localité/ID/propriété tags/bornes et permissions Git restent prioritaires. L'ancienne gouvernance sous-jacente s'applique pour le reste ; les guides historiques sont étiquetés comme tels.
+
 # AGENTS.md — MailPin
 
 Ce dépôt contient une MailExtension Thunderbird Manifest V3 avec une API Experiment privilégiée.
