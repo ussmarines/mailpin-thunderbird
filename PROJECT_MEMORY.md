@@ -1,8 +1,8 @@
 # Mémoire opérationnelle — MailPin
 
-> Version source : **1.7.9**
+> Version source : **1.7.10**
 > Dernière release publique : **1.7.9**
-> Branche courante : `main` ; MailPin 1.7.9 publiée
+> Branche courante : `fix/thunderbird-157-compatibility` ; candidate MailPin 1.7.10 / Thunderbird 157
 > Extension ID : `ussmarines.mailpin@addons.thunderbird.net`
 
 ## Résumé
@@ -21,6 +21,8 @@ Thunderbird 156.0 est sorti le 15 septembre 2026. La source 1.7.9 relève `stric
 
 
 La compatibilité Thunderbird 156 a été démontrée sur la candidate `da9d97a874f5043b43a212d09b9090ad0f77d681` (QA `35224045803`, smoke réel 156.0 `35224046106`) puis sur le target publié `46bb9fc27256cc143743e74e4a04fb48d48f6e85` (QA `35224161719`, smoke `35224161877`). Le workflow canonique Release `35224299551` a publié `v1.7.9`. Empreintes GitHub : XPI `41248fb7f68dde8a7858e5500e008a09248f7c3a4968b045e1f8c2d6d5839fb2`, source `b3aef29587f653433dd211dfeb7d077f44832d1b83331de26151c40c334e9397`, `SHA256SUMS.txt` `ea5f9801b5d952368290ca2754e8dbc0df3a01133759b594b59c2d812609bcb0`.
+
+Thunderbird 157.0 est sorti le 30 septembre 2026 et 157.0.1 le 1er octobre 2026. La candidate 1.7.10 relève `strict_max_version` à `157.*` et déplace le smoke runtime sur le binaire officiel 157.0.1. Le runtime métier, les permissions, schémas, stockage et frontières privilégiées restent inchangés ; aucune compatibilité 157 n’est considérée prouvée avant le PASS du smoke exact de la candidate.
 
 ## Invariants non négociables
 
@@ -66,14 +68,14 @@ La compatibilité Thunderbird 156 a été démontrée sur la candidate `da9d97a8
 
 ## État technique courant
 
-- source : 1.7.9 publiée ; dernière release publique : 1.7.9 ;
-- Thunderbird : 153.0 à 155.* ;
+- source : 1.7.10 candidate ; dernière release publique : 1.7.9 ;
+- Thunderbird candidat : 153.0 à 157.* ; baseline publiée validée : 153.0 à 156.* ;
 - permission WebExtension : `menus` uniquement ;
 - schémas : SQLite 5, settings 8, data 7 ;
-- aucune migration, permission, dépendance runtime ou connexion réseau introduite par 1.7.7 ;
-- candidate 1.7.7 `94ce4d2656df8eb9694ce794743b82c00d83e8a9` : QA `33688297275` — PASS ; smoke Thunderbird 155.0 `33688296968` — PASS ;
-- `main` publié `f5d5c07a0f8d375ed7347b3a42fbc57f4bafb7fb` : QA `33689155033` — PASS ; smoke Thunderbird 155.0 `33689155048` — PASS ;
-- release `v1.7.7` : tag ciblant `f5d5c07a0f8d375ed7347b3a42fbc57f4bafb7fb` ; workflow Release `33689378381` — PASS.
+- aucun changement métier, migration, permission, dépendance runtime ou réseau prévu pour 1.7.10 ;
+- preuve publiée 1.7.9 : candidate `da9d97a874f5043b43a212d09b9090ad0f77d681` — QA `35224045803` / smoke Thunderbird 156.0 `35224046106` PASS ;
+- target publié 1.7.9 `46bb9fc27256cc143743e74e4a04fb48d48f6e85` — QA `35224161719` / smoke `35224161877` PASS ;
+- preuve Thunderbird 157.0.1 : en attente sur le head exact 1.7.10.
 
 ## Commandes obligatoires
 
@@ -88,7 +90,7 @@ npm run ci
 
 - version source et dernière release publique déclarées sans ambiguïté ;
 - tests et build verts sur le diff applicable ;
-- smoke Thunderbird 155 réel frais sur le head versionné et après intégration ;
+- smoke Thunderbird 157.0.1 réel frais sur le head versionné et après intégration ;
 - cold start avec épingles persistées sans Dashboard validé ;
 - aucune permission, schéma, réseau ou dépendance runtime injustifiée ;
 - documentation active alignée avec les preuves exactes ;

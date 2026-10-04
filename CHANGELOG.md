@@ -1,5 +1,12 @@
 # Journal des modifications
 
+## 1.7.10 — compatibilité Thunderbird 157
+
+- étend la compatibilité déclarée de Thunderbird `153.0` à `157.*` ;
+- déplace le smoke runtime automatisé sur le binaire officiel Thunderbird 157.0.1 avec vérification SHA-256 ;
+- conserve le runtime métier, le chargeur Experiment borné, `PinCompatibility`, les permissions, schémas, stockage local-first et l’état lu/non-lu inchangés ;
+- n’ajoute aucune dépendance runtime, connexion réseau, télémétrie, publicité, CDN ou code distant.
+
 ## 1.7.9 — compatibilité Thunderbird 156
 
 - étend la compatibilité déclarée de Thunderbird `153.0` à `156.*` ;

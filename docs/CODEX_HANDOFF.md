@@ -1,22 +1,23 @@
-# Passage de relais — MailPin 1.7.9 candidate
+# Passage de relais — MailPin 1.7.10 candidate
 
 ## État
 
-- branche : `main` ;
-- version source : **1.7.9** ;
+- branche : `fix/thunderbird-157-compatibility` ;
+- version source : **1.7.10** ;
 - dernière release publique : **1.7.9** ;
-- Thunderbird : 153.0 à 155.* ;
+- Thunderbird candidat : 153.0 à 157.* ;
+- baseline publiée : 153.0 à 156.* ;
 - ID : `ussmarines.mailpin@addons.thunderbird.net` ;
-- tag/release : `v1.7.8` → `800c07315ee7f8611f2d2fc6e12a4f2c2d74b849`.
+- tag/release public : `v1.7.9` → `46bb9fc27256cc143743e74e4a04fb48d48f6e85`.
 
-## Résultat
+## Résultat attendu
 
-MailPin 1.7.8 publie l’état Git final synchronisé après 1.7.7 sans modifier le runtime Thunderbird 155. Candidate `e48a12239c674e1f8a909b22a04c0c3266eca70e` : QA `33691697322` PASS, smoke Thunderbird 155.0 `33691697345` PASS. `main`/tag target `800c07315ee7f8611f2d2fc6e12a4f2c2d74b849` : QA `33691785442` PASS, smoke `33691785284` PASS. Publisher canonique `33691919194` PASS.
+MailPin 1.7.10 relève uniquement la borne de compatibilité et le binaire du smoke vers Thunderbird 157.0.1. Aucun changement métier, permission, migration, schéma, stockage, dépendance runtime, télémétrie, publicité, connexion réseau ou code distant.
 
-Artefacts publics : XPI `b007f9ad0213bb5672e5273c27b4f0d3935897fc2696922acd2e2dd673b5048e`, archive source `509076b18aef693c060983037c4277a97c65d98e13738ead351da7ef13537b9d`, SHA256SUMS asset `c20e8f706bad9d688486d8143a375a5377289ccf40c3aeeb023491ed7cccc1b7`.
+## Gates
 
-## Suite
+QA Linux/Windows, garde sécurité/identité, build reproductible et smoke réel Thunderbird 157.0.1 doivent passer sur le head exact avant merge. Après squash sur `main`, QA et smoke 157.0.1 doivent repasser avant le workflow Release.
 
-La soumission Add-ons for Thunderbird 1.7.8 reste distincte de la release GitHub. La PR #74 et sa branche prototype upstream restent hors de cette maintenance.
+La soumission Add-ons for Thunderbird reste distincte de la release GitHub. La PR #74 et sa branche prototype upstream restent hors de cette maintenance.
 
 Codex Security n’est pas requis.
