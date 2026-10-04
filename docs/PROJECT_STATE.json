@@ -4,7 +4,7 @@
   "project": "MailPin — Email Follow-up & Productivity",
   "extensionVersion": "1.7.10",
   "baseGitHub": {
-    "branch": "fix/thunderbird-157-compatibility",
+    "branch": "main",
     "commit": "aef40057221ae44c598f1769f6ab7d718637cd47",
     "role": "MailPin 1.7.9 published baseline used for the Thunderbird 157 / MailPin 1.7.10 compatibility candidate"
   },
