@@ -1,91 +1,113 @@
 <div align="center">
-  <img src="assets/brand/mailpin-hero.svg" width="100%" alt="MailPin — Email Follow-up & Productivity">
+  <img src="assets/brand/mailpin-hero.svg" width="100%" alt="MailPin — Thunderbird email follow-up, reminders and productivity add-on">
 
 # MailPin
 
-**Email Follow-up & Productivity for Thunderbird**
+**A local-first Thunderbird add-on for email follow-up, reminders, notes and task management.**
 
+[![Install from Thunderbird Add-ons](https://img.shields.io/badge/Thunderbird%20Add--ons-Install%20MailPin-0A84FF?logo=thunderbird&logoColor=white)](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/)
 [![QA](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml)
-![Release](https://img.shields.io/badge/release-v1.7.10-4F7F75)
+[![Release](https://img.shields.io/badge/release-v1.7.10-4F7F75)](https://github.com/ussmarines/mailpin-thunderbird/releases/tag/v1.7.10)
 ![Source](https://img.shields.io/badge/release-v1.7.10-3D536B)
 ![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x--157.x-3D536B)
-![Licence](https://img.shields.io/badge/license-MailPin%20Source--Available%201.1-1A1D21)
+![Local first](https://img.shields.io/badge/local--first-no%20telemetry-4F7F75)
+![License](https://img.shields.io/badge/license-MailPin%20Source--Available%201.1-1A1D21)
+
+**English** · [Français](README.fr.md)
 </div>
 
-MailPin transforme les e-mails importants en suivi actionnable **sans remplacer la boîte de réception Thunderbird**. Épinglez un message, ajoutez une note ou une checklist, planifiez une relance, organisez vos vues et, lorsque l’agenda le permet, créez un événement ou une tâche — le tout localement.
+MailPin is a privacy-focused **Thunderbird extension / add-on** that turns important email into actionable follow-up without replacing Thunderbird's native inbox. Pin messages, add notes and checklists, schedule reminders, snooze follow-ups, track unanswered email, and organize work with saved views, a dashboard and Kanban.
 
-## Pourquoi MailPin
+Everything runs locally: **no telemetry, no advertising, no remote API, no CDN and no remote code**.
 
-- **Épingler sans altérer Thunderbird** — l’épinglage ne marque jamais un message lu/non lu et ne modifie pas les compteurs natifs.
-- **Faire avancer le suivi** — états Actif, En attente, Planifié et Terminé, rappels, snooze et suivi de non-réponse.
-- **Ajouter du contexte** — notes personnelles, sous-tâches, groupes, affaires, modèles et règles locales.
-- **Retrouver vite** — recherche globale, vues enregistrées, Dashboard, Kanban et palette de commandes.
-- **Relier l’Agenda** — événements et tâches uniquement lorsque le calendrier Thunderbird annonce la capacité correspondante.
-- **Rester local-first** — aucune télémétrie, publicité, API distante, CDN ou code distant.
+## Install MailPin
 
-## Interface
+The easiest installation path is the official **Add-ons for Thunderbird** listing:
 
-La release **1.7.10** étend la compatibilité à Thunderbird 157 après validation réelle sur le binaire officiel 157.0.1. Aucun changement de permission, schéma, stockage, dépendance runtime ou réseau n’est ajouté.
+**[Install MailPin from Add-ons for Thunderbird](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/)**
 
-## Compatibilité
+You can also install the GitHub release `v1.7.10` manually:
 
-- **Version source :** `1.7.10` — publiée
-- **Dernière release publique :** `1.7.10`
-- **Thunderbird :** `153.0` à `157.*`
-- **Format :** MailExtension Manifest V3
-- **Langues :** français et anglais
-- **ID public :** `ussmarines.mailpin@addons.thunderbird.net`
-- **Fiche Add-ons for Thunderbird :** [MailPin](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/) — le cycle de soumission/revue ATN reste distinct de la release GitHub
+1. Download `MailPin_v1.7.10.xpi` from the [GitHub release](https://github.com/ussmarines/mailpin-thunderbird/releases/tag/v1.7.10).
+2. Open Thunderbird → **Add-ons and Themes**.
+3. Open the gear menu → **Install Add-on From File**.
+4. Select the XPI.
 
-MailPin utilise une API Experiment privilégiée pour l’intégration `about:3pane`, le stockage SQLite local et certaines fonctions Messages/Tags/Agenda. Les frontières Messages, Tags et Agenda restent isolées derrière `PinCompatibility`. La candidate exacte `565f565710da6262d7a91bfbe280a943047cdc6c` a passé QA `37213680870` et le smoke réel Thunderbird 157.0.1 `37213680824` ; le target publié `704b3d5c2b35a2eceb4fbe1136b50a86dfadd6f0` a repassé QA `37213779632`, smoke `37213779633` et CodeQL `37213779727` avant publication par le workflow Release `37214354533`.
+## What MailPin does
 
-## Installation
+| Feature | What it gives you |
+| --- | --- |
+| **Email follow-up** | Pin important messages without changing read/unread state or Thunderbird's native counters. |
+| **Reminders & snooze** | Bring email back at the right time instead of leaving it buried in the inbox. |
+| **Reply tracking** | Track messages that still need a response and surface no-reply follow-ups. |
+| **Notes & checklists** | Attach personal context, subtasks and next actions to email. |
+| **Workflow states** | Move follow-ups through Active, Waiting, Planned and Completed states. |
+| **Dashboard & Kanban** | Review email work outside the normal inbox flow. |
+| **Saved views & search** | Find follow-ups quickly by state, context or custom views. |
+| **Calendar integration** | Create supported Thunderbird Calendar items when the selected calendar exposes the required capability. |
+| **Local-first privacy** | Keep MailPin data on your machine with no runtime network dependency. |
 
-### Add-ons for Thunderbird
+## Why MailPin
 
-La [fiche MailPin sur Add-ons for Thunderbird](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/) existe. La publication GitHub 1.7.10 est distincte du cycle de revue Add-ons for Thunderbird.
+MailPin is aimed at people who use Thunderbird as a working inbox and need more than flags or stars:
 
-### Release GitHub
+- **email follow-up** without turning Thunderbird into a different mail client;
+- **email reminders and snooze** for messages that matter later;
+- **task-style workflows** for inbox follow-through;
+- **notes, subtasks, templates, groups and cases** for context;
+- **Kanban and saved views** for a clearer workload;
+- **offline-first / local-first operation** with no telemetry or cloud account.
 
-1. Téléchargez `MailPin_v1.7.10.xpi` depuis la release `v1.7.10`.
-2. Thunderbird → **Extensions et thèmes** → engrenage → **Installer un module depuis un fichier**.
-3. Sélectionnez le XPI.
+## Compatibility
 
-### Depuis les sources
+- **Source version:** `1.7.10` — published
+- **Latest public release:** `1.7.10`
+- **Thunderbird:** `153.0` to `157.*`
+- **Extension format:** MailExtension Manifest V3
+- **Languages:** English and French
+- **Public extension ID:** `ussmarines.mailpin@addons.thunderbird.net`
+- **Repository:** https://github.com/ussmarines/mailpin-thunderbird
 
-Prérequis : Python 3.11+ et Node.js 20+.
+MailPin 1.7.10 uses a privileged Thunderbird Experiment for selected `about:3pane`, local SQLite, Messages, Tags and Calendar integration. The public release has been validated on Thunderbird 157.0.1; detailed evidence is kept in the validation and security reports rather than duplicated here.
+
+## Privacy & security
+
+MailPin makes **no runtime network calls** and contains no telemetry, advertising or remote code. Full message bodies and attachment contents are not copied into the MailPin database.
+
+- [Privacy policy](PRIVACY.md)
+- [Security policy](SECURITY.md)
+- [Security audit — 1.7.10](SECURITY_AUDIT_1.7.10.md)
+- [Validation report — 1.7.10](VALIDATION_REPORT_1.7.10.md)
+- [Known limitations](docs/KNOWN_LIMITATIONS.md)
+
+## Build from source
+
+Requirements: Python 3.11+, Node.js 20+ and npm 10+.
 
 ```bash
 npm run ci
 ```
 
-Livrables reproductibles de la source publiée :
+Published-source build outputs:
 
 - `dist/MailPin_v1.7.10.xpi`
 - `dist/MailPin_GitHub_Repository_v1.7.10.zip`
 - `dist/SHA256SUMS.txt`
 
-## Confidentialité & sécurité
-
-MailPin ne contient aucun appel réseau runtime, aucune télémétrie, aucune publicité ni code distant. Le corps complet des messages et le contenu des pièces jointes ne sont pas copiés dans la base MailPin.
-
-- [Politique de confidentialité](PRIVACY.md)
-- [Politique de sécurité](SECURITY.md)
-- [Audit sécurité source 1.7.10](SECURITY_AUDIT_1.7.10.md)
-- [Rapport de validation source 1.7.10](VALIDATION_REPORT_1.7.10.md)
-- [Limites connues](docs/KNOWN_LIMITATIONS.md)
-
-## Documentation & support
+## Documentation
 
 - [Architecture](docs/ARCHITECTURE.md)
-- [Compatibilité Thunderbird](docs/THUNDERBIRD_COMPATIBILITY.md)
-- [Banc Thunderbird](docs/THUNDERBIRD_TEST_BENCH.md)
-- [Build reviewers](release/BUILD_INSTRUCTIONS.md)
-- [Préparation ATN](STORE_RELEASE.md)
+- [Thunderbird compatibility](docs/THUNDERBIRD_COMPATIBILITY.md)
+- [Thunderbird test bench](docs/THUNDERBIRD_TEST_BENCH.md)
+- [Reviewer build instructions](release/BUILD_INSTRUCTIONS.md)
+- [Add-ons for Thunderbird release preparation](STORE_RELEASE.md)
 - [Support](SUPPORT.md)
+- [Contributing](CONTRIBUTING.md)
 
-Maintenu par [ussmarines](https://github.com/ussmarines). Les dons [PayPal](https://paypal.me/ussmarinesdot) sont facultatifs et ne débloquent aucune fonction.
+## Support the project
 
-## Licence
+MailPin is maintained by [ussmarines](https://github.com/ussmarines). Contributions and issue reports are welcome. Optional [PayPal donations](https://paypal.me/ussmarinesdot) support development and unlock no functionality.
 
-MailPin est distribué sous la **MailPin Source-Available License 1.1**. Consultez [LICENSE](LICENSE).
+## License
+
+MailPin is distributed under the **MailPin Source-Available License 1.1**. See [LICENSE](LICENSE).

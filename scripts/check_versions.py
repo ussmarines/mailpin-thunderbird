@@ -26,7 +26,7 @@ elif status == "candidate":
     assert version != public, "candidate source must not reuse the latest public version"
 
 source_checks = {
-    "README.md": [f"**Version source :** `{version}`", f"dist/MailPin_v{version}.xpi"],
+    "README.md": [f"**Source version:** `{version}`", f"dist/MailPin_v{version}.xpi"],
     "README.en.md": [f"**Source version:** `{version}`", f"dist/MailPin_v{version}.xpi"],
     "CHANGELOG.md": [f"## {version}"],
     "THIRD_PARTY_NOTICES.md": [f"MailPin {version} source"],
@@ -45,7 +45,7 @@ source_checks = {
     f"VALIDATION_REPORT_{version}.md": [f"MailPin {version}"],
 }
 public_checks = {
-    "README.md": [f"release `v{public}`", f"MailPin_v{public}.xpi", f"**Dernière release publique :** `{public}`"],
+    "README.md": [f"release `v{public}`", f"MailPin_v{public}.xpi", f"**Latest public release:** `{public}`"],
     "README.en.md": [f"release `v{public}`", f"MailPin_v{public}.xpi", f"**Latest public release:** `{public}`"],
     "PROJECT_MEMORY.md": [f"Dernière release publique : **{public}**"],
     "STORE_RELEASE.md": [f"Dernière release publique :** {public}"],

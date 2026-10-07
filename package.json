@@ -2,7 +2,7 @@
   "name": "mailpin-thunderbird",
   "version": "1.7.10",
   "private": true,
-  "description": "Build, test, and release tooling for MailPin — Email Follow-up & Productivity.",
+  "description": "MailPin — local-first Thunderbird add-on for email follow-up, reminders, notes, snooze, Kanban, and task management.",
   "author": "ussmarines",
   "repository": {
     "type": "git",
@@ -23,5 +23,30 @@
     "node": ">=20",
     "npm": ">=10",
     "python": ">=3.11"
+  },
+  "keywords": [
+    "thunderbird",
+    "thunderbird-addon",
+    "thunderbird-extension",
+    "webextension",
+    "email",
+    "email-follow-up",
+    "email-management",
+    "email-productivity",
+    "inbox",
+    "productivity",
+    "reminders",
+    "snooze",
+    "task-management",
+    "workflow",
+    "kanban",
+    "notes",
+    "local-first",
+    "offline-first",
+    "privacy",
+    "mail-extension"
+  ],
+  "bugs": {
+    "url": "https://github.com/ussmarines/mailpin-thunderbird/issues"
   }
 }
