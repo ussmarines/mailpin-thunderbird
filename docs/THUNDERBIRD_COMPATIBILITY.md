@@ -149,8 +149,10 @@ La preuve runtime publiée pour la limite supérieure est désormais Thunderbird
 
 Les preuves Thunderbird 154 restent historiques : la candidate versionnée `c2527b57de4775f4fd228af22b9792937e7ce6ea` avait passé QA `32300356172` et smoke réel Thunderbird 154.0 `32300356085`, puis `v1.7.4` avait été publiée sur `b74c0c7f264cf387269be0aaf18e47e99cf07600`. Les fournisseurs réseau, calendriers distants et la matrice multi-OS restent des validations distinctes.
 
-### Candidate Thunderbird 158.0 — 15 octobre 2026
+### Thunderbird 158.0 — 15 octobre 2026
 
 La Release officielle est 158.0 (ESR distinct : 153.5.0esr). Les notes officielles signalent des améliorations Quick Filter et des corrections Agenda/RSS ; aucune compatibilité interne n’en est déduite. La borne 157.* de 1.7.10 a provoqué un refus réel d’installation sur 158.0. La candidate 1.7.11 relève la borne à 158.* et son smoke Windows frais passe sur le binaire officiel, build 20261008005236, geckodriver 0.37.1. Le runtime reste inchangé. Critères complets et limites : `../VALIDATION_REPORT_1.7.11.md`. La preuve 157 précédente reste historique, sans valeur de validation 158.
 
 Sources : [versions](https://product-details.mozilla.org/1.0/thunderbird_versions.json), [notes 158](https://www.thunderbird.net/en-US/thunderbird/158.0/releasenotes/), [archives](https://archive.mozilla.org/pub/thunderbird/releases/158.0/).
+
+La release `v1.7.11` cible `fce07e98e2a056f38bfc7143766a71d1f7923e44` : QA `38754897029`, smoke réel Linux 158 `38754897259`, CodeQL `38754896607` et publisher `38755293619` PASS. Artefacts publics téléchargés et vérifiés ; XPI identique à celui du smoke de cette cible.

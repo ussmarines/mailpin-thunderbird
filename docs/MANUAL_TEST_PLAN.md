@@ -1,10 +1,10 @@
 # Plan de test manuel MailPin — 1.7.11
 
-Utiliser de préférence un profil Thunderbird jetable pour les scénarios destructifs. Le présent plan complète les validations automatisées de la source 1.7.11 ; la dernière release publique est 1.7.10. Aucun contrôle non exécuté ne doit être présenté comme PASS.
+Utiliser de préférence un profil Thunderbird jetable pour les scénarios destructifs. Le présent plan complète les validations automatisées de la source 1.7.11 ; la dernière release publique est 1.7.11. Aucun contrôle non exécuté ne doit être présenté comme PASS.
 
-## Candidate 1.7.11 — Thunderbird 158.0
+## Release 1.7.11 — Thunderbird 158.0
 
-Exécuter les critères C/D de `VALIDATION_REPORT_1.7.11.md` dans un profil synthétique. Les validations ci-dessous de 1.7.10 restent historiques et ne prouvent pas 158.
+Les critères C/D synthétiques exécutés sous Windows et le smoke Linux 158 sont consignés dans `../VALIDATION_REPORT_1.7.11.md`. Les fournisseurs réseau, macOS et l’accessibilité assistée restent à valider séparément. Les validations ci-dessous de 1.7.10 restent historiques et ne prouvent pas 158.
 
 ## Recette 1.7.10 — Thunderbird 157.0.1
 

@@ -5,8 +5,8 @@
   "extensionVersion": "1.7.11",
   "baseGitHub": {
     "branch": "main",
-    "commit": "048867671e7bf9e8ccd71529676b1b4814da3916",
-    "role": "Observed remote main before local Thunderbird 158 maintenance"
+    "commit": "fce07e98e2a056f38bfc7143766a71d1f7923e44",
+    "role": "MailPin 1.7.11 immutable release/tag target, validated before publication"
   },
   "extensionId": "ussmarines.mailpin@addons.thunderbird.net",
   "thunderbird": {
@@ -91,7 +91,7 @@
     "uiDependencyPolicy": "native HTML plus local Organic Workspace CSS tokens; canonical workspace stylesheet; no runtime patch stylesheet, npm runtime dependency, bundler, CDN or remote asset",
     "runtimeTestSupplyChain": "test-only Thunderbird/geckodriver downloads are checksum-verified and are not runtime dependencies"
   },
-  "developmentBranch": "codex/thunderbird-158-compatibility",
+  "developmentBranch": "main",
   "testing": {
     "contract": [
       "tests/test_organic_workspace_ui.py",
@@ -100,9 +100,9 @@
     ],
     "runtimeWorkflow": ".github/workflows/thunderbird-smoke.yml",
     "runtimeScript": "tests/thunderbird/real_smoke.py",
-    "browserStatus": "Local 1.7.11 candidate targets 153.0–158.*; public 1.7.10 remains 153.0–157.*. See VALIDATION_REPORT_1.7.11.md.",
-    "runtimeStatus": "Fresh Windows Thunderbird 158.0 extended smoke, functional bench (50 synthetic messages, Tags/Calendar) and same-profile cold-start persistence passed. CI on final tag target pending; owner authorized publication only after exact-target checks. See VALIDATION_REPORT_1.7.11.md."
+    "browserStatus": "MailPin 1.7.11 published for Thunderbird 153.0–158.*. Fresh Windows and Linux 158.0 synthetic runtime checks passed; provider/macOS limits remain separate.",
+    "runtimeStatus": "PR #86 candidate c19bd4054c9632ce44bbda4a1512c6b1ab6ae910: QA 38754605711, Thunderbird 158 smoke 38754605738, CodeQL 38754601088 PASS. Integrated release target fce07e98e2a056f38bfc7143766a71d1f7923e44: QA 38754897029, real Thunderbird 158 smoke 38754897259, CodeQL 38754896607 PASS. Release publisher 38755293619 PASS; downloaded published assets verified against SHA-256 and exact-target QA builds."
   },
-  "latestPublicVersion": "1.7.10",
-  "releaseStatus": "candidate"
+  "latestPublicVersion": "1.7.11",
+  "releaseStatus": "published"
 }

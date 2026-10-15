@@ -1,10 +1,12 @@
-# Passage de relais — MailPin 1.7.11 candidate locale
+# Passage de relais — MailPin 1.7.11 publiée
 
-- branche : `codex/thunderbird-158-compatibility` ; base `048867671e7bf9e8ccd71529676b1b4814da3916` ;
-- version source : **1.7.11** ; dernière release publique : **1.7.10** ;
-- Thunderbird candidat : 153.0 à 158.* ; ID `ussmarines.mailpin@addons.thunderbird.net` inchangé ;
-- aucun changement métier ; PR #84 et #74 hors périmètre et inchangées.
+- branche : `main` ; version source : **1.7.11** ; dernière release publique : **1.7.11** ;
+- tag/release : `v1.7.11` → `fce07e98e2a056f38bfc7143766a71d1f7923e44` ; Thunderbird 153.0 à 158.* ;
+- ID : `ussmarines.mailpin@addons.thunderbird.net` ; runtime métier inchangé ;
+- PR #86 fusionnée après QA/smoke 158/CodeQL verts sur `c19bd4054c9632ce44bbda4a1512c6b1ab6ae910` ;
+- target intégré : QA `38754897029`, smoke réel Linux 158 `38754897259`, CodeQL `38754896607` PASS ; publisher `38755293619` PASS ;
+- trois artefacts publics téléchargés, SHA-256 vérifiés et archives identiques à la QA du target.
 
-Voir `../VALIDATION_REPORT_1.7.11.md` et `AI_VALIDATION_STATE.json` pour les preuves actuelles et les limites. Le checkout initial et ses modifications Graphify restent préservés.
+Preuves détaillées, empreintes et limites : `../VALIDATION_REPORT_1.7.11.md`, `AI_VALIDATION_STATE.json`. Les contrôles Windows synthétiques et les contrats restent valides ; fournisseurs réseau, macOS, accessibilité assistée et matrice inférieure non rejoués.
 
-Aucun commit, push, PR, merge, tag ou publication effectué pour cette maintenance. Le propriétaire a autorisé commit, push, PR, merge, tag et publication le 15 octobre 2026, uniquement après validation des contrôles requis sur la cible exacte. Utiliser le workflow Release existant après ces contrôles. Aucune soumission ATN incluse.
+Le checkout initial et ses modifications Graphify sont préservés ; PR #84 et #74 inchangées. Aucune soumission ATN. La documentation publiée après le tag ne modifie pas les assets immuables de cette release.

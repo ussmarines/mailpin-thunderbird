@@ -2,9 +2,9 @@
 
 ## Verdicts
 
-Compatibilité : PASS pour les scénarios synthétiques exécutés sous Windows Thunderbird 158.0. Release : EN ATTENTE des contrôles distants sur la cible finale. Le propriétaire a explicitement autorisé commit, push, PR, merge, tag et publication le 15 octobre 2026, sous condition de validation de la cible exacte. Candidate locale non publiée, aucun commit créé.
+Compatibilité : PASS pour les scénarios synthétiques Windows 158.0 et le smoke réel Linux 158.0 exécutés. Release : PASS — `v1.7.11` publiée le 15 octobre 2026 sur `fce07e98e2a056f38bfc7143766a71d1f7923e44` après QA/smoke/CodeQL exacts. Assets publics téléchargés et vérifiés.
 
-Branche `codex/thunderbird-158-compatibility`, HEAD/base `048867671e7bf9e8ccd71529676b1b4814da3916` plus diff local. ID `ussmarines.mailpin@addons.thunderbird.net`. Dernière release publique : 1.7.10. PR #84 draft/head `cfb14b8e24b557dec351432120f4ae9bea0b26ba` inchangée. Checkout initial, branche upstream et modifications Graphify préservés.
+Préparation initiale : branche `codex/thunderbird-158-compatibility`, HEAD/base `048867671e7bf9e8ccd71529676b1b4814da3916` plus diff local. ID `ussmarines.mailpin@addons.thunderbird.net`. Dernière release publique lors de cette préparation : 1.7.10. PR #84 draft/head `cfb14b8e24b557dec351432120f4ae9bea0b26ba` inchangée. Checkout initial, branche upstream et modifications Graphify préservés.
 
 ## Critères posés avant modification
 
@@ -48,10 +48,18 @@ Les binaires et archives téléchargés sont conservés hors checkout dans le do
 
 Aucune ancienne entrée verte du cache 1.7.6 ni aucun smoke 157 n’est réattribué à 158. Le minimum 153.0 est conservé ; sa matrice n’est pas réexécutée. L’identité de l’exécutable geckodriver officiel a été vérifiée après les tests par comparaison SHA-256, sans changer le binaire testé.
 
-Pas de test Linux/macOS 158, fournisseur réseau, calendrier distant, profil personnel, accessibilité assistée ou comparaison binaire inter-OS. La matrice de volume complète n’est pas rejouée : seule la régression fonctionnelle à 50 est pertinente ici. Les captures et assertions réelles ne sont pas une certification visuelle humaine exhaustive.
+Le smoke Linux 158 a ensuite passé sur la PR et la cible publiée. Pas de test macOS 158, fournisseur réseau, calendrier distant, profil personnel, accessibilité assistée ou identité binaire inter-OS revendiquée. La matrice de volume complète n’est pas rejouée : seule la régression fonctionnelle à 50 est pertinente ici. Les captures et assertions réelles ne sont pas une certification visuelle humaine exhaustive.
 
-## Opérations restantes pour publication
+## Publication exécutée et vérification indépendante
 
-Autorisations explicites reçues du propriétaire le 15 octobre 2026 : commit hors main, push de branche, création de PR, merge selon protections, nouveau tag et publication. Avant publication, valider les contrôles requis sur le commit/arbre exact à publier ; utiliser le workflow Release existant, puis télécharger et comparer les empreintes des assets. Aucun push, PR, merge, tag, release, changement de PR #84 ou soumission ATN effectué.
+- PR [#86](https://github.com/ussmarines/mailpin-thunderbird/pull/86), head `c19bd4054c9632ce44bbda4a1512c6b1ab6ae910` : QA `38754605711`, smoke réel Linux 158 `38754605738` et CodeQL `38754601088` PASS avant squash.
+- Cible intégrée et tag : `fce07e98e2a056f38bfc7143766a71d1f7923e44` ; arbre identique à la PR validée. QA [38754897029](https://github.com/ussmarines/mailpin-thunderbird/actions/runs/38754897029), smoke [38754897259](https://github.com/ussmarines/mailpin-thunderbird/actions/runs/38754897259) et CodeQL [38754896607](https://github.com/ussmarines/mailpin-thunderbird/actions/runs/38754896607) PASS avant création du nouveau tag.
+- Publisher canonique [38755293619](https://github.com/ussmarines/mailpin-thunderbird/actions/runs/38755293619) PASS sur ce même target ; [release publique v1.7.11](https://github.com/ussmarines/mailpin-thunderbird/releases/tag/v1.7.11) publiée à 14:52:47 UTC.
+- Trois assets publics téléchargés : digests GitHub et fichier SHA256SUMS concordants ; XPI et source identiques octet pour octet aux archives QA de ce target. Le log du smoke confirme le SHA-256 exact du XPI publié. Reconstruction depuis la source publique sans Git : contenu extrait du XPI identique ; aucune identité ZIP inter-OS inférée.
+- XPI public SHA-256 : `9332bb52f0954799d73f8b655423620ba00f00501c7351981d1d2f5c13ec9a63`.
+- Archive source publique SHA-256 : `06ead2e37381ddb3facebe793fb2bf3374406ce9ac2c323e75f3786153e4054a`.
+- Asset SHA256SUMS SHA-256 : `c141fef24a8a9b7c8df9164180ff201fb037e873cce211374a061a4ea95b5744`.
+
+Preuve locale : `artifacts/published-1.7.11/verification.json`. Les assets restent ceux du tag immuable ; cette mise à jour documentaire postérieure ne les remplace pas. Autorisations explicites du propriétaire reçues avant les opérations. PR #84 et #74 inchangées. Aucune soumission ATN.
 
 Sources officielles : [versions](https://product-details.mozilla.org/1.0/thunderbird_versions.json), [notes 158](https://www.thunderbird.net/en-US/thunderbird/158.0/releasenotes/), [archive et SHA256SUMS](https://archive.mozilla.org/pub/thunderbird/releases/158.0/). Les changements Quick Filter/Agenda annoncés ont motivé les tests réels, sans servir de preuve de compatibilité. Comparaison directe des sources embarquées dans les deux binaires officiels : `quickFilterBar.js`, `message-pane.mjs` et `pane-layout.mjs` identiques ; diff `about3Pane.js` limité à la gestion des dossiers unifiés/parents masqués. Diff conservé dans `artifacts/validation/thunderbird-internal-diff.txt`.

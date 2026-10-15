@@ -1,7 +1,7 @@
 # Limites connues — MailPin
 
-## Source 1.7.11 / release publique 1.7.10
+## Source 1.7.11 / release publique 1.7.11
 
-La candidate locale 1.7.11 cible Thunderbird 158.0 ; la release publique 1.7.10 reste limitée à 157.*. Le smoke Windows frais ne couvre pas à lui seul les critères C/D complets du prompt. Voir `../VALIDATION_REPORT_1.7.11.md` pour les résultats et blocages réels.
+La release 1.7.11 couvre Thunderbird 153.0 à 158.*. Le smoke réel 158, la QA et CodeQL ont passé sur la PR puis sur la cible exacte publiée. Les tests Windows synthétiques couvrent aussi la persistance, Dashboard/Options, Tags/Agenda et les thèmes. Voir `../VALIDATION_REPORT_1.7.11.md`.
 
-Les fournisseurs réseau, calendriers distants, macOS/Linux 158, l’accessibilité assistée et l’identité binaire inter-OS restent distincts. Aucun compte ou profil personnel n’est utilisé. L’obstacle ATN lié à l’Experiment n’est pas levé par cette maintenance.
+Les fournisseurs réseau, calendriers distants, macOS, l’accessibilité assistée et l’identité binaire inter-OS restent distincts. Les versions inférieures de la plage n’ont pas été retestées pour cette maintenance. Aucun compte ou profil personnel utilisé. L’obstacle ATN lié à l’Experiment n’est pas levé par cette release GitHub.
