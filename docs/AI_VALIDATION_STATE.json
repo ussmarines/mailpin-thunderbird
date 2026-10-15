@@ -50,7 +50,10 @@
         "package.json",
         "scripts/**",
         "tests/**",
-        ".github/**"
+        ".github/**",
+        "docs/**",
+        "*.md",
+        "release/**"
       ],
       "evidence": {
         "kind": "github-exact-target-gates",
@@ -77,7 +80,10 @@
         "package.json",
         "scripts/**",
         "tests/**",
-        ".github/**"
+        ".github/**",
+        "docs/**",
+        "*.md",
+        "release/**"
       ],
       "evidence": {
         "kind": "github-exact-target-gates",
