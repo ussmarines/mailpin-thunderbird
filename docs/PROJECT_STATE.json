@@ -2,16 +2,16 @@
   "format": "mailperch-project-state",
   "version": 1,
   "project": "MailPin — Email Follow-up & Productivity",
-  "extensionVersion": "1.7.10",
+  "extensionVersion": "1.7.11",
   "baseGitHub": {
     "branch": "main",
-    "commit": "704b3d5c2b35a2eceb4fbe1136b50a86dfadd6f0",
-    "role": "MailPin 1.7.10 release/tag target validated on Thunderbird 157.0.1 before publication"
+    "commit": "048867671e7bf9e8ccd71529676b1b4814da3916",
+    "role": "Observed remote main before local Thunderbird 158 maintenance"
   },
   "extensionId": "ussmarines.mailpin@addons.thunderbird.net",
   "thunderbird": {
     "min": "153.0",
-    "max": "157.*"
+    "max": "158.*"
   },
   "schemas": {
     "sqlite": 5,
@@ -91,7 +91,7 @@
     "uiDependencyPolicy": "native HTML plus local Organic Workspace CSS tokens; canonical workspace stylesheet; no runtime patch stylesheet, npm runtime dependency, bundler, CDN or remote asset",
     "runtimeTestSupplyChain": "test-only Thunderbird/geckodriver downloads are checksum-verified and are not runtime dependencies"
   },
-  "developmentBranch": "main",
+  "developmentBranch": "codex/thunderbird-158-compatibility",
   "testing": {
     "contract": [
       "tests/test_organic_workspace_ui.py",
@@ -100,9 +100,9 @@
     ],
     "runtimeWorkflow": ".github/workflows/thunderbird-smoke.yml",
     "runtimeScript": "tests/thunderbird/real_smoke.py",
-    "browserStatus": "MailPin 1.7.10 is published for Thunderbird 153.0 through 157.*. Thunderbird 157.0.1 compatibility was validated on both the exact candidate and the merged release target.",
-    "runtimeStatus": "Exact candidate 565f565710da6262d7a91bfbe280a943047cdc6c: QA 37213680870 PASS and real Thunderbird 157.0.1 smoke 37213680824 PASS. Merged main/tag target 704b3d5c2b35a2eceb4fbe1136b50a86dfadd6f0: QA 37213779632 PASS, real Thunderbird 157.0.1 smoke 37213779633 PASS and CodeQL 37213779727 PASS. Canonical Release workflow 37214354533 rebuilt and published v1.7.10 from the same target commit."
+    "browserStatus": "Local 1.7.11 candidate targets 153.0–158.*; public 1.7.10 remains 153.0–157.*. See VALIDATION_REPORT_1.7.11.md.",
+    "runtimeStatus": "Fresh Windows Thunderbird 158.0 extended smoke, functional bench (50 synthetic messages, Tags/Calendar) and same-profile cold-start persistence passed. CI on final tag target pending; owner authorized publication only after exact-target checks. See VALIDATION_REPORT_1.7.11.md."
   },
   "latestPublicVersion": "1.7.10",
-  "releaseStatus": "published"
+  "releaseStatus": "candidate"
 }

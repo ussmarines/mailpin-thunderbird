@@ -1,13 +1,7 @@
 # Limites connues — MailPin
 
-## Source 1.7.10 / release publique 1.7.10
+## Source 1.7.11 / release publique 1.7.10
 
-La source **1.7.10** et la release publique **1.7.10** sont alignées. La compatibilité publiée couvre Thunderbird 153.0 à 157.* après validation réelle sur Thunderbird 157.0.1.
+La candidate locale 1.7.11 cible Thunderbird 158.0 ; la release publique 1.7.10 reste limitée à 157.*. Le smoke Windows frais ne couvre pas à lui seul les critères C/D complets du prompt. Voir `../VALIDATION_REPORT_1.7.11.md` pour les résultats et blocages réels.
 
-- candidate exacte `565f565710da6262d7a91bfbe280a943047cdc6c` : QA `37213680870` et smoke réel Thunderbird 157.0.1 `37213680824` — PASS ;
-- `main` publié `704b3d5c2b35a2eceb4fbe1136b50a86dfadd6f0` : QA `37213779632`, smoke réel Thunderbird 157.0.1 `37213779633` et CodeQL `37213779727` — PASS ;
-- Agenda reste facultatif et dépend des capacités réelles du calendrier ;
-- fournisseurs réseau et calendriers distants restent des validations distinctes ;
-- le smoke Linux réel ne remplace pas une matrice complète Windows/macOS ;
-- aucune nouvelle permission, migration, dépendance runtime ou connexion réseau n’est introduite ;
-- les trois assets publics de `v1.7.10` exposent des SHA-256 dans les métadonnées GitHub.
+Les fournisseurs réseau, calendriers distants, macOS/Linux 158, l’accessibilité assistée et l’identité binaire inter-OS restent distincts. Aucun compte ou profil personnel n’est utilisé. L’obstacle ATN lié à l’Experiment n’est pas levé par cette maintenance.

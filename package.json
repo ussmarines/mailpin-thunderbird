@@ -1,6 +1,6 @@
 {
   "name": "mailpin-thunderbird",
-  "version": "1.7.10",
+  "version": "1.7.11",
   "private": true,
   "description": "MailPin — local-first Thunderbird add-on for email follow-up, reminders, notes, snooze, Kanban, and task management.",
   "author": "ussmarines",

@@ -8,7 +8,7 @@
 [![Install from Thunderbird Add-ons](https://img.shields.io/badge/Thunderbird%20Add--ons-Install%20MailPin-0A84FF?logo=thunderbird&logoColor=white)](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/)
 [![QA](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/badge/release-v1.7.10-4F7F75)](https://github.com/ussmarines/mailpin-thunderbird/releases/tag/v1.7.10)
-![Source](https://img.shields.io/badge/release-v1.7.10-3D536B)
+![Source](https://img.shields.io/badge/candidate-v1.7.11-3D536B)
 ![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x--157.x-3D536B)
 ![Local first](https://img.shields.io/badge/local--first-no%20telemetry-4F7F75)
 ![License](https://img.shields.io/badge/license-MailPin%20Source--Available%201.1-1A1D21)
@@ -60,7 +60,7 @@ MailPin is aimed at people who use Thunderbird as a working inbox and need more 
 
 ## Compatibility
 
-- **Source version:** `1.7.10` — published
+- **Source version:** `1.7.11` — local candidate, not published
 - **Latest public release:** `1.7.10`
 - **Thunderbird:** `153.0` to `157.*`
 - **Extension format:** MailExtension Manifest V3
@@ -76,8 +76,8 @@ MailPin makes **no runtime network calls** and contains no telemetry, advertisin
 
 - [Privacy policy](PRIVACY.md)
 - [Security policy](SECURITY.md)
-- [Security audit — 1.7.10](SECURITY_AUDIT_1.7.10.md)
-- [Validation report — 1.7.10](VALIDATION_REPORT_1.7.10.md)
+- [Security audit — 1.7.11](SECURITY_AUDIT_1.7.11.md)
+- [Validation report — 1.7.11](VALIDATION_REPORT_1.7.11.md)
 - [Known limitations](docs/KNOWN_LIMITATIONS.md)
 
 ## Build from source
@@ -88,10 +88,10 @@ Requirements: Python 3.11+, Node.js 20+ and npm 10+.
 npm run ci
 ```
 
-Published-source build outputs:
+Candidate-source build outputs:
 
-- `dist/MailPin_v1.7.10.xpi`
-- `dist/MailPin_GitHub_Repository_v1.7.10.zip`
+- `dist/MailPin_v1.7.11.xpi`
+- `dist/MailPin_GitHub_Repository_v1.7.11.zip`
 - `dist/SHA256SUMS.txt`
 
 ## Documentation
@@ -111,3 +111,5 @@ MailPin is maintained by [ussmarines](https://github.com/ussmarines). Contributi
 ## License
 
 MailPin is distributed under the **MailPin Source-Available License 1.1**. See [LICENSE](LICENSE).
+
+The local 1.7.11 candidate targets Thunderbird 153.0–158.*. See [candidate validation](VALIDATION_REPORT_1.7.11.md) for executed checks and remaining release gates. The public 1.7.10 release remains limited to 157.*.

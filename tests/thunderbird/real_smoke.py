@@ -457,6 +457,112 @@ const done = arguments[arguments.length - 1];
 """
 
 
+MAIL_BEHAVIOR_SCRIPT = r"""
+const done = arguments[arguments.length - 1];
+const stage = String(arguments[0]);
+(async () => {
+  const win = Services.wm.getMostRecentWindow("mail:3pane");
+  const tabmail = win.document.getElementById("tabmail");
+  const pane = tabmail.currentAbout3Pane;
+  const doc = pane.document;
+  const folder = pane.gFolder;
+  const tree = doc.getElementById("threadTree");
+  const sleep = ms => new Promise(resolve => win.setTimeout(resolve, ms));
+  const wait = async (test, label) => {
+    const deadline = Date.now() + 15000;
+    while (Date.now() < deadline) { if (test()) return; await sleep(50); }
+    throw new Error(`Mail behavior timeout: ${label}`);
+  };
+  const cards = () => [...doc.querySelectorAll(".pin-mails-card")];
+  if (stage === "prepare") {
+    Services.io.offline = true;
+    Services.prefs.setBoolPref("mailnews.mark_message_read.auto", false);
+    for (let i = 0; i < 40; i++) {
+      folder.QueryInterface(Ci.nsIMsgLocalMailFolder).addMessage([
+        "From: smoke@example.invalid", "To: smoke@example.invalid",
+        `Subject: MailPin synthetic ${i}`, `Message-ID: <mailpin-smoke-${i}@example.invalid>`,
+        `Date: ${new Date(Date.now() - i * 60000).toUTCString()}`,
+        `X-Mozilla-Status: ${i % 2 ? "0001" : "0000"}`, "X-Mozilla-Status2: 00000000",
+        "Content-Type: text/plain; charset=UTF-8", "", "Synthetic test only.", ""
+      ].join("\r\n"));
+    }
+    pane.displayFolder(folder);
+    await wait(() => pane.gDBView?.rowCount === 40, "40 synthetic messages");
+    const snapshot = () => ({
+      total:folder.getTotalMessages(false), unread:folder.getNumUnread(false),
+      newMessages:folder.getNumNewMessages(false),
+      flags:Array.from(folder.messages, header => [header.messageId, header.flags]).sort()
+    });
+    const before = snapshot();
+    const button = () => doc.querySelector("#threadTree tr .pin-mails-independent-button");
+    await wait(() => button(), "native row pin button");
+    button().click(); await wait(() => cards().length === 1, "pin");
+    cards()[0].querySelector('[data-card-action="unpin"]').click();
+    await wait(() => cards().length === 0, "unpin");
+    button().click(); await wait(() => cards().length === 1, "repin");
+    const after = snapshot();
+    if (JSON.stringify(before) !== JSON.stringify(after)) throw new Error("Pin/unpin changed native flags or counters");
+    tree.selectedIndex = 0;
+    pane.gDBView.selection.select(0);
+    tree.focus();
+    done({nativeFlagsAndCountersUnchanged:true, before, after});
+    return;
+  }
+  if (stage === "shortcut-unpin" || stage === "shortcut-pin") {
+    const expected = stage === "shortcut-pin" ? 1 : 0;
+    await wait(() => cards().length === expected, stage);
+    tree.focus();
+    done({stage, count:cards().length});
+    return;
+  }
+  const countersAfterShortcuts = {
+    total:folder.getTotalMessages(false), unread:folder.getNumUnread(false),
+    newMessages:folder.getNumNewMessages(false),
+    flags:Array.from(folder.messages, header => [header.messageId, header.flags]).sort()
+  };
+  const countersBeforeShortcuts = arguments[1];
+  for (const key of ["total", "unread", "newMessages", "flags"]) {
+    if (JSON.stringify(countersAfterShortcuts[key]) !== JSON.stringify(countersBeforeShortcuts[key])) throw new Error(`Keyboard pin/unpin changed native ${key}: ${JSON.stringify({before:countersBeforeShortcuts[key], after:countersAfterShortcuts[key]})}`);
+  }
+  // Scroll to a different native row before opening the pinned message.
+  tree.scrollToIndex(39, true);
+  await sleep(200);
+  const scrollBefore = tree.scrollTop;
+  if (scrollBefore <= 0) throw new Error("Native scroll precondition was not exercised");
+  const header = cards()[0]._pinMessageHeader;
+  if (!header) throw new Error("Pinned header unavailable");
+  cards()[0].dispatchEvent(new pane.MouseEvent("click", {bubbles:true}));
+  await wait(() => pane.messagePane.messageBrowser.contentWindow.gMessage?.messageId === header.messageId, "pinned message displayed");
+  await sleep(200);
+  const scrollAfter = tree.scrollTop;
+  if (scrollAfter !== scrollBefore) throw new Error(`Native list scrolled ${scrollBefore} -> ${scrollAfter}`);
+  const unread = folder.getNumUnread(false);
+  const unreadButton = doc.getElementById("qfb-unread");
+  if (!unreadButton) throw new Error("Native Quick Filter unread button missing");
+  unreadButton.click();
+  await wait(() => pane.gDBView.rowCount === unread, "Quick Filter unread results");
+  if (cards().length !== 1) throw new Error("Quick Filter removed the independent pin card");
+  unreadButton.click();
+  await wait(() => pane.gDBView.rowCount === 40, "Quick Filter cleared");
+  const root = folder.parent;
+  root.createSubfolder("MailPin Smoke Empty", null);
+  const other = root.getChildNamed("MailPin Smoke Empty");
+  pane.displayFolder(other);
+  await wait(() => pane.gFolder?.URI === other.URI && pane.gDBView?.rowCount === 0, "empty folder switch");
+  pane.displayFolder(folder);
+  await wait(() => pane.gFolder?.URI === folder.URI && pane.gDBView?.rowCount === 40 && cards().length === 1, "folder return");
+  const originalTab = tabmail.currentTabInfo;
+  const newTab = tabmail.openTab("mail3PaneTab", {folderURI:folder.URI});
+  await wait(() => tabmail.currentAbout3Pane !== pane && tabmail.currentAbout3Pane?.document.querySelectorAll("#pin-mails-panel").length === 1, "new mail tab single injection");
+  tabmail.closeTab(newTab);
+  tabmail.switchToTab(originalTab);
+  await wait(() => tabmail.currentAbout3Pane === pane && cards().length === 1, "original mail tab restored");
+  done({shortcutFlagsAndCountersUnchanged:true, scrollBefore, scrollAfter, messageOpened:true, quickFilterUnread:unread,
+    nativeRowsRestored:40, pinCardPreserved:true, folderSwitch:true, mailTabSwitch:true});
+})().catch(error => done({__mailperchSmokeError: `${error?.name}: ${error?.message}\n${error?.stack || ""}`}));
+"""
+
+
 def _free_port() -> int:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         sock.bind(("127.0.0.1", 0))
@@ -622,6 +728,21 @@ def run(args: argparse.Namespace) -> int:
             )
             result["firstInstall"] = first
             result["checks"].append("panel-and-toggle-injected-once")
+            result["pinInvariants"] = client.execute_async(MAIL_BEHAVIOR_SCRIPT, ["prepare"])
+            result["checks"].append("pin-unpin-native-flags-and-counters")
+            for stage in ("shortcut-unpin", "shortcut-pin"):
+                client.request("POST", client._session_path("/actions"), {"actions": [{
+                    "type": "key", "id": "mailpin-keyboard", "actions": [
+                        {"type": "keyDown", "value": "\ue00a"},
+                        {"type": "keyDown", "value": "p"},
+                        {"type": "keyUp", "value": "p"},
+                        {"type": "keyUp", "value": "\ue00a"},
+                    ]
+                }]})
+                result[stage] = client.execute_async(MAIL_BEHAVIOR_SCRIPT, [stage])
+                result["checks"].append(stage)
+            result["mailBehavior"] = client.execute_async(MAIL_BEHAVIOR_SCRIPT, ["finish", result["pinInvariants"]["before"]])
+            result["checks"].append("message-open-scroll-quick-filter-folder-and-tab")
             dashboard_open = client.execute_async(OPEN_DASHBOARD_SCRIPT)
             if not isinstance(dashboard_open, dict) or not dashboard_open.get("opened"):
                 raise SmokeFailure(f"Dashboard did not open exactly once: {dashboard_open!r}")
