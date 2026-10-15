@@ -6,9 +6,9 @@
 **Email Follow-up & Productivity for Thunderbird**
 
 [![QA](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml)
-![Release](https://img.shields.io/badge/release-v1.7.10-4F7F75)
-![Source](https://img.shields.io/badge/candidate-v1.7.11-3D536B)
-![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x--157.x-3D536B)
+![Release](https://img.shields.io/badge/release-v1.7.11-4F7F75)
+![Source](https://img.shields.io/badge/release-v1.7.11-3D536B)
+![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x--158.x-3D536B)
 ![License](https://img.shields.io/badge/license-MailPin%20Source--Available%201.1-1A1D21)
 </div>
 
@@ -25,29 +25,29 @@ MailPin turns important email into actionable follow-up **without replacing Thun
 
 ## Brand & interface
 
-Release **1.7.10** extends compatibility to Thunderbird 157 after real-runtime validation on the official 157.0.1 binary. No permission, schema, storage, runtime dependency or network behavior changes.
+Release **1.7.11** extends compatibility to Thunderbird 158 after real-runtime validation on the official 158.0 binary. No permission, schema, storage, runtime dependency or network behavior changes.
 
 ## Compatibility
 
-- **Source version:** `1.7.11` — local candidate, not published
-- **Latest public release:** `1.7.10`
-- **Thunderbird:** `153.0` to `157.*`
+- **Source version:** `1.7.11` — published
+- **Latest public release:** `1.7.11`
+- **Thunderbird:** `153.0` to `158.*`
 - **Format:** MailExtension Manifest V3
 - **Locales:** French and English
 - **Public ID:** `ussmarines.mailpin@addons.thunderbird.net`
 - **Add-ons for Thunderbird listing:** [MailPin](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/) — the ATN submission/review cycle remains separate from the GitHub release
 
-MailPin uses a privileged Thunderbird Experiment for `about:3pane`, local SQLite storage, and selected Messages/Tags/Calendar integration. Messages, Tags and Calendar internals remain isolated behind `PinCompatibility`. Exact candidate `565f565710da6262d7a91bfbe280a943047cdc6c` passed QA `37213680870` and real Thunderbird 157.0.1 smoke `37213680824`; published target `704b3d5c2b35a2eceb4fbe1136b50a86dfadd6f0` reran QA `37213779632`, smoke `37213779633` and CodeQL `37213779727` before canonical Release run `37214354533` published v1.7.10.
+MailPin uses a privileged Thunderbird Experiment for `about:3pane`, local SQLite and selected Messages/Tags/Calendar integration behind `PinCompatibility`. Published target `fce07e98e2a056f38bfc7143766a71d1f7923e44` passed QA, CodeQL and real Thunderbird 158.0 smoke before publication. Detailed evidence is in [the validation report](VALIDATION_REPORT_1.7.11.md).
 
 ## Install
 
 ### Add-ons for Thunderbird
 
-The [MailPin listing on Add-ons for Thunderbird](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/) exists. GitHub release 1.7.10 is separate from the Add-ons for Thunderbird review cycle.
+The [MailPin listing on Add-ons for Thunderbird](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/) exists. GitHub release 1.7.11 is separate from the Add-ons for Thunderbird review cycle.
 
 ### GitHub release
 
-1. Download `MailPin_v1.7.10.xpi` from release `v1.7.10`.
+1. Download `MailPin_v1.7.11.xpi` from release `v1.7.11`.
 2. Thunderbird → **Add-ons and Themes** → gear menu → **Install Add-on From File**.
 3. Select the XPI.
 
@@ -90,4 +90,4 @@ Maintained by [ussmarines](https://github.com/ussmarines). [PayPal](https://payp
 
 MailPin is distributed under the **MailPin Source-Available License 1.1**. See [LICENSE](LICENSE).
 
-The local 1.7.11 candidate targets Thunderbird 153.0–158.*. See [candidate validation](VALIDATION_REPORT_1.7.11.md) for executed checks and remaining release gates. The public 1.7.10 release remains limited to 157.*.
+Release 1.7.11 supports Thunderbird 153.0–158.*. Fresh synthetic runtime scenarios passed on Windows and Linux 158.0; see [validation and remaining limits](VALIDATION_REPORT_1.7.11.md). The lower supported versions and macOS were not retested for this maintenance.

@@ -1,19 +1,13 @@
 {
   "schema_version": 1,
   "purpose": "Cache machine-readable des dernières preuves de validation réutilisables. Ce fichier ne remplace ni AGENTS.md ni les règles de sécurité et ne doit jamais servir à inventer un test non exécuté.",
-  "recorded_at": "2026-10-15T16:37:18+02:00",
+  "recorded_at": "2026-10-15T16:55:46+02:00",
   "baseline": {
     "repository": "ussmarines/mailpin-thunderbird",
-    "branch": "codex/thunderbird-158-compatibility",
-    "commit_sha": "048867671e7bf9e8ccd71529676b1b4814da3916",
-    "working_tree_patch_id": "0fce605d8e69c6bec409aee3290d286698da0a85",
-    "untracked_candidate_files": [],
-    "patch_scope": [
-      "extension",
-      "package.json",
-      "tests",
-      ".github/workflows/thunderbird-smoke.yml"
-    ]
+    "branch": "main",
+    "commit_sha": "fce07e98e2a056f38bfc7143766a71d1f7923e44",
+    "working_tree_patch_id": "",
+    "untracked_candidate_files": []
   },
   "policy": {
     "mode": "latest-valid-evidence-only",
@@ -39,72 +33,91 @@
   },
   "repository_checks": [
     {
-      "id": "local-source-validation-1-7-11",
+      "id": "github-candidate-1-7-11",
       "result": "success",
-      "validated_commit": "048867671e7bf9e8ccd71529676b1b4814da3916",
-      "working_tree_patch_id": "0fce605d8e69c6bec409aee3290d286698da0a85",
-      "patch_scope": [
-        "extension",
-        "package.json",
-        "tests",
-        ".github/workflows/thunderbird-smoke.yml"
-      ],
-      "validated_at": "2026-10-15T16:36:13+02:00",
-      "command": "npm run check; npm test (component-wise continuation after initial npm run ci guard failures)",
+      "validated_commit": "c19bd4054c9632ce44bbda4a1512c6b1ab6ae910",
+      "working_tree_patch_id": "",
+      "validated_at": "2026-10-15T16:55:46+02:00",
+      "command": "GitHub QA 38754605711, real Thunderbird 158 smoke 38754605738, CodeQL 38754601088",
       "environment": {
-        "os": "Windows",
-        "python": "3.14.6",
-        "node": "26.8.1",
-        "npm": "11.19.0"
+        "ci": "GitHub Actions",
+        "linux": "ubuntu-24.04",
+        "windows": "windows-latest",
+        "thunderbird": "158.0"
       },
       "invalidates_on": [
         "extension/**",
-        "tests/**",
-        "scripts/**",
         "package.json",
+        "scripts/**",
+        "tests/**",
         ".github/**",
         "docs/**",
         "*.md",
         "release/**"
       ],
       "evidence": {
-        "kind": "local-command-logs",
-        "paths": [
-          "artifacts/validation/check-158.log",
-          "artifacts/validation/test-158-final.log"
-        ],
-        "notes": "No CI or GitHub candidate validation claim; initial guard failures retained. Final metadata-only edits receive targeted guards."
+        "kind": "github-exact-target-gates",
+        "qa_run": 38754605711,
+        "thunderbird_smoke_run": 38754605738,
+        "codeql_run": 38754601088
       }
     },
     {
-      "id": "local-build-reviewer-1-7-11",
+      "id": "github-release-target-1-7-11",
       "result": "success",
-      "validated_commit": "048867671e7bf9e8ccd71529676b1b4814da3916",
-      "working_tree_patch_id": "0fce605d8e69c6bec409aee3290d286698da0a85",
-      "patch_scope": [
-        "extension",
-        "package.json",
-        "tests",
-        ".github/workflows/thunderbird-smoke.yml"
-      ],
-      "validated_at": "2026-10-15T16:37:18+02:00",
-      "command": "npm run build; python artifacts/validation/reviewer158.py",
+      "validated_commit": "fce07e98e2a056f38bfc7143766a71d1f7923e44",
+      "working_tree_patch_id": "",
+      "validated_at": "2026-10-15T16:55:46+02:00",
+      "command": "GitHub QA 38754897029, real Thunderbird 158 smoke 38754897259, CodeQL 38754896607",
       "environment": {
-        "os": "Windows",
-        "python": "3.14.6",
-        "zlib": "1.3.1.zlib-ng"
+        "ci": "GitHub Actions",
+        "linux": "ubuntu-24.04",
+        "windows": "windows-latest",
+        "thunderbird": "158.0"
       },
       "invalidates_on": [
         "extension/**",
-        "scripts/build.py",
         "package.json",
-        ".gitattributes"
+        "scripts/**",
+        "tests/**",
+        ".github/**",
+        "docs/**",
+        "*.md",
+        "release/**"
       ],
       "evidence": {
-        "kind": "local-build-and-reviewer-without-git",
-        "path": "artifacts/validation/reviewer-build.json",
-        "xpi_sha256": "5373ecd6d981ced8411312ac18eb4323e6ca01f5f20b47426758ae66613c802f",
-        "notes": "Reviewer XPI byte-identical on this environment; no cross-OS binary identity claim. Source archive hash stays external to avoid self-reference."
+        "kind": "github-exact-target-gates",
+        "qa_run": 38754897029,
+        "thunderbird_smoke_run": 38754897259,
+        "codeql_run": 38754896607
+      }
+    },
+    {
+      "id": "github-publication-1-7-11",
+      "result": "success",
+      "validated_commit": "fce07e98e2a056f38bfc7143766a71d1f7923e44",
+      "working_tree_patch_id": "",
+      "validated_at": "2026-10-15T16:55:46+02:00",
+      "command": "Release workflow 38755293619; gh release download v1.7.11; SHA-256/QA comparison; public source reviewer rebuild",
+      "environment": {
+        "ci": "GitHub Actions",
+        "release_os": "ubuntu-24.04",
+        "verification_os": "Windows"
+      },
+      "invalidates_on": [
+        "extension/**",
+        "package.json",
+        "scripts/build.py"
+      ],
+      "evidence": {
+        "kind": "immutable-release-download-verification",
+        "release_tag": "v1.7.11",
+        "release_target": "fce07e98e2a056f38bfc7143766a71d1f7923e44",
+        "release_run": 38755293619,
+        "public_asset_verification": "three assets independently downloaded, GitHub digests and SHA256SUMS match; archives byte-identical to target QA; public source rebuild content-identical",
+        "xpi_sha256": "9332bb52f0954799d73f8b655423620ba00f00501c7351981d1d2f5c13ec9a63",
+        "local_proof": "artifacts/published-1.7.11/verification.json",
+        "scope": "immutable tag target; later documentation commits do not replace published assets"
       }
     }
   ],
