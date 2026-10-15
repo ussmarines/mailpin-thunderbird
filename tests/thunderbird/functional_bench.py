@@ -159,6 +159,7 @@ const initialPanelScope = arguments[2] === "selectedAccounts" ? "selectedAccount
     return (hash >>> 0).toString(16);
   };
   const refs = {};
+  MailServices.tags.addTagForKey("mailpin-bench-personal", "Synthetic personal tag", "#2468ac", "");
   const manualOrder = [];
   const now = Date.now();
   const senders = ["Ada Lovelace", "Grace Hopper", "Margaret Hamilton", "Alan Turing", "Katherine Johnson", "Hedy Lamarr"];
@@ -193,6 +194,7 @@ const initialPanelScope = arguments[2] === "selectedAccounts" ? "selectedAccount
     addMessage(folder, raw);
     const hdr = folder.msgDatabase.getMsgHdrForMessageID(messageId);
     if (!hdr) throw new Error(`Synthetic header ${index} was not indexed`);
+    if (index === 0) folder.addKeywordsToMessages([hdr], "mailpin-bench-personal");
     const accountKey = String(syntheticAccounts[servers.indexOf(folder.server)]?.key || "unknown");
     const conversation = index % 10 === 0;
     const simpleCard = index < 4;
@@ -1024,6 +1026,43 @@ const done = arguments[arguments.length - 1];
 """
 
 
+TAG_SYNC_CONTENT_SCRIPT = r"""
+const done = arguments[arguments.length - 1];
+(async () => {
+  const enabled = Boolean(arguments[0]);
+  await browser.pinInbox.setConfiguration({settings:{enableThunderbirdTagSync:enabled}});
+  const result = await browser.pinInbox.syncTags([]);
+  if (result.errors) throw new Error(`Tag sync reported ${result.errors} errors`);
+  done({enabled, result});
+})().catch(error => done({__mailperchSmokeError:String(error)}));
+"""
+
+TAG_SYNC_STATE_SCRIPT = r"""
+const done = arguments[arguments.length - 1];
+try {
+  const {MailServices} = ChromeUtils.importESModule("resource:///modules/MailServices.sys.mjs");
+  const enabled = Boolean(arguments[0]);
+  const managed = MailServices.tags.getAllTags().filter(tag => tag.key.startsWith("mailperch-"));
+  if ((managed.length === 6) !== enabled || (!enabled && managed.length)) throw new Error(`Unexpected managed tag definitions: ${managed.length}`);
+  if (MailServices.tags.getTagForKey("mailpin-bench-personal") !== "Synthetic personal tag" || MailServices.tags.getColorForKey("mailpin-bench-personal") !== "#2468ac") throw new Error("Personal tag definition changed");
+  let personal = 0, tagged = 0;
+  for (const account of MailServices.accounts.accounts) {
+    for (const folder of account.incomingServer.rootFolder.subFolders) {
+      if (!folder.name.startsWith("MailPin Bench ")) continue;
+      for (const header of folder.messages) {
+        const keys = String(header.getStringProperty("keywords") || "").split(/\s+/);
+        if (keys.includes("mailpin-bench-personal")) personal++;
+        if (keys.some(key => managed.some(tag => tag.key === key))) tagged++;
+        if (!enabled && keys.some(key => /^mailperch-(active|waiting|planned|completed|important|follow-up)$/.test(key))) throw new Error("Managed keyword remained after disabling sync");
+      }
+    }
+  }
+  if (personal !== 1 || (enabled && tagged !== Number(arguments[1]))) throw new Error(`Tag keyword counts personal=${personal}, managed=${tagged}`);
+  done({enabled, definitions:managed.length, tagged, personal});
+} catch(error) { done({__mailperchSmokeError:String(error)}); }
+"""
+
+
 THEME_BENCH_SCRIPT = r"""
 const done = arguments[arguments.length - 1];
 const dark = Boolean(arguments[0]);
@@ -1038,10 +1077,14 @@ const dark = Boolean(arguments[0]);
     String(tab.browser?.currentURI?.spec || tab.chromeBrowser?.currentURI?.spec || "") === "about:3pane"
   );
   if (mailTab && typeof tabmail.switchToTab === "function") tabmail.switchToTab(mailTab);
+  // The horizontal-control/two-card assertions below describe a wide mail
+  // column. Do not inherit the platform's default narrow vertical split.
+  const pane = tabmail?.currentAbout3Pane;
+  pane.paneLayout.messagePaneSplitter.isCollapsed = true;
   Services.prefs.setIntPref("ui.systemUsesDarkTheme", dark ? 1 : 0);
   await new Promise(resolve => win.setTimeout(resolve, 750));
-  const pane = tabmail?.currentAbout3Pane;
-  const panel = pane?.document.getElementById("pin-mails-panel");
+  const doc = pane.document;
+  const panel = doc.getElementById("pin-mails-panel");
   const cards = [...(panel?.querySelectorAll(".pin-mails-card") || [])];
   if (!panel || cards.length < 2) throw new Error("Two panel cards are not available for theme evidence");
   const list = panel.querySelector(".pin-mails-panel-list");
@@ -1059,10 +1102,21 @@ const dark = Boolean(arguments[0]);
   const pin = cards[0].querySelector(".pin-mails-card-pin");
   const pinStyle = pane.getComputedStyle(pin);
   const pinMask = pane.getComputedStyle(pin, "::before");
-  const parseRgb = value => { const match=String(value||"").match(/rgba?\((\d+(?:\.\d+)?)[, ]+(\d+(?:\.\d+)?)[, ]+(\d+(?:\.\d+)?)/i); return match ? match.slice(1,4).map(Number) : null; };
+  // Let Gecko resolve CSS Color 4 and alpha compositing instead of treating
+  // color(srgb ...) as an unreadable color with a zero contrast ratio.
+  const canvas = doc.createElementNS("http://www.w3.org/1999/xhtml", "canvas");
+  canvas.width = canvas.height = 1;
+  const context = canvas.getContext("2d", {willReadFrequently:true});
+  const sample = colors => {
+    context.clearRect(0, 0, 1, 1);
+    for (const color of colors) { context.fillStyle=color; context.fillRect(0, 0, 1, 1); }
+    return Array.from(context.getImageData(0, 0, 1, 1).data).slice(0, 3);
+  };
+  const colorSamplingSelfTest = JSON.stringify(sample(["white", "color(srgb 0 0 0 / 0.5)"])) === JSON.stringify(sample(["white", "rgba(0, 0, 0, 0.5)"]));
+  if (!colorSamplingSelfTest || sample(["black"])[0] !== 0 || sample(["white"])[0] !== 255) throw new Error("CSS color sampling self-test failed");
   const luminance = rgb => { if(!rgb) return null; const values=rgb.map(value=>{const c=value/255; return c<=0.04045?c/12.92:((c+0.055)/1.055)**2.4;}); return 0.2126*values[0]+0.7152*values[1]+0.0722*values[2]; };
-  const effectiveBackground = element => { for(let current=element; current; current=current.parentElement){ const value=pane.getComputedStyle(current).backgroundColor; if(value && value!=="transparent" && !/^rgba\([^)]*,\s*0(?:\.0+)?\)$/.test(value)) return value; } return pane.getComputedStyle(doc.documentElement).backgroundColor; };
-  const contrast = element => { const fg=luminance(parseRgb(pane.getComputedStyle(element).color)); const bg=luminance(parseRgb(effectiveBackground(element))); if(fg==null||bg==null)return 0; return (Math.max(fg,bg)+0.05)/(Math.min(fg,bg)+0.05); };
+  const backgrounds = element => { const colors=[]; for(let current=element; current; current=current.parentElement) colors.unshift(pane.getComputedStyle(current).backgroundColor); return ["white", ...colors]; };
+  const contrast = element => { const colors=backgrounds(element); const bg=luminance(sample(colors)); const fg=luminance(sample([...colors,pane.getComputedStyle(element).color])); return (Math.max(fg,bg)+0.05)/(Math.min(fg,bg)+0.05); };
   const searchElement=panel.querySelector(".pin-mails-search");
   const filterElement=panel.querySelector(".pin-mails-smart-view-select");
   const listStyle=pane.getComputedStyle(list);
@@ -1376,6 +1430,12 @@ def _run_volume(args: argparse.Namespace, volume: int, output_dir: pathlib.Path,
                     raise SmokeFailure(f"Dashboard DOM runtime validation failed: {dashboard_content!r}")
                 result["dashboard"]["content"]=dashboard_content
                 result["checks"].append("dashboard-dom-runtime")
+                result["tagSync"] = []
+                for enabled in (True, False):
+                    transition = client.execute_async(REMOTE_TAB_ASYNC_SCRIPT, ["dashboard/dashboard.html", TAG_SYNC_CONTENT_SCRIPT, [enabled]])
+                    state = client.execute_async(TAG_SYNC_STATE_SCRIPT, [enabled, volume])
+                    result["tagSync"].append({"transition": transition, "state": state})
+                result["checks"].append("real-tag-sync-and-personal-tag-preservation")
                 # Capture both real Thunderbird color-scheme variants and keep
                 # machine-readable geometry/style observations beside them.
                 light = client.execute_async(THEME_BENCH_SCRIPT, [False])

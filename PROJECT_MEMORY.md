@@ -1,11 +1,13 @@
 # Mémoire opérationnelle — MailPin
 
-> Version source : **1.7.10**
+> Version source : **1.7.11**
 > Dernière release publique : **1.7.10**
-> Branche courante : `main` ; MailPin 1.7.10 publiée
+> Branche courante : `codex/thunderbird-158-compatibility` ; candidate locale 1.7.11, non publiée
 > Extension ID : `ussmarines.mailpin@addons.thunderbird.net`
 
 ## Résumé
+
+La candidate locale 1.7.11 cible Thunderbird 158.0 sans changement du runtime métier. Le smoke Windows frais passe ; les critères complets et les gates restants sont dans `VALIDATION_REPORT_1.7.11.md`. La release publique reste 1.7.10. Aucun commit/push/PR/merge/tag/release pour cette maintenance sans autorisation explicite.
 
 MailPin est une extension Thunderbird Manifest V3 locale. La release 1.7.7 restaure la compatibilité Thunderbird 155.0 après le durcissement du chargement des sous-scripts privilégiés. Le chargeur de modules de l’Experiment utilise désormais `loadSubScriptWithOptions` avec `allowUnsafeURL: true` uniquement pour les fichiers locaux fixés dans `MODULE_PATHS` et résolus sous `context.extension.rootURI`. Aucune URL utilisateur ou distante ne construit ce chemin.
 

@@ -1,6 +1,6 @@
 # Registre des bugs MailPin
 
-Version source : **1.7.10**
+Version source : **1.7.11**
 
 Dernière release publique : **1.7.10**
 
@@ -16,6 +16,7 @@ Les détails historiques complets restent dans Git et les audits archivés. Le r
 
 | ID | Introduit | Symptôme | Cause | Fichiers | Test | Statut | Correction | Validation |
 |---|---|---|---|---|---|---|---|---|
+| MP-2026-065 | 1.7.10 | Thunderbird 158 refuse la release 1.7.10 avant chargement. | Le manifeste borne strict_max_version à 157.*. | manifeste, smoke et métadonnées | smoke réel Thunderbird 158.0 | CORRIGÉ | 1.7.11 candidate | Refus reproduit dans artifacts/thunderbird-158-baseline/result.json ; smoke candidat PASS dans artifacts/thunderbird-158-candidate/result.json. Smoke étendu, banc fonctionnel 50 et cold start PASS sous Windows 158 ; publication non autorisée. Détails : VALIDATION_REPORT_1.7.11.md. |
 | MP-2026-064 | 1.7.9 | Thunderbird 157 refuse la release 1.7.9 comme incompatible avant le démarrage de l’extension. | `strict_max_version` et le smoke runtime étaient bornés à Thunderbird 156. | `extension/manifest.json`, `.github/workflows/thunderbird-smoke.yml`, gardes et documentation Thunderbird | QA + smoke réel Thunderbird 157.0.1 | CORRIGÉ | 1.7.10 | Candidate `565f565710da6262d7a91bfbe280a943047cdc6c` : QA `37213680870` + smoke `37213680824` PASS ; target `704b3d5c2b35a2eceb4fbe1136b50a86dfadd6f0` : QA `37213779632` + smoke `37213779633` + CodeQL `37213779727` PASS ; release `37214354533` PASS. |
 | MP-2026-063 | 1.7.8 | Thunderbird 156 refuse la release 1.7.8 comme incompatible avant le démarrage de l’extension. | `strict_max_version` et le smoke runtime étaient bornés à Thunderbird 155. | `extension/manifest.json`, `.github/workflows/thunderbird-smoke.yml`, gardes et documentation Thunderbird | QA + smoke réel Thunderbird 156.0 | CORRIGÉ | 1.7.9 | Candidate `da9d97a874f5043b43a212d09b9090ad0f77d681` : QA `35224045803` + smoke `35224046106` PASS ; target `46bb9fc27256cc143743e74e4a04fb48d48f6e85` : QA `35224161719` + smoke `35224161877` PASS ; release `35224299551` PASS. |
 | MP-2026-062 | 1.7.6 | Sous Thunderbird 155.0, MailPin démarrait l’add-on mais l’Experiment échouait avant l’injection du panneau avec `Trying to load untrusted URI`. | Thunderbird 155 refuse désormais par défaut les sous-scripts `jar:`, `file:` et `moz-extension:` via `loadSubScript()`, alors que MailPin charge ses modules privilégiés depuis l’XPI. | `extension/api/pinInbox/implementation.js`, `extension/manifest.json`, smoke et gardes Thunderbird | QA + smoke réel Thunderbird 155.0 | CORRIGÉ | 1.7.7 | Candidate `94ce4d2656df8eb9694ce794743b82c00d83e8a9` : QA `33688297275` PASS, smoke `33688296968` PASS. Main `f5d5c07a0f8d375ed7347b3a42fbc57f4bafb7fb` : QA `33689155033` PASS, smoke `33689155048` PASS. Release `v1.7.7` publiée par `33689378381`. |

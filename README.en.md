@@ -7,7 +7,7 @@
 
 [![QA](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml)
 ![Release](https://img.shields.io/badge/release-v1.7.10-4F7F75)
-![Source](https://img.shields.io/badge/release-v1.7.10-3D536B)
+![Source](https://img.shields.io/badge/candidate-v1.7.11-3D536B)
 ![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x--157.x-3D536B)
 ![License](https://img.shields.io/badge/license-MailPin%20Source--Available%201.1-1A1D21)
 </div>
@@ -29,7 +29,7 @@ Release **1.7.10** extends compatibility to Thunderbird 157 after real-runtime v
 
 ## Compatibility
 
-- **Source version:** `1.7.10` — published
+- **Source version:** `1.7.11` — local candidate, not published
 - **Latest public release:** `1.7.10`
 - **Thunderbird:** `153.0` to `157.*`
 - **Format:** MailExtension Manifest V3
@@ -61,8 +61,8 @@ npm run ci
 
 Reproducible outputs from the published source:
 
-- `dist/MailPin_v1.7.10.xpi`
-- `dist/MailPin_GitHub_Repository_v1.7.10.zip`
+- `dist/MailPin_v1.7.11.xpi`
+- `dist/MailPin_GitHub_Repository_v1.7.11.zip`
 - `dist/SHA256SUMS.txt`
 
 ## Privacy & security
@@ -71,8 +71,8 @@ MailPin has no runtime network call, telemetry, advertising or remote code. Full
 
 - [Privacy](PRIVACY.md)
 - [Security](SECURITY.md)
-- [Source security audit 1.7.10](SECURITY_AUDIT_1.7.10.md)
-- [Source validation report 1.7.10](VALIDATION_REPORT_1.7.10.md)
+- [Source security audit 1.7.11](SECURITY_AUDIT_1.7.11.md)
+- [Source validation report 1.7.11](VALIDATION_REPORT_1.7.11.md)
 - [Known limitations](docs/KNOWN_LIMITATIONS.md)
 
 ## Documentation & support
@@ -89,3 +89,5 @@ Maintained by [ussmarines](https://github.com/ussmarines). [PayPal](https://payp
 ## License
 
 MailPin is distributed under the **MailPin Source-Available License 1.1**. See [LICENSE](LICENSE).
+
+The local 1.7.11 candidate targets Thunderbird 153.0–158.*. See [candidate validation](VALIDATION_REPORT_1.7.11.md) for executed checks and remaining release gates. The public 1.7.10 release remains limited to 157.*.

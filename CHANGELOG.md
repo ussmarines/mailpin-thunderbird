@@ -1,5 +1,12 @@
 # Journal des modifications
 
+## 1.7.11 — candidate de compatibilité Thunderbird 158
+
+- relève la borne déclarée à `158.*`, minimum `153.0` inchangé ;
+- cible Thunderbird 158.0 dans le smoke existant, avec SHA-256 officiel et geckodriver 0.37.1 inchangés ;
+- conserve le runtime métier, les permissions, l’identité, les schémas, SQLite et `PinCompatibility` ;
+- candidate locale non publiée : voir `VALIDATION_REPORT_1.7.11.md` pour les preuves et limites.
+
 ## 1.7.10 — compatibilité Thunderbird 157
 
 - étend la compatibilité déclarée de Thunderbird `153.0` à `157.*` ;

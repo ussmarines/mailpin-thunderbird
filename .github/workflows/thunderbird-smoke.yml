@@ -29,12 +29,12 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  THUNDERBIRD_VERSION: "157.0.1"
+  THUNDERBIRD_VERSION: "158.0"
   GECKODRIVER_VERSION: "0.37.1"
 
 jobs:
   runtime-smoke:
-    name: Real Thunderbird 157.0.1 runtime smoke
+    name: Real Thunderbird 158.0 runtime smoke
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:

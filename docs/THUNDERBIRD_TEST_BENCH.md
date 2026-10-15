@@ -56,7 +56,7 @@ Thunderbird documente officiellement `mach`/xpcshell/Mochitest pour ses propres 
 Le job :
 
 1. construit l’XPI depuis le checkout ;
-2. télécharge Thunderbird `157.0.1` depuis l’archive officielle Mozilla ;
+2. télécharge Thunderbird `158.0` depuis l’archive officielle Mozilla ;
 3. vérifie l’archive avec le `SHA256SUMS` officiel Mozilla ;
 4. télécharge geckodriver `0.37.1` depuis la release Mozilla officielle ;
 5. vérifie le SHA-256 de l’asset fourni par GitHub ;
@@ -68,7 +68,7 @@ Le job :
 11. désinstalle puis contrôle le nettoyage ;
 12. réinstalle et contrôle une nouvelle injection propre ;
 13. conserve logs, résultat JSON et captures comme artefacts ;
-14. clique le bouton Dashboard injecté et exige l’ouverture d’un unique onglet Dashboard, sans erreur runtime.
+14. vérifie pin/unpin, raccourci Alt+P réel, flags/compteurs natifs, ouverture sans défilement, Quick Filter, dossiers/onglets et Dashboard unique. Le banc fonctionnel couvre aussi les tags personnels synthétiques et leur préservation pendant activation/désactivation de la synchronisation MailPin. Les mesures de thème utilisent une colonne large contrôlée et les couleurs composées par Gecko ; le mode compact reste une validation distincte.
 
 Aucun de ces téléchargements n’est une dépendance d’exécution de MailPin. Ils existent uniquement dans l’environnement de test.
 
@@ -91,7 +91,7 @@ Lorsque le job réussit réellement, il démontre au minimum sur la version épi
 
 Il ne prouve pas à lui seul :
 
-- toute extension future de la plage Thunderbird au-delà de 157 ;
+- toute extension future de la plage Thunderbird au-delà de 158 ;
 - Windows ou macOS ;
 - IMAP/POP/Gmail/Microsoft réels ;
 - les dossiers virtuels réels ;

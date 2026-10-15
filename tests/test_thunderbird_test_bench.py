@@ -51,14 +51,19 @@ assert "panel-dashboard-button-opens-dashboard-once" in HARNESS
 assert "dashboardTabCount" in HARNESS
 assert "runtime-cleanup-after-uninstall" in HARNESS
 assert "clean-reinstall" in HARNESS
+assert "pin-unpin-native-flags-and-counters" in HARNESS
+assert "shortcut-unpin" in HARNESS and "shortcut-pin" in HARNESS
+assert "message-open-scroll-quick-filter-folder-and-tab" in HARNESS
+assert "scrollBefore <= 0" in HARNESS
+assert "scrollAfter !== scrollBefore" in HARNESS
 
 # Runtime-sensitive changes are checked on PRs and again after integration on main;
-# manual dispatch remains available for explicit reruns. Thunderbird 157.0.1 is
-# the release-candidate runtime gate for MailPin 1.7.10.
+# manual dispatch remains available for explicit reruns. Thunderbird 158.0 is
+# the release-candidate runtime gate for MailPin 1.7.11.
 assert "workflow_dispatch:" in WORKFLOW
 assert re.search(r"branches:\s*\n\s*- main", WORKFLOW)
 assert "pull_request:" in WORKFLOW
-assert 'THUNDERBIRD_VERSION: "157.0.1"' in WORKFLOW
+assert 'THUNDERBIRD_VERSION: "158.0"' in WORKFLOW
 assert 'GECKODRIVER_VERSION: "0.37.1"' in WORKFLOW
 assert "archive.mozilla.org/pub/thunderbird/releases" in WORKFLOW
 assert "SHA256SUMS" in WORKFLOW
@@ -137,6 +142,11 @@ assert "dashboard-dom-runtime" in BENCH
 assert "options-dom-runtime" in BENCH
 assert "theme-geometry-and-contrast" in BENCH
 assert "contrastRatios" in BENCH
+assert "pane.paneLayout.messagePaneSplitter.isCollapsed = true" in BENCH
+assert "getImageData(0, 0, 1, 1)" in BENCH
+assert "CSS color sampling self-test failed" in BENCH
+assert "real-tag-sync-and-personal-tag-preservation" in BENCH
+assert "Personal tag definition changed" in BENCH
 assert "ordinaryTwoFit" in BENCH
 assert "ordinaryCardHeights" in BENCH
 assert "listClientHeight" in BENCH

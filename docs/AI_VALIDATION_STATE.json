@@ -1,13 +1,19 @@
 {
   "schema_version": 1,
   "purpose": "Cache machine-readable des dernières preuves de validation réutilisables. Ce fichier ne remplace ni AGENTS.md ni les règles de sécurité et ne doit jamais servir à inventer un test non exécuté.",
-  "recorded_at": "2026-08-23T14:55:33+02:00",
+  "recorded_at": "2026-10-15T16:37:18+02:00",
   "baseline": {
     "repository": "ussmarines/mailpin-thunderbird",
-    "branch": "release/finalize-1.7.6",
-    "commit_sha": "8cf29c0d64fb0ea2b49c9568655be45514586747",
-    "working_tree_patch_id": "",
-    "untracked_candidate_files": []
+    "branch": "codex/thunderbird-158-compatibility",
+    "commit_sha": "048867671e7bf9e8ccd71529676b1b4814da3916",
+    "working_tree_patch_id": "0fce605d8e69c6bec409aee3290d286698da0a85",
+    "untracked_candidate_files": [],
+    "patch_scope": [
+      "extension",
+      "package.json",
+      "tests",
+      ".github/workflows/thunderbird-smoke.yml"
+    ]
   },
   "policy": {
     "mode": "latest-valid-evidence-only",
@@ -33,81 +39,171 @@
   },
   "repository_checks": [
     {
-      "id": "github-candidate-1-7-6-gate",
+      "id": "local-source-validation-1-7-11",
       "result": "success",
-      "validated_commit": "c502175041c85e3cb6e37666a0784f7df0a9e367",
-      "working_tree_patch_id": "",
-      "validated_at": "2026-08-23T14:43:13+02:00",
-      "command": "PR #65 QA 32640198347 + Thunderbird runtime smoke 32640198339",
+      "validated_commit": "048867671e7bf9e8ccd71529676b1b4814da3916",
+      "working_tree_patch_id": "0fce605d8e69c6bec409aee3290d286698da0a85",
+      "patch_scope": [
+        "extension",
+        "package.json",
+        "tests",
+        ".github/workflows/thunderbird-smoke.yml"
+      ],
+      "validated_at": "2026-10-15T16:36:13+02:00",
+      "command": "npm run check; npm test (component-wise continuation after initial npm run ci guard failures)",
       "environment": {
-        "ci": "GitHub Actions",
-        "linux": "ubuntu-24.04",
-        "windows": "windows-latest",
-        "thunderbird": "154.0"
+        "os": "Windows",
+        "python": "3.14.6",
+        "node": "26.8.1",
+        "npm": "11.19.0"
       },
       "invalidates_on": [
         "extension/**",
-        "package.json",
-        "scripts/**",
         "tests/**",
-        ".github/workflows/ci.yml",
-        ".github/workflows/thunderbird-smoke.yml"
+        "scripts/**",
+        "package.json",
+        ".github/**",
+        "docs/**",
+        "*.md",
+        "release/**"
       ],
       "evidence": {
-        "kind": "github-candidate-gate",
-        "summary": "MailPin 1.7.6 exact candidate passed Linux/Windows QA, identity/security guard, build/XPI checks and real Thunderbird 154 smoke before publication.",
-        "qa_run": 32640198347,
-        "thunderbird_smoke_run": 32640198339,
-        "release_tag": "v1.7.6",
-        "release_target": "522042df08c2eb7a18a13cbb83631943e54abf2c",
-        "public_asset_verification": "not independently downloaded in this session"
+        "kind": "local-command-logs",
+        "paths": [
+          "artifacts/validation/check-158.log",
+          "artifacts/validation/test-158-final.log"
+        ],
+        "notes": "No CI or GitHub candidate validation claim; initial guard failures retained. Final metadata-only edits receive targeted guards."
+      }
+    },
+    {
+      "id": "local-build-reviewer-1-7-11",
+      "result": "success",
+      "validated_commit": "048867671e7bf9e8ccd71529676b1b4814da3916",
+      "working_tree_patch_id": "0fce605d8e69c6bec409aee3290d286698da0a85",
+      "patch_scope": [
+        "extension",
+        "package.json",
+        "tests",
+        ".github/workflows/thunderbird-smoke.yml"
+      ],
+      "validated_at": "2026-10-15T16:37:18+02:00",
+      "command": "npm run build; python artifacts/validation/reviewer158.py",
+      "environment": {
+        "os": "Windows",
+        "python": "3.14.6",
+        "zlib": "1.3.1.zlib-ng"
+      },
+      "invalidates_on": [
+        "extension/**",
+        "scripts/build.py",
+        "package.json",
+        ".gitattributes"
+      ],
+      "evidence": {
+        "kind": "local-build-and-reviewer-without-git",
+        "path": "artifacts/validation/reviewer-build.json",
+        "xpi_sha256": "5373ecd6d981ced8411312ac18eb4323e6ca01f5f20b47426758ae66613c802f",
+        "notes": "Reviewer XPI byte-identical on this environment; no cross-OS binary identity claim. Source archive hash stays external to avoid self-reference."
       }
     }
   ],
   "targeted_checks": [
     {
-      "id": "startup-persisted-pins-thunderbird-154",
+      "id": "thunderbird-158-extended-smoke",
       "result": "success",
-      "validated_commit": "26fc0ac9b4d35009f125f543eefc5de9338bef71",
-      "working_tree_patch_id": "",
-      "validated_at": "2026-08-23T14:27:33+02:00",
-      "command": "functional_bench._run_scope_case volume=50 scope=A-and-C on two Thunderbird processes without Dashboard or tab activation",
+      "validated_commit": "048867671e7bf9e8ccd71529676b1b4814da3916",
+      "working_tree_patch_id": "0fce605d8e69c6bec409aee3290d286698da0a85",
+      "validated_at": "2026-10-15T16:33:16+02:00",
+      "command": "python tests/thunderbird/real_smoke.py --binary official-158 --xpi dist/MailPin_v1.7.11.xpi --geckodriver 0.37.1",
       "environment": {
         "os": "Windows",
-        "thunderbird": "154.0",
+        "thunderbird": "158.0",
+        "build": "20261008005236",
         "geckodriver": "0.37.1"
-      },
-      "invalidates_on": [
-        "extension/background.js",
-        "extension/api/pinInbox/**",
-        "tests/thunderbird/functional_bench.py",
-        "tests/thunderbird/real_smoke.py"
-      ],
-      "evidence": {
-        "kind": "real-thunderbird-cold-start",
-        "summary": "Baseline failed with the MV3 background stopped and no panel. The corrected worktree passed on the same persistent profile shape: APP_STARTUP background running, 50 SQLite refs preserved, 34 A+C cards rendered, one panel, one toggle, zero timeout and zero MailPin JavaScript exception."
-      }
-    },
-    {
-      "id": "startup-fix-github-runtime",
-      "result": "success",
-      "validated_commit": "c502175041c85e3cb6e37666a0784f7df0a9e367",
-      "working_tree_patch_id": "",
-      "validated_at": "2026-08-23T14:43:13+02:00",
-      "command": "GitHub Actions Thunderbird runtime smoke 32640198339 on exact 1.7.6 candidate",
-      "environment": {
-        "ci": "GitHub Actions",
-        "thunderbird": "154.0"
       },
       "invalidates_on": [
         "extension/**",
         "tests/thunderbird/**",
+        "tests/test_thunderbird_test_bench.py",
         ".github/workflows/thunderbird-smoke.yml"
       ],
       "evidence": {
-        "kind": "real-thunderbird-smoke",
-        "summary": "Exact versioned 1.7.6 candidate passed the real Thunderbird 154 runtime smoke before GitHub publication."
-      }
+        "kind": "fresh-real-thunderbird",
+        "path": "artifacts/thunderbird-158-extended-final/result.json",
+        "xpi_sha256": "5373ecd6d981ced8411312ac18eb4323e6ca01f5f20b47426758ae66613c802f",
+        "scope": "local candidate worktree; no CI or publication claim"
+      },
+      "patch_scope": [
+        "extension",
+        "package.json",
+        "tests",
+        ".github/workflows/thunderbird-smoke.yml"
+      ]
+    },
+    {
+      "id": "thunderbird-158-functional-50",
+      "result": "success",
+      "validated_commit": "048867671e7bf9e8ccd71529676b1b4814da3916",
+      "working_tree_patch_id": "0fce605d8e69c6bec409aee3290d286698da0a85",
+      "validated_at": "2026-10-15T16:33:16+02:00",
+      "command": "python tests/thunderbird/functional_bench.py --volumes 50 --binary official-158 --xpi dist/MailPin_v1.7.11.xpi --geckodriver 0.37.1",
+      "environment": {
+        "os": "Windows",
+        "thunderbird": "158.0",
+        "build": "20261008005236",
+        "geckodriver": "0.37.1"
+      },
+      "invalidates_on": [
+        "extension/**",
+        "tests/thunderbird/**",
+        "tests/test_thunderbird_test_bench.py",
+        ".github/workflows/thunderbird-smoke.yml"
+      ],
+      "evidence": {
+        "kind": "fresh-real-thunderbird",
+        "path": "artifacts/thunderbird-158-functional-final/results.json",
+        "xpi_sha256": "5373ecd6d981ced8411312ac18eb4323e6ca01f5f20b47426758ae66613c802f",
+        "scope": "local candidate worktree; no CI or publication claim"
+      },
+      "patch_scope": [
+        "extension",
+        "package.json",
+        "tests",
+        ".github/workflows/thunderbird-smoke.yml"
+      ]
+    },
+    {
+      "id": "thunderbird-158-cold-start",
+      "result": "success",
+      "validated_commit": "048867671e7bf9e8ccd71529676b1b4814da3916",
+      "working_tree_patch_id": "0fce605d8e69c6bec409aee3290d286698da0a85",
+      "validated_at": "2026-10-15T16:33:16+02:00",
+      "command": "functional_bench._run_scope_case volume=50 A-and-C",
+      "environment": {
+        "os": "Windows",
+        "thunderbird": "158.0",
+        "build": "20261008005236",
+        "geckodriver": "0.37.1"
+      },
+      "invalidates_on": [
+        "extension/**",
+        "tests/thunderbird/**",
+        "tests/test_thunderbird_test_bench.py",
+        ".github/workflows/thunderbird-smoke.yml"
+      ],
+      "evidence": {
+        "kind": "fresh-real-thunderbird",
+        "path": "artifacts/thunderbird-158-persistence/result.json",
+        "xpi_sha256": "5373ecd6d981ced8411312ac18eb4323e6ca01f5f20b47426758ae66613c802f",
+        "scope": "local candidate worktree; no CI or publication claim"
+      },
+      "patch_scope": [
+        "extension",
+        "package.json",
+        "tests",
+        ".github/workflows/thunderbird-smoke.yml"
+      ]
     }
   ]
 }
