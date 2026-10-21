@@ -73,7 +73,7 @@ assert "digest" in WORKFLOW
 assert "--allow-system-access" in HARNESS
 assert "xvfb-run -a" in WORKFLOW
 assert "npm run check && npm run build" in WORKFLOW
-assert "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a" in WORKFLOW
+assert "actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9" in WORKFLOW
 assert not re.search(r"uses:\s+[^\s]+@(main|master|latest)\b", WORKFLOW)
 
 # The functional/scale bench stays separate from the PR smoke. It provisions
