@@ -226,3 +226,7 @@ Le smoke PR/main cible le binaire officiel Thunderbird 157.0.1, téléchargé de
 ## Candidate MailPin 1.7.12 — Thunderbird 159.0
 
 Le workflow `.github/workflows/thunderbird-smoke.yml` cible désormais le binaire officiel 159.0, téléchargé depuis l’archive Mozilla et vérifié par SHA-256. Le smoke sur le XPI candidat doit valider l’injection `about:3pane`, l’épinglage, l’état lu/non-lu et les compteurs, le Dashboard et le nettoyage. Aucun PASS de l’ancien smoke 158 n’est transposé à 159. Les tests fournisseur/Agenda distant, multi-OS et accessibilité assistée restent indépendants. Preuves à consigner dans `../VALIDATION_REPORT_1.7.12.md`.
+
+### Preuve de publication — MailPin 1.7.12
+
+La cible finale GitHub `968832d1f2db39a227e16c0f079d3ba06f669359` a passé le smoke réel Thunderbird 159.0 [40755718258](https://github.com/ussmarines/mailpin-thunderbird/actions/runs/40755718258), avec téléchargement et checksum Mozilla officiels vérifiés, ainsi que QA `40755717992` et CodeQL `40755717952`. Release `v1.7.12` par workflow `40755984476` PASS. Cette preuve porte sur le smoke automatisé Linux, non sur tous les profils/fournisseurs et plateformes.

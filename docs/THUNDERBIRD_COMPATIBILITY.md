@@ -160,3 +160,5 @@ La release `v1.7.11` cible `fce07e98e2a056f38bfc7143766a71d1f7923e44` : QA `3875
 ### Thunderbird 159.0 — 27 octobre 2026
 
 La version 159.0 a été publiée le 27 octobre 2026 ([notes officielles](https://www.thunderbird.net/en-US/thunderbird/159.0/releasenotes/)). Elle apporte notamment des correctifs IMAP/Agenda et de sécurité, sans garantie de stabilité des API internes. La candidate MailPin 1.7.12 élargit la borne de manifeste à `159.*` et déplace le smoke sur le binaire officiel 159.0 avec vérification SHA-256 ; minimum `153.0` inchangé. Le runtime métier, l’Experiment, `PinCompatibility`, le stockage et les permissions restent inchangés. Aucune compatibilité 159 n’est déclarée validée avant smoke réel sur le SHA exact.
+
+**Publication 1.7.12 :** PR #90 QA `40755535256`, smoke réel Thunderbird 159.0 `40755535312`, CodeQL `40755524358` PASS. Après squash : target GitHub `968832d1f2db39a227e16c0f079d3ba06f669359`, QA `40755717992`, smoke `40755718258`, CodeQL `40755717952` PASS ; publisher `40755984476` PASS. Fournisseurs externes/macOS : non testés pour cette maintenance.
