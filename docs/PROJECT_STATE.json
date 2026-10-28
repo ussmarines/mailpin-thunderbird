@@ -5,8 +5,8 @@
   "extensionVersion": "1.7.12",
   "baseGitHub": {
     "branch": "main",
-    "commit": "133975ba1dd7c2d61bb8626351658abb78018b41",
-    "role": "Published 1.7.11 baseline with 1.7.12 compatibility candidate branched from current main"
+    "commit": "968832d1f2db39a227e16c0f079d3ba06f669359",
+    "role": "MailPin 1.7.12 published release/tag target, validated before publication"
   },
   "extensionId": "ussmarines.mailpin@addons.thunderbird.net",
   "thunderbird": {
@@ -91,7 +91,7 @@
     "uiDependencyPolicy": "native HTML plus local Organic Workspace CSS tokens; canonical workspace stylesheet; no runtime patch stylesheet, npm runtime dependency, bundler, CDN or remote asset",
     "runtimeTestSupplyChain": "test-only Thunderbird/geckodriver downloads are checksum-verified and are not runtime dependencies"
   },
-  "developmentBranch": "fix/thunderbird-159-compatibility",
+  "developmentBranch": "main",
   "testing": {
     "contract": [
       "tests/test_organic_workspace_ui.py",
@@ -100,9 +100,9 @@
     ],
     "runtimeWorkflow": ".github/workflows/thunderbird-smoke.yml",
     "runtimeScript": "tests/thunderbird/real_smoke.py",
-    "browserStatus": "Candidate 1.7.12 targets Thunderbird 153.0–159.*; Thunderbird 159 real-runtime validation PENDING. Published 1.7.11 was validated through 158.*.",
-    "runtimeStatus": "No Thunderbird 159 QA, smoke or release proof yet. Historical v1.7.11 proofs remain in VALIDATION_REPORT_1.7.11.md."
+    "browserStatus": "MailPin 1.7.12 published for Thunderbird 153.0–159.*. Real Thunderbird 159.0 Linux smoke PASS on exact target; provider/macOS limits remain separate.",
+    "runtimeStatus": "PR #90 head 249116323668f322d04cb37def629f8ecb19df5a QA 40755535256, smoke 40755535312, CodeQL 40755524358 PASS. Main target 968832d1f2db39a227e16c0f079d3ba06f669359 QA 40755717992, smoke 159 40755718258, CodeQL 40755717952 PASS. Publisher 40755984476 PASS; GitHub release v1.7.12 assets expose SHA-256 metadata."
   },
-  "latestPublicVersion": "1.7.11",
-  "releaseStatus": "candidate"
+  "latestPublicVersion": "1.7.12",
+  "releaseStatus": "published"
 }

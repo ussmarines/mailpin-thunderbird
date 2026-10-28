@@ -1,13 +1,13 @@
 # Mémoire opérationnelle — MailPin
 
 > Version source : **1.7.12**
-> Dernière release publique : **1.7.11**
-> Branche courante : `fix/thunderbird-159-compatibility` ; candidate 1.7.12 pour Thunderbird 159
+> Dernière release publique : **1.7.12**
+> Branche courante : `main` ; MailPin 1.7.12 publiée
 > Extension ID : `ussmarines.mailpin@addons.thunderbird.net`
 
 ## Résumé
 
-La source 1.7.12 relève uniquement la compatibilité déclarée à Thunderbird 159.0 et adapte son banc smoke. Aucune preuve runtime 159 ni publication n'est encore revendiquée ; dernière release publique 1.7.11. Détails et gates : `VALIDATION_REPORT_1.7.12.md`.
+MailPin 1.7.12 est publiée sur `v1.7.12`, cible `968832d1f2db39a227e16c0f079d3ba06f669359`. La QA, le smoke réel Thunderbird 159.0 Linux et CodeQL ont passé sur ce target ; publisher 40755984476 PASS. Aucune modification du runtime métier ni des permissions. Détails et gates : `VALIDATION_REPORT_1.7.12.md`.
 
 
 MailPin 1.7.11 est publiée sur `v1.7.11`, cible `fce07e98e2a056f38bfc7143766a71d1f7923e44`. La PR #86 et le target intégré ont passé QA, smoke réel Thunderbird 158.0 Linux et CodeQL avant le publisher canonique `38755293619`. Les artefacts publics ont été téléchargés et vérifiés ; le XPI est identique à celui de la QA/smoke du target. Les tests Windows synthétiques, la persistance et Tags/Agenda restent documentés dans `VALIDATION_REPORT_1.7.11.md`. Aucun changement métier ni soumission ATN.

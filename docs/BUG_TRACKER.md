@@ -2,7 +2,7 @@
 
 Version source : **1.7.12**
 
-Dernière release publique : **1.7.11**
+Dernière release publique : **1.7.12**
 
 Les détails historiques complets restent dans Git et les audits archivés. Le registre courant conserve les entrées encore actionnables, les dernières corrections et les IDs historiques utilisés comme preuves permanentes par les gardes de régression.
 
@@ -16,7 +16,7 @@ Les détails historiques complets restent dans Git et les audits archivés. Le r
 
 | ID | Introduit | Symptôme | Cause | Fichiers | Test | Statut | Correction | Validation |
 |---|---|---|---|---|---|---|---|---|
-| MP-2026-066 | 1.7.11 | Thunderbird 159 refuse la release publique 1.7.11 avant démarrage. | Le manifeste est borné à 158.*. | `extension/manifest.json`, smoke et métadonnées | QA, smoke réel Thunderbird 159.0 et vérification release | À VALIDER | 1.7.12 (candidate) | Borne 159.* et smoke 159.0 préparés ; preuves réelles et publication en attente. Voir VALIDATION_REPORT_1.7.12.md. |
+| MP-2026-066 | 1.7.11 | Thunderbird 159 refuse la release publique 1.7.11 avant démarrage. | Le manifeste est borné à 158.*. | `extension/manifest.json`, smoke et métadonnées | QA, smoke réel Thunderbird 159.0 et vérification release | CORRIGÉ | 1.7.12 | PR #90 QA 40755535256, smoke 40755535312, CodeQL 40755524358 PASS ; target `968832d1f2db39a227e16c0f079d3ba06f669359` QA 40755717992, smoke 159 40755718258, CodeQL 40755717952 PASS ; release 40755984476 PASS. Voir VALIDATION_REPORT_1.7.12.md. |
 | MP-2026-065 | 1.7.10 | Thunderbird 158 refuse la release 1.7.10 avant chargement. | Le manifeste borne strict_max_version à 157.*. | manifeste, smoke et métadonnées | smoke réel Thunderbird 158.0 | CORRIGÉ | 1.7.11 | Refus reproduit dans artifacts/thunderbird-158-baseline/result.json ; smoke candidat PASS dans artifacts/thunderbird-158-candidate/result.json. Smoke étendu, banc fonctionnel 50 et cold start PASS sous Windows 158 ; target `fce07e98e2a056f38bfc7143766a71d1f7923e44` QA 38754897029, smoke Linux 158 38754897259, CodeQL 38754896607 et publication 38755293619 PASS. Détails : VALIDATION_REPORT_1.7.11.md. |
 | MP-2026-064 | 1.7.9 | Thunderbird 157 refuse la release 1.7.9 comme incompatible avant le démarrage de l’extension. | `strict_max_version` et le smoke runtime étaient bornés à Thunderbird 156. | `extension/manifest.json`, `.github/workflows/thunderbird-smoke.yml`, gardes et documentation Thunderbird | QA + smoke réel Thunderbird 157.0.1 | CORRIGÉ | 1.7.10 | Candidate `565f565710da6262d7a91bfbe280a943047cdc6c` : QA `37213680870` + smoke `37213680824` PASS ; target `704b3d5c2b35a2eceb4fbe1136b50a86dfadd6f0` : QA `37213779632` + smoke `37213779633` + CodeQL `37213779727` PASS ; release `37214354533` PASS. |
 | MP-2026-063 | 1.7.8 | Thunderbird 156 refuse la release 1.7.8 comme incompatible avant le démarrage de l’extension. | `strict_max_version` et le smoke runtime étaient bornés à Thunderbird 155. | `extension/manifest.json`, `.github/workflows/thunderbird-smoke.yml`, gardes et documentation Thunderbird | QA + smoke réel Thunderbird 156.0 | CORRIGÉ | 1.7.9 | Candidate `da9d97a874f5043b43a212d09b9090ad0f77d681` : QA `35224045803` + smoke `35224046106` PASS ; target `46bb9fc27256cc143743e74e4a04fb48d48f6e85` : QA `35224161719` + smoke `35224161877` PASS ; release `35224299551` PASS. |

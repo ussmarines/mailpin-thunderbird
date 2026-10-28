@@ -8,8 +8,8 @@
 **Email Follow-up & Productivity for Thunderbird**
 
 [![QA](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml)
-![Release](https://img.shields.io/badge/release-v1.7.11-4F7F75)
-![Source](https://img.shields.io/badge/candidate-v1.7.12-3D536B)
+![Release](https://img.shields.io/badge/release-v1.7.12-4F7F75)
+![Source](https://img.shields.io/badge/release-v1.7.12-3D536B)
 ![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x--159.x-3D536B)
 ![Licence](https://img.shields.io/badge/license-MailPin%20Source--Available%201.1-1A1D21)
 </div>
@@ -27,13 +27,13 @@ MailPin transforme les e-mails importants en suivi actionnable **sans remplacer 
 
 ## Interface
 
-La candidate **1.7.12** cible Thunderbird 159.0 ; les validations réelles sur cette version restent à effectuer. Aucun changement de permission, schéma, stockage, dépendance runtime ou réseau n’est ajouté.
+La release **1.7.12** étend la compatibilité à Thunderbird 159 après smoke réel sur le binaire officiel 159.0 sous Linux. Aucun changement de permission, schéma, stockage, dépendance runtime ou réseau n’est ajouté.
 
 ## Compatibilité
 
-- **Version source :** `1.7.12` — candidate
-- **Dernière release publique :** `1.7.11`
-- **Thunderbird :** `153.0` à `159.*` (candidate)
+- **Version source :** `1.7.12` — publiée
+- **Dernière release publique :** `1.7.12`
+- **Thunderbird :** `153.0` à `159.*`
 - **Format :** MailExtension Manifest V3
 - **Langues :** français et anglais
 - **ID public :** `ussmarines.mailpin@addons.thunderbird.net`
@@ -45,11 +45,11 @@ MailPin utilise une API Experiment privilégiée pour l’intégration `about:3p
 
 ### Add-ons for Thunderbird
 
-La [fiche MailPin sur Add-ons for Thunderbird](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/) existe. La publication GitHub 1.7.11 est distincte du cycle de revue Add-ons for Thunderbird.
+La [fiche MailPin sur Add-ons for Thunderbird](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/) existe. La publication GitHub 1.7.12 est distincte du cycle de revue Add-ons for Thunderbird.
 
 ### Release GitHub
 
-1. Téléchargez `MailPin_v1.7.11.xpi` depuis la release `v1.7.11`.
+1. Téléchargez `MailPin_v1.7.12.xpi` depuis la release `v1.7.12`.
 2. Thunderbird → **Extensions et thèmes** → engrenage → **Installer un module depuis un fichier**.
 3. Sélectionnez le XPI.
 
