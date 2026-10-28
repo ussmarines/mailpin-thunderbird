@@ -1,5 +1,12 @@
 # Journal des modifications
 
+## 1.7.12 — compatibilité candidate Thunderbird 159
+
+- relève la limite déclarée à `159.*` (minimum `153.0` inchangé) ;
+- déplace le smoke réel sur le binaire officiel Thunderbird `159.0` avec vérification SHA-256 ;
+- conserve le runtime, l’identité, les permissions, les schémas, SQLite et `PinCompatibility` inchangés ;
+- validation Thunderbird 159 et nouvelle publication soumises aux gates QA, smoke réel et CodeQL.
+
 ## 1.7.11 — candidate de compatibilité Thunderbird 158
 
 - relève la borne déclarée à `158.*`, minimum `153.0` inchangé ;
