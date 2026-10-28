@@ -25,6 +25,10 @@ assert "npm run check && npm test" in ci
 assert "npm run ci" in release
 assert "gh release create" in release
 assert 'tags:\n      - "v*"' in release
+assert 'branches:\n      - "publish/v*"' in release
+assert 'test "${GITHUB_REF_NAME}" = "publish/${TAG}"' in release
+assert 'test "${GITHUB_EVENT_NAME}" = "push"' in release
+assert 'git rev-parse refs/remotes/origin/main' in release
 assert 'test "${GITHUB_REF_NAME}" = "$TAG"' in release
 assert 'test "${GITHUB_REF_NAME}" = "main"' in release
 assert "git/refs/heads" not in release
