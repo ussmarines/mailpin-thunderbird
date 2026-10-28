@@ -8,9 +8,9 @@
 **Email Follow-up & Productivity for Thunderbird**
 
 [![QA](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml)
-![Release](https://img.shields.io/badge/release-v1.7.10-4F7F75)
-![Source](https://img.shields.io/badge/release-v1.7.10-3D536B)
-![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x--157.x-3D536B)
+![Release](https://img.shields.io/badge/release-v1.7.11-4F7F75)
+![Source](https://img.shields.io/badge/candidate-v1.7.12-3D536B)
+![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x--159.x-3D536B)
 ![Licence](https://img.shields.io/badge/license-MailPin%20Source--Available%201.1-1A1D21)
 </div>
 
@@ -27,13 +27,13 @@ MailPin transforme les e-mails importants en suivi actionnable **sans remplacer 
 
 ## Interface
 
-La release **1.7.10** étend la compatibilité à Thunderbird 157 après validation réelle sur le binaire officiel 157.0.1. Aucun changement de permission, schéma, stockage, dépendance runtime ou réseau n’est ajouté.
+La candidate **1.7.12** cible Thunderbird 159.0 ; les validations réelles sur cette version restent à effectuer. Aucun changement de permission, schéma, stockage, dépendance runtime ou réseau n’est ajouté.
 
 ## Compatibilité
 
-- **Version source :** `1.7.10` — publiée
-- **Dernière release publique :** `1.7.10`
-- **Thunderbird :** `153.0` à `157.*`
+- **Version source :** `1.7.12` — candidate
+- **Dernière release publique :** `1.7.11`
+- **Thunderbird :** `153.0` à `159.*` (candidate)
 - **Format :** MailExtension Manifest V3
 - **Langues :** français et anglais
 - **ID public :** `ussmarines.mailpin@addons.thunderbird.net`
@@ -45,11 +45,11 @@ MailPin utilise une API Experiment privilégiée pour l’intégration `about:3p
 
 ### Add-ons for Thunderbird
 
-La [fiche MailPin sur Add-ons for Thunderbird](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/) existe. La publication GitHub 1.7.10 est distincte du cycle de revue Add-ons for Thunderbird.
+La [fiche MailPin sur Add-ons for Thunderbird](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/) existe. La publication GitHub 1.7.11 est distincte du cycle de revue Add-ons for Thunderbird.
 
 ### Release GitHub
 
-1. Téléchargez `MailPin_v1.7.10.xpi` depuis la release `v1.7.10`.
+1. Téléchargez `MailPin_v1.7.11.xpi` depuis la release `v1.7.11`.
 2. Thunderbird → **Extensions et thèmes** → engrenage → **Installer un module depuis un fichier**.
 3. Sélectionnez le XPI.
 
@@ -63,8 +63,8 @@ npm run ci
 
 Livrables reproductibles de la source publiée :
 
-- `dist/MailPin_v1.7.10.xpi`
-- `dist/MailPin_GitHub_Repository_v1.7.10.zip`
+- `dist/MailPin_v1.7.12.xpi`
+- `dist/MailPin_GitHub_Repository_v1.7.12.zip`
 - `dist/SHA256SUMS.txt`
 
 ## Confidentialité & sécurité
@@ -73,8 +73,8 @@ MailPin ne contient aucun appel réseau runtime, aucune télémétrie, aucune pu
 
 - [Politique de confidentialité](PRIVACY.md)
 - [Politique de sécurité](SECURITY.md)
-- [Audit sécurité source 1.7.10](SECURITY_AUDIT_1.7.10.md)
-- [Rapport de validation source 1.7.10](VALIDATION_REPORT_1.7.10.md)
+- [Audit sécurité source 1.7.10](SECURITY_AUDIT_1.7.12.md)
+- [Rapport de validation source 1.7.10](VALIDATION_REPORT_1.7.12.md)
 - [Limites connues](docs/KNOWN_LIMITATIONS.md)
 
 ## Documentation & support

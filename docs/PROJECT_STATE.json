@@ -2,16 +2,16 @@
   "format": "mailperch-project-state",
   "version": 1,
   "project": "MailPin — Email Follow-up & Productivity",
-  "extensionVersion": "1.7.11",
+  "extensionVersion": "1.7.12",
   "baseGitHub": {
     "branch": "main",
-    "commit": "fce07e98e2a056f38bfc7143766a71d1f7923e44",
-    "role": "MailPin 1.7.11 immutable release/tag target, validated before publication"
+    "commit": "133975ba1dd7c2d61bb8626351658abb78018b41",
+    "role": "Published 1.7.11 baseline with 1.7.12 compatibility candidate branched from current main"
   },
   "extensionId": "ussmarines.mailpin@addons.thunderbird.net",
   "thunderbird": {
     "min": "153.0",
-    "max": "158.*"
+    "max": "159.*"
   },
   "schemas": {
     "sqlite": 5,
@@ -91,7 +91,7 @@
     "uiDependencyPolicy": "native HTML plus local Organic Workspace CSS tokens; canonical workspace stylesheet; no runtime patch stylesheet, npm runtime dependency, bundler, CDN or remote asset",
     "runtimeTestSupplyChain": "test-only Thunderbird/geckodriver downloads are checksum-verified and are not runtime dependencies"
   },
-  "developmentBranch": "main",
+  "developmentBranch": "fix/thunderbird-159-compatibility",
   "testing": {
     "contract": [
       "tests/test_organic_workspace_ui.py",
@@ -100,9 +100,9 @@
     ],
     "runtimeWorkflow": ".github/workflows/thunderbird-smoke.yml",
     "runtimeScript": "tests/thunderbird/real_smoke.py",
-    "browserStatus": "MailPin 1.7.11 published for Thunderbird 153.0–158.*. Fresh Windows and Linux 158.0 synthetic runtime checks passed; provider/macOS limits remain separate.",
-    "runtimeStatus": "PR #86 candidate c19bd4054c9632ce44bbda4a1512c6b1ab6ae910: QA 38754605711, Thunderbird 158 smoke 38754605738, CodeQL 38754601088 PASS. Integrated release target fce07e98e2a056f38bfc7143766a71d1f7923e44: QA 38754897029, real Thunderbird 158 smoke 38754897259, CodeQL 38754896607 PASS. Release publisher 38755293619 PASS; downloaded published assets verified against SHA-256 and exact-target QA builds."
+    "browserStatus": "Candidate 1.7.12 targets Thunderbird 153.0–159.*; Thunderbird 159 real-runtime validation PENDING. Published 1.7.11 was validated through 158.*.",
+    "runtimeStatus": "No Thunderbird 159 QA, smoke or release proof yet. Historical v1.7.11 proofs remain in VALIDATION_REPORT_1.7.11.md."
   },
   "latestPublicVersion": "1.7.11",
-  "releaseStatus": "published"
+  "releaseStatus": "candidate"
 }

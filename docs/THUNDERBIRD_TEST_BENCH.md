@@ -56,7 +56,7 @@ Thunderbird documente officiellement `mach`/xpcshell/Mochitest pour ses propres 
 Le job :
 
 1. construit l’XPI depuis le checkout ;
-2. télécharge Thunderbird `158.0` depuis l’archive officielle Mozilla ;
+2. télécharge Thunderbird `159.0` depuis l’archive officielle Mozilla ;
 3. vérifie l’archive avec le `SHA256SUMS` officiel Mozilla ;
 4. télécharge geckodriver `0.37.1` depuis la release Mozilla officielle ;
 5. vérifie le SHA-256 de l’asset fourni par GitHub ;
@@ -222,3 +222,7 @@ Le 19 août 2026, la PR #52 a exécuté le smoke sur le binaire officiel **Thund
 ## Cible runtime actuelle — Thunderbird 157.0.1
 
 Le smoke PR/main cible le binaire officiel Thunderbird 157.0.1, téléchargé depuis l’archive Mozilla et vérifié avec le SHA-256 officiel. La candidate exacte `565f565710da6262d7a91bfbe280a943047cdc6c` a passé le smoke `37213680824`, puis `main` `704b3d5c2b35a2eceb4fbe1136b50a86dfadd6f0` a passé le smoke post-merge `37213779633`. Le cycle confirme le démarrage de l’Experiment/background MV3, l’injection unique du panneau et du Quick Filter, l’ouverture unique du Dashboard, le nettoyage après désinstallation et la réinstallation propre. Le banc fonctionnel volumétrique ESR reste un contrôle distinct et n’est pas modifié sans besoin.
+
+## Candidate MailPin 1.7.12 — Thunderbird 159.0
+
+Le workflow `.github/workflows/thunderbird-smoke.yml` cible désormais le binaire officiel 159.0, téléchargé depuis l’archive Mozilla et vérifié par SHA-256. Le smoke sur le XPI candidat doit valider l’injection `about:3pane`, l’épinglage, l’état lu/non-lu et les compteurs, le Dashboard et le nettoyage. Aucun PASS de l’ancien smoke 158 n’est transposé à 159. Les tests fournisseur/Agenda distant, multi-OS et accessibilité assistée restent indépendants. Preuves à consigner dans `../VALIDATION_REPORT_1.7.12.md`.

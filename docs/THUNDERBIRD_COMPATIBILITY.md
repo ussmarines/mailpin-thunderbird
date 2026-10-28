@@ -156,3 +156,7 @@ La Release officielle est 158.0 (ESR distinct : 153.5.0esr). Les notes officiell
 Sources : [versions](https://product-details.mozilla.org/1.0/thunderbird_versions.json), [notes 158](https://www.thunderbird.net/en-US/thunderbird/158.0/releasenotes/), [archives](https://archive.mozilla.org/pub/thunderbird/releases/158.0/).
 
 La release `v1.7.11` cible `fce07e98e2a056f38bfc7143766a71d1f7923e44` : QA `38754897029`, smoke réel Linux 158 `38754897259`, CodeQL `38754896607` et publisher `38755293619` PASS. Artefacts publics téléchargés et vérifiés ; XPI identique à celui du smoke de cette cible.
+
+### Thunderbird 159.0 — 27 octobre 2026
+
+La version 159.0 a été publiée le 27 octobre 2026 ([notes officielles](https://www.thunderbird.net/en-US/thunderbird/159.0/releasenotes/)). Elle apporte notamment des correctifs IMAP/Agenda et de sécurité, sans garantie de stabilité des API internes. La candidate MailPin 1.7.12 élargit la borne de manifeste à `159.*` et déplace le smoke sur le binaire officiel 159.0 avec vérification SHA-256 ; minimum `153.0` inchangé. Le runtime métier, l’Experiment, `PinCompatibility`, le stockage et les permissions restent inchangés. Aucune compatibilité 159 n’est déclarée validée avant smoke réel sur le SHA exact.

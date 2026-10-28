@@ -1,12 +1,10 @@
-# Passage de relais — MailPin 1.7.11 publiée
+# Passage de relais — candidate MailPin 1.7.12 / Thunderbird 159
 
-- branche : `main` ; version source : **1.7.11** ; dernière release publique : **1.7.11** ;
-- tag/release : `v1.7.11` → `fce07e98e2a056f38bfc7143766a71d1f7923e44` ; Thunderbird 153.0 à 158.* ;
-- ID : `ussmarines.mailpin@addons.thunderbird.net` ; runtime métier inchangé ;
-- PR #86 fusionnée après QA/smoke 158/CodeQL verts sur `c19bd4054c9632ce44bbda4a1512c6b1ab6ae910` ;
-- target intégré : QA `38754897029`, smoke réel Linux 158 `38754897259`, CodeQL `38754896607` PASS ; publisher `38755293619` PASS ;
-- trois artefacts publics téléchargés, SHA-256 vérifiés et archives identiques à la QA du target.
+- branche : `fix/thunderbird-159-compatibility` ; version source : **1.7.12** ; dernière release publique : **1.7.11** ;
+- base GitHub : `main` `133975ba1dd7c2d61bb8626351658abb78018b41` ; PR #84 native 2.2.0 draft non touchée ;
+- cible : Thunderbird 159.0 officiel (sorti le 27 octobre 2026) ; manifest `153.0` à `159.*` ;
+- périmètre : borne déclarée, banc smoke réel, documents de release/validation et garde associée ; aucun changement runtime métier, permissions, ID, schémas ou dépendance ;
+- gates : QA, smoke 159.0 réel, CodeQL, intégration et release/assets sur SHA exacts avant PASS ;
+- statut : aucun résultat 159 ni publication 1.7.12 présumés ; historique 1.7.11 dans `../VALIDATION_REPORT_1.7.11.md`.
 
-Preuves détaillées, empreintes et limites : `../VALIDATION_REPORT_1.7.11.md`, `AI_VALIDATION_STATE.json`. Les contrôles Windows synthétiques et les contrats restent valides ; fournisseurs réseau, macOS, accessibilité assistée et matrice inférieure non rejoués.
-
-Le checkout initial et ses modifications Graphify sont préservés ; PR #84 et #74 inchangées. Aucune soumission ATN. La documentation publiée après le tag ne modifie pas les assets immuables de cette release.
+Détails dans `../VALIDATION_REPORT_1.7.12.md` et `AI_VALIDATION_STATE.json`. Conserver les invariants et la validation différentielle.

@@ -2,6 +2,8 @@ name: Release
 
 on:
   push:
+    branches:
+      - "publish/v*"
     tags:
       - "v*"
   workflow_dispatch:
@@ -42,8 +44,12 @@ jobs:
           TAG="v${VERSION}"
           if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
             test "${GITHUB_REF_NAME}" = "$TAG"
-          else
+          elif [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
             test "${GITHUB_REF_NAME}" = "main"
+          else
+            test "${GITHUB_EVENT_NAME}" = "push"
+            test "${GITHUB_REF_NAME}" = "publish/${TAG}"
+            test "$(git rev-parse refs/remotes/origin/main)" = "${GITHUB_SHA}"
           fi
           awk -v version="$VERSION" '
             $0 ~ "^## " version "([[:space:]]|$)" {found=1; next}
