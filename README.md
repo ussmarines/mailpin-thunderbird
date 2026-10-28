@@ -7,8 +7,8 @@
 
 [![Install from Thunderbird Add-ons](https://img.shields.io/badge/Thunderbird%20Add--ons-Install%20MailPin-0A84FF?logo=thunderbird&logoColor=white)](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/)
 [![QA](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/badge/release-v1.7.11-4F7F75)](https://github.com/ussmarines/mailpin-thunderbird/releases/tag/v1.7.11)
-![Source](https://img.shields.io/badge/candidate-v1.7.12-3D536B)
+[![Release](https://img.shields.io/badge/release-v1.7.12-4F7F75)](https://github.com/ussmarines/mailpin-thunderbird/releases/tag/v1.7.12)
+![Source](https://img.shields.io/badge/release-v1.7.12-3D536B)
 ![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x--159.x-3D536B)
 ![Local first](https://img.shields.io/badge/local--first-no%20telemetry-4F7F75)
 ![License](https://img.shields.io/badge/license-MailPin%20Source--Available%201.1-1A1D21)
@@ -26,9 +26,9 @@ The easiest installation path is the official **Add-ons for Thunderbird** listin
 
 **[Install MailPin from Add-ons for Thunderbird](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/)**
 
-You can also install the GitHub release `v1.7.11` manually:
+You can also install the GitHub release `v1.7.12` manually:
 
-1. Download `MailPin_v1.7.11.xpi` from the [GitHub release](https://github.com/ussmarines/mailpin-thunderbird/releases/tag/v1.7.11).
+1. Download `MailPin_v1.7.12.xpi` from the [GitHub release](https://github.com/ussmarines/mailpin-thunderbird/releases/tag/v1.7.12).
 2. Open Thunderbird → **Add-ons and Themes**.
 3. Open the gear menu → **Install Add-on From File**.
 4. Select the XPI.
@@ -60,15 +60,15 @@ MailPin is aimed at people who use Thunderbird as a working inbox and need more 
 
 ## Compatibility
 
-- **Source version:** `1.7.12` — compatibility candidate (verification pending)
-- **Latest public release:** `1.7.11`
-- **Thunderbird:** `153.0` to `159.*` (candidate)
+- **Source version:** `1.7.12` — published
+- **Latest public release:** `1.7.12`
+- **Thunderbird:** `153.0` to `159.*`
 - **Extension format:** MailExtension Manifest V3
 - **Languages:** English and French
 - **Public extension ID:** `ussmarines.mailpin@addons.thunderbird.net`
 - **Repository:** https://github.com/ussmarines/mailpin-thunderbird
 
-MailPin 1.7.12 candidate uses a privileged Thunderbird Experiment for selected `about:3pane`, local SQLite, Messages, Tags and Calendar integration. The public release has been validated on Thunderbird 158.0; detailed evidence is kept in the validation and security reports rather than duplicated here.
+MailPin 1.7.12 uses a privileged Thunderbird Experiment for selected `about:3pane`, local SQLite, Messages, Tags and Calendar integration. The public release has been validated on Thunderbird 158.0; detailed evidence is kept in the validation and security reports rather than duplicated here.
 
 ## Privacy & security
 
@@ -112,4 +112,4 @@ MailPin is maintained by [ussmarines](https://github.com/ussmarines). Contributi
 
 MailPin is distributed under the **MailPin Source-Available License 1.1**. See [LICENSE](LICENSE).
 
-Candidate 1.7.12 targets Thunderbird 153.0–159.*; Thunderbird 159 real-runtime testing is pending. Public release 1.7.11 remains validated through 158.*. See [validation and remaining limits](VALIDATION_REPORT_1.7.12.md). The lower supported versions and macOS were not retested for this maintenance.
+Release 1.7.12 supports Thunderbird 153.0–159.*. Real Linux Thunderbird 159.0 runtime smoke, QA and CodeQL passed on the exact published target; other providers and macOS remain separate. See [validation and remaining limits](VALIDATION_REPORT_1.7.12.md). The lower supported versions and macOS were not retested for this maintenance.

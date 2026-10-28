@@ -1,10 +1,10 @@
-# Passage de relais — candidate MailPin 1.7.12 / Thunderbird 159
+# Passage de relais — MailPin 1.7.12 publiée
 
-- branche : `fix/thunderbird-159-compatibility` ; version source : **1.7.12** ; dernière release publique : **1.7.11** ;
-- base GitHub : `main` `133975ba1dd7c2d61bb8626351658abb78018b41` ; PR #84 native 2.2.0 draft non touchée ;
-- cible : Thunderbird 159.0 officiel (sorti le 27 octobre 2026) ; manifest `153.0` à `159.*` ;
-- périmètre : borne déclarée, banc smoke réel, documents de release/validation et garde associée ; aucun changement runtime métier, permissions, ID, schémas ou dépendance ;
-- gates : QA, smoke 159.0 réel, CodeQL, intégration et release/assets sur SHA exacts avant PASS ;
-- statut : aucun résultat 159 ni publication 1.7.12 présumés ; historique 1.7.11 dans `../VALIDATION_REPORT_1.7.11.md`.
+- branche : `main` ; version source : **1.7.12** ; dernière release publique : **1.7.12** ;
+- tag/release : `v1.7.12` → `968832d1f2db39a227e16c0f079d3ba06f669359` ; Thunderbird `153.0` à `159.*` ;
+- PR #90 squash-mergée ; PR #84 native 2.2.0 draft inchangée ;
+- QA exacte `40755717992`, smoke réel Thunderbird 159.0 Linux `40755718258`, CodeQL `40755717952` : PASS ; workflow Release `40755984476` : PASS ;
+- XPI public `MailPin_v1.7.12.xpi` (SHA-256 déclaré par GitHub `58cf44b3696a29a52d11df047760e5fba0f5cc3ac9cc908e68bc8ae4a58e3df8`) ; source reviewer et checksums publiés ;
+- limites : pas de vérification indépendante des octets téléchargés dans cette session, ni tests fournisseurs réels/macOS. Soumission ATN distincte.
 
-Détails dans `../VALIDATION_REPORT_1.7.12.md` et `AI_VALIDATION_STATE.json`. Conserver les invariants et la validation différentielle.
+Preuves : `../VALIDATION_REPORT_1.7.12.md`, `AI_VALIDATION_STATE.json`. Les mises à jour documentaires après la release n'affectent pas les assets/tag immuables.

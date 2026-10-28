@@ -1,10 +1,10 @@
 # Plan de test manuel MailPin — 1.7.12
 
-Utiliser de préférence un profil Thunderbird jetable pour les scénarios destructifs. Le présent plan complète les validations automatisées de la source 1.7.12 ; la dernière release publique est 1.7.11. Aucun contrôle non exécuté ne doit être présenté comme PASS.
+Utiliser de préférence un profil Thunderbird jetable pour les scénarios destructifs. Le présent plan complète les validations automatisées de la source 1.7.12 ; la dernière release publique est 1.7.12. Aucun contrôle non exécuté ne doit être présenté comme PASS.
 
-## Candidate 1.7.12 — Thunderbird 159.0
+## Release 1.7.12 — Thunderbird 159.0
 
-Sur profil jetable avec le XPI candidat : installer l'extension, vérifier injection unique `about:3pane`, épinglage/désépinglage, compteur de non-lus et état lu inchangés, Dashboard/Options, persistance au cold start, Quick Filter, menus/tags et Agenda facultatif, désinstallation/nettoyage. Vérifier les logs de l'Experiment ; ne déclarer PASS qu'après smoke réel et revue des sorties.
+Sur profil jetable avec le XPI candidat : installer l'extension, vérifier injection unique `about:3pane`, épinglage/désépinglage, compteur de non-lus et état lu inchangés, Dashboard/Options, persistance au cold start, Quick Filter, menus/tags et Agenda facultatif, désinstallation/nettoyage. Le smoke réel Linux Thunderbird 159.0 `40755718258` est PASS sur la cible publiée, sans profil personnel. Les fournisseurs distants, macOS et la recette humaine restent non vérifiés. Voir `../VALIDATION_REPORT_1.7.12.md`.
 
 ## Release 1.7.11 — Thunderbird 158.0
 

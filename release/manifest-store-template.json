@@ -1,5 +1,5 @@
 {
-  "note": "MailPin 1.7.12 candidate (NOT published), Thunderbird 153.0 à 159.* ; QA, smoke réel Thunderbird 159.0, CodeQL et release à vérifier. MailPin 1.7.11 publié sur GitHub reste la dernière release publique. Aucune soumission ATN incluse.",
+  "note": "MailPin 1.7.12 publié sur GitHub, Thunderbird 153.0 à 159.* ; QA 40755717992, smoke réel Thunderbird 159.0 Linux 40755718258, CodeQL 40755717952 et release 40755984476 PASS sur le target 968832d1f2db39a227e16c0f079d3ba06f669359. Fichiers publics XPI/source/SHA256SUMS avec digests GitHub ; aucun téléchargement indépendant des octets revendiqué. Soumission ATN distincte.",
   "browser_specific_settings": {
     "gecko": {
       "id": "ussmarines.mailpin@addons.thunderbird.net",
