@@ -8,8 +8,8 @@
 **Email Follow-up & Productivity for Thunderbird**
 
 [![QA](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml)
-![Release](https://img.shields.io/badge/release-v1.7.12-4F7F75)
-![Source](https://img.shields.io/badge/candidate-v1.7.13-3D536B)
+![Release](https://img.shields.io/badge/release-v1.7.13-4F7F75)
+![Source](https://img.shields.io/badge/release-v1.7.13-3D536B)
 ![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x--160.x-3D536B)
 ![Licence](https://img.shields.io/badge/license-MailPin%20Source--Available%201.1-1A1D21)
 </div>
@@ -27,29 +27,29 @@ MailPin transforme les e-mails importants en suivi actionnable **sans remplacer 
 
 ## Interface
 
-La source candidate **1.7.13** déclare Thunderbird 160.0, sans validation runtime réelle à ce stade ; la release publique **1.7.12** reste compatible jusqu’à 159.*. Aucun changement de permission, schéma, stockage, dépendance runtime ou réseau n’est ajouté.
+La release **1.7.13** prend en charge Thunderbird 160.0 après un smoke automatisé réel sous Linux, QA et CodeQL PASS sur le commit publié. Permissions, schémas, stockage, runtime et politique réseau inchangés.
 
 ## Compatibilité
 
-- **Version source :** `1.7.13` — candidate non publiée
-- **Dernière release publique :** `1.7.12`
-- **Thunderbird :** `153.0` à `160.*` (candidate ; smoke réel en attente)
+- **Version source :** `1.7.13` — publiée
+- **Dernière release publique :** `1.7.13`
+- **Thunderbird :** `153.0` à `160.*`
 - **Format :** MailExtension Manifest V3
 - **Langues :** français et anglais
 - **ID public :** `ussmarines.mailpin@addons.thunderbird.net`
 - **Fiche Add-ons for Thunderbird :** [MailPin](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/) — le cycle de soumission/revue ATN reste distinct de la release GitHub
 
-MailPin utilise une API Experiment privilégiée pour l’intégration `about:3pane`, le stockage SQLite local et certaines fonctions Messages/Tags/Agenda. Les frontières Messages, Tags et Agenda restent isolées derrière `PinCompatibility`. La candidate exacte `565f565710da6262d7a91bfbe280a943047cdc6c` a passé QA `37213680870` et le smoke réel Thunderbird 157.0.1 `37213680824` ; le target publié `704b3d5c2b35a2eceb4fbe1136b50a86dfadd6f0` a repassé QA `37213779632`, smoke `37213779633` et CodeQL `37213779727` avant publication par le workflow Release `37214354533`.
+MailPin utilise une API Experiment privilégiée pour `about:3pane`, SQLite local et certaines fonctions Messages/Tags/Agenda derrière `PinCompatibility`. La cible publiée a passé QA Linux/Windows, CodeQL et smoke réel Thunderbird 160.0 ; autres plateformes et fournisseurs restent à valider (voir [le rapport](VALIDATION_REPORT_1.7.13.md)).
 
 ## Installation
 
 ### Add-ons for Thunderbird
 
-La [fiche MailPin sur Add-ons for Thunderbird](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/) existe. La publication GitHub 1.7.12 est distincte du cycle de revue Add-ons for Thunderbird.
+La [fiche MailPin sur Add-ons for Thunderbird](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/) existe. La publication GitHub 1.7.13 est distincte du cycle de revue Add-ons for Thunderbird.
 
 ### Release GitHub
 
-1. Téléchargez `MailPin_v1.7.12.xpi` depuis la release `v1.7.12`.
+1. Téléchargez `MailPin_v1.7.13.xpi` depuis la release `v1.7.13`.
 2. Thunderbird → **Extensions et thèmes** → engrenage → **Installer un module depuis un fichier**.
 3. Sélectionnez le XPI.
 
@@ -61,7 +61,7 @@ Prérequis : Python 3.11+ et Node.js 20+.
 npm run ci
 ```
 
-Livrables reproductibles de la source candidate (non publiée) :
+Livrables reproductibles de la source publiée :
 
 - `dist/MailPin_v1.7.13.xpi`
 - `dist/MailPin_GitHub_Repository_v1.7.13.zip`
@@ -73,8 +73,8 @@ MailPin ne contient aucun appel réseau runtime, aucune télémétrie, aucune pu
 
 - [Politique de confidentialité](PRIVACY.md)
 - [Politique de sécurité](SECURITY.md)
-- [Audit sécurité source 1.7.13 candidate](SECURITY_AUDIT_1.7.13.md)
-- [Rapport de validation source 1.7.13 candidate](VALIDATION_REPORT_1.7.13.md)
+- [Audit sécurité source 1.7.13 ](SECURITY_AUDIT_1.7.13.md)
+- [Rapport de validation source 1.7.13 ](VALIDATION_REPORT_1.7.13.md)
 - [Limites connues](docs/KNOWN_LIMITATIONS.md)
 
 ## Documentation & support

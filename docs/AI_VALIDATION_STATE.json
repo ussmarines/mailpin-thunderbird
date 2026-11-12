@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "purpose": "Cache machine-readable des dernières preuves de validation réutilisables. Ce fichier ne remplace ni AGENTS.md ni les règles de sécurité et ne doit jamais servir à inventer un test non exécuté.",
-  "recorded_at": "2026-10-28T20:45:00+01:00",
+  "recorded_at": "2026-11-12T15:28:00+01:00",
   "baseline": {
     "repository": "ussmarines/mailpin-thunderbird",
     "branch": "main",
-    "commit_sha": "968832d1f2db39a227e16c0f079d3ba06f669359",
+    "commit_sha": "9bc7a0ef2c28fc2547420ea4d1e6172d50e7cf0d",
     "working_tree_patch_id": "",
     "untracked_candidate_files": []
   },
@@ -33,17 +33,17 @@
   },
   "repository_checks": [
     {
-      "id": "github-candidate-1-7-12",
+      "id": "github-candidate-1-7-13",
       "result": "success",
-      "validated_commit": "249116323668f322d04cb37def629f8ecb19df5a",
+      "validated_commit": "092a3afa4d9bf495d7110f3ab0e4550114eb3634",
       "working_tree_patch_id": "",
-      "validated_at": "2026-10-28T20:40:00+01:00",
-      "command": "GitHub QA 40755535256, real Thunderbird 159 smoke 40755535312, CodeQL 40755524358",
+      "validated_at": "2026-11-12T15:26:00+01:00",
+      "command": "GitHub QA 43236791295, real Thunderbird 160 smoke 43236791204, CodeQL 43236785838",
       "environment": {
         "ci": "GitHub Actions",
         "linux": "ubuntu-24.04",
         "windows": "windows-latest",
-        "thunderbird": "159.0"
+        "thunderbird": "160.0"
       },
       "invalidates_on": [
         "extension/**",
@@ -57,23 +57,23 @@
       ],
       "evidence": {
         "kind": "github-exact-target-gates",
-        "qa_run": 40755535256,
-        "thunderbird_smoke_run": 40755535312,
-        "codeql_run": 40755524358
+        "qa_run": 43236791295,
+        "thunderbird_smoke_run": 43236791204,
+        "codeql_run": 43236785838
       }
     },
     {
-      "id": "github-release-target-1-7-12",
+      "id": "github-release-target-1-7-13",
       "result": "success",
-      "validated_commit": "968832d1f2db39a227e16c0f079d3ba06f669359",
+      "validated_commit": "9bc7a0ef2c28fc2547420ea4d1e6172d50e7cf0d",
       "working_tree_patch_id": "",
-      "validated_at": "2026-10-28T20:40:00+01:00",
-      "command": "GitHub QA 40755717992, real Thunderbird 159 smoke 40755718258, CodeQL 40755717952",
+      "validated_at": "2026-11-12T15:27:00+01:00",
+      "command": "GitHub QA 43237043214, real Thunderbird 160 smoke 43237043458, CodeQL 43237043274",
       "environment": {
         "ci": "GitHub Actions",
         "linux": "ubuntu-24.04",
         "windows": "windows-latest",
-        "thunderbird": "159.0"
+        "thunderbird": "160.0"
       },
       "invalidates_on": [
         "extension/**",
@@ -84,18 +84,18 @@
       ],
       "evidence": {
         "kind": "github-exact-target-gates",
-        "qa_run": 40755717992,
-        "thunderbird_smoke_run": 40755718258,
-        "codeql_run": 40755717952
+        "qa_run": 43237043214,
+        "thunderbird_smoke_run": 43237043458,
+        "codeql_run": 43237043274
       }
     },
     {
-      "id": "github-publication-1-7-12",
+      "id": "github-publication-1-7-13",
       "result": "success",
-      "validated_commit": "968832d1f2db39a227e16c0f079d3ba06f669359",
+      "validated_commit": "9bc7a0ef2c28fc2547420ea4d1e6172d50e7cf0d",
       "working_tree_patch_id": "",
-      "validated_at": "2026-10-28T20:40:00+01:00",
-      "command": "Release workflow 40755984476 PASS; GitHub release API v1.7.12 with three assets and digest metadata",
+      "validated_at": "2026-11-12T15:28:00+01:00",
+      "command": "Release workflow 43237379954 PASS; GitHub release API v1.7.13 with three assets and SHA256 digests",
       "environment": {
         "ci": "GitHub Actions",
         "release_os": "ubuntu-24.04"
@@ -108,12 +108,14 @@
       ],
       "evidence": {
         "kind": "immutable-github-release-metadata",
-        "release_tag": "v1.7.12",
-        "release_target": "968832d1f2db39a227e16c0f079d3ba06f669359",
-        "release_run": 40755984476,
-        "xpi_sha256": "58cf44b3696a29a52d11df047760e5fba0f5cc3ac9cc908e68bc8ae4a58e3df8",
-        "asset_metadata": "XPI, source reviewer, SHA256SUMS present with GitHub digests; no independent asset re-download or byte comparison",
-        "scope": "immutable tag target; documentation update does not replace release assets"
+        "release_tag": "v1.7.13",
+        "release_target": "9bc7a0ef2c28fc2547420ea4d1e6172d50e7cf0d",
+        "release_run": 43237379954,
+        "xpi_sha256": "58b734de3bb8835f9fd8dc01b61115bbee3d83e8b2ebbc7ada3ec71ae93b90ec",
+        "source_sha256": "d252def3542f2e799bce041f81ca44336b490b3bae6003b017c500ebbb493f13",
+        "sums_sha256": "1ad6eeeecbf2daf5718068a7c574a4cd7bac08182f6261289bc2d2b2ddf9ef0c",
+        "asset_metadata": "XPI/source/SHA256SUMS GitHub digests match prepublication local candidate; no independent download",
+        "scope": "immutable release tag target; subsequent documentation merge does not change assets"
       }
     }
   ],

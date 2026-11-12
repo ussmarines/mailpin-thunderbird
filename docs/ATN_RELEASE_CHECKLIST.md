@@ -1,11 +1,11 @@
 # Checklist Add-ons for Thunderbird — MailPin 1.7.13
 
-Dernière release GitHub publique : **1.7.12**. La version source 1.7.13 est une candidate non publiée et non soumise à ATN.
+Dernière release GitHub publique : **1.7.13**. Version source 1.7.13 publiée sur GitHub ; **non soumise à ATN** dans cette opération.
 
-- [x] Identité publique, format MV3, permissions et runtime métier inchangés.
+- [x] Identité publique, format Manifest V3, permissions et runtime métier inchangés.
 - [x] version source 1.7.13 synchronisée, sans nouvelle dépendance runtime.
-- [ ] QA CI sur SHA GitHub exact, CodeQL et smoke réel Thunderbird 160.0 PASS.
-- [ ] Release GitHub 1.7.13 créée et trois assets/empreintes vérifiés.
-- [ ] Soumission et approbation humaine ATN (procédure indépendante).
+- [x] QA Linux/Windows, smoke réel Thunderbird 160.0 et CodeQL PASS sur la PR #94 puis sur le SHA publié (voir `../VALIDATION_REPORT_1.7.13.md`).
+- [x] Release GitHub v1.7.13 publiée avec XPI, source reviewer et SHA256SUMS ; digests GitHub contrôlés et comparés à la candidate locale.
+- [ ] Soumission et approbation humaine ATN (procédure indépendante, Experiment privilégiée).
 
-Voir `../VALIDATION_REPORT_1.7.13.md`. Les résultats locaux ne remplacent pas le smoke réel sur Thunderbird 160.
+La QA automatisée n'est pas une recette complète multi-plateforme/fournisseur ni un remplacement de la revue ATN.
