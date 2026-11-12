@@ -7,8 +7,8 @@
 
 [![Install from Thunderbird Add-ons](https://img.shields.io/badge/Thunderbird%20Add--ons-Install%20MailPin-0A84FF?logo=thunderbird&logoColor=white)](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/)
 [![QA](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/badge/release-v1.7.12-4F7F75)](https://github.com/ussmarines/mailpin-thunderbird/releases/tag/v1.7.12)
-![Source](https://img.shields.io/badge/candidate-v1.7.13-3D536B)
+[![Release](https://img.shields.io/badge/release-v1.7.13-4F7F75)](https://github.com/ussmarines/mailpin-thunderbird/releases/tag/v1.7.13)
+![Source](https://img.shields.io/badge/release-v1.7.13-3D536B)
 ![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x--160.x-3D536B)
 ![Local first](https://img.shields.io/badge/local--first-no%20telemetry-4F7F75)
 ![License](https://img.shields.io/badge/license-MailPin%20Source--Available%201.1-1A1D21)
@@ -26,9 +26,9 @@ The easiest installation path is the official **Add-ons for Thunderbird** listin
 
 **[Install MailPin from Add-ons for Thunderbird](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/)**
 
-You can also install the GitHub release `v1.7.12` manually:
+You can also install the GitHub release `v1.7.13` manually:
 
-1. Download `MailPin_v1.7.12.xpi` from the [GitHub release](https://github.com/ussmarines/mailpin-thunderbird/releases/tag/v1.7.12).
+1. Download `MailPin_v1.7.13.xpi` from the [GitHub release](https://github.com/ussmarines/mailpin-thunderbird/releases/tag/v1.7.13).
 2. Open Thunderbird → **Add-ons and Themes**.
 3. Open the gear menu → **Install Add-on From File**.
 4. Select the XPI.
@@ -60,15 +60,15 @@ MailPin is aimed at people who use Thunderbird as a working inbox and need more 
 
 ## Compatibility
 
-- **Source version:** `1.7.13` — candidate, not yet released
-- **Latest public release:** `1.7.12`
-- **Thunderbird:** `153.0` to `160.*` (candidate; runtime verification pending)
+- **Source version:** `1.7.13` — published
+- **Latest public release:** `1.7.13`
+- **Thunderbird:** `153.0` to `160.*`
 - **Extension format:** MailExtension Manifest V3
 - **Languages:** English and French
 - **Public extension ID:** `ussmarines.mailpin@addons.thunderbird.net`
 - **Repository:** https://github.com/ussmarines/mailpin-thunderbird
 
-MailPin 1.7.13 is a source candidate for Thunderbird 160.0. The privileged Experiment, `about:3pane` integration, local SQLite, Messages, Tags and Calendar boundaries remain unchanged. The GitHub release 1.7.12 is validated on Thunderbird 159.0; the 160 runtime gate remains pending.
+MailPin 1.7.13 supports Thunderbird 160.0 after QA, CodeQL and an actual Linux Thunderbird 160.0 runtime smoke on the published Git target. The privileged Experiment, `about:3pane` integration, SQLite and `PinCompatibility` remain unchanged. See [the validation report](VALIDATION_REPORT_1.7.13.md).
 
 ## Privacy & security
 
@@ -76,8 +76,8 @@ MailPin makes **no runtime network calls** and contains no telemetry, advertisin
 
 - [Privacy policy](PRIVACY.md)
 - [Security policy](SECURITY.md)
-- [Security audit — 1.7.13 candidate](SECURITY_AUDIT_1.7.13.md)
-- [Validation report — 1.7.13 candidate](VALIDATION_REPORT_1.7.13.md)
+- [Security audit — 1.7.13 ](SECURITY_AUDIT_1.7.13.md)
+- [Validation report — 1.7.13 ](VALIDATION_REPORT_1.7.13.md)
 - [Known limitations](docs/KNOWN_LIMITATIONS.md)
 
 ## Build from source
@@ -88,7 +88,7 @@ Requirements: Python 3.11+, Node.js 20+ and npm 10+.
 npm run ci
 ```
 
-Candidate-source build outputs (not a published GitHub release):
+Reproducible outputs from the published source:
 
 - `dist/MailPin_v1.7.13.xpi`
 - `dist/MailPin_GitHub_Repository_v1.7.13.zip`
@@ -112,4 +112,4 @@ MailPin is maintained by [ussmarines](https://github.com/ussmarines). Contributi
 
 MailPin is distributed under the **MailPin Source-Available License 1.1**. See [LICENSE](LICENSE).
 
-Candidate 1.7.13 declares Thunderbird 153.0–160.*. Its Thunderbird 160 runtime smoke and GitHub release gates remain PENDING; no compatibility claim is made until they pass. Public release 1.7.12 supports Thunderbird 153.0–159.*. See [validation and remaining limits](VALIDATION_REPORT_1.7.13.md).
+Release 1.7.13 supports Thunderbird 153.0–160.*. Linux Thunderbird 160.0 smoke, QA, CodeQL and the GitHub release workflow passed on the exact published target. macOS and remote providers remain separate validations. See [validation and remaining limits](VALIDATION_REPORT_1.7.13.md).

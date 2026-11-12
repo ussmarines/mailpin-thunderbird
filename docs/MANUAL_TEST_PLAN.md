@@ -1,10 +1,10 @@
 # Plan de test manuel MailPin — 1.7.13
 
-Utiliser de préférence un profil Thunderbird jetable pour les scénarios destructifs. Le présent plan complète les validations automatisées de la source 1.7.13 ; la dernière release publique est 1.7.12. Aucun contrôle non exécuté ne doit être présenté comme PASS.
+Utiliser de préférence un profil Thunderbird jetable pour les scénarios destructifs. Le présent plan complète les validations automatisées de la source 1.7.13 ; la dernière release publique est 1.7.13. Aucun contrôle non exécuté ne doit être présenté comme PASS.
 
-## Candidate 1.7.13 — Thunderbird 160.0
+## Release 1.7.13 — Thunderbird 160.0
 
-Sur un profil jetable Thunderbird 160.0 et sur le XPI exact : vérifier au démarrage le panneau `about:3pane`, l’injection unique, les épingles persistées après redémarrage, Dashboard/Options, pin/unpin sans effet sur lu/non-lu ni compteurs, Quick Filter, nettoyage à la désinstallation et réinstallation. Vérifier l’Experiment et le background MV3, puis enregistrer les captures/résultats du smoke. **Non testé à ce stade.**
+Sur un profil jetable Thunderbird 160.0 et sur le XPI exact : vérifier au démarrage le panneau `about:3pane`, l’injection unique, les épingles persistées après redémarrage, Dashboard/Options, pin/unpin sans effet sur lu/non-lu ni compteurs, Quick Filter, nettoyage à la désinstallation et réinstallation. Vérifier l’Experiment et le background MV3, puis enregistrer les captures/résultats du smoke. **Smoke automatisé Linux PASS** sur `9bc7a0ef2c28fc2547420ea4d1e6172d50e7cf0d` (run `43237043458`) : injection unique, pin/unpin sans modification des flags/compteurs, Dashboard, nettoyage et réinstallation. La persistance après cold start complet, les fournisseurs distants, Windows/macOS en UI réelle et la recette humaine restent à valider séparément.
 
 ## Release 1.7.12 — Thunderbird 159.0
 

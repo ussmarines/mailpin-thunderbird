@@ -5,8 +5,8 @@
   "extensionVersion": "1.7.13",
   "baseGitHub": {
     "branch": "main",
-    "commit": "9af16307b3bf43aef274c6a9b252092934d4ab9e",
-    "role": "verified GitHub main baseline for Thunderbird 160 compatibility candidate; not yet published"
+    "commit": "9bc7a0ef2c28fc2547420ea4d1e6172d50e7cf0d",
+    "role": "MailPin 1.7.13 published release/tag target; exact QA/Thunderbird 160 smoke/CodeQL validated before publication"
   },
   "extensionId": "ussmarines.mailpin@addons.thunderbird.net",
   "thunderbird": {
@@ -91,7 +91,7 @@
     "uiDependencyPolicy": "native HTML plus local Organic Workspace CSS tokens; canonical workspace stylesheet; no runtime patch stylesheet, npm runtime dependency, bundler, CDN or remote asset",
     "runtimeTestSupplyChain": "test-only Thunderbird/geckodriver downloads are checksum-verified and are not runtime dependencies"
   },
-  "developmentBranch": "codex/thunderbird-160-candidate",
+  "developmentBranch": "main",
   "testing": {
     "contract": [
       "tests/test_organic_workspace_ui.py",
@@ -100,9 +100,9 @@
     ],
     "runtimeWorkflow": ".github/workflows/thunderbird-smoke.yml",
     "runtimeScript": "tests/thunderbird/real_smoke.py",
-    "browserStatus": "Source candidate 1.7.13 declares Thunderbird 153.0–160.*; Thunderbird 160.0 runtime smoke PENDING; 159 evidence is historical.",
-    "runtimeStatus": "Candidate 1.7.13: real Thunderbird 160 smoke, exact GitHub QA and CodeQL PENDING; no release or ATN submission."
+    "browserStatus": "MailPin 1.7.13 published for Thunderbird 153.0–160.*. Automated real Thunderbird 160.0 Linux smoke PASS on exact published target; provider/macOS/cold-start limits remain separate.",
+    "runtimeStatus": "PR #94 head 092a3afa4d9bf495d7110f3ab0e4550114eb3634 QA 43236791295, smoke 43236791204, CodeQL 43236785838 PASS. Main target 9bc7a0ef2c28fc2547420ea4d1e6172d50e7cf0d QA 43237043214, smoke 160 43237043458, CodeQL 43237043274 PASS. Release 43237379954 PASS; GitHub assets match locally validated candidate SHA-256."
   },
-  "latestPublicVersion": "1.7.12",
-  "releaseStatus": "candidate"
+  "latestPublicVersion": "1.7.13",
+  "releaseStatus": "published"
 }

@@ -1,11 +1,10 @@
 # Revue différentielle de sécurité — MailPin 1.7.13
 
-**STATUT : CANDIDATE, pas une approbation de release.** Changement limité au numéro de version, à `strict_max_version` (`159.*` → `160.*`), au smoke sur binaire officiel Thunderbird 160.0, aux gardes et à la documentation. La liste des permissions, la CSP, le runtime, l’Experiment, `PinCompatibility`, SQLite et les contrats ne sont pas modifiés dans cette préparation.
+**PASS sur la portée différentielle vérifiée.** Passage de la borne Thunderbird `159.*` à `160.*` et version `1.7.13` ; smoke runtime sur Thunderbird officiel 160.0 avec SHA-256 de téléchargement vérifié. Runtime, API Experiment, `PinCompatibility`, identité `ussmarines.mailpin@addons.thunderbird.net`, permissions `menus`, CSP, SQLite et dépendances inchangés.
 
-- Identité attendue : `ussmarines.mailpin@addons.thunderbird.net` (sensible à la casse).
-- Aucune nouvelle permission, dépendance runtime, URL distante, télémétrie, publicité ou code distant.
-- `npm run check` local : PASS (garde de sécurité, audit, scan de secrets) ; CodeQL sur SHA GitHub exact : NON EXÉCUTÉ. Aucune preuve GitHub 1.7.13 disponible.
-- Smoke réel Thunderbird 160.0 et vérification des fichiers GitHub publiés : **PENDING**.
-- Codex Security non utilisé ; pas de scan global supplémentaire.
+- PR #94 `092a3afa4d9bf495d7110f3ab0e4550114eb3634` : QA 43236791295, smoke Thunderbird 160 43236791204 et CodeQL 43236785838 PASS.
+- Cible publiée `9bc7a0ef2c28fc2547420ea4d1e6172d50e7cf0d` : QA 43237043214, smoke 43237043458 et CodeQL 43237043274 PASS ; workflow Release 43237379954 PASS.
+- Le XPI publié expose SHA-256 `58b734de3bb8835f9fd8dc01b61115bbee3d83e8b2ebbc7ada3ec71ae93b90ec`, identique à celui de la candidate locale ; la vérification est fondée sur les digests déclarés par GitHub, sans retéléchargement indépendant de l'asset.
+- Aucun Codex Security, scan global supplémentaire, permission ou connexion runtime ajoutés.
 
-La release précédente 1.7.12 est historique et n'établit pas une compatibilité Thunderbird 160.0.
+Limites : le smoke automatisé Linux ne prouve pas tous les fournisseurs, profils, calendriers distants, macOS ni les usages prolongés. Revue ATN indépendante.

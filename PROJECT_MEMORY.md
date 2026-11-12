@@ -1,13 +1,13 @@
 # Mémoire opérationnelle — MailPin
 
 > Version source : **1.7.13**
-> Dernière release publique : **1.7.12**
-> Branche candidate : `codex/thunderbird-160-candidate` ; MailPin 1.7.13 non publiée
+> Dernière release publique : **1.7.13**
+> Branche courante : `main` ; MailPin 1.7.13 publiée
 > Extension ID : `ussmarines.mailpin@addons.thunderbird.net`
 
 ## Résumé
 
-La candidate 1.7.13 vise Thunderbird 160.0 (10 novembre 2026). La borne déclarée passe à `160.*` et le smoke est préparé sur 160.0 ; aucun résultat réel Thunderbird 160 n’est encore revendiqué. Dernière release GitHub publiée : 1.7.12, validée sur Thunderbird 159.0. Base GitHub courante `9af16307b3bf43aef274c6a9b252092934d4ab9e`, provenance de la source récupérée depuis un artefact CI exact.
+MailPin 1.7.13 est publiée sur `v1.7.13`, cible `9bc7a0ef2c28fc2547420ea4d1e6172d50e7cf0d`. PR #94 `092a3afa4d9bf495d7110f3ab0e4550114eb3634` : QA `43236791295`, smoke réel Thunderbird 160.0 `43236791204`, CodeQL `43236785838` PASS. Après squash, QA `43237043214`, smoke `43237043458` et CodeQL `43237043274` PASS ; publisher `43237379954` PASS. XPI SHA-256 `58b734de3bb8835f9fd8dc01b61115bbee3d83e8b2ebbc7ada3ec71ae93b90ec`. Le runtime métier, `PinCompatibility`, les permissions et le stockage sont inchangés. Voir `VALIDATION_REPORT_1.7.13.md`.
 
 MailPin 1.7.12 est publiée sur `v1.7.12`, cible `968832d1f2db39a227e16c0f079d3ba06f669359`. La QA, le smoke réel Thunderbird 159.0 Linux et CodeQL ont passé sur ce target ; publisher 40755984476 PASS. Aucune modification du runtime métier ni des permissions. Détails et gates : `VALIDATION_REPORT_1.7.12.md`.
 

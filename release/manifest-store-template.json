@@ -1,5 +1,5 @@
 {
-  "note": "MailPin 1.7.13 candidate non publiée pour Thunderbird 153.0 à 160.* ; MailPin 1.7.12 publié sur GitHub (153.0 à 159.*). Smoke réel Thunderbird 160, QA exacte, CodeQL et publication GitHub en attente ; aucune validation ATN revendiquée. Identité et permissions inchangées.",
+  "note": "MailPin 1.7.13 publié sur GitHub pour Thunderbird 153.0 à 160.* ; QA 43237043214, smoke réel Thunderbird 160.0 Linux 43237043458, CodeQL 43237043274 et release 43237379954 PASS sur target 9bc7a0ef2c28fc2547420ea4d1e6172d50e7cf0d. Fichiers publics XPI/source/SHA256SUMS et digests GitHub correspondent à la candidate locale. Revue ATN indépendante et non revendiquée.",
   "browser_specific_settings": {
     "gecko": {
       "id": "ussmarines.mailpin@addons.thunderbird.net",

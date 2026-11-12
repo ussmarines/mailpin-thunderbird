@@ -143,7 +143,7 @@ Thunderbird 156.0 est sorti le 15 septembre 2026. Les notes officielles ne signa
 
 Thunderbird 157.0 est sorti le 30 septembre 2026 et 157.0.1 le 1er octobre. Les notes officielles 157.0/157.0.1 ne décrivent pas de rupture WebExtension/Experiment équivalente au durcissement observé en 155, mais MailPin dépend du DOM interne `about:3pane` et d’une API Experiment privilégiée : la compatibilité n’a pas été inférée. MailPin 1.7.10 relève `strict_max_version` à `157.*`, cible le binaire officiel 157.0.1 dans le smoke et conserve le runtime métier inchangé. Preuves : candidate `565f565710da6262d7a91bfbe280a943047cdc6c` — QA `37213680870` PASS, smoke réel 157.0.1 `37213680824` PASS ; target publié `704b3d5c2b35a2eceb4fbe1136b50a86dfadd6f0` — QA `37213779632`, smoke `37213779633` et CodeQL `37213779727` PASS ; Release `37214354533` PASS.
 
-### Preuve runtime actuelle
+### Preuve runtime historique — Thunderbird 157
 
 La preuve runtime publiée pour la limite supérieure est désormais Thunderbird 157.0.1 : candidate exacte `565f565710da6262d7a91bfbe280a943047cdc6c`, smoke `37213680824` PASS, puis target publié `704b3d5c2b35a2eceb4fbe1136b50a86dfadd6f0`, smoke post-merge `37213779633` PASS. Les deux jobs utilisent le binaire officiel Thunderbird 157.0.1 et geckodriver 0.37.1 vérifiés avant exécution.
 
@@ -163,6 +163,6 @@ La version 159.0 a été publiée le 27 octobre 2026 ([notes officielles](https:
 
 **Publication 1.7.12 :** PR #90 QA `40755535256`, smoke réel Thunderbird 159.0 `40755535312`, CodeQL `40755524358` PASS. Après squash : target GitHub `968832d1f2db39a227e16c0f079d3ba06f669359`, QA `40755717992`, smoke `40755718258`, CodeQL `40755717952` PASS ; publisher `40755984476` PASS. Fournisseurs externes/macOS : non testés pour cette maintenance.
 
-### Thunderbird 160.0 — 10 novembre 2026 (candidate)
+### Thunderbird 160.0 — 10 novembre 2026 (release 1.7.13)
 
-Thunderbird 160.0 est sorti le 10 novembre 2026 ([notes officielles](https://www.thunderbird.net/en-US/thunderbird/160.0/releasenotes/)). La version source MailPin 1.7.13 relève `strict_max_version` à `160.*` et la cible de smoke à 160.0 sans changement du runtime, de l’Experiment, de `PinCompatibility`, des permissions ou du stockage. La compatibilité réelle de l’injection `about:3pane` et du panneau ne peut pas être déduite des notes de version : **smoke réel 160.0 sur SHA exact requis avant publication**. Le contrôle 159 antérieur ne constitue pas une preuve pour 160.
+Thunderbird 160.0 est sorti le 10 novembre 2026 ([notes officielles](https://www.thunderbird.net/en-US/thunderbird/160.0/releasenotes/)). MailPin 1.7.13 relève `strict_max_version` à `160.*`, sans changer l'Experiment, le DOM injecté, `PinCompatibility`, les permissions ou SQLite. PR #94 : QA `43236791295`, smoke Thunderbird 160.0 `43236791204`, CodeQL `43236785838` PASS. Après squash, cible publiée `9bc7a0ef2c28fc2547420ea4d1e6172d50e7cf0d` : QA `43237043214`, smoke réel `43237043458`, CodeQL `43237043274` PASS ; release `v1.7.13` par workflow `43237379954` PASS. Le smoke prouve l'injection et les actions essentielles sur un profil local synthétique sous Linux ; fournisseurs externes, macOS et persistance cold start ne sont pas déduits de ce gate.
