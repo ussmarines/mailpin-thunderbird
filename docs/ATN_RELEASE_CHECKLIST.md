@@ -1,11 +1,11 @@
-# Checklist Add-ons for Thunderbird — MailPin 1.7.12
+# Checklist Add-ons for Thunderbird — MailPin 1.7.13
 
-Dernière release GitHub publique : **1.7.12**. La version source 1.7.12 est publiée sur GitHub, non soumise à ATN.
+Dernière release GitHub publique : **1.7.12**. La version source 1.7.13 est une candidate non publiée et non soumise à ATN.
 
-- [x] Identité publique et Manifest V3 inchangés ; permission `menus` uniquement.
-- [x] version source 1.7.12 synchronisée, sans nouvelle dépendance runtime.
-- [x] Contrôles QA, smoke réel Thunderbird 159.0, CodeQL et XPI/source sur cible GitHub exacte (voir `../VALIDATION_REPORT_1.7.12.md`).
-- [x] XPI, archive reviewer et `SHA256SUMS.txt` présents sur la release GitHub v1.7.12 ; empreintes déclarées par GitHub contrôlées. Re-téléchargement et comparaison des octets non exécutés.
-- [ ] Soumission et approbation humaine ATN (hors périmètre de la release GitHub).
+- [x] Identité publique, format MV3, permissions et runtime métier inchangés.
+- [x] version source 1.7.13 synchronisée, sans nouvelle dépendance runtime.
+- [ ] QA CI sur SHA GitHub exact, CodeQL et smoke réel Thunderbird 160.0 PASS.
+- [ ] Release GitHub 1.7.13 créée et trois assets/empreintes vérifiés.
+- [ ] Soumission et approbation humaine ATN (procédure indépendante).
 
-Preuve Thunderbird 159 : smoke Linux sur cible publiée `968832d1f2db39a227e16c0f079d3ba06f669359` (40755718258) PASS. Les autres fournisseurs/macOS restent non vérifiés.
+Voir `../VALIDATION_REPORT_1.7.13.md`. Les résultats locaux ne remplacent pas le smoke réel sur Thunderbird 160.

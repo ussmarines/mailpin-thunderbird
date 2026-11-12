@@ -56,7 +56,7 @@ Thunderbird documente officiellement `mach`/xpcshell/Mochitest pour ses propres 
 Le job :
 
 1. construit l’XPI depuis le checkout ;
-2. télécharge Thunderbird `159.0` depuis l’archive officielle Mozilla ;
+2. télécharge Thunderbird `160.0` depuis l’archive officielle Mozilla ;
 3. vérifie l’archive avec le `SHA256SUMS` officiel Mozilla ;
 4. télécharge geckodriver `0.37.1` depuis la release Mozilla officielle ;
 5. vérifie le SHA-256 de l’asset fourni par GitHub ;
@@ -230,3 +230,7 @@ Le workflow `.github/workflows/thunderbird-smoke.yml` cible désormais le binair
 ### Preuve de publication — MailPin 1.7.12
 
 La cible finale GitHub `968832d1f2db39a227e16c0f079d3ba06f669359` a passé le smoke réel Thunderbird 159.0 [40755718258](https://github.com/ussmarines/mailpin-thunderbird/actions/runs/40755718258), avec téléchargement et checksum Mozilla officiels vérifiés, ainsi que QA `40755717992` et CodeQL `40755717952`. Release `v1.7.12` par workflow `40755984476` PASS. Cette preuve porte sur le smoke automatisé Linux, non sur tous les profils/fournisseurs et plateformes.
+
+## Candidate MailPin 1.7.13 — Thunderbird 160.0
+
+Le smoke cible Thunderbird 160.0 officiel et vérifie les empreintes de téléchargement. La suite doit confirmer `about:3pane`, le panneau MailPin unique, le background MV3, l’épinglage sans mutation des compteurs/lu, le Dashboard, le cold start et le nettoyage. À ce stade, **aucun smoke réel Thunderbird 160 n’est exécuté ou PASS** ; la preuve 159 reste historique. Voir `../VALIDATION_REPORT_1.7.13.md`.

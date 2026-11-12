@@ -1,5 +1,12 @@
 # Journal des modifications
 
+## 1.7.13 — candidate compatibilité Thunderbird 160 (non publiée)
+
+- relève la borne supérieure déclarée du manifeste de `159.*` à `160.*`, minimum `153.0` inchangé ;
+- cible Thunderbird 160.0 officiel (sortie le 10 novembre 2026) dans le smoke réel existant avec vérification SHA-256 ;
+- conserve le runtime, l’Experiment, l’identité publique, `PinCompatibility`, les permissions, les schémas, SQLite et la politique locale inchangés ;
+- publication conditionnée aux gates QA, smoke réel Thunderbird 160.0, CodeQL, revue et vérification de la release sur la cible Git exacte. Aucun PASS runtime ni release revendiqué dans la candidate.
+
 ## 1.7.12 — compatibilité Thunderbird 159
 
 - relève la limite déclarée à `159.*` (minimum `153.0` inchangé) ;

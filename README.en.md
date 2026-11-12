@@ -7,8 +7,8 @@
 
 [![QA](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml)
 ![Release](https://img.shields.io/badge/release-v1.7.12-4F7F75)
-![Source](https://img.shields.io/badge/release-v1.7.12-3D536B)
-![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x--159.x-3D536B)
+![Source](https://img.shields.io/badge/candidate-v1.7.13-3D536B)
+![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x--160.x-3D536B)
 ![License](https://img.shields.io/badge/license-MailPin%20Source--Available%201.1-1A1D21)
 </div>
 
@@ -25,25 +25,25 @@ MailPin turns important email into actionable follow-up **without replacing Thun
 
 ## Brand & interface
 
-Release **1.7.12** supports Thunderbird 159 after a real-runtime smoke on the official 159.0 binary. No permission, schema, storage, runtime dependency or network behavior changes.
+Source candidate **1.7.13** declares compatibility with Thunderbird 160.0 but has not yet passed the real-runtime smoke; public release **1.7.12** remains supported through Thunderbird 159. No permission, schema, storage, runtime dependency or network behavior changes.
 
 ## Compatibility
 
-- **Source version:** `1.7.12` — published
+- **Source version:** `1.7.13` — candidate, not yet released
 - **Latest public release:** `1.7.12`
-- **Thunderbird:** `153.0` to `159.*`
+- **Thunderbird:** `153.0` to `160.*` (candidate; runtime verification pending)
 - **Format:** MailExtension Manifest V3
 - **Locales:** French and English
 - **Public ID:** `ussmarines.mailpin@addons.thunderbird.net`
 - **Add-ons for Thunderbird listing:** [MailPin](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/) — the ATN submission/review cycle remains separate from the GitHub release
 
-MailPin uses a privileged Thunderbird Experiment for `about:3pane`, local SQLite and selected Messages/Tags/Calendar integration behind `PinCompatibility`. Published target `fce07e98e2a056f38bfc7143766a71d1f7923e44` passed QA, CodeQL and real Thunderbird 158.0 smoke before publication. Detailed evidence is in [the validation report](VALIDATION_REPORT_1.7.12.md).
+MailPin uses a privileged Thunderbird Experiment for `about:3pane`, local SQLite and selected Messages/Tags/Calendar integration behind `PinCompatibility`. Public release 1.7.12 passed QA, CodeQL and real Thunderbird 159.0 smoke; Thunderbird 160.0 remains unverified for this candidate. Detailed evidence is in [the validation report](VALIDATION_REPORT_1.7.13.md).
 
 ## Install
 
 ### Add-ons for Thunderbird
 
-The [MailPin listing on Add-ons for Thunderbird](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/) exists. GitHub release 1.7.11 is separate from the Add-ons for Thunderbird review cycle.
+The [MailPin listing on Add-ons for Thunderbird](https://addons.thunderbird.net/en-US/thunderbird/addon/mailpin/) exists. GitHub release 1.7.12 is separate from the Add-ons for Thunderbird review cycle.
 
 ### GitHub release
 
@@ -59,10 +59,10 @@ Requires Python 3.11+ and Node.js 20+.
 npm run ci
 ```
 
-Reproducible outputs from the published source:
+Reproducible outputs from the candidate source (not published):
 
-- `dist/MailPin_v1.7.12.xpi`
-- `dist/MailPin_GitHub_Repository_v1.7.12.zip`
+- `dist/MailPin_v1.7.13.xpi`
+- `dist/MailPin_GitHub_Repository_v1.7.13.zip`
 - `dist/SHA256SUMS.txt`
 
 ## Privacy & security
@@ -71,8 +71,8 @@ MailPin has no runtime network call, telemetry, advertising or remote code. Full
 
 - [Privacy](PRIVACY.md)
 - [Security](SECURITY.md)
-- [Source security audit 1.7.11](SECURITY_AUDIT_1.7.12.md)
-- [Source validation report 1.7.11](VALIDATION_REPORT_1.7.12.md)
+- [Source security audit 1.7.13 candidate](SECURITY_AUDIT_1.7.13.md)
+- [Source validation report 1.7.13 candidate](VALIDATION_REPORT_1.7.13.md)
 - [Known limitations](docs/KNOWN_LIMITATIONS.md)
 
 ## Documentation & support
@@ -90,4 +90,4 @@ Maintained by [ussmarines](https://github.com/ussmarines). [PayPal](https://payp
 
 MailPin is distributed under the **MailPin Source-Available License 1.1**. See [LICENSE](LICENSE).
 
-Release 1.7.12 supports Thunderbird 153.0–159.*. Linux Thunderbird 159.0 smoke, QA and CodeQL passed on the published target; Windows ran source and model checks, not an interactive 159 smoke. See [validation and remaining limits](VALIDATION_REPORT_1.7.12.md). The lower supported versions and macOS were not retested for this maintenance.
+Candidate 1.7.13 declares Thunderbird 153.0–160.*. Thunderbird 160.0 runtime smoke and GitHub release gates are PENDING. Public release 1.7.12 supports Thunderbird 153.0–159.*. See [validation and remaining limits](VALIDATION_REPORT_1.7.13.md).
