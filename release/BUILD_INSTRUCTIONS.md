@@ -1,13 +1,13 @@
-# Instructions de build pour les reviewers — MailPin 1.7.12
+# Instructions de build pour les reviewers — MailPin 1.7.13
 
-La source 1.7.12 est publiée ; la release GitHub **1.7.12** est publiée sur le commit `968832d1f2db39a227e16c0f079d3ba06f669359`.
+La source 1.7.13 est une candidate ; la release GitHub **1.7.12** est publiée. Aucun artefact 1.7.13 n'est publié sur GitHub à ce stade.
 
-Python 3.11+, Node.js 20+, npm 10+. Aucune dépendance tierce à installer. Depuis le checkout MailPin 1.7.12 ou l’archive reviewer extraite sans `.git` :
+Python 3.11+, Node.js 20+, npm 10+. Aucune dépendance tierce à installer. Depuis le checkout MailPin 1.7.13 ou l’archive reviewer extraits sans `.git` :
 
 ```bash
 npm run ci
 ```
 
-Livrables publics : `dist/MailPin_v1.7.12.xpi`, `dist/MailPin_GitHub_Repository_v1.7.12.zip`, `dist/SHA256SUMS.txt`.
+Livrables candidats : `dist/MailPin_v1.7.13.xpi`, `dist/MailPin_GitHub_Repository_v1.7.13.zip`, `dist/SHA256SUMS.txt`.
 
-Le XPI contient directement les sources lisibles de `extension/`. Le build depuis l’archive sans Git utilise le manifeste borné `.mailpin-source-files.json`. La reproductibilité locale ne prouve pas l’identité binaire inter-OS. La CI `40755717992`, le smoke Thunderbird 159.0 `40755718258` et le publisher `40755984476` sont PASS ; voir `../VALIDATION_REPORT_1.7.12.md`. Les checksums GitHub des assets sont disponibles ; re-téléchargement et comparaison indépendante des octets non exécutés.
+Le XPI contient les sources lisibles de `extension/`. Le build depuis l’archive sans Git utilise `.mailpin-source-files.json`. Les gates CI GitHub, smoke Thunderbird 160.0 et release officielle ne sont pas prouvés. Voir `../VALIDATION_REPORT_1.7.13.md`.

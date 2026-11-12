@@ -1,6 +1,6 @@
 # Registre des bugs MailPin
 
-Version source : **1.7.12**
+Version source : **1.7.13**
 
 Dernière release publique : **1.7.12**
 
@@ -10,6 +10,7 @@ Les détails historiques complets restent dans Git et les audits archivés. Le r
 
 | ID | Introduit | Symptôme | Cause | Fichiers | Test | Statut | Correction | Validation |
 |---|---|---|---|---|---|---|---|---|
+| MP-2026-067 | 1.7.12 | Thunderbird 160 rejette 1.7.12 à cause de la borne `159.*` ; panneau potentiellement absent. | Borne supérieure du manifeste obsolète. | Manifeste, smoke, métadonnées | Smoke réel Thunderbird 160.0 sur la candidate et cible finale | À VALIDER | Candidate 1.7.13 déclarée `160.*` ; runtime inchangé | PENDING : aucun smoke réel 160 ni release validés. |
 | MP-2026-018 | 1.1.1 | L’empreinte binaire du ZIP peut différer entre Windows et Linux malgré des contenus extraits identiques. | Différences de conteneur ZIP entre plateformes. | `scripts/build.py`, tests de reproductibilité | `tests/test_build_reproducible.py` | À VALIDER | — | Comparer les artefacts inter-plateformes et leur contenu extrait. |
 
 ## Bugs corrigés ou en validation

@@ -2,16 +2,16 @@
   "format": "mailperch-project-state",
   "version": 1,
   "project": "MailPin — Email Follow-up & Productivity",
-  "extensionVersion": "1.7.12",
+  "extensionVersion": "1.7.13",
   "baseGitHub": {
     "branch": "main",
-    "commit": "968832d1f2db39a227e16c0f079d3ba06f669359",
-    "role": "MailPin 1.7.12 published release/tag target, validated before publication"
+    "commit": "9af16307b3bf43aef274c6a9b252092934d4ab9e",
+    "role": "verified GitHub main baseline for Thunderbird 160 compatibility candidate; not yet published"
   },
   "extensionId": "ussmarines.mailpin@addons.thunderbird.net",
   "thunderbird": {
     "min": "153.0",
-    "max": "159.*"
+    "max": "160.*"
   },
   "schemas": {
     "sqlite": 5,
@@ -91,7 +91,7 @@
     "uiDependencyPolicy": "native HTML plus local Organic Workspace CSS tokens; canonical workspace stylesheet; no runtime patch stylesheet, npm runtime dependency, bundler, CDN or remote asset",
     "runtimeTestSupplyChain": "test-only Thunderbird/geckodriver downloads are checksum-verified and are not runtime dependencies"
   },
-  "developmentBranch": "main",
+  "developmentBranch": "codex/thunderbird-160-candidate",
   "testing": {
     "contract": [
       "tests/test_organic_workspace_ui.py",
@@ -100,9 +100,9 @@
     ],
     "runtimeWorkflow": ".github/workflows/thunderbird-smoke.yml",
     "runtimeScript": "tests/thunderbird/real_smoke.py",
-    "browserStatus": "MailPin 1.7.12 published for Thunderbird 153.0–159.*. Real Thunderbird 159.0 Linux smoke PASS on exact target; provider/macOS limits remain separate.",
-    "runtimeStatus": "PR #90 head 249116323668f322d04cb37def629f8ecb19df5a QA 40755535256, smoke 40755535312, CodeQL 40755524358 PASS. Main target 968832d1f2db39a227e16c0f079d3ba06f669359 QA 40755717992, smoke 159 40755718258, CodeQL 40755717952 PASS. Publisher 40755984476 PASS; GitHub release v1.7.12 assets expose SHA-256 metadata."
+    "browserStatus": "Source candidate 1.7.13 declares Thunderbird 153.0–160.*; Thunderbird 160.0 runtime smoke PENDING; 159 evidence is historical.",
+    "runtimeStatus": "Candidate 1.7.13: real Thunderbird 160 smoke, exact GitHub QA and CodeQL PENDING; no release or ATN submission."
   },
   "latestPublicVersion": "1.7.12",
-  "releaseStatus": "published"
+  "releaseStatus": "candidate"
 }

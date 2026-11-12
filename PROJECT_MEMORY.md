@@ -1,11 +1,13 @@
 # Mémoire opérationnelle — MailPin
 
-> Version source : **1.7.12**
+> Version source : **1.7.13**
 > Dernière release publique : **1.7.12**
-> Branche courante : `main` ; MailPin 1.7.12 publiée
+> Branche candidate : `codex/thunderbird-160-candidate` ; MailPin 1.7.13 non publiée
 > Extension ID : `ussmarines.mailpin@addons.thunderbird.net`
 
 ## Résumé
+
+La candidate 1.7.13 vise Thunderbird 160.0 (10 novembre 2026). La borne déclarée passe à `160.*` et le smoke est préparé sur 160.0 ; aucun résultat réel Thunderbird 160 n’est encore revendiqué. Dernière release GitHub publiée : 1.7.12, validée sur Thunderbird 159.0. Base GitHub courante `9af16307b3bf43aef274c6a9b252092934d4ab9e`, provenance de la source récupérée depuis un artefact CI exact.
 
 MailPin 1.7.12 est publiée sur `v1.7.12`, cible `968832d1f2db39a227e16c0f079d3ba06f669359`. La QA, le smoke réel Thunderbird 159.0 Linux et CodeQL ont passé sur ce target ; publisher 40755984476 PASS. Aucune modification du runtime métier ni des permissions. Détails et gates : `VALIDATION_REPORT_1.7.12.md`.
 

@@ -1,10 +1,11 @@
-# Passage de relais — MailPin 1.7.12 publiée
+# Passage de relais — candidate MailPin 1.7.13 / Thunderbird 160
 
-- branche : `main` ; version source : **1.7.12** ; dernière release publique : **1.7.12** ;
-- tag/release : `v1.7.12` → `968832d1f2db39a227e16c0f079d3ba06f669359` ; Thunderbird `153.0` à `159.*` ;
-- PR #90 squash-mergée ; PR #84 native 2.2.0 draft inchangée ;
-- QA exacte `40755717992`, smoke réel Thunderbird 159.0 Linux `40755718258`, CodeQL `40755717952` : PASS ; workflow Release `40755984476` : PASS ;
-- XPI public `MailPin_v1.7.12.xpi` (SHA-256 déclaré par GitHub `58cf44b3696a29a52d11df047760e5fba0f5cc3ac9cc908e68bc8ae4a58e3df8`) ; source reviewer et checksums publiés ;
-- limites : pas de vérification indépendante des octets téléchargés dans cette session, ni tests fournisseurs réels/macOS. Soumission ATN distincte.
+- Base GitHub vérifiée : `main` `9af16307b3bf43aef274c6a9b252092934d4ab9e` ; travailler hors `main`.
+- version source : **1.7.13** ; dernière release publique : **1.7.12** (`v1.7.12` → `968832d1f2db39a227e16c0f079d3ba06f669359`).
+- Déclaration candidate : Thunderbird 153.0–160.* ; runtime 160.0 non prouvé jusqu'au smoke du SHA GitHub exact.
+- Portée : manifeste, workflow de smoke 160.0, gardes de version, métadonnées et documentation ; aucune modification des modules runtime privilégiés.
+- Gates : `npm run ci`, CI Linux/Windows, CodeQL, smoke réel Thunderbird 160.0 et preuve du panneau, vérification des artefacts et release finale ; aucune de ces preuves GitHub 1.7.13 n'existe encore.
+- Ne pas réutiliser la preuve Thunderbird 159 comme preuve 160 ; ne pas modifier 2.2.0 draft, l’ID, les permissions ni le stockage.
+- Aucun push, PR, merge, tag ni opération de publication sans autorisation explicite correspondant à l’opération.
 
-Preuves : `../VALIDATION_REPORT_1.7.12.md`, `AI_VALIDATION_STATE.json`. Les mises à jour documentaires après la release n'affectent pas les assets/tag immuables.
+Voir `../VALIDATION_REPORT_1.7.13.md` et `AI_VALIDATION_STATE.json`.

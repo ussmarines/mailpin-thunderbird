@@ -9,8 +9,8 @@
 
 [![QA](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ussmarines/mailpin-thunderbird/actions/workflows/ci.yml)
 ![Release](https://img.shields.io/badge/release-v1.7.12-4F7F75)
-![Source](https://img.shields.io/badge/release-v1.7.12-3D536B)
-![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x--159.x-3D536B)
+![Source](https://img.shields.io/badge/candidate-v1.7.13-3D536B)
+![Thunderbird](https://img.shields.io/badge/Thunderbird-153.x--160.x-3D536B)
 ![Licence](https://img.shields.io/badge/license-MailPin%20Source--Available%201.1-1A1D21)
 </div>
 
@@ -27,13 +27,13 @@ MailPin transforme les e-mails importants en suivi actionnable **sans remplacer 
 
 ## Interface
 
-La release **1.7.12** étend la compatibilité à Thunderbird 159 après smoke réel sur le binaire officiel 159.0 sous Linux. Aucun changement de permission, schéma, stockage, dépendance runtime ou réseau n’est ajouté.
+La source candidate **1.7.13** déclare Thunderbird 160.0, sans validation runtime réelle à ce stade ; la release publique **1.7.12** reste compatible jusqu’à 159.*. Aucun changement de permission, schéma, stockage, dépendance runtime ou réseau n’est ajouté.
 
 ## Compatibilité
 
-- **Version source :** `1.7.12` — publiée
+- **Version source :** `1.7.13` — candidate non publiée
 - **Dernière release publique :** `1.7.12`
-- **Thunderbird :** `153.0` à `159.*`
+- **Thunderbird :** `153.0` à `160.*` (candidate ; smoke réel en attente)
 - **Format :** MailExtension Manifest V3
 - **Langues :** français et anglais
 - **ID public :** `ussmarines.mailpin@addons.thunderbird.net`
@@ -61,10 +61,10 @@ Prérequis : Python 3.11+ et Node.js 20+.
 npm run ci
 ```
 
-Livrables reproductibles de la source publiée :
+Livrables reproductibles de la source candidate (non publiée) :
 
-- `dist/MailPin_v1.7.12.xpi`
-- `dist/MailPin_GitHub_Repository_v1.7.12.zip`
+- `dist/MailPin_v1.7.13.xpi`
+- `dist/MailPin_GitHub_Repository_v1.7.13.zip`
 - `dist/SHA256SUMS.txt`
 
 ## Confidentialité & sécurité
@@ -73,8 +73,8 @@ MailPin ne contient aucun appel réseau runtime, aucune télémétrie, aucune pu
 
 - [Politique de confidentialité](PRIVACY.md)
 - [Politique de sécurité](SECURITY.md)
-- [Audit sécurité source 1.7.10](SECURITY_AUDIT_1.7.12.md)
-- [Rapport de validation source 1.7.10](VALIDATION_REPORT_1.7.12.md)
+- [Audit sécurité source 1.7.13 candidate](SECURITY_AUDIT_1.7.13.md)
+- [Rapport de validation source 1.7.13 candidate](VALIDATION_REPORT_1.7.13.md)
 - [Limites connues](docs/KNOWN_LIMITATIONS.md)
 
 ## Documentation & support

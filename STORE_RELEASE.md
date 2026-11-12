@@ -1,11 +1,11 @@
-# Publication MailPin 1.7.12
+# Préparation de publication MailPin 1.7.13
 
-- **Version source :** 1.7.12 — publiée
+- **Version source :** 1.7.13 — candidate locale, non publiée
 - **Dernière release publique :** 1.7.12
-- **Tag public :** `v1.7.12` → `968832d1f2db39a227e16c0f079d3ba06f669359`
-- **ID :** `ussmarines.mailpin@addons.thunderbird.net`
+- **Tag public actuel :** `v1.7.12` → `968832d1f2db39a227e16c0f079d3ba06f669359`
+- **ID canonique :** `ussmarines.mailpin@addons.thunderbird.net`
+- **Compatibilité candidate :** Thunderbird 153.0 à 160.* (non démontrée sur 160)
 - **Compatibilité publiée :** Thunderbird 153.0 à 159.*
-- **Artefact publié :** `MailPin_v1.7.12.xpi`
-- **SHA-256 XPI (métadonnées GitHub) :** `58cf44b3696a29a52d11df047760e5fba0f5cc3ac9cc908e68bc8ae4a58e3df8`
+- **Artefact candidat :** `MailPin_v1.7.13.xpi` — ne pas présenter comme release GitHub publiée
 
-QA exacte `40755717992`, smoke réel Thunderbird 159.0 `40755718258`, CodeQL `40755717952` : PASS. Publication GitHub [v1.7.12](https://github.com/ussmarines/mailpin-thunderbird/releases/tag/v1.7.12) : workflow `40755984476` PASS ; XPI, archive source reviewer et `SHA256SUMS.txt` présents avec digests GitHub. Un téléchargement indépendant des trois assets et une comparaison de leurs octets n'ont pas été exécutés ici. Aucune soumission ATN effectuée.
+**Gates avant publication :** QA Linux/Windows, smoke réel Thunderbird 160.0 vérifié SHA-256 sur la candidate exacte, CodeQL, merge squash approuvé vers `main`, mêmes contrôles sur cible finale, déclenchement contrôlé du workflow `Release`, vérification des trois assets et de leurs empreintes. Soumission ATN distincte. Aucun gate GitHub 1.7.13 revendiqué ici.
